@@ -1,4 +1,4 @@
-﻿namespace api_Devion.Models
+﻿namespace Api.Devion.Models
 {
     public class ProjectTimeChimp
     {
