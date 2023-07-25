@@ -14,9 +14,9 @@ public class customerTimeChimp
     public string? email { get; set; }
     public string? website { get; set; }
     public int paymentPeriod { get; set; }
-    public double tax { get; set; }
-    public double hourlyRate { get; set; }
-    public double mileageRate { get; set; }
+    public double? tax { get; set; }
+    public double? hourlyRate { get; set; }
+    public double? mileageRate { get; set; }
     public string? iban { get; set; }
     public string? bic { get; set; }
     public string? vatNumber { get; set; }
