@@ -16,28 +16,26 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+string api_key_timechimp = "3Hr14yu7DrW4R7YcRfSQDTjBldTpvRuqvzoUG60uN_Sqyl2dlBZakWwyIfZsH4GKeSPAkj1sp8y6zKSJhgQ8pXhAFukK9VB1AjcU97NVkqj8LO1nGof_9dy4u4Ui4EBgnt3Nmyu9tU-ia0cYcwqZJnlMDP-YunXu9hH-230PnlklEy-nHOZ7a7bORvJ0zYMM_U961cfJNeAXH39kFIDfOj9KtnGGZbgwfvDfm6KapW-uoT7ehUN1lLLVhXSTlQO1SNjRkDN15ZRLA9veYydybmizGIQtMVIxvZ726G3GCGpj4nvx";
+string baseUrl = "https://api.timechimp.com/v1/";
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/api/devion/customers", () =>
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateTime.Now.AddDays(index),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    // connection with timechimp
+    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
+    var response = client.GetAsync("customers");
+    return response;
 })
-.WithName("GetWeatherForecast");
+.WithName("GetCustomers");
+
+app.MapPost("/api/devion/customer", (customerTimeChimp customer) =>
+{
+    //connection with timechimp
+    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
+    var response = client.PostAsync("customers", JsonConvert.SerializeObject(customer));
+    return response;
+})
+.WithName("PostCustomer");
+
 
 app.Run();
-
-internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
