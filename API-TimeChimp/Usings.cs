@@ -1,6 +1,7 @@
 ﻿//own namespaces
 global using Api.Devion.Models;
 global using Api.Devion.Client;
+global using API_TimeChimp.Helpers.TimeChimp;
 
 //dotnet namespaces
 global using System;
