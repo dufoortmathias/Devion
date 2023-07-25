@@ -39,10 +39,6 @@ app.MapPost("/api/devion/customer", (customerTimeChimp customer) =>
 })
 .WithName("PostCustomer");
 
-app.MapGet("api/devion/times", () =>
-{
-    // connection with timechimp
-    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
 app.MapGet("/api/devion/projects", () =>
 {
     //connection with timechimp
@@ -52,6 +48,30 @@ app.MapGet("/api/devion/projects", () =>
     return projects;
 })
 .WithName("GetProjects");
+
+app.MapPost("/api/devion/project", (ProjectTimeChimp project) =>
+{
+    //connection with timechimp
+    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
+    var response = client.PostAsync("projects", JsonConvert.SerializeObject(project));
+    return response;
+})
+.WithName("CreateProject");
+
+app.MapPut("/api/devion/project", (ProjectTimeChimp project) =>
+{
+    //connection with timechimp
+    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
+    var response = client.PutAsync("projects", JsonConvert.SerializeObject(project));
+    return response;
+})
+.WithName("UpdateProject");
+
+app.MapGet("api/devion/times", () =>
+{
+    // connection with timechimp
+    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
+
 
     // get date from today and 7 days ago
     DateOnly today = DateOnly.FromDateTime(DateTime.Now);
@@ -102,23 +122,3 @@ app.MapGet("/api/devion/projects", () =>
 
 
 app.Run("http://localhost:5001");
-app.MapPost("/api/devion/project", (ProjectTimeChimp project) =>
-{
-    //connection with timechimp
-    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
-    var response = client.PostAsync("projects", JsonConvert.SerializeObject(project));
-    return response;
-})
-.WithName("CreateProject");
-
-app.MapPut("/api/devion/project", (ProjectTimeChimp project) =>
-{
-    //connection with timechimp
-    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
-    var response = client.PutAsync("projects", JsonConvert.SerializeObject(project));
-    return response;
-})
-.WithName("UpdateProject");
-
-
-app.Run();
