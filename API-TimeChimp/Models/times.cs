@@ -14,12 +14,12 @@ public class timeTimeChimp
     public string? userDisplayName { get; set; }
     public string[]? userTags { get; set; }
     public DateTime date { get; set; }
-    public Double hours { get; set; }
+    public Double? hours { get; set; }
     public string? notes { get; set; }
     public string? startEnd { get; set; }
     public DateTime start { get; set; }
     public DateTime end { get; set; }
-    public Double pause { get; set; }
+    public Double? pause { get; set; }
     public string? externalName { get; set; }
     public string? externalUrl { get; set; }
     public int status { get; set; }

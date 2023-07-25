@@ -1,0 +1,16 @@
+@host=localhost:5001
+
+GET http://{{host}}/api/devion/customers HTTP/1.1
+
+###
+
+POST http://{{host}}/api/devion/customer HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "test"
+}
+
+###
+
+GET http://{{host}}/api/devion/times HTTP/1.1

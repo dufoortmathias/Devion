@@ -49,4 +49,20 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
             return null;
         }
     }
+
+    public async Task<string> PutAsync(string endpoint, string jsonPayload)
+    {
+        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+        HttpResponseMessage response = await _httpClient.PutAsync(endpoint, content);
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadAsStringAsync();
+        }
+        else
+        {
+            // Handle error response if needed
+            return null;
+        }
+    }
 }
