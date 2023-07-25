@@ -1,3 +1,5 @@
+using api_Devion.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -36,6 +38,34 @@ app.MapPost("/api/devion/customer", (customerTimeChimp customer) =>
     return response;
 })
 .WithName("PostCustomer");
+
+app.MapGet("/api/devion/projects", () =>
+{
+    //connection with timechimp
+    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
+    var response = client.GetAsync("projects");
+    ProjectTimeChimp[] projects = JsonConvert.DeserializeObject<ProjectTimeChimp[]>(response.Result);
+    return projects;
+})
+.WithName("GetProjects");
+
+app.MapPost("/api/devion/project", (ProjectTimeChimp project) =>
+{
+    //connection with timechimp
+    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
+    var response = client.PostAsync("projects", JsonConvert.SerializeObject(project));
+    return response;
+})
+.WithName("CreateProject");
+
+app.MapPut("/api/devion/project", (ProjectTimeChimp project) =>
+{
+    //connection with timechimp
+    var client = new BearerTokenHttpClient(baseUrl, api_key_timechimp);
+    var response = client.PutAsync("projects", JsonConvert.SerializeObject(project));
+    return response;
+})
+.WithName("UpdateProject");
 
 
 app.Run();
