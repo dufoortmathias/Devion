@@ -4,6 +4,7 @@ public interface IBearerTokenHttpClient
 {
     Task<string> GetAsync(string endpoint);
     Task<string> PostAsync(string endpoint, string jsonPayload);
+    Task<string> PutAsync(string endpoint, string jsonPayload);
 }
 
 public class BearerTokenHttpClient : IBearerTokenHttpClient
