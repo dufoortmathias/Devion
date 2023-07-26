@@ -42,6 +42,12 @@ app.MapPost("/api/devion/project", (ProjectTimeChimp project) => TimeChimpProjec
 
 app.MapPut("/api/devion/project", (ProjectTimeChimp project) => TimeChimpProjectHelper.UpdateProject(project)).WithName("UpdateProject");
 
+app.MapGet("/api/devion/employees", () => TimeChimpEmployeeHelper.GetEmployees()).WithName("GetEmployees");
+
+app.MapPost("/api/devion/employee", (EmployeeTimeChimp employee) => TimeChimpEmployeeHelper.CreateEmployee(employee)).WithName("CreateEmployee");
+
+app.MapPut("/api/devion/employee", (EmployeeTimeChimp employee) => TimeChimpEmployeeHelper.UpdateEmployee(employee)).WithName("UpdateEmployee");
+
 app.MapGet("api/devion/times", () =>
 {
     // connection with timechimp
@@ -161,4 +167,4 @@ app.MapPut("/api/devion/contacten", (contactsTimeChimp contact) =>
 })
 .WithName("PutContact");
 
-app.Run("http://localhost:5001");
+app.Run();
