@@ -28,23 +28,16 @@ app.MapPut("/api/devion/project", (ProjectTimeChimp project) => TimeChimpProject
 
 app.MapGet("api/devion/times", () => TimeChimpTimeHelper.GetTimesLastWeek()).WithName("GetTimesFromLastWeek");
 
-<<<<<<< HEAD
 app.MapPut("/api/devion/employee", (EmployeeTimeChimp employee) => TimeChimpEmployeeHelper.UpdateEmployee(employee)).WithName("UpdateEmployee");
 
 app.MapPost("/api/devion/employee", (EmployeeTimeChimp employee) => TimeChimpEmployeeHelper.CreateEmployee(employee)).WithName("CreateEmployee");
 
 app.MapGet("/api/devion/employees", () => TimeChimpEmployeeHelper.GetEmployees()).WithName("GetEmployees");
 
-=======
->>>>>>> #8-helper-files
 app.MapGet("/api/devion/contacts", () => TimeChimpContactHelper.GetContacts()).WithName("GetContacts");
 
 app.MapPost("/api/devion/contact", (contactsTimeChimp contact) => TimeChimpContactHelper.CreateContact(contact)).WithName("PostContact");
 
 app.MapPut("/api/devion/contacten", (contactsTimeChimp contact) => TimeChimpContactHelper.UpdateContact(contact)).WithName("PutContact");
 
-<<<<<<< HEAD
 app.Run();
-=======
-app.Run("http://localhost:5001");
->>>>>>> #8-helper-files
