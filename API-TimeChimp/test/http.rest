@@ -14,3 +14,33 @@ Content-Type: application/json
 ###
 
 GET http://{{host}}/api/devion/times HTTP/1.1
+
+###
+
+GET http://{{host}}/api/devion/contacts HTTP/1.1
+
+###
+
+POST http://{{host}}/api/devion/contact HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "testing",
+    "email": "test@gmail.com"
+}
+
+###
+
+PUT http://{{host}}/api/devion/contacten HTTP/1.1
+Content-Type: application/json
+
+{
+    "id": 126277,
+    "name": "test",
+    "email": "test@gmail.com",
+    "useForInvoicing": false,
+    "phone": "0123456789",
+    "customerIds": [1329003]
+}
+
+###
