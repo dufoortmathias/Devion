@@ -95,5 +95,70 @@ app.MapGet("api/devion/times", () =>
 })
 .WithName("GetTimesFromLastWeek");
 
+app.MapGet("/api/devion/contacts", () =>
+{
+    // connection with timechimp
+    var client = new BearerTokenHttpClient();
+    var response = client.GetAsync("contacts");
+    List<contactsTimeChimp> contacts = JsonConvert.DeserializeObject<List<contactsTimeChimp>>(response.Result);
+    return contacts;
+})
+.WithName("GetContacts");
+
+app.MapPost("/api/devion/contact", (contactsTimeChimp contact) =>
+{
+    //connection with timechimp
+    var client = new BearerTokenHttpClient();
+    var response = client.PostAsync("contacts", JsonConvert.SerializeObject(contact));
+    contactsTimeChimp contactResponse = JsonConvert.DeserializeObject<contactsTimeChimp>(response.Result);
+    return contactResponse;
+})
+.WithName("PostContact");
+
+app.MapPut("/api/devion/contacten", (contactsTimeChimp contact) =>
+{
+    //connection with timechimp
+    var client = new BearerTokenHttpClient();
+    var response = client.GetAsync($"contacts/{contact.id}");
+    contactsTimeChimp originalContact = JsonConvert.DeserializeObject<contactsTimeChimp>(response.Result);
+    //checking with original contact
+    if (contact.name != originalContact.name)
+    {
+        originalContact.name = contact.name;
+    }
+    else if (contact.jobTitle != originalContact.jobTitle)
+    {
+        originalContact.jobTitle = contact.jobTitle;
+    }
+    else if (contact.email != originalContact.email)
+    {
+        originalContact.email = contact.email;
+    }
+    else if (contact.phone != originalContact.phone)
+    {
+        originalContact.phone = contact.phone;
+    }
+    else if (contact.useForInvoicing != originalContact.useForInvoicing)
+    {
+        originalContact.useForInvoicing = contact.useForInvoicing;
+    }
+    else if (contact.active != originalContact.active)
+    {
+        originalContact.active = contact.active;
+    }
+
+    //checking if customerIds are equal
+    bool areEqual = originalContact.customerIds.SequenceEqual(contact.customerIds);
+    if (!areEqual)
+    {
+        originalContact.customerIds = contact.customerIds;
+    }
+
+    var json = JsonConvert.SerializeObject(originalContact);
+    var response2 = client.PutAsync($"contacts", json);
+    contactsTimeChimp contactResponse = JsonConvert.DeserializeObject<contactsTimeChimp>(response2.Result);
+    return contactResponse;
+})
+.WithName("PutContact");
 
 app.Run("http://localhost:5001");
