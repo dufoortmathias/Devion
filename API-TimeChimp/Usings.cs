@@ -11,6 +11,8 @@ global using System.Net.Http;
 global using System.Net.Http.Headers;
 global using System.Threading.Tasks;
 global using System.Text;
+global using System.Data;
 
 //nuget namespaces
+global using FirebirdSql.Data.FirebirdClient;
 global using Newtonsoft.Json;

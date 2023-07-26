@@ -16,28 +16,28 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/api/devion/customers", () => TimeChimpCustomerHelper.GetCustomers()).WithName("GetCustomers");
+app.MapGet("/api/timechimp/customers", () => TimeChimpCustomerHelper.GetCustomers()).WithName("GetCustomers");
 
-app.MapPost("/api/devion/customer", (customerTimeChimp customer) => TimeChimpCustomerHelper.CreateCustomer(customer)).WithName("CreateCustomer");
+app.MapPost("/api/timechimp/customer", (customerTimeChimp customer) => TimeChimpCustomerHelper.CreateCustomer(customer)).WithName("CreateCustomer");
 
-app.MapGet("/api/devion/projects", () => TimeChimpProjectHelper.GetProjects()).WithName("GetProjects");
+app.MapGet("/api/timechimp/projects", () => TimeChimpProjectHelper.GetProjects()).WithName("GetProjects");
 
-app.MapPost("/api/devion/project", (ProjectTimeChimp project) => TimeChimpProjectHelper.CreateProject(project)).WithName("CreateProject");
+app.MapPost("/api/timechimp/project", (ProjectTimeChimp project) => TimeChimpProjectHelper.CreateProject(project)).WithName("CreateProject");
 
-app.MapPut("/api/devion/project", (ProjectTimeChimp project) => TimeChimpProjectHelper.UpdateProject(project)).WithName("UpdateProject");
+app.MapPut("/api/timechimp/project", (ProjectTimeChimp project) => TimeChimpProjectHelper.UpdateProject(project)).WithName("UpdateProject");
 
-app.MapGet("api/devion/times", () => TimeChimpTimeHelper.GetTimesLastWeek()).WithName("GetTimesFromLastWeek");
+app.MapGet("api/timechimp/times", () => TimeChimpTimeHelper.GetTimesLastWeek()).WithName("GetTimesFromLastWeek");
 
-app.MapPut("/api/devion/employee", (EmployeeTimeChimp employee) => TimeChimpEmployeeHelper.UpdateEmployee(employee)).WithName("UpdateEmployee");
+app.MapPut("/api/timechimp/employee", (EmployeeTimeChimp employee) => TimeChimpEmployeeHelper.UpdateEmployee(employee)).WithName("UpdateEmployee");
 
-app.MapPost("/api/devion/employee", (EmployeeTimeChimp employee) => TimeChimpEmployeeHelper.CreateEmployee(employee)).WithName("CreateEmployee");
+app.MapPost("/api/timechimp/employee", (EmployeeTimeChimp employee) => TimeChimpEmployeeHelper.CreateEmployee(employee)).WithName("CreateEmployee");
 
-app.MapGet("/api/devion/employees", () => TimeChimpEmployeeHelper.GetEmployees()).WithName("GetEmployees");
+app.MapGet("/api/timechimp/employees", () => TimeChimpEmployeeHelper.GetEmployees()).WithName("GetEmployees");
 
-app.MapGet("/api/devion/contacts", () => TimeChimpContactHelper.GetContacts()).WithName("GetContacts");
+app.MapGet("/api/timechimp/contacts", () => TimeChimpContactHelper.GetContacts()).WithName("GetContacts");
 
-app.MapPost("/api/devion/contact", (contactsTimeChimp contact) => TimeChimpContactHelper.CreateContact(contact)).WithName("PostContact");
+app.MapPost("/api/timechimp/contact", (contactsTimeChimp contact) => TimeChimpContactHelper.CreateContact(contact)).WithName("PostContact");
 
-app.MapPut("/api/devion/contacten", (contactsTimeChimp contact) => TimeChimpContactHelper.UpdateContact(contact)).WithName("PutContact");
+app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => TimeChimpContactHelper.UpdateContact(contact)).WithName("PutContact");
 
-app.Run();
+app.Run("http://localhost:5001");
