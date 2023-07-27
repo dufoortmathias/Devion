@@ -2,7 +2,7 @@ namespace Api.Devion.Helpers.TimeChimp;
 
 public static class TimeChimpTimeHelper
 {
-    public static List<timeTimeChimp> GetTimesLastWeek()
+    public static List<timeETS> GetTimesLastWeek()
     {
         // connection with timechimp
         var client = new BearerTokenHttpClient();
@@ -16,39 +16,35 @@ public static class TimeChimpTimeHelper
         var response = client.GetAsync($"time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
 
         //convert data to timeTimeChimp object
-        timeTimeChimp[] times = JsonConvert.DeserializeObject<timeTimeChimp[]>(response.Result);
-        List<timeTimeChimp> goedgekeurdeUren = new List<timeTimeChimp>();
-        changeRegistrationStatusTimeChimp changeRegistrationStatus = new changeRegistrationStatusTimeChimp();
-        List<int> registrationIds = new List<int>();
-        foreach (timeTimeChimp time in times)
-        {
-            //checking uren is goedgekeurd
-            if (time.status == 2)
-            {
-                Console.WriteLine(time.id);
-                var id = time.id;
-                if (id == null)
-                {
-                    Console.WriteLine("id is null");
-                }
-                else
-                {
-                    registrationIds.Add(id);
-                    goedgekeurdeUren.Add(time);
-                }
+        List<timeTimeChimp> times = JsonConvert.DeserializeObject<List<timeTimeChimp>>(response.Result);
 
+        List<timeETS> timesETS = times.Select(time => new timeETS(time)).ToList();
+        List<timeETS> timesETSFiltered = new List<timeETS>();
+        foreach (timeETS time in timesETS)
+        {
+            if (time.timechimpStatus == 2)
+            {
+                // get project code
+                response = client.GetAsync($"projects/{time.PLA_PROJECT}");
+                ProjectTimeChimp project = JsonConvert.DeserializeObject<ProjectTimeChimp>(response.Result);
+
+                // split project code
+                string code = project.code;
+                if (code != null && code.Length > 5)
+                {
+                    string projectCode = code.Substring(0, Math.Min(code.Length, 5));
+                    time.PLA_PROJECT = projectCode;
+                    string subProjectCode = code.Substring(5, Math.Min(code.Length - 5, 5));
+                    time.PLA_SUBPROJECT = subProjectCode;
+                }
+                //get personeelsnummer
+                response = client.GetAsync($"users/{time.PLA_PERSOON}");
+                EmployeeTimeChimp user = JsonConvert.DeserializeObject<EmployeeTimeChimp>(response.Result);
+                time.PLA_PERSOON = user.employeeNumber;
+                timesETSFiltered.Add(time);
             }
         }
 
-        //put registrationid in ChangeRegistrationStatusTimeChimp object
-        changeRegistrationStatus.registrationIds = registrationIds;
-        changeRegistrationStatus.status = 3;
-        changeRegistrationStatus.message = "gefactureerd";
-
-
-        //send to timechimp
-        client.PostAsync("time/changestatusintern", JsonConvert.SerializeObject(changeRegistrationStatus));
-        //return data
-        return goedgekeurdeUren;
+        return timesETSFiltered;
     }
 }

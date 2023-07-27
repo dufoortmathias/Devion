@@ -18,5 +18,21 @@ public static class ETSTimeHelper
         return times;
     }
 
+    public static List<timeETS> addTimesETS(List<timeETS> times)
+    {
+        var client = new FirebirdClientETS();
 
+        foreach (timeETS time in times)
+        {
+            var response = client.insertQuery($"insert into tbl_planning (PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON) values ({time.PLA_CAPTION}, {time.PLA_START}, {time.PLA_EINDE}, {time.PLA_KM_PAUZE}, {time.PLA_TEKST}, {time.PLA_PROJECT}, {time.PLA_SUBPROJECT}, {time.PLA_PERSOON})");
+        }
+        return times;
+    }
+
+    public static List<timeETS> addTimes()
+    {
+        List<timeETS> times = TimeChimpTimeHelper.GetTimesLastWeek();
+        times = addTimesETS(times);
+        return times;
+    }
 }
