@@ -44,4 +44,6 @@ app.MapGet("/api/ets/customers", () => ETSCustomerHelper.GetCustomers()).WithNam
 
 app.MapGet("/api/ets/contacts", () => ETSContactHelper.GetContacts()).WithName("GetContactsETS");
 
+app.MapGet("/api/ets/times", () => ETSTimeHelper.GetTime()).WithName("GetTimesFromETS");
+
 app.Run("http://localhost:5001");
