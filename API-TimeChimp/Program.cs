@@ -44,4 +44,16 @@ app.MapGet("/api/ets/customers", () => ETSCustomerHelper.GetCustomers()).WithNam
 
 app.MapGet("/api/ets/contacts", () => ETSContactHelper.GetContacts()).WithName("GetContactsETS");
 
+app.MapGet("/api/ets/employees", () =>
+{
+    List<EmployeeETS> employees = ETSEmployeeHelper.GetEmployees();
+    List<EmployeeTimeChimp> employeesTimeChimp = employees.Select(employee => new EmployeeTimeChimp(employee)).ToList();
+    foreach (EmployeeTimeChimp employee in employeesTimeChimp)
+    {
+        TimeChimpEmployeeHelper.CreateEmployee(employee);
+    }
+    return employees;
+
+}).WithName("GetEmployeesETS");
+
 app.Run("http://localhost:5001");

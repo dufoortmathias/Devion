@@ -50,3 +50,7 @@ Get http://{{host}}/api/ets/customers HTTP/1.1
 ###
 
 GET http://{{host}}/api/ets/contacts HTTP/1.1
+
+###
+
+GET http://{{host}}/api/ets/employees HTTP/1.1

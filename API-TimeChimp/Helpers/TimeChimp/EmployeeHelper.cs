@@ -15,8 +15,8 @@
         public static EmployeeTimeChimp CreateEmployee(EmployeeTimeChimp employee)
         {
             var client = new BearerTokenHttpClient();
-
-            String response = client.PostAsync("users", JsonConvert.SerializeObject(employee)).Result;
+            var json = JsonConvert.SerializeObject(employee);
+            String response = client.PostAsync("users", json).Result;
 
             EmployeeTimeChimp employeeResponse = JsonConvert.DeserializeObject<EmployeeTimeChimp>(response);
             return employeeResponse;
