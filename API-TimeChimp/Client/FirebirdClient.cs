@@ -34,7 +34,7 @@ public class FirebirdClientETS
                 }
             }
             connection.Close();
-            string json = JsonConvert.SerializeObject(values);
+            string json = JsonTool.ConvertFrom(values);
             return json;
 
         }

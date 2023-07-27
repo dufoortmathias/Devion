@@ -7,7 +7,7 @@ public static class TimeChimpCustomerHelper
         // connection with timechimp
         var client = new BearerTokenHttpClient();
         var response = client.GetAsync("customers");
-        List<customerTimeChimp> customers = JsonConvert.DeserializeObject<List<customerTimeChimp>>(response.Result);
+        List<customerTimeChimp> customers = JsonTool.ConvertTo<List<customerTimeChimp>>(response.Result);
         return customers;
     }
 
@@ -15,8 +15,8 @@ public static class TimeChimpCustomerHelper
     {
         //connection with timechimp
         var client = new BearerTokenHttpClient();
-        var response = client.PostAsync("customers", JsonConvert.SerializeObject(customer));
-        customerTimeChimp customerResponse = JsonConvert.DeserializeObject<customerTimeChimp>(response.Result);
+        var response = client.PostAsync("customers", JsonTool.ConvertFrom(customer));
+        customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
         return customerResponse;
     }
 }

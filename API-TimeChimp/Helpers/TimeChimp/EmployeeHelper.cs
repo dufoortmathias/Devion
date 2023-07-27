@@ -8,7 +8,7 @@
 
             String response = client.GetAsync("users").Result;
 
-            EmployeeTimeChimp[] employees = JsonConvert.DeserializeObject<EmployeeTimeChimp[]>(response);
+            EmployeeTimeChimp[] employees = JsonTool.ConvertTo<EmployeeTimeChimp[]>(response);
             return employees;
         }
 
@@ -16,9 +16,9 @@
         {
             var client = new BearerTokenHttpClient();
 
-            String response = client.PostAsync("users", JsonConvert.SerializeObject(employee)).Result;
+            String response = client.PostAsync("users", JsonTool.ConvertFrom(employee)).Result;
 
-            EmployeeTimeChimp employeeResponse = JsonConvert.DeserializeObject<EmployeeTimeChimp>(response);
+            EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;
         }
 
@@ -26,9 +26,9 @@
         {
             var client = new BearerTokenHttpClient();
 
-            String response = client.PutAsync("users", JsonConvert.SerializeObject(employee)).Result;
+            String response = client.PutAsync("users", JsonTool.ConvertFrom(employee)).Result;
 
-            EmployeeTimeChimp employeeResponse = JsonConvert.DeserializeObject<EmployeeTimeChimp>(response);
+            EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;
         }
     }

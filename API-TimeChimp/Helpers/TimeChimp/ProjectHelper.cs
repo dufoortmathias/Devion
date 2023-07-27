@@ -8,7 +8,7 @@
 
             String response = client.GetAsync("projects").Result;
 
-            ProjectTimeChimp[] projects = JsonConvert.DeserializeObject<ProjectTimeChimp[]>(response);
+            ProjectTimeChimp[] projects = JsonTool.ConvertTo<ProjectTimeChimp[]>(response);
             return projects;
         }
 
@@ -16,9 +16,9 @@
         {
             var client = new BearerTokenHttpClient();
 
-            String response = client.PostAsync("projects", JsonConvert.SerializeObject(project)).Result;
+            String response = client.PostAsync("projects", JsonTool.ConvertFrom(project)).Result;
 
-            ProjectTimeChimp[] projects = JsonConvert.DeserializeObject<ProjectTimeChimp[]>(response);
+            ProjectTimeChimp[] projects = JsonTool.ConvertTo<ProjectTimeChimp[]>(response);
             return projects;
         }
 
@@ -26,9 +26,9 @@
         {
             var client = new BearerTokenHttpClient();
 
-            String response = client.PutAsync("projects", JsonConvert.SerializeObject(project)).Result;
+            String response = client.PutAsync("projects", JsonTool.ConvertFrom(project)).Result;
 
-            ProjectTimeChimp[] projects = JsonConvert.DeserializeObject<ProjectTimeChimp[]>(response);
+            ProjectTimeChimp[] projects = JsonTool.ConvertTo<ProjectTimeChimp[]>(response);
             return projects;
         }
     }
