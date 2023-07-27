@@ -40,4 +40,20 @@ app.MapPost("/api/timechimp/contact", (contactsTimeChimp contact) => TimeChimpCo
 
 app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => TimeChimpContactHelper.UpdateContact(contact)).WithName("PutContact");
 
-app.Run("http://localhost:5001");
+app.MapGet("/api/firebird/projectids", () => FireBirdProjectHelper.GetProjectIds()).WithName("GetProjectIds");
+
+app.MapPost("/api/firebird/updateProject", (Int32 projectId) =>
+{
+    ProjectFireBird FBProject = FireBirdProjectHelper.GetProject(projectId);
+    ProjectTimeChimp TCProject = new(FBProject);
+
+    if (TimeChimpProjectHelper.ProjectExists(projectId))
+    {
+        return TimeChimpProjectHelper.UpdateProject(TCProject);
+    } else
+    {
+        return TimeChimpProjectHelper.CreateProject(TCProject);
+    }
+}).WithName("UpdateProjectTimechimp");
+
+app.Run();

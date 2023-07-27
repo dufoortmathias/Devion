@@ -41,5 +41,24 @@
         public Int32[]? projectManagerIds { get; set; }
         public Boolean? useSubprojects { get; set; }
         public Int32[]? subprojectIds { get; set; }
+
+        public ProjectTimeChimp() {}
+
+        public ProjectTimeChimp(ProjectFireBird projectFireBird)
+        {
+            //TODO: use actual fields
+            id = 9;
+            name = projectFireBird.PR_KROM;
+            customerId = 1330156;
+            invoiceMethod = 1; //TODO: add value to seperate file
+            budgetMethod = 2; //TODO: add value to seperate file
+        }
+    }
+
+    public class ProjectFireBird
+    {
+        public Int32? PR_NR { get; set; }
+        public Int32? PR_KLNR { get; set; }
+        public String? PR_KROM { get; set; }
     }
 }

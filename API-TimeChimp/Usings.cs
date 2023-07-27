@@ -2,6 +2,7 @@
 global using Api.Devion.Models;
 global using Api.Devion.Client;
 global using Api.Devion.Helpers.TimeChimp;
+global using Api.Devion.Helpers.FireBird;
 
 //dotnet namespaces
 global using System;
