@@ -1,6 +1,6 @@
 namespace Api.Devion.Helpers.ETS;
 
-public class customerETSHelper
+public static class ETSCustomerHelper
 {
     public static List<CustomersETS> GetCustomers()
     {
