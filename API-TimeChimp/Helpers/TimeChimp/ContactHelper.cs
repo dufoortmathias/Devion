@@ -7,7 +7,7 @@ public class TimeChimpContactHelper
         // connection with timechimp
         var client = new BearerTokenHttpClient();
         var response = client.GetAsync("contacts");
-        List<contactsTimeChimp> contacts = JsonConvert.DeserializeObject<List<contactsTimeChimp>>(response.Result);
+        List<contactsTimeChimp> contacts = JsonTool.ConvertTo<List<contactsTimeChimp>>(response.Result);
         return contacts;
     }
 
@@ -15,8 +15,8 @@ public class TimeChimpContactHelper
     {
         //connection with timechimp
         var client = new BearerTokenHttpClient();
-        var response = client.PostAsync("contacts", JsonConvert.SerializeObject(contact));
-        contactsTimeChimp contactResponse = JsonConvert.DeserializeObject<contactsTimeChimp>(response.Result);
+        var response = client.PostAsync("contacts", JsonTool.ConvertFrom(contact));
+        contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response.Result);
         return contactResponse;
     }
 
@@ -25,7 +25,7 @@ public class TimeChimpContactHelper
         //connection with timechimp
         var client = new BearerTokenHttpClient();
         var response = client.GetAsync($"contacts/{contact.id}");
-        contactsTimeChimp originalContact = JsonConvert.DeserializeObject<contactsTimeChimp>(response.Result);
+        contactsTimeChimp originalContact = JsonTool.ConvertTo<contactsTimeChimp>(response.Result);
         //checking with original contact
         if (contact.name != originalContact.name)
         {
@@ -59,9 +59,9 @@ public class TimeChimpContactHelper
             originalContact.customerIds = contact.customerIds;
         }
 
-        var json = JsonConvert.SerializeObject(originalContact);
+        var json = JsonTool.ConvertFrom(originalContact);
         var response2 = client.PutAsync($"contacts", json);
-        contactsTimeChimp contactResponse = JsonConvert.DeserializeObject<contactsTimeChimp>(response2.Result);
+        contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response2.Result);
         return contactResponse;
 
     }

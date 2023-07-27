@@ -16,7 +16,7 @@ public static class TimeChimpTimeHelper
         var response = client.GetAsync($"time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
 
         //convert data to timeTimeChimp object
-        timeTimeChimp[] times = JsonConvert.DeserializeObject<timeTimeChimp[]>(response.Result);
+        timeTimeChimp[] times = JsonTool.ConvertTo<timeTimeChimp[]>(response.Result);
         List<timeTimeChimp> goedgekeurdeUren = new List<timeTimeChimp>();
         changeRegistrationStatusTimeChimp changeRegistrationStatus = new changeRegistrationStatusTimeChimp();
         List<int> registrationIds = new List<int>();
@@ -47,7 +47,7 @@ public static class TimeChimpTimeHelper
 
 
         //send to timechimp
-        client.PostAsync("time/changestatusintern", JsonConvert.SerializeObject(changeRegistrationStatus));
+        client.PostAsync("time/changestatusintern", JsonTool.ConvertFrom(changeRegistrationStatus));
         //return data
         return goedgekeurdeUren;
     }
