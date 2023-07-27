@@ -34,3 +34,30 @@ public class customerTimeChimp
     public DateTime modified { get; set; }
 }
 
+public class CustomersETS
+{
+    public string? KL_COD { get; set; }
+    public string? KL_NAM { get; set; }
+    public string? KL_OPV { get; set; }
+    public string? KL_STR { get; set; }
+    public string? KL_PNR { get; set; }
+    public string? KL_WPL { get; set; }
+    public string? KL_LND { get; set; }
+    public string? KL_TEL { get; set; }
+    public string? KL_FAX { get; set; }
+    public string? KL_TEX { get; set; }
+    public string? KL_EMAIL { get; set; }
+    public string? KL_WEBPAGE { get; set; }
+    public string? KL_T { get; set; }
+    public string? KL_BTW { get; set; }
+    public string? KL_TYP { get; set; }
+    public string? KL_BOE { get; set; }
+    public string? KL_VRIJ1 { get; set; }
+    public string? KL_MNT { get; set; }
+    public string? BM_OMS { get; set; }
+    public string? BVW_CODE { get; set; }
+    public string? BEL_CODE { get; set; }
+    public string? REK_CODE { get; set; }
+    public string? KL_SLECHTBET { get; set; }
+}
+
