@@ -57,8 +57,26 @@ app.MapPost("/api/firebird/updateCustomer", (String customerId) =>
     {
         return TimeChimpCustomerHelper.CreateCustomer(TCCustomer);
     }
-}).WithName("UpdateProjectTimechimp");
+}).WithName("UpdateCustomerTimechimp");
 
 app.MapGet("/api/ets/contacts", () => ETSContactHelper.GetContacts()).WithName("GetContactsETS");
+
+app.MapGet("/api/ets/contactids", () => ETSContactHelper.GetContactIds()).WithName("GetContactIds");
+
+app.MapPost("/api/firebird/updateContact", (Int32 contactId) =>
+{
+    contactsETS FBContact = ETSContactHelper.GetContact(contactId);
+    contactsTimeChimp TCContact = new(FBContact);
+
+    if (TimeChimpContactHelper.ContactExists(FBContact))
+    {
+        return TimeChimpContactHelper.UpdateContact(TCContact);
+    }
+    else
+    {
+        return TimeChimpContactHelper.CreateContact(TCContact);
+    }
+}).WithName("UpdateContactTimechimp");
+
 
 app.Run();

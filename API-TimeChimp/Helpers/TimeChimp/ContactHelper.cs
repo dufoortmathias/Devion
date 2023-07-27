@@ -2,6 +2,11 @@ namespace Api.Devion.Helpers.TimeChimp;
 
 public class TimeChimpContactHelper
 {
+    public static Boolean ContactExists(contactsETS contactETS)
+    {
+        return GetContacts().Any(contact => contact.email.Equals(contactETS.CO_EMAIL));
+    }
+
     public static List<contactsTimeChimp> GetContacts()
     {
         // connection with timechimp
