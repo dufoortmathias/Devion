@@ -40,7 +40,7 @@ app.MapPost("/api/timechimp/contact", (contactsTimeChimp contact) => TimeChimpCo
 
 app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => TimeChimpContactHelper.UpdateContact(contact)).WithName("PutContact");
 
-app.MapGet("/api/ets/customerids", () => ETSCustomerHelper.GetCustomerIds()).WithName("GetCustomerIds");
+app.MapGet("/api/ets/customerids", (String dateString) => ETSCustomerHelper.GetCustomerIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetCustomerIds");
 
 app.MapPost("/api/ets/updateCustomer", (String customerId) =>
 {
@@ -64,7 +64,7 @@ app.MapPost("/api/ets/updateCustomer", (String customerId) =>
     }
 }).WithName("UpdateCustomerTimechimp");
 
-app.MapGet("/api/ets/contactids", () => ETSContactHelper.GetContactIds()).WithName("GetContactIds");
+app.MapGet("/api/ets/contactids", (String dateString) => ETSContactHelper.GetContactIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetContactIds");
 
 app.MapPost("/api/ets/updateContact", (Int32 contactId) =>
 {
@@ -88,7 +88,7 @@ app.MapPost("/api/ets/updateContact", (Int32 contactId) =>
     }
 }).WithName("UpdateContactTimechimp");
 
-app.MapGet("/api/ets/projectids", () => ETSProjectHelper.GetProjectIds()).WithName("GetProjectIds");
+app.MapGet("/api/ets/projectids", (String dateString) => ETSProjectHelper.GetProjectIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetProjectIds");
 
 app.MapPost("/api/ets/updateProject", (String projectId) =>
 {
