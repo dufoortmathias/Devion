@@ -44,21 +44,21 @@
 
         public ProjectTimeChimp() {}
 
-        public ProjectTimeChimp(ProjectFireBird projectFireBird)
+        public ProjectTimeChimp(ProjectETS projectETS)
         {
             //TODO: use actual fields
-            id = 9;
-            name = projectFireBird.PR_KROM;
-            customerId = 1330156;
+            code = projectETS.PR_NR;
+            name = projectETS.PR_KROM;
+            customerId = TimeChimpCustomerHelper.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(projectETS.PR_KLNR)).id.Value;
             invoiceMethod = 1; //TODO: add value to seperate file
             budgetMethod = 2; //TODO: add value to seperate file
         }
     }
 
-    public class ProjectFireBird
+    public class ProjectETS
     {
-        public Int32? PR_NR { get; set; }
-        public Int32? PR_KLNR { get; set; }
+        public String? PR_NR { get; set; }
+        public String? PR_KLNR { get; set; }
         public String? PR_KROM { get; set; }
     }
 }

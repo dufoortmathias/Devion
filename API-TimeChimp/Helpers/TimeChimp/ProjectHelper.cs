@@ -2,12 +2,9 @@
 {
     public static class TimeChimpProjectHelper
     {
-        public static Boolean ProjectExists(Int32 projectId)
+        public static Boolean ProjectExists(String projectId)
         {
-            var client = new BearerTokenHttpClient();
-
-            String response = client.GetAsync($"projects/{projectId}").Result;
-            return response != null;
+            return GetProjects().Any(project => project.code != null && project.code.Equals(projectId));
         }
 
         public static ProjectTimeChimp[] GetProjects()
@@ -33,6 +30,11 @@
 
         public static ProjectTimeChimp UpdateProject(ProjectTimeChimp project)
         {
+            if (project.id  == null)
+            {
+                project.id = GetProjects().ToList().Find(p => p.code.Equals(project.code)).id;
+            }
+
             var client = new BearerTokenHttpClient();
 
             String response = client.PutAsync("projects", JsonTool.ConvertFrom(project)).Result;

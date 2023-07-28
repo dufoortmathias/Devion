@@ -8,7 +8,6 @@ global using Api.Devion.Tools;
 //dotnet namespaces
 global using System;
 global using System.Collections.Generic;
-global using Microsoft.Extensions.Options;
 global using System.Net.Http;
 global using System.Net.Http.Headers;
 global using System.Threading.Tasks;

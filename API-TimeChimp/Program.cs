@@ -46,8 +46,8 @@ app.MapGet("/api/ets/customerids", () => ETSCustomerHelper.GetCustomerIds()).Wit
 
 app.MapPost("/api/firebird/updateCustomer", (String customerId) =>
 {
-    CustomersETS FBCustomer = ETSCustomerHelper.GetCustomer(customerId);
-    customerTimeChimp TCCustomer = new(FBCustomer);
+    CustomersETS ETSCustomer = ETSCustomerHelper.GetCustomer(customerId);
+    customerTimeChimp TCCustomer = new(ETSCustomer);
 
     if (TimeChimpCustomerHelper.CustomerExists(customerId))
     {
@@ -65,10 +65,10 @@ app.MapGet("/api/ets/contactids", () => ETSContactHelper.GetContactIds()).WithNa
 
 app.MapPost("/api/firebird/updateContact", (Int32 contactId) =>
 {
-    contactsETS FBContact = ETSContactHelper.GetContact(contactId);
-    contactsTimeChimp TCContact = new(FBContact);
+    contactsETS ETSContact = ETSContactHelper.GetContact(contactId);
+    contactsTimeChimp TCContact = new(ETSContact);
 
-    if (TimeChimpContactHelper.ContactExists(FBContact))
+    if (TimeChimpContactHelper.ContactExists(ETSContact))
     {
         return TimeChimpContactHelper.UpdateContact(TCContact);
     }
@@ -78,12 +78,12 @@ app.MapPost("/api/firebird/updateContact", (Int32 contactId) =>
     }
 }).WithName("UpdateContactTimechimp");
 
-app.MapGet("/api/firebird/projectids", () => FireBirdProjectHelper.GetProjectIds()).WithName("GetProjectIds");
+app.MapGet("/api/firebird/projectids", () => ETSProjectHelper.GetProjectIds()).WithName("GetProjectIds");
 
-app.MapPost("/api/firebird/updateProject", (Int32 projectId) =>
+app.MapPost("/api/firebird/updateProject", (String projectId) =>
 {
-    ProjectFireBird FBProject = FireBirdProjectHelper.GetProject(projectId);
-    ProjectTimeChimp TCProject = new(FBProject);
+    ProjectETS ETSProject = ETSProjectHelper.GetProject(projectId);
+    ProjectTimeChimp TCProject = new(ETSProject);
 
     if (TimeChimpProjectHelper.ProjectExists(projectId))
     {
