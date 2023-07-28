@@ -40,8 +40,6 @@ app.MapPost("/api/timechimp/contact", (contactsTimeChimp contact) => TimeChimpCo
 
 app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => TimeChimpContactHelper.UpdateContact(contact)).WithName("PutContact");
 
-app.MapGet("/api/ets/customers", () => ETSCustomerHelper.GetCustomers()).WithName("GetCustomersETS");
-
 app.MapGet("/api/ets/customerids", () => ETSCustomerHelper.GetCustomerIds()).WithName("GetCustomerIds");
 
 app.MapPost("/api/ets/updateCustomer", (String customerId) =>
@@ -65,8 +63,6 @@ app.MapPost("/api/ets/updateCustomer", (String customerId) =>
         return Results.Ok(TimeChimpCustomerHelper.CreateCustomer(TCCustomer));
     }
 }).WithName("UpdateCustomerTimechimp");
-
-app.MapGet("/api/ets/contacts", () => ETSContactHelper.GetContacts()).WithName("GetContactsETS");
 
 app.MapGet("/api/ets/contactids", () => ETSContactHelper.GetContactIds()).WithName("GetContactIds");
 
@@ -110,14 +106,32 @@ app.MapPost("/api/ets/updateProject", (String projectId) =>
 
     ProjectTimeChimp TCProject = new(ETSProject);
 
+    ProjectTimeChimp createdMainProject;
     if (TimeChimpProjectHelper.ProjectExists(projectId))
     {
-        return Results.Ok(TimeChimpProjectHelper.UpdateProject(TCProject));
+        createdMainProject = TimeChimpProjectHelper.UpdateProject(TCProject);
     }
     else
     {
-        return Results.Ok(TimeChimpProjectHelper.CreateProject(TCProject));
+        createdMainProject = TimeChimpProjectHelper.CreateProject(TCProject);
     }
+
+    List<SubprojectETS> ETSSubprojects = ETSProjectHelper.GetSubprojects(projectId);
+    foreach (SubprojectETS ETSSubproject in ETSSubprojects)
+    {
+        ProjectTimeChimp TCSubproject = new(ETSSubproject);
+
+        if (TimeChimpProjectHelper.ProjectExists(TCSubproject.code))
+        {
+            TimeChimpProjectHelper.UpdateProject(TCSubproject);
+        }
+        else
+        {
+            TimeChimpProjectHelper.CreateProject(TCSubproject);
+        }
+    }
+
+    return Results.Ok(TimeChimpProjectHelper.GetProject(createdMainProject.id.Value));
 }).WithName("UpdateProjectTimechimp");
 
 app.Run();

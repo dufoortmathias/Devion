@@ -12,6 +12,16 @@
             return project;
         }
 
+        public static List<SubprojectETS> GetSubprojects(String projectId)
+        {
+            FirebirdClientETS client = new();
+
+            string query = $"SELECT * FROM SUBPROJ WHERE SU_NR = {projectId}";
+            string json = client.selectQuery(query);
+            List<SubprojectETS> subprojects = JsonTool.ConvertTo<List<SubprojectETS>>(json);
+            return subprojects;
+        }
+
         public static String[] GetProjectIds()
         {
             FirebirdClientETS client = new();

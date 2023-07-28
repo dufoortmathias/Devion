@@ -46,10 +46,29 @@
 
         public ProjectTimeChimp(ProjectETS projectETS)
         {
-            //TODO: use actual fields
             code = projectETS.PR_NR;
             name = projectETS.PR_KROM;
             customerId = TimeChimpCustomerHelper.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(projectETS.PR_KLNR)).id.Value;
+            startDate = projectETS.PR_START_PRODUCTIE;
+            endDate = projectETS.PR_BELOOFD;
+            active = projectETS.PR_STAT.Equals('A');
+            useSubprojects = true; //TODO: add value to seperate file
+            invoiceMethod = 1; //TODO: add value to seperate file
+            budgetMethod = 2; //TODO: add value to seperate file
+        }
+
+        public ProjectTimeChimp(SubprojectETS subprojectETS)
+        {
+            ProjectTimeChimp mainProject = TimeChimpProjectHelper.GetProjects().Find(p => p.code != null && p.code.Equals(subprojectETS.SU_NR));
+
+            code = subprojectETS.VOLNR;
+            name = subprojectETS.SU_OMS;
+            mainProjectId = mainProject.id;
+            customerId = mainProject.customerId;
+            startDate = mainProject.startDate;
+            endDate = mainProject.endDate;
+            active = subprojectETS.SU_AFGEWERKT == 1;
+            useSubprojects = false; //TODO: add value to seperate file
             invoiceMethod = 1; //TODO: add value to seperate file
             budgetMethod = 2; //TODO: add value to seperate file
         }
@@ -60,5 +79,17 @@
         public String PR_NR { get; set; }
         public String PR_KLNR { get; set; }
         public String PR_KROM { get; set; }
+        public DateTime? PR_START_PRODUCTIE { get; set; }
+        public DateTime? PR_BELOOFD { get; set; }
+        public Char? PR_STAT { get; set; }
+    }
+
+    public class SubprojectETS
+    {
+        public String SU_NR { get; set; }
+        public String SU_SUB { get; set; }
+        public String SU_OMS { get; set; }
+        public String VOLNR { get; set; }
+        public Int32? SU_AFGEWERKT { get; set; }
     }
 }
