@@ -32,5 +32,46 @@ public class customerTimeChimp
     public double VatRatePercentage { get; set; }
     public contactsTimeChimp[]? contacts { get; set; }
     public DateTime modified { get; set; }
+
+    public customerTimeChimp() { }
+
+    public customerTimeChimp(CustomersETS customerETS) {
+        name = customerETS.KL_NAM;
+        email = customerETS.KL_EMAIL;
+        phone = customerETS.KL_TEL;
+        address = customerETS.KL_STR;
+        country = customerETS.KL_LND;
+        city = customerETS.KL_WPL;
+        postalCode = customerETS.KL_PNR;
+        website = customerETS.KL_WEBPAGE;
+        relationId = customerETS.KL_COD;
+    }
+}
+
+public class CustomersETS
+{
+    public string? KL_COD { get; set; }
+    public string? KL_NAM { get; set; }
+    public string? KL_OPV { get; set; }
+    public string? KL_STR { get; set; }
+    public string? KL_PNR { get; set; }
+    public string? KL_WPL { get; set; }
+    public string? KL_LND { get; set; }
+    public string? KL_TEL { get; set; }
+    public string? KL_FAX { get; set; }
+    public string? KL_TEX { get; set; }
+    public string? KL_EMAIL { get; set; }
+    public string? KL_WEBPAGE { get; set; }
+    public string? KL_T { get; set; }
+    public string? KL_BTW { get; set; }
+    public string? KL_TYP { get; set; }
+    public string? KL_BOE { get; set; }
+    public string? KL_VRIJ1 { get; set; }
+    public string? KL_MNT { get; set; }
+    public string? BM_OMS { get; set; }
+    public string? BVW_CODE { get; set; }
+    public string? BEL_CODE { get; set; }
+    public string? REK_CODE { get; set; }
+    public string? KL_SLECHTBET { get; set; }
 }
 

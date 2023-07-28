@@ -2,7 +2,8 @@
 global using Api.Devion.Models;
 global using Api.Devion.Client;
 global using Api.Devion.Helpers.TimeChimp;
-global using Api.Devion.Helpers.FireBird;
+global using Api.Devion.Helpers.ETS;
+global using Api.Devion.Tools;
 
 //dotnet namespaces
 global using System;
@@ -16,4 +17,3 @@ global using System.Data;
 
 //nuget namespaces
 global using FirebirdSql.Data.FirebirdClient;
-global using Newtonsoft.Json;

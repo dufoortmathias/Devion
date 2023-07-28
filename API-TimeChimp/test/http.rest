@@ -45,4 +45,8 @@ Content-Type: application/json
 
 ###
 
-Get http://{{host}}/test HTTP/1.1
+Get http://{{host}}/api/ets/customers HTTP/1.1
+
+###
+
+GET http://{{host}}/api/ets/contacts HTTP/1.1
