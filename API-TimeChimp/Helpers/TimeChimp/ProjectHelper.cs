@@ -7,9 +7,7 @@
             var client = new BearerTokenHttpClient();
 
             String response = client.GetAsync($"projects/{projectId}").Result;
-
-            ProjectTimeChimp? project = JsonConvert.DeserializeObject<ProjectTimeChimp>(response);
-            return project != null;
+            return response != null;
         }
 
         public static ProjectTimeChimp[] GetProjects()
