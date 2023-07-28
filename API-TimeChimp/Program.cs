@@ -42,20 +42,27 @@ app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => TimeChimpC
 
 app.MapGet("/api/ets/customers", () => ETSCustomerHelper.GetCustomers()).WithName("GetCustomersETS");
 
-app.MapGet("/api/ets/customerids", () => ETSCustomerHelper.GetCustomerIds()).WithName("GetCustomersIds");
+app.MapGet("/api/ets/customerids", () => ETSCustomerHelper.GetCustomerIds()).WithName("GetCustomerIds");
 
-app.MapPost("/api/firebird/updateCustomer", (String customerId) =>
+app.MapPost("/api/ets/updateCustomer", (String customerId) =>
 {
     CustomersETS ETSCustomer = ETSCustomerHelper.GetCustomer(customerId);
+
+    // Handle when customer doesn't exist in ETS
+    if (ETSCustomer == null)
+    {
+        return Results.Problem($"ETS doesn't contain a customer with id = {customerId}");
+    }
+
     customerTimeChimp TCCustomer = new(ETSCustomer);
 
     if (TimeChimpCustomerHelper.CustomerExists(customerId))
     {
-        return TimeChimpCustomerHelper.UpdateCustomer(TCCustomer);
+        return Results.Ok(TimeChimpCustomerHelper.UpdateCustomer(TCCustomer));
     }
     else
     {
-        return TimeChimpCustomerHelper.CreateCustomer(TCCustomer);
+        return Results.Ok(TimeChimpCustomerHelper.CreateCustomer(TCCustomer));
     }
 }).WithName("UpdateCustomerTimechimp");
 
@@ -63,34 +70,53 @@ app.MapGet("/api/ets/contacts", () => ETSContactHelper.GetContacts()).WithName("
 
 app.MapGet("/api/ets/contactids", () => ETSContactHelper.GetContactIds()).WithName("GetContactIds");
 
-app.MapPost("/api/firebird/updateContact", (Int32 contactId) =>
+app.MapPost("/api/ets/updateContact", (Int32 contactId) =>
 {
     contactsETS ETSContact = ETSContactHelper.GetContact(contactId);
+
+    // Handle when contact doesn't exist in ETS
+    if (ETSContact == null)
+    {
+        return Results.Problem($"ETS doesn't contain a contact with id = {contactId}");
+    }
+
     contactsTimeChimp TCContact = new(ETSContact);
 
     if (TimeChimpContactHelper.ContactExists(ETSContact))
     {
-        return TimeChimpContactHelper.UpdateContact(TCContact);
+        return Results.Ok(TimeChimpContactHelper.UpdateContact(TCContact));
     }
     else
     {
-        return TimeChimpContactHelper.CreateContact(TCContact);
+        return Results.Ok(TimeChimpContactHelper.CreateContact(TCContact));
     }
 }).WithName("UpdateContactTimechimp");
 
-app.MapGet("/api/firebird/projectids", () => ETSProjectHelper.GetProjectIds()).WithName("GetProjectIds");
+app.MapGet("/api/ets/projectids", () => ETSProjectHelper.GetProjectIds()).WithName("GetProjectIds");
 
-app.MapPost("/api/firebird/updateProject", (String projectId) =>
+app.MapPost("/api/ets/updateProject", (String projectId) =>
 {
     ProjectETS ETSProject = ETSProjectHelper.GetProject(projectId);
+
+    // Handle when project doesn't exist in ETS
+    if (ETSProject == null)
+    {
+        return Results.Problem($"ETS doesn't contain a project with id = {projectId}");
+    }
+    else if (ETSProject.PR_KLNR == null)
+    {
+        return Results.Problem($"The ETS record for project with id = {projectId} doesn't has a customernumber");
+    }
+
     ProjectTimeChimp TCProject = new(ETSProject);
 
     if (TimeChimpProjectHelper.ProjectExists(projectId))
     {
-        return TimeChimpProjectHelper.UpdateProject(TCProject);
-    } else
+        return Results.Ok(TimeChimpProjectHelper.UpdateProject(TCProject));
+    }
+    else
     {
-        return TimeChimpProjectHelper.CreateProject(TCProject);
+        return Results.Ok(TimeChimpProjectHelper.CreateProject(TCProject));
     }
 }).WithName("UpdateProjectTimechimp");
 

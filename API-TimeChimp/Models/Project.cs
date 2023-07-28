@@ -57,8 +57,8 @@
 
     public class ProjectETS
     {
-        public String? PR_NR { get; set; }
-        public String? PR_KLNR { get; set; }
-        public String? PR_KROM { get; set; }
+        public String PR_NR { get; set; }
+        public String PR_KLNR { get; set; }
+        public String PR_KROM { get; set; }
     }
 }
