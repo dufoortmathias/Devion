@@ -32,6 +32,20 @@ public class customerTimeChimp
     public double VatRatePercentage { get; set; }
     public contactsTimeChimp[]? contacts { get; set; }
     public DateTime modified { get; set; }
+
+    public customerTimeChimp() { }
+
+    public customerTimeChimp(CustomersETS customerETS) {
+        name = customerETS.KL_NAM;
+        email = customerETS.KL_EMAIL;
+        phone = customerETS.KL_TEL;
+        address = customerETS.KL_STR;
+        country = customerETS.KL_LND;
+        city = customerETS.KL_WPL;
+        postalCode = customerETS.KL_PNR;
+        website = customerETS.KL_WEBPAGE;
+        relationId = customerETS.KL_COD;
+    }
 }
 
 public class CustomersETS
