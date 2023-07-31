@@ -7,7 +7,7 @@ public static class ETSEmployeeHelper
         //connection with ETS
         var client = new FirebirdClientETS();
         var response = client.selectQuery("select * from J2W_PNPX");
-        List<EmployeeETS> employees = JsonConvert.DeserializeObject<List<EmployeeETS>>(response);
+        List<EmployeeETS> employees = JsonTool.ConvertTo<List<EmployeeETS>>(response);
         return employees;
     }
 }

@@ -15,10 +15,8 @@ namespace Api.Devion.Helpers.TimeChimp
         public static EmployeeTimeChimp CreateEmployee(EmployeeTimeChimp employee)
         {
             var client = new BearerTokenHttpClient();
-            var json = JsonConvert.SerializeObject(employee);
+            var json = JsonTool.ConvertFrom(employee);
             String response = client.PostAsync("users", json).Result;
-
-            String response = client.PostAsync("users", JsonTool.ConvertFrom(employee)).Result;
 
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;

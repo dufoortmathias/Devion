@@ -16,7 +16,7 @@ public static class TimeChimpTimeHelper
         var response = client.GetAsync($"time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
 
         //convert data to timeTimeChimp object
-        List<timeTimeChimp> times = JsonConvert.DeserializeObject<List<timeTimeChimp>>(response.Result);
+        List<timeTimeChimp> times = JsonTool.ConvertTo<List<timeTimeChimp>>(response.Result);
 
         List<timeETS> timesETS = times.Select(time => new timeETS(time)).ToList();
         List<timeETS> timesETSFiltered = new List<timeETS>();
@@ -26,7 +26,7 @@ public static class TimeChimpTimeHelper
             {
                 // get project code
                 response = client.GetAsync($"projects/{time.PLA_PROJECT}");
-                ProjectTimeChimp project = JsonConvert.DeserializeObject<ProjectTimeChimp>(response.Result);
+                ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response.Result);
 
                 // split project code
                 string code = project.code;
@@ -39,7 +39,7 @@ public static class TimeChimpTimeHelper
                 }
                 //get personeelsnummer
                 response = client.GetAsync($"users/{time.PLA_PERSOON}");
-                EmployeeTimeChimp user = JsonConvert.DeserializeObject<EmployeeTimeChimp>(response.Result);
+                EmployeeTimeChimp user = JsonTool.ConvertTo<EmployeeTimeChimp>(response.Result);
                 time.PLA_PERSOON = user.employeeNumber;
                 timesETSFiltered.Add(time);
             }

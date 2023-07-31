@@ -6,13 +6,13 @@ public static class ETSTimeHelper
     {
         var client = new FirebirdClientETS();
         var response = client.selectQuery("select * from tbl_planning");
-        List<timeETS> times = JsonConvert.DeserializeObject<List<timeETS>>(response);
+        List<timeETS> times = JsonTool.ConvertTo<List<timeETS>>(response);
         foreach (timeETS time in times)
         {
             string query = $"select * from J2W_PNPX where PN_ID = {time.PLA_PERSOON}";
             string json = client.selectQuery(query);
             Console.WriteLine(json);
-            List<naamTimeETS> naam = JsonConvert.DeserializeObject<List<naamTimeETS>>(json);
+            List<naamTimeETS> naam = JsonTool.ConvertTo<List<naamTimeETS>>(json);
             time.PN_NAM = naam.First().PN_NAM;
         }
         return times;
