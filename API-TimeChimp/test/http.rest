@@ -61,7 +61,7 @@ GET http://{{host}}/api/ets/employeeids?dateString=1899-12-30 HTTP/1.1
 
 ###
 
-GET http://{{host}}/api/ets/updateEmployee?employeeid=0009 HTTP/1.1
+GET http://{{host}}/api/ets/updateEmployee?employeeid=0006 HTTP/1.1
 
 ###
 

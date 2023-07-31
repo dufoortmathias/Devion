@@ -28,6 +28,8 @@ namespace Api.Devion.Helpers.TimeChimp
 
         public static EmployeeTimeChimp UpdateEmployee(EmployeeTimeChimp employee)
         {
+            EmployeeTimeChimp employee2 = GetEmployees().ToList().Find(e => e.employeeNumber == employee.employeeNumber);
+            Console.WriteLine(employee2.id);
             if (employee.id == null)
             {
                 employee.id = GetEmployees().ToList().Find(e => e.employeeNumber == employee.employeeNumber).id;
@@ -35,7 +37,7 @@ namespace Api.Devion.Helpers.TimeChimp
 
             var client = new BearerTokenHttpClient();
 
-            String response = client.PutAsync($"user/{employee.id}", JsonTool.ConvertFrom(employee)).Result;
+            String response = client.PutAsync($"users", JsonTool.ConvertFrom(employee)).Result;
             Console.WriteLine(response);
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;
