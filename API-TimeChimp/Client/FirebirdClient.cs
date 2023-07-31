@@ -29,10 +29,8 @@ public class FirebirdClientETS
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
                         value.Add(reader.GetName(i), reader.GetValue(i));
-                        Console.WriteLine(reader.GetName(i));
                     }
                     values.Add(value);
-                    Console.WriteLine(values);
                 }
             }
             connection.Close();
