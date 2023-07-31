@@ -2,10 +2,10 @@ namespace Api.Devion.Helpers.ETS;
 
 public static class ETSContactHelper
 {
-    public static Int32[] GetContactIds()
+    public static Int32[] GetContactIdsChangedAfter(DateTime date)
     {
         FirebirdClientETS client = new FirebirdClientETS();
-        string query = "SELECT C_CODE FROM contact";
+        string query = $"SELECT C_CODE FROM contact WHERE DATE_CHANGED BETWEEN '{date.ToString("MM/dd/yyyy HH:mm")}' AND '{DateTime.Now.ToString("MM/dd/yyyy HH:mm")}'";
         string json = client.selectQuery(query);
         Int32[] ids = JsonTool.ConvertTo<contactsETS[]>(json)
             .Select(contact => contact.C_CODE)

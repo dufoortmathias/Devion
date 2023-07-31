@@ -7,13 +7,23 @@
             return GetProjects().Any(project => project.code != null && project.code.Equals(projectId));
         }
 
-        public static ProjectTimeChimp[] GetProjects()
+        public static ProjectTimeChimp GetProject(Int32 projectId)
+        {
+            var client = new BearerTokenHttpClient();
+
+            String response = client.GetAsync($"projects/{projectId}").Result;
+
+            ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response);
+            return project;
+        }
+
+        public static List<ProjectTimeChimp> GetProjects()
         {
             var client = new BearerTokenHttpClient();
 
             String response = client.GetAsync("projects").Result;
 
-            ProjectTimeChimp[] projects = JsonTool.ConvertTo<ProjectTimeChimp[]>(response);
+            List<ProjectTimeChimp> projects = JsonTool.ConvertTo<List<ProjectTimeChimp>>(response);
             return projects;
         }
 

@@ -5,10 +5,10 @@ namespace Api.Devion.Helpers.ETS;
 
 public static class ETSCustomerHelper
 {
-    public static String[] GetCustomerIds()
+    public static String[] GetCustomerIdsChangedAfter(DateTime date)
     {
         FirebirdClientETS client = new FirebirdClientETS();
-        string query = "SELECT KL_COD FROM KLPX";
+        string query = $"SELECT KL_COD FROM KLPX WHERE DATE_CHANGED BETWEEN '{date.ToString("MM/dd/yyyy HH:mm")}' AND '{DateTime.Now.ToString("MM/dd/yyyy HH:mm")}'";
         string json = client.selectQuery(query);
         String[] ids = JsonTool.ConvertTo<CustomersETS[]>(json)
             .Select(customer => customer.KL_COD)
