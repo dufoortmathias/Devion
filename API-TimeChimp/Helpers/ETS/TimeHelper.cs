@@ -24,15 +24,36 @@ public static class ETSTimeHelper
 
         foreach (timeETS time in times)
         {
-            var response = client.insertQuery($"insert into tbl_planning (PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON) values ({time.PLA_CAPTION}, {time.PLA_START}, {time.PLA_EINDE}, {time.PLA_KM_PAUZE}, {time.PLA_TEKST}, {time.PLA_PROJECT}, {time.PLA_SUBPROJECT}, {time.PLA_PERSOON})");
+            var response = client.insertQuery($"insert into tbl_planning (PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON) values ({time.PLA_CAPTION}, {time.PLA_START.Value.ToString("yyyy-MM-dd HH:mm:ss")}, {time.PLA_EINDE.Value.ToString("yyyy-MM-dd HH:mm:ss")}, {time.PLA_KM_PAUZE}, {time.PLA_TEKST}, {time.PLA_PROJECT}, {time.PLA_SUBPROJECT}, {time.PLA_PERSOON})");
         }
         return times;
+    }
+
+    public static string addTime(timeETS time)
+    {
+        var client = new FirebirdClientETS();
+        var response = client.selectQuery("select max(PLA_ID) from tbl_planning");
+
+        List<maxValue> max = JsonTool.ConvertTo<List<maxValue>>(response);
+        time.PLA_ID = max[0].MAX + 1;
+
+        response = client.insertQuery($"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON) " +
+                                        $"VALUES ({time.PLA_ID}, {time.PLA_KLEUR}, '{time.PLA_CAPTION}', '{time.PLA_START.Value.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+                                        $"'{time.PLA_EINDE.Value.ToString("yyyy-MM-dd HH:mm:ss")}', '{time.PLA_KM_PAUZE}', '{time.PLA_TEKST}', " +
+                                        $"'{time.PLA_PROJECT}', '{time.PLA_SUBPROJECT}', '{time.PLA_PERSOON}')");
+        return response;
     }
 
     public static List<timeETS> addTimes()
     {
         List<timeETS> times = TimeChimpTimeHelper.GetTimesLastWeek();
-        times = addTimesETS(times);
+        List<int> ids = new List<int>();
+        foreach (timeETS time in times)
+        {
+            var response = addTime(time);
+            ids.Add(time.timechimpId);
+        }
+        changeRegistrationStatusTimeChimp status = TimeChimpTimeHelper.changeStatus(ids);
         return times;
     }
 }
