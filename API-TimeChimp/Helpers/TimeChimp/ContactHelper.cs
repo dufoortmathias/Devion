@@ -54,13 +54,10 @@ public class TimeChimpContactHelper
         List<customerTimeChimp> customers = TimeChimpCustomerHelper.GetCustomers();
         foreach (var customerId in contact.customerIds)
         {
-            Console.WriteLine(customerId);
             var id = "00000" + customerId.ToString();
             id = id.Substring(id.Length - 6);
-            Console.WriteLine(id);
             foreach (customerTimeChimp customer in customers)
             {
-                Console.WriteLine(customer.relationId);
                 if (customer.relationId.Equals(id))
                 {
                     customerIds.Add(customer.id.Value);
@@ -68,7 +65,6 @@ public class TimeChimpContactHelper
                 }
             }
         }
-        Console.WriteLine(customerIds);
         originalContact.customerIds = customerIds.ToArray();
 
         // update contact TimeChimp
