@@ -4,7 +4,7 @@ public class TimeChimpContactHelper
 {
     public static Boolean ContactExists(contactsETS contactETS)
     {
-        return GetContacts().Any(contact => contact.email.Equals(contactETS.CO_EMAIL));
+        return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_TAV));
     }
 
     public static List<contactsTimeChimp> GetContacts()
@@ -35,9 +35,10 @@ public class TimeChimpContactHelper
         {
             var response = client.GetAsync($"contacts/{contact.id}").Result;
             originalContact = JsonTool.ConvertTo<contactsTimeChimp>(response);
-        } else
+        }
+        else
         {
-            originalContact = GetContacts().Find(c => c.email.Equals(contact.email));
+            originalContact = GetContacts().Find(c => c.name.Equals(contact.name));
         }
 
         // update original contact
@@ -47,7 +48,28 @@ public class TimeChimpContactHelper
         originalContact.phone = contact.phone;
         originalContact.useForInvoicing = contact.useForInvoicing;
         originalContact.active = contact.active;
-        originalContact.customerIds = contact.customerIds;
+
+        // get ids from customers
+        var customerIds = new List<int>();
+        List<customerTimeChimp> customers = TimeChimpCustomerHelper.GetCustomers();
+        foreach (var customerId in contact.customerIds)
+        {
+            Console.WriteLine(customerId);
+            var id = "00000" + customerId.ToString();
+            id = id.Substring(id.Length - 6);
+            Console.WriteLine(id);
+            foreach (customerTimeChimp customer in customers)
+            {
+                Console.WriteLine(customer.relationId);
+                if (customer.relationId.Equals(id))
+                {
+                    customerIds.Add(customer.id.Value);
+                    break;
+                }
+            }
+        }
+        Console.WriteLine(customerIds);
+        originalContact.customerIds = customerIds.ToArray();
 
         // update contact TimeChimp
         var json = JsonTool.ConvertFrom(originalContact);

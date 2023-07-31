@@ -136,16 +136,31 @@ app.MapPost("/api/ets/updateProject", (String projectId) =>
 
 app.MapGet("/api/ets/times", () => ETSTimeHelper.addTimes()).WithName("GetTimesFromETS");
 
-app.MapGet("/api/ets/employees", () =>
-{
-    List<EmployeeETS> employees = ETSEmployeeHelper.GetEmployees();
-    List<EmployeeTimeChimp> employeesTimeChimp = employees.Select(employee => new EmployeeTimeChimp(employee)).ToList();
-    foreach (EmployeeTimeChimp employee in employeesTimeChimp)
-    {
-        TimeChimpEmployeeHelper.CreateEmployee(employee);
-    }
-    return employees;
+app.MapGet("api/ets/employeeids", (String dateString) => ETSEmployeeHelper.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
 
+app.MapGet("/api/ets/updateEmployee", (string employeeid) =>
+{
+    EmployeeETS employee = ETSEmployeeHelper.GetEmployee(employeeid);
+
+    // Handle when employee doesn't exist in ETS
+    if (employee == null)
+    {
+        return Results.Problem($"ETS doesn't contain an employee with id = {employeeid}");
+    }
+
+    EmployeeTimeChimp employeeTimeChimp = new(employee);
+
+    if (TimeChimpEmployeeHelper.EmployeeExists(employeeid))
+    {
+        Console.WriteLine("Employee exists");
+        return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
+    }
+    else
+    {
+        Console.WriteLine("Employee doesn't exist");
+        TimeChimpEmployeeHelper.CreateEmployee(employeeTimeChimp);
+        return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
+    }
 }).WithName("GetEmployeesETS");
 
 app.Run("http://localhost:5001");

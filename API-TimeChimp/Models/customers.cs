@@ -35,7 +35,8 @@ public class customerTimeChimp
 
     public customerTimeChimp() { }
 
-    public customerTimeChimp(CustomersETS customerETS) {
+    public customerTimeChimp(CustomersETS customerETS)
+    {
         name = customerETS.KL_NAM;
         email = customerETS.KL_EMAIL;
         phone = customerETS.KL_TEL;
@@ -45,6 +46,7 @@ public class customerTimeChimp
         postalCode = customerETS.KL_PNR;
         website = customerETS.KL_WEBPAGE;
         relationId = customerETS.KL_COD;
+        active = customerETS.KL_BOE == "K" ? true : false;
     }
 }
 
