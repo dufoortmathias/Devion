@@ -52,5 +52,15 @@
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return projectResponse;
         }
+
+        public static ProjectTimeChimp GetProject(int id)
+        {
+            var client = new BearerTokenHttpClient();
+
+            String response = client.GetAsync($"projects/{id}").Result;
+
+            ProjectTimeChimp project = JsonConvert.DeserializeObject<ProjectTimeChimp>(response);
+            return project;
+        }
     }
 }

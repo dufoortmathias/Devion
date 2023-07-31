@@ -29,3 +29,41 @@ public class timeTimeChimp
     public DateTime modified { get; set; }
     public SubmitForApprovalsTimeChimp[]? submitForApprovals { get; set; }
 }
+
+public class timeETS
+{
+    public int timechimpStatus { get; set; }
+    public int timechimpId { get; set; }
+    public string? PLA_CAPTION { get; set; }
+    public DateTime? PLA_START { get; set; }
+    public DateTime? PLA_EINDE { get; set; }
+    public string? PLA_KM_PAUZE { get; set; }
+    public string? PLA_TEKST { get; set; }
+    public string? PLA_PROJECT { get; set; }
+    public string? PLA_SUBPROJECT { get; set; }
+    public string? PLA_PERSOON { get; set; }
+    public string? PN_NAM { get; set; }
+
+    public timeETS() { }
+
+    public timeETS(timeTimeChimp time)
+    {
+        this.timechimpStatus = time.status;
+        this.timechimpId = time.id;
+        this.PLA_CAPTION = time.taskName;
+        this.PLA_START = time.start;
+        this.PLA_EINDE = time.end;
+        DateTime baseDateTime = DateTime.Parse("1899-12-30T00:00:00");
+        this.PLA_KM_PAUZE = baseDateTime.AddMinutes((double)time.pause).ToString("yyyy-MM-ddTHH:mm:ss");
+        this.PLA_TEKST = time.notes;
+        this.PLA_PROJECT = time.projectId.ToString();
+        this.PLA_SUBPROJECT = time.projectTaskId.ToString();
+        this.PN_NAM = time.userDisplayName;
+        this.PLA_PERSOON = time.userId.ToString();
+    }
+}
+
+public class naamTimeETS
+{
+    public string? PN_NAM { get; set; }
+}

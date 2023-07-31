@@ -134,4 +134,6 @@ app.MapPost("/api/ets/updateProject", (String projectId) =>
     return Results.Ok(TimeChimpProjectHelper.GetProject(createdMainProject.id.Value));
 }).WithName("UpdateProjectTimechimp");
 
-app.Run();
+app.MapGet("/api/ets/times", () => ETSTimeHelper.addTimes()).WithName("GetTimesFromETS");
+
+app.Run("http://localhost:5001");

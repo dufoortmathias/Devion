@@ -24,7 +24,7 @@
         public Boolean? active { get; set; }
         public Int32 customerId { get; set; }
         public String? customerName { get; set; }
-        public String name { get; set; }
+        public String? name { get; set; }
         public String? code { get; set; }
         public String? notes { get; set; }
         public Int32 invoiceMethod { get; set; }
