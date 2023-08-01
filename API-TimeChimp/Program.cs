@@ -40,6 +40,8 @@ app.MapPost("/api/timechimp/contact", (contactsTimeChimp contact) => TimeChimpCo
 
 app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => TimeChimpContactHelper.UpdateContact(contact)).WithName("PutContact");
 
+app.MapGet("/api/timechimp/mileage", () => TimeChimpMileageHelper.GetMileages()).WithName("GetMileages");
+
 app.MapGet("/api/ets/customerids", (String dateString) => ETSCustomerHelper.GetCustomerIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetCustomerIds");
 
 app.MapPost("/api/ets/updateCustomer", (String customerId) =>
@@ -136,8 +138,6 @@ app.MapPost("/api/ets/updateProject", (String projectId) =>
 
 app.MapGet("/api/ets/times", () => ETSTimeHelper.addTimes()).WithName("GetTimesFromETS");
 
-
-
 app.MapGet("api/ets/employeeids", (String dateString) => ETSEmployeeHelper.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
 
 app.MapGet("/api/ets/updateEmployee", (string employeeid) =>
@@ -164,5 +164,11 @@ app.MapGet("/api/ets/updateEmployee", (string employeeid) =>
         return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
     }
 }).WithName("GetEmployeesETS");
+
+app.MapGet("/api/ets/mileage", () =>
+{
+    List<mileageETS> mileages = ETSMileageHelper.GetMileages();
+    List<mileageTimeChimp> mileagesTimeChimp = TimeChimpMileageHelper.GetMileagesByDate(DateTime.Now.AddDays(-7));
+}).WithName("GetMileagesFromETS");
 
 app.Run("http://localhost:5001");
