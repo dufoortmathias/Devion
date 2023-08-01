@@ -52,4 +52,16 @@ public class FirebirdClientETS
         }
     }
 
+    public string updateQuery(string query)
+    {
+        FbConnection connection = new FbConnection(_connectionString);
+        using (var command = new FbCommand(query, connection))
+        {
+            connection.Open();
+            command.ExecuteNonQuery();
+            connection.Close();
+            return "success";
+        }
+    }
+
 }

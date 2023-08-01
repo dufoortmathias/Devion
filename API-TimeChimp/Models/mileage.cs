@@ -34,4 +34,21 @@ public class mileageETS
     public string? PLA_PERSOON { get; set; }
     public string? PLA_KM_DERDEN { get; set; }
     public string? PLA_KM_VERGOEDING { get; set; }
+
+    public mileageETS() { }
+
+    public mileageETS(mileageTimeChimp mileage)
+    {
+        PLA_KM = (int)mileage.distance;
+        var project = "0000000000" + mileage.projectId.ToString();
+        PLA_PROJECT = project.Substring(0, Math.Min(project.Length, 7));
+        PLA_SUBPROJECT = project.Substring(project.Length - 4);
+        project = project.Remove(project.Length - 4, 4);
+        PLA_PROJECT = project.Substring(project.Length - 7);
+        PLA_START = mileage.date.Date;
+        var persoon = "0000" + mileage.userId.ToString();
+        PLA_PERSOON = persoon.Substring(persoon.Length - 4);
+        PLA_KM_DERDEN = mileage.vehicleName.Substring(mileage.vehicleName.Length - 4);
+        PLA_KM_VERGOEDING = "1";
+    }
 }

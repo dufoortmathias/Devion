@@ -169,6 +169,48 @@ app.MapGet("/api/ets/mileage", () =>
 {
     List<mileageETS> mileages = ETSMileageHelper.GetMileages();
     List<mileageTimeChimp> mileagesTimeChimp = TimeChimpMileageHelper.GetMileagesByDate(DateTime.Now.AddDays(-7));
+
+    List<int> ids = new List<int>();
+
+    //get projectID
+    foreach (mileageTimeChimp mileage in mileagesTimeChimp)
+    {
+        if (mileage.projectId != null)
+        {
+            mileage.projectId = TimeChimpProjectHelper.GetProjectId(mileage.projectId);
+            ids.Add(mileage.id);
+        }
+
+        EmployeeTimeChimp employee = TimeChimpEmployeeHelper.GetEmployee(mileage.userId.ToString());
+        mileage.userId = Int32.Parse(employee.employeeNumber);
+    }
+
+    List<mileageTimeChimp> copyMileages = new List<mileageTimeChimp>(mileagesTimeChimp);
+    foreach (mileageTimeChimp mileage in mileagesTimeChimp)
+    {
+        mileageTimeChimp mileages2 = copyMileages.Find(mileage2 => mileage2.projectId == mileage.projectId && mileage2.userId == mileage.userId && mileage2.distance == mileage.distance && mileage2.fromAddress == mileage.toAddress && mileage2.toAddress == mileage.fromAddress);
+        if (mileages2 != null)
+        {
+            Console.WriteLine(mileage.distance + " " + mileages2.distance);
+            mileage.distance = mileage.distance * 2;
+            copyMileages.Remove(mileages2);
+        }
+    }
+
+    //change to etsclass
+    List<mileageETS> mileagesETS = copyMileages.Select(mileage => new mileageETS(mileage)).ToList();
+
+    //update ets
+    foreach (var mileage in mileagesETS)
+    {
+        var response = ETSMileageHelper.UpdateMileage(mileage);
+    }
+
+    //change status
+    var responseStatus = TimeChimpMileageHelper.changeStatus(ids);
+
+    return mileagesETS;
 }).WithName("GetMileagesFromETS");
 
+app.MapGet("/api/timechimp/mileages", () => TimeChimpMileageHelper.GetMileages()).WithName("GetMileagesFromTimechimp");
 app.Run("http://localhost:5001");

@@ -15,7 +15,6 @@ public static class TimeChimpTimeHelper
 
         //get data from timechimp
         var response = client.GetAsync($"time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
-        Console.WriteLine(response.Result);
         //convert data to timeTimeChimp object
         List<timeTimeChimp> times = JsonTool.ConvertTo<List<timeTimeChimp>>(response.Result);
 
@@ -40,17 +39,15 @@ public static class TimeChimpTimeHelper
                     time.PLA_CAPTION = "Proj:" + time.PLA_PROJECT + "/ " + time.PLA_SUBPROJECT;
                     timeTimeChimp timechimp = times.Find(chimp => chimp.id == time.timechimpId);
                     ProjectETS projectETS = ETSProjectHelper.GetProject(time.PLA_PROJECT);
-                    time.PLA_TEKST = time.PLA_PROJECT + ":" + time.PLA_SUBPROJECT + "\n" + projectETS.PR_KROM + "\n" + timechimp.projectName + "\n" + timechimp.userDisplayName + ":" + "\nWerkbon:";
+                    time.PLA_TEKST = time.PLA_PROJECT + ":" + time.PLA_SUBPROJECT + "\n" + projectETS.PR_KROM + "\n" + timechimp.projectName + "\n" + timechimp.userDisplayName + ": " + "\nWerkbon:";
 
                 }
                 //get personeelsnummer
                 response = client.GetAsync($"users/{time.PLA_PERSOON}");
                 EmployeeTimeChimp user = JsonTool.ConvertTo<EmployeeTimeChimp>(response.Result);
-                Console.WriteLine(user.employeeNumber);
                 time.PLA_PERSOON = user.employeeNumber;
                 timesETSFiltered.Add(time);
             }
-            Console.WriteLine(time.PLA_PERSOON);
         }
 
         return timesETSFiltered;
