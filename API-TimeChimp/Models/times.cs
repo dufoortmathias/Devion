@@ -32,7 +32,7 @@ public class timeTimeChimp
 
 public class timeETS
 {
-    public int timechimpStatus { get; set; }
+    public int? timechimpStatus { get; set; }
     public int timechimpId { get; set; }
     public string? PLA_CAPTION { get; set; }
     public DateTime? PLA_START { get; set; }
@@ -43,8 +43,10 @@ public class timeETS
     public string? PLA_SUBPROJECT { get; set; }
     public string? PLA_PERSOON { get; set; }
     public string? PN_NAM { get; set; }
-    public int PLA_ID { get; set; }
-    public int PLA_KLEUR { get; set; }
+    public int? PLA_ID { get; set; }
+    public int? PLA_KLEUR { get; set; }
+    public string? PLA_KLANT { get; set; }
+    public string? PLA_UURCODE { get; set; }
 
     public timeETS()
     { }
@@ -62,6 +64,8 @@ public class timeETS
         this.PN_NAM = time.userDisplayName;
         this.PLA_PERSOON = time.userId.ToString();
         this.PLA_KLEUR = 12971235;
+        this.PLA_UURCODE = "0001";
+        this.PLA_KLANT = time.customerId.ToString();
     }
 }
 
@@ -72,5 +76,5 @@ public class naamTimeETS
 
 public class maxValue
 {
-    public int MAX { get; set; }
+    public int? MAX { get; set; }
 }

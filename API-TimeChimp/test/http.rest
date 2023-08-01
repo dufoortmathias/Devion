@@ -82,3 +82,7 @@ GET http://{{host}}/api/ets/times HTTP/1.1
 ###
 
 GET http://{{host}}/api/ets/mileage HTTP/1.1
+
+###
+
+GET http://{{host}}/api/timechimp/mileages HTTP/1.1

@@ -35,12 +35,20 @@ public static class ETSTimeHelper
         var response = client.selectQuery("select max(PLA_ID) from tbl_planning");
 
         List<maxValue> max = JsonTool.ConvertTo<List<maxValue>>(response);
-        time.PLA_ID = max[0].MAX + 1;
-
-        response = client.insertQuery($"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON) " +
+        if (max[0].MAX == null)
+        {
+            time.PLA_ID = 1;
+        }
+        else
+        {
+            time.PLA_ID = max[0].MAX + 1;
+        }
+        customerTimeChimp customer = TimeChimpCustomerHelper.GetCustomer(time.PLA_KLANT.ToString());
+        time.PLA_KLANT = customer.relationId;
+        response = client.insertQuery($"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE) " +
                                         $"VALUES ({time.PLA_ID}, {time.PLA_KLEUR}, '{time.PLA_CAPTION}', '{time.PLA_START.Value.ToString("yyyy-MM-dd HH:mm:ss")}', " +
                                         $"'{time.PLA_EINDE.Value.ToString("yyyy-MM-dd HH:mm:ss")}', '{time.PLA_KM_PAUZE}', '{time.PLA_TEKST}', " +
-                                        $"'{time.PLA_PROJECT}', '{time.PLA_SUBPROJECT}', '{time.PLA_PERSOON}')");
+                                        $"'{time.PLA_PROJECT}', '{time.PLA_SUBPROJECT}', '{time.PLA_PERSOON}', '{time.PLA_KLANT}', '{time.PLA_UURCODE}')");
         return response;
     }
 
