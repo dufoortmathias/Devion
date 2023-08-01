@@ -45,6 +45,10 @@ Content-Type: application/json
 
 ###
 
+GET http://{{host}}/api/timechimp/mileage HTTP/1.1
+
+###
+
 Get http://{{host}}/api/ets/customerids?dateString=1899-12-30 HTTP/1.1
 
 ###
@@ -74,3 +78,7 @@ GET http://{{host}}/api/ets/updateCustomer?customerId=000002 HTTP/1.1
 ###
 
 GET http://{{host}}/api/ets/times HTTP/1.1
+
+###
+
+GET http://{{host}}/api/ets/mileage HTTP/1.1

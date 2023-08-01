@@ -37,7 +37,7 @@ public static class TimeChimpTimeHelper
                     time.PLA_PROJECT = projectCode;
                     string subProjectCode = code.Substring(7, Math.Min(code.Length - 7, 4));
                     time.PLA_SUBPROJECT = subProjectCode;
-                    time.PLA_CAPTION = "Proj: " + time.PLA_PROJECT + "/" + time.PLA_SUBPROJECT;
+                    time.PLA_CAPTION = "Proj:" + time.PLA_PROJECT + "/ " + time.PLA_SUBPROJECT;
                     timeTimeChimp timechimp = times.Find(chimp => chimp.id == time.timechimpId);
                     ProjectETS projectETS = ETSProjectHelper.GetProject(time.PLA_PROJECT);
                     time.PLA_TEKST = time.PLA_PROJECT + ":" + time.PLA_SUBPROJECT + "\n" + projectETS.PR_KROM + "\n" + timechimp.projectName + "\n" + timechimp.userDisplayName + ":" + "\nWerkbon:";
