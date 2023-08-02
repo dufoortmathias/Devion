@@ -207,10 +207,17 @@ app.MapGet("/api/ets/mileage", () =>
     }
 
     //change status
-    var responseStatus = TimeChimpMileageHelper.changeStatus(ids);
+    // var responseStatus = TimeChimpMileageHelper.changeStatus(ids);
 
     return mileagesETS;
 }).WithName("GetMileagesFromETS");
 
 app.MapGet("/api/timechimp/mileages", () => TimeChimpMileageHelper.GetMileages()).WithName("GetMileagesFromTimechimp");
+
+app.MapGet("api/timechimp/uurcodes", () => TimeChimpUurcodeHelper.GetUurcodes()).WithName("GetUurcodes");
+
+app.MapGet("/api/ets/uurcodes", () => ETSUurcodeHelper.GetUurcodes()).WithName("GetUurcodesFromETS");
+
+app.MapGet("api/timechimp/updateUurcodes", () => TimeChimpUurcodeHelper.UpdateUurcodes()).WithName("UpdateUurcodes");
+
 app.Run("http://localhost:5001");

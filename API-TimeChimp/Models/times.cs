@@ -55,8 +55,8 @@ public class timeETS
     {
         this.timechimpStatus = time.status;
         this.timechimpId = time.id;
-        this.PLA_START = time.start.AddHours(2);
-        this.PLA_EINDE = time.end.AddHours(2);
+        this.PLA_START = time.start.ToLocalTime();
+        this.PLA_EINDE = time.end.ToLocalTime();
         DateTime baseDateTime = DateTime.Parse("1899-12-30T00:00:00");
         this.PLA_KM_PAUZE = baseDateTime.AddMinutes((double)time.pause * 60).ToString("yyyy-MM-dd HH:mm:ss");
         this.PLA_PROJECT = time.projectId.ToString();
@@ -64,7 +64,7 @@ public class timeETS
         this.PN_NAM = time.userDisplayName;
         this.PLA_PERSOON = time.userId.ToString();
         this.PLA_KLEUR = 12971235;
-        this.PLA_UURCODE = "0001";
+        this.PLA_UURCODE = time.TaskId.ToString();
         this.PLA_KLANT = time.customerId.ToString();
     }
 }

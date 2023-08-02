@@ -42,6 +42,11 @@ public static class TimeChimpTimeHelper
                     time.PLA_TEKST = time.PLA_PROJECT + ":" + time.PLA_SUBPROJECT + "\n" + projectETS.PR_KROM + "\n" + timechimp.projectName + "\n" + timechimp.userDisplayName + ": " + "\nWerkbon:";
 
                 }
+
+                //get uurcode
+                uurcodesTimeChimp uurcode = TimeChimpUurcodeHelper.GetUurcode(time.PLA_UURCODE);
+                time.PLA_UURCODE = uurcode.code;
+
                 //get personeelsnummer
                 response = client.GetAsync($"users/{time.PLA_PERSOON}");
                 EmployeeTimeChimp user = JsonTool.ConvertTo<EmployeeTimeChimp>(response.Result);
