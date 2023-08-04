@@ -2,9 +2,9 @@ namespace Api.Devion.Helpers.TimeChimp
 {
     public static class TimeChimpEmployeeHelper
     {
-        public static Boolean EmployeeExists(String employeeId)
+        public static Boolean EmployeeExists(EmployeeETS employee)
         {
-            return GetEmployees().Any(employee => employee.employeeNumber != null && employee.employeeNumber.Equals(employeeId));
+            return GetEmployees().Any(employee2 => employee2.displayName != null && employee2.displayName.Equals(employee.PN_NAM));
         }
         public static EmployeeTimeChimp[] GetEmployees()
         {
@@ -28,19 +28,19 @@ namespace Api.Devion.Helpers.TimeChimp
 
         public static EmployeeTimeChimp UpdateEmployee(EmployeeTimeChimp employee)
         {
-            EmployeeTimeChimp employee2 = GetEmployees().ToList().Find(e => e.employeeNumber == employee.employeeNumber);
-            Console.WriteLine(employee2.id);
-            if (employee.id == null)
+            EmployeeTimeChimp employee2 = GetEmployees().ToList().Find(e => e.displayName == employee.displayName);
+
+            if (employee2 != null)
             {
-                employee.id = GetEmployees().ToList().Find(e => e.employeeNumber == employee.employeeNumber).id;
+                if (employee.id == null)
+                {
+                    employee.id = GetEmployees().ToList().Find(e => e.displayName == employee.displayName).id;
+                }
             }
 
             var client = new BearerTokenHttpClient();
-
-            String response = client.PutAsync($"users", JsonTool.ConvertFrom(employee)).Result;
-            Console.WriteLine(response);
-            EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
-            return employeeResponse;
+            String response = client.PutAsync($"users", JsonTool.ConvertFromWithNullValues(employee)).Result;
+            return employee;
         }
 
         public static EmployeeTimeChimp GetEmployee(String employeeId)
@@ -48,8 +48,6 @@ namespace Api.Devion.Helpers.TimeChimp
             var client = new BearerTokenHttpClient();
 
             String response = client.GetAsync($"users/{employeeId}").Result;
-
-            Console.WriteLine(response);
 
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;

@@ -19,7 +19,7 @@
 
         public static List<ProjectTimeChimp> GetProjects()
         {
-            var client = new BearerTokenHttpClient();
+            var client = new BearerTokenHttpClient("https://api.timechimp.com/v2/");
 
             String response = client.GetAsync("projects").Result;
 
@@ -30,7 +30,6 @@
         public static ProjectTimeChimp CreateProject(ProjectTimeChimp project)
         {
             var client = new BearerTokenHttpClient();
-
             String json = JsonTool.ConvertFrom(project);
             String response = client.PostAsync("projects", json).Result;
 
@@ -45,10 +44,9 @@
                 project.id = GetProjects().ToList().Find(p => p.code.Equals(project.code)).id;
             }
 
+
             var client = new BearerTokenHttpClient();
-
             String response = client.PutAsync("projects", JsonTool.ConvertFrom(project)).Result;
-
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return projectResponse;
         }

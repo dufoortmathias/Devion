@@ -48,37 +48,50 @@
         {
             code = projectETS.PR_NR;
             name = projectETS.PR_KROM;
-            customerId = TimeChimpCustomerHelper.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(projectETS.PR_KLNR)).id.Value;
+            if (projectETS.PR_KLNR != null)
+            {
+                customerId = TimeChimpCustomerHelper.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(projectETS.PR_KLNR)).id.Value;
+            }
+            else
+            {
+                customerId = 0;
+            }
             startDate = projectETS.PR_START_PRODUCTIE;
-            endDate = projectETS.PR_BELOOFD;
-            active = projectETS.PR_STAT.Equals('A');
+            active = projectETS.PR_STAT.Equals('L');
             useSubprojects = true; //TODO: add value to seperate file
-            invoiceMethod = 1; //TODO: add value to seperate file
-            budgetMethod = 2; //TODO: add value to seperate file
+            invoiceMethod = 2; //TODO: add value to seperate file
+            budgetMethod = 1; //TODO: add value to seperate file
         }
 
-        public ProjectTimeChimp(SubprojectETS subprojectETS)
+        public ProjectTimeChimp(SubprojectETS subprojectETS, ProjectTimeChimp mainProject)
         {
-            ProjectTimeChimp? mainProject = TimeChimpProjectHelper.GetProjects().Find(p => p.code != null && p.code.Equals(subprojectETS.SU_NR));
-
-            code = subprojectETS.VOLNR;
-            name = subprojectETS.SU_OMS;
-            mainProjectId = mainProject.id;
-            customerId = mainProject.customerId;
-            startDate = mainProject.startDate;
-            endDate = mainProject.endDate;
-            active = subprojectETS.SU_AFGEWERKT == 1;
-            useSubprojects = false; //TODO: add value to seperate file
-            invoiceMethod = 1; //TODO: add value to seperate file
-            budgetMethod = 2; //TODO: add value to seperate file
+            if (subprojectETS != null && mainProject != null)
+            {
+                code = subprojectETS.VOLNR;
+                name = subprojectETS.SU_OMS;
+                customerId = mainProject.customerId;
+                startDate = subprojectETS.SU_START_PRODUCTIE;
+                if (subprojectETS.SU_AFGEWERKT == 1)
+                {
+                    active = false;
+                }
+                else
+                {
+                    active = true;
+                }
+                useSubprojects = false; //TODO: add value to seperate file
+                invoiceMethod = 2; //TODO: add value to seperate file
+                budgetMethod = 1; //TODO: add value to seperate file
+                projectTasks = null;
+                projectUsers = null;
+            }
         }
     }
-
     public class ProjectETS
     {
-        public String PR_NR { get; set; }
-        public String PR_KLNR { get; set; }
-        public String PR_KROM { get; set; }
+        public String? PR_NR { get; set; }
+        public String? PR_KLNR { get; set; }
+        public String? PR_KROM { get; set; }
         public DateTime? PR_START_PRODUCTIE { get; set; }
         public DateTime? PR_BELOOFD { get; set; }
         public Char? PR_STAT { get; set; }
@@ -91,5 +104,6 @@
         public String SU_OMS { get; set; }
         public String VOLNR { get; set; }
         public Int32? SU_AFGEWERKT { get; set; }
+        public DateTime? SU_START_PRODUCTIE { get; set; }
     }
 }

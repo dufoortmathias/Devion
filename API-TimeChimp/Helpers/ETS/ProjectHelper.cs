@@ -16,7 +16,7 @@
         {
             FirebirdClientETS client = new();
 
-            string query = $"SELECT * FROM SUBPROJ WHERE SU_NR = {projectId}";
+            string query = $"SELECT * FROM SUBPROJ WHERE VOLNR like '{projectId}%'";
             string json = client.selectQuery(query);
             List<SubprojectETS> subprojects = JsonTool.ConvertTo<List<SubprojectETS>>(json);
             return subprojects;

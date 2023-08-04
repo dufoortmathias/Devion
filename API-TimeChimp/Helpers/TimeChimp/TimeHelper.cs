@@ -11,7 +11,6 @@ public static class TimeChimpTimeHelper
         // get date from today and 7 days ago
         DateOnly today = DateOnly.FromDateTime(DateTime.Now);
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
-        Console.WriteLine(lastWeek.ToString("yyyy-MM-dd") + " " + today.ToString("yyyy-MM-dd"));
 
         //get data from timechimp
         var response = client.GetAsync($"time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");

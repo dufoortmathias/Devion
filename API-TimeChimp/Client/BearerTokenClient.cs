@@ -10,7 +10,8 @@ public interface IBearerTokenHttpClient
 public class BearerTokenHttpClient : IBearerTokenHttpClient
 {
 
-    private const string bearerToken = "3Hr14yu7DrW4R7YcRfSQDTjBldTpvRuqvzoUG60uN_Sqyl2dlBZakWwyIfZsH4GKeSPAkj1sp8y6zKSJhgQ8pXhAFukK9VB1AjcU97NVkqj8LO1nGof_9dy4u4Ui4EBgnt3Nmyu9tU-ia0cYcwqZJnlMDP-YunXu9hH-230PnlklEy-nHOZ7a7bORvJ0zYMM_U961cfJNeAXH39kFIDfOj9KtnGGZbgwfvDfm6KapW-uoT7ehUN1lLLVhXSTlQO1SNjRkDN15ZRLA9veYydybmizGIQtMVIxvZ726G3GCGpj4nvx";
+    private const string bearerTokenDevion = "sohP2Xh3doeSCigZ2UGm3kECxjsDDb4AsmphuBnJfv35ezR4g2tgtMb8txkELKeDSpa9DVpQD5MG9WgcS-4QJgj0YXw5BzUn92oDEuwft2GiaJfslY-1oUBQ0Mk1gscaMtuf3GgZsvFl8SZ_SFvLA0LoQADmGT0cmbeIMayBuLZija7FZk0sFisAeC6Z97YAkKEq9zWm3N7kEfWnNtp_FxSg5rDmAo5DxGLTRtYCaddQOavq9veveFC4CJ6ew4nAcRlFQkhIN3QOPbBQL4ZB3EA_WD-ZSxJN7SoMiXdzefc-st-h";
+    private const string bearerTokenMetabil = "k1ddaDjfd5-MFcFka5uOOFAvVv0KY4KVrRLQA5ScaH8y6ROXUrX_TtGUrTDKXFkH30Ug0bzXjgPZjceOiGckLv8R274S4XuCf3FjZWUSL5CAC3spR3ow6GvteL3LsSCBpGmRWGA87PhX9AEThion2C1TIMTGvM7k-VAlGsABaWv0uaNs-g-SH2jMjNnXQKlC1fn1SkpLHKZBCMQzznCnqktdTNrxTkB-95gzFJgrrYMpKQVgErp3piT87YpNjVLfY9TuWOl3eqfZ5u_aD9t9u5hwLtSkY19jUsdRjUPRhm8Dm0M8";
     private const string baseUrl = "https://api.timechimp.com/v1/";
     private readonly HttpClient _httpClient;
 
@@ -21,7 +22,17 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
             BaseAddress = new Uri(baseUrl)
         };
 
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerTokenDevion);
+    }
+
+    public BearerTokenHttpClient(string baseUrl2)
+    {
+        _httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(baseUrl2)
+        };
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerTokenDevion);
     }
 
     public async Task<string> GetAsync(string endpoint)

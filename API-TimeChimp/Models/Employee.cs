@@ -4,7 +4,7 @@
     {
         public Int32? id { get; set; }
         public String? userName { get; set; }
-        public String displayName { get; set; }
+        public String? displayName { get; set; }
         public Int32? accountType { get; set; }
         public Boolean? isLocked { get; set; }
         public String? picture { get; set; }

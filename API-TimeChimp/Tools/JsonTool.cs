@@ -6,6 +6,7 @@ namespace Api.Devion.Tools
     {
         public static T ConvertTo<T>(String json)
         {
+            Console.WriteLine(json);
             return JsonConvert.DeserializeObject<T>(json);
         }
 

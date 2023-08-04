@@ -108,6 +108,7 @@ app.MapPost("/api/ets/updateProject", (String projectId) =>
 
     ProjectTimeChimp TCProject = new(ETSProject);
 
+
     ProjectTimeChimp createdMainProject;
     if (TimeChimpProjectHelper.ProjectExists(projectId))
     {
@@ -116,12 +117,14 @@ app.MapPost("/api/ets/updateProject", (String projectId) =>
     else
     {
         createdMainProject = TimeChimpProjectHelper.CreateProject(TCProject);
+        createdMainProject = TimeChimpProjectHelper.UpdateProject(TCProject);
     }
 
     List<SubprojectETS> ETSSubprojects = ETSProjectHelper.GetSubprojects(projectId);
     foreach (SubprojectETS ETSSubproject in ETSSubprojects)
     {
-        ProjectTimeChimp TCSubproject = new(ETSSubproject);
+        ProjectTimeChimp TCSubproject = new(ETSSubproject, TCProject);
+        TCSubproject.mainProjectId = TCProject.id;
 
         if (TimeChimpProjectHelper.ProjectExists(TCSubproject.code))
         {
@@ -130,17 +133,20 @@ app.MapPost("/api/ets/updateProject", (String projectId) =>
         else
         {
             TimeChimpProjectHelper.CreateProject(TCSubproject);
+            TimeChimpProjectHelper.UpdateProject(TCSubproject);
         }
     }
 
     return Results.Ok(TimeChimpProjectHelper.GetProject(createdMainProject.id.Value));
 }).WithName("UpdateProjectTimechimp");
 
-app.MapGet("/api/ets/times", () => ETSTimeHelper.addTimes()).WithName("GetTimesFromETS");
+app.MapGet("/api/ets/times", () => ETSTimeHelper.GetTime()).WithName("GetTimesFromETS");
 
-app.MapGet("api/ets/employeeids", (String dateString) => ETSEmployeeHelper.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
+app.MapPost("/api/ets/times", () => ETSTimeHelper.addTimes()).WithName("updateTimes");
 
-app.MapGet("/api/ets/updateEmployee", (string employeeid) =>
+app.MapGet("/api/ets/employeeids", (String dateString) => ETSEmployeeHelper.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
+
+app.MapPost("/api/ets/updateEmployee", (string employeeid) =>
 {
     EmployeeETS employee = ETSEmployeeHelper.GetEmployee(employeeid);
 
@@ -152,14 +158,12 @@ app.MapGet("/api/ets/updateEmployee", (string employeeid) =>
 
     EmployeeTimeChimp employeeTimeChimp = new(employee);
 
-    if (TimeChimpEmployeeHelper.EmployeeExists(employeeid))
+    if (TimeChimpEmployeeHelper.EmployeeExists(employee))
     {
-        Console.WriteLine("Employee exists");
         return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
     }
     else
     {
-        Console.WriteLine("Employee doesn't exist");
         TimeChimpEmployeeHelper.CreateEmployee(employeeTimeChimp);
         return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
     }
@@ -191,9 +195,7 @@ app.MapGet("/api/ets/mileage", () =>
         mileageTimeChimp mileages2 = copyMileages.Find(mileage2 => mileage2.projectId == mileage.projectId && mileage2.userId == mileage.userId && mileage2.distance == mileage.distance && mileage2.fromAddress == mileage.toAddress && mileage2.toAddress == mileage.fromAddress);
         if (mileages2 != null)
         {
-            Console.WriteLine(mileage.distance + " " + mileages2.distance);
             mileage.distance = mileage.distance * 2;
-            copyMileages.Remove(mileages2);
         }
     }
 
@@ -207,17 +209,25 @@ app.MapGet("/api/ets/mileage", () =>
     }
 
     //change status
-    // var responseStatus = TimeChimpMileageHelper.changeStatus(ids);
+    var responseStatus = TimeChimpMileageHelper.changeStatus(ids);
 
     return mileagesETS;
 }).WithName("GetMileagesFromETS");
 
 app.MapGet("/api/timechimp/mileages", () => TimeChimpMileageHelper.GetMileages()).WithName("GetMileagesFromTimechimp");
 
-app.MapGet("api/timechimp/uurcodes", () => TimeChimpUurcodeHelper.GetUurcodes()).WithName("GetUurcodes");
+app.MapGet("/api/timechimp/uurcodes", () => TimeChimpUurcodeHelper.GetUurcodes()).WithName("GetUurcodes");
 
 app.MapGet("/api/ets/uurcodes", () => ETSUurcodeHelper.GetUurcodes()).WithName("GetUurcodesFromETS");
 
-app.MapGet("api/timechimp/updateUurcodes", () => TimeChimpUurcodeHelper.UpdateUurcodes()).WithName("UpdateUurcodes");
+app.MapPost("/api/timechimp/updateUurcodes", () => TimeChimpUurcodeHelper.UpdateUurcodes()).WithName("UpdateUurcodes");
+
+app.MapGet("/api/ets/subprojects", (string mainprojectid) => ETSProjectHelper.GetSubprojects(mainprojectid)).WithName("GetSubprojects");
+
+app.MapGet("/api/timechimp/projectusers", () => TimeChimpProjectUserHelper.GetProjectUsers()).WithName("GetProjectUsers");
+
+app.MapGet("/api/timechimp/projectusers/project", (int projectId) => TimeChimpProjectUserHelper.GetProjectUsersByProject(projectId)).WithName("GetProjectUsersByProject");
+
+app.MapPost("/api/timechimp/projectuser", (string projectId) => TimeChimpProjectUserHelper.AddProjectUserProject(projectId)).WithName("AddProjectUser");
 
 app.Run("http://localhost:5001");
