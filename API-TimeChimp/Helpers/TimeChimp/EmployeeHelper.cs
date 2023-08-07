@@ -44,9 +44,14 @@ namespace Api.Devion.Helpers.TimeChimp
             return employeeResponse;
         }
 
-        public static EmployeeTimeChimp GetEmployee(string employeeId)
+        public static EmployeeTimeChimp GetEmployee(Int32 employeeId)
         {
-            return GetEmployees().Find(e => e.employeeNumber.Equals(employeeId));
+            var client = new BearerTokenHttpClient();
+
+            String response = client.GetAsync($"users/{employeeId}").Result;
+
+            EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
+            return employeeResponse;
         }
     }
 }

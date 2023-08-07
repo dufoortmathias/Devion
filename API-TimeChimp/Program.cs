@@ -172,8 +172,6 @@ app.MapPost("/api/ets/syncemployee", (String employeeId) =>
     }
 }).WithName("SyncEmployeeTimechimp");
 
-app.MapGet("/api/ets/times", () => ETSTimeHelper.addTimes()).WithName("GetTimesFromETS");
-
 app.MapGet("/api/ets/mileage", () =>
 {
     List<mileageETS> mileages = ETSMileageHelper.GetMileages();
