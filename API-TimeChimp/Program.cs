@@ -40,6 +40,8 @@ app.MapPost("/api/timechimp/contact", (contactsTimeChimp contact) => TimeChimpCo
 
 app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => TimeChimpContactHelper.UpdateContact(contact)).WithName("PutContact");
 
+app.MapGet("/api/timechimp/mileage", () => TimeChimpMileageHelper.GetMileages()).WithName("GetMileages");
+
 app.MapGet("/api/ets/customerids", (String dateString) => ETSCustomerHelper.GetCustomerIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetCustomerIds");
 
 app.MapPost("/api/ets/synccustomer", (String customerId) =>
@@ -158,4 +160,88 @@ app.MapPost("/api/ets/syncemployee", (String employeeId) =>
     }
 }).WithName("SyncEmployeeTimechimp");
 
-app.Run();
+app.MapGet("/api/ets/times", () => ETSTimeHelper.addTimes()).WithName("GetTimesFromETS");
+
+app.MapGet("api/ets/employeeids", (String dateString) => ETSEmployeeHelper.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
+
+app.MapGet("/api/ets/updateEmployee", (string employeeid) =>
+{
+    EmployeeETS employee = ETSEmployeeHelper.GetEmployee(employeeid);
+
+    // Handle when employee doesn't exist in ETS
+    if (employee == null)
+    {
+        return Results.Problem($"ETS doesn't contain an employee with id = {employeeid}");
+    }
+
+    EmployeeTimeChimp employeeTimeChimp = new(employee);
+
+    if (TimeChimpEmployeeHelper.EmployeeExists(employeeid))
+    {
+        Console.WriteLine("Employee exists");
+        return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
+    }
+    else
+    {
+        Console.WriteLine("Employee doesn't exist");
+        TimeChimpEmployeeHelper.CreateEmployee(employeeTimeChimp);
+        return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
+    }
+}).WithName("GetEmployeesETS");
+
+app.MapGet("/api/ets/mileage", () =>
+{
+    List<mileageETS> mileages = ETSMileageHelper.GetMileages();
+    List<mileageTimeChimp> mileagesTimeChimp = TimeChimpMileageHelper.GetMileagesByDate(DateTime.Now.AddDays(-7));
+
+    List<int> ids = new List<int>();
+
+    //get projectID
+    foreach (mileageTimeChimp mileage in mileagesTimeChimp)
+    {
+        if (mileage.projectId != null)
+        {
+            mileage.projectId = TimeChimpProjectHelper.GetProjectId(mileage.projectId);
+            ids.Add(mileage.id);
+        }
+
+        EmployeeTimeChimp employee = TimeChimpEmployeeHelper.GetEmployee(mileage.userId.ToString());
+        mileage.userId = Int32.Parse(employee.employeeNumber);
+    }
+
+    List<mileageTimeChimp> copyMileages = new List<mileageTimeChimp>(mileagesTimeChimp);
+    foreach (mileageTimeChimp mileage in mileagesTimeChimp)
+    {
+        mileageTimeChimp mileages2 = copyMileages.Find(mileage2 => mileage2.projectId == mileage.projectId && mileage2.userId == mileage.userId && mileage2.distance == mileage.distance && mileage2.fromAddress == mileage.toAddress && mileage2.toAddress == mileage.fromAddress);
+        if (mileages2 != null)
+        {
+            Console.WriteLine(mileage.distance + " " + mileages2.distance);
+            mileage.distance = mileage.distance * 2;
+            copyMileages.Remove(mileages2);
+        }
+    }
+
+    //change to etsclass
+    List<mileageETS> mileagesETS = copyMileages.Select(mileage => new mileageETS(mileage)).ToList();
+
+    //update ets
+    foreach (var mileage in mileagesETS)
+    {
+        var response = ETSMileageHelper.UpdateMileage(mileage);
+    }
+
+    //change status
+    // var responseStatus = TimeChimpMileageHelper.changeStatus(ids);
+
+    return mileagesETS;
+}).WithName("GetMileagesFromETS");
+
+app.MapGet("/api/timechimp/mileages", () => TimeChimpMileageHelper.GetMileages()).WithName("GetMileagesFromTimechimp");
+
+app.MapGet("api/timechimp/uurcodes", () => TimeChimpUurcodeHelper.GetUurcodes()).WithName("GetUurcodes");
+
+app.MapGet("/api/ets/uurcodes", () => ETSUurcodeHelper.GetUurcodes()).WithName("GetUurcodesFromETS");
+
+app.MapGet("api/timechimp/updateUurcodes", () => TimeChimpUurcodeHelper.UpdateUurcodes()).WithName("UpdateUurcodes");
+
+app.Run("http://localhost:5001");

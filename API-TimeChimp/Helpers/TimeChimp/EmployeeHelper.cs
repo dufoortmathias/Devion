@@ -1,10 +1,10 @@
-﻿namespace Api.Devion.Helpers.TimeChimp
+namespace Api.Devion.Helpers.TimeChimp
 {
     public static class TimeChimpEmployeeHelper
     {
-        public static Boolean EmployeeExists(EmployeeETS employeeETS)
+        public static Boolean EmployeeExists(String employeeId)
         {
-            return GetEmployees().Any(employee => employee.userName != null && employee.userName.Equals(employeeETS.PN_EMAIL));
+            return GetEmployees().Any(employee => employee.employeeNumber != null && employee.employeeNumber.Equals(employeeId));
         }
 
         public static List<EmployeeTimeChimp> GetEmployees()
@@ -20,21 +20,27 @@
         public static EmployeeTimeChimp CreateEmployee(EmployeeTimeChimp employee)
         {
             var client = new BearerTokenHttpClient();
+            var json = JsonTool.ConvertFrom(employee);
+            String response = client.PostAsync("users", json).Result;
 
             employee.email = employee.userName;
             employee.sendInvitation = true;
 
             String response = client.PostAsync("users", JsonTool.ConvertFrom(employee)).Result;
 
+            var client = new BearerTokenHttpClient();
+
+            String response = client.PutAsync($"users", JsonTool.ConvertFrom(employee)).Result;
+            Console.WriteLine(response);
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;
         }
 
-        public static EmployeeTimeChimp UpdateEmployee(EmployeeTimeChimp employee)
+        public static EmployeeTimeChimp UpdateEmployee(String employeeId)
         {
             var client = new BearerTokenHttpClient();
 
-            employee.id = GetEmployees().Find(e => e.userName.Equals(employee.userName)).id;
+            employee.id = GetEmployees().Find(e => e.employeeNumber.Equals(employeeId)).id;
             employee.userName = null;
             
 

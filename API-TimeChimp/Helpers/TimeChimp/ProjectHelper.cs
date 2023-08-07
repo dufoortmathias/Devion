@@ -40,7 +40,7 @@
 
         public static ProjectTimeChimp UpdateProject(ProjectTimeChimp project)
         {
-            if (project.id  == null)
+            if (project.id == null)
             {
                 project.id = GetProjects().ToList().Find(p => p.code.Equals(project.code)).id;
             }
@@ -51,6 +51,11 @@
 
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return projectResponse;
+        }
+
+        public static int GetProjectId(int projectId)
+        {
+            return Int32.Parse(GetProjects().ToList().Find(p => p.id.Equals(projectId)).code);
         }
     }
 }

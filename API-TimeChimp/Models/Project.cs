@@ -24,7 +24,7 @@
         public Boolean? active { get; set; }
         public Int32 customerId { get; set; }
         public String? customerName { get; set; }
-        public String name { get; set; }
+        public String? name { get; set; }
         public String? code { get; set; }
         public String? notes { get; set; }
         public Int32 invoiceMethod { get; set; }
@@ -42,7 +42,7 @@
         public Boolean? useSubprojects { get; set; }
         public Int32[]? subprojectIds { get; set; }
 
-        public ProjectTimeChimp() {}
+        public ProjectTimeChimp() { }
 
         public ProjectTimeChimp(ProjectETS projectETS)
         {
@@ -59,7 +59,7 @@
 
         public ProjectTimeChimp(SubprojectETS subprojectETS)
         {
-            ProjectTimeChimp mainProject = TimeChimpProjectHelper.GetProjects().Find(p => p.code != null && p.code.Equals(subprojectETS.SU_NR));
+            ProjectTimeChimp? mainProject = TimeChimpProjectHelper.GetProjects().Find(p => p.code != null && p.code.Equals(subprojectETS.SU_NR));
 
             code = subprojectETS.VOLNR;
             name = subprojectETS.SU_OMS;

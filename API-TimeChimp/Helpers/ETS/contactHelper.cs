@@ -29,7 +29,7 @@ public static class ETSContactHelper
         // connection with ets
         var client = new FirebirdClientETS();
         var response = client.selectQuery($"select C.CO_KLCOD, C.CO_TAV, C.CO_TAV2, C.CO_TEL, C.CO_FAX, C.CO_GSM, C.CO_EMAIL, C.CO_ACTIEF, F.FUT_OMSCHRIJVING from contact as C left join tbl_functie_taal as F on C.CO_FUNCTIE = F.FUT_ID where c.C_CODE = {contactId}");
-        contactsETS contact = JsonTool.ConvertTo <contactsETS[]>(response).FirstOrDefault();
+        contactsETS contact = JsonTool.ConvertTo<contactsETS[]>(response).FirstOrDefault();
         return contact;
     }
 }

@@ -34,4 +34,13 @@ public static class TimeChimpCustomerHelper
         customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
         return customerResponse;
     }
+
+    public static customerTimeChimp GetCustomer(String customerId)
+    {
+        //connection with timechimp
+        var client = new BearerTokenHttpClient();
+        var response = client.GetAsync($"customers/{customerId}");
+        customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
+        return customerResponse;
+    }
 }

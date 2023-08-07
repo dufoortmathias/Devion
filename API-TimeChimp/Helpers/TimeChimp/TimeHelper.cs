@@ -2,7 +2,7 @@ namespace Api.Devion.Helpers.TimeChimp;
 
 public static class TimeChimpTimeHelper
 {
-    public static List<timeTimeChimp> GetTimesLastWeek()
+    public static List<timeETS> GetTimesLastWeek()
     {
         // connection with timechimp
         var client = new BearerTokenHttpClient();
@@ -11,44 +11,60 @@ public static class TimeChimpTimeHelper
         // get date from today and 7 days ago
         DateOnly today = DateOnly.FromDateTime(DateTime.Now);
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
+        Console.WriteLine(lastWeek.ToString("yyyy-MM-dd") + " " + today.ToString("yyyy-MM-dd"));
 
         //get data from timechimp
         var response = client.GetAsync($"time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
-
         //convert data to timeTimeChimp object
-        timeTimeChimp[] times = JsonTool.ConvertTo<timeTimeChimp[]>(response.Result);
-        List<timeTimeChimp> goedgekeurdeUren = new List<timeTimeChimp>();
-        changeRegistrationStatusTimeChimp changeRegistrationStatus = new changeRegistrationStatusTimeChimp();
-        List<int> registrationIds = new List<int>();
-        foreach (timeTimeChimp time in times)
+        List<timeTimeChimp> times = JsonTool.ConvertTo<List<timeTimeChimp>>(response.Result);
+
+        List<timeETS> timesETS = times.Select(time => new timeETS(time)).ToList();
+        List<timeETS> timesETSFiltered = new List<timeETS>();
+        foreach (timeETS time in timesETS)
         {
-            //checking uren is goedgekeurd
-            if (time.status == 2)
+            if (time.timechimpStatus == 2)
             {
-                Console.WriteLine(time.id);
-                var id = time.id;
-                if (id == null)
+                // get project code
+                response = client.GetAsync($"projects/{time.PLA_PROJECT}");
+                ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response.Result);
+
+                // split project code
+                string code = project.code;
+                if (code != null && code.Length > 5)
                 {
-                    Console.WriteLine("id is null");
-                }
-                else
-                {
-                    registrationIds.Add(id);
-                    goedgekeurdeUren.Add(time);
+                    string projectCode = code.Substring(0, Math.Min(code.Length, 7));
+                    time.PLA_PROJECT = projectCode;
+                    string subProjectCode = code.Substring(7, Math.Min(code.Length - 7, 4));
+                    time.PLA_SUBPROJECT = subProjectCode;
+                    time.PLA_CAPTION = "Proj:" + time.PLA_PROJECT + "/ " + time.PLA_SUBPROJECT;
+                    timeTimeChimp timechimp = times.Find(chimp => chimp.id == time.timechimpId);
+                    ProjectETS projectETS = ETSProjectHelper.GetProject(time.PLA_PROJECT);
+                    time.PLA_TEKST = time.PLA_PROJECT + ":" + time.PLA_SUBPROJECT + "\n" + projectETS.PR_KROM + "\n" + timechimp.projectName + "\n" + timechimp.userDisplayName + ": " + "\nWerkbon:";
+
                 }
 
+                //get uurcode
+                uurcodesTimeChimp uurcode = TimeChimpUurcodeHelper.GetUurcode(time.PLA_UURCODE);
+                time.PLA_UURCODE = uurcode.code;
+
+                //get personeelsnummer
+                response = client.GetAsync($"users/{time.PLA_PERSOON}");
+                EmployeeTimeChimp user = JsonTool.ConvertTo<EmployeeTimeChimp>(response.Result);
+                time.PLA_PERSOON = user.employeeNumber;
+                timesETSFiltered.Add(time);
             }
         }
 
-        //put registrationid in ChangeRegistrationStatusTimeChimp object
-        changeRegistrationStatus.registrationIds = registrationIds;
-        changeRegistrationStatus.status = 3;
-        changeRegistrationStatus.message = "gefactureerd";
+        return timesETSFiltered;
+    }
 
-
-        //send to timechimp
-        client.PostAsync("time/changestatusintern", JsonTool.ConvertFrom(changeRegistrationStatus));
-        //return data
-        return goedgekeurdeUren;
+    public static changeRegistrationStatusTimeChimp changeStatus(List<int> ids)
+    {
+        var client = new BearerTokenHttpClient();
+        changeRegistrationStatusTimeChimp changes = new changeRegistrationStatusTimeChimp();
+        changes.registrationIds = ids;
+        changes.status = 3;
+        var response = client.PostAsync("time/changestatusintern", JsonTool.ConvertFrom(changes));
+        return changes;
     }
 }
