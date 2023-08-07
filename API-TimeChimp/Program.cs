@@ -150,44 +150,24 @@ app.MapPost("/api/ets/syncemployee", (String employeeId) =>
 
     EmployeeTimeChimp TCEmployee = new(ETSEmployee);
 
-    if (TimeChimpEmployeeHelper.EmployeeExists(ETSEmployee))
+    if (TimeChimpEmployeeHelper.EmployeeExists(employeeId))
     {
         return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(TCEmployee));
     }
     else
     {
-        return Results.Ok(TimeChimpEmployeeHelper.CreateEmployee(TCEmployee));
+        if (TCEmployee.userName == null)
+        {
+            return Results.Problem($"Can't create the employee {TCEmployee.displayName} without an emailaddress");
+        }
+
+        EmployeeTimeChimp employee = TimeChimpEmployeeHelper.CreateEmployee(TCEmployee);
+        TCEmployee.id = employee.id;
+        return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(TCEmployee));
     }
 }).WithName("SyncEmployeeTimechimp");
 
 app.MapGet("/api/ets/times", () => ETSTimeHelper.addTimes()).WithName("GetTimesFromETS");
-
-app.MapGet("api/ets/employeeids", (String dateString) => ETSEmployeeHelper.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
-
-app.MapGet("/api/ets/updateEmployee", (string employeeid) =>
-{
-    EmployeeETS employee = ETSEmployeeHelper.GetEmployee(employeeid);
-
-    // Handle when employee doesn't exist in ETS
-    if (employee == null)
-    {
-        return Results.Problem($"ETS doesn't contain an employee with id = {employeeid}");
-    }
-
-    EmployeeTimeChimp employeeTimeChimp = new(employee);
-
-    if (TimeChimpEmployeeHelper.EmployeeExists(employeeid))
-    {
-        Console.WriteLine("Employee exists");
-        return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
-    }
-    else
-    {
-        Console.WriteLine("Employee doesn't exist");
-        TimeChimpEmployeeHelper.CreateEmployee(employeeTimeChimp);
-        return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(employeeTimeChimp));
-    }
-}).WithName("GetEmployeesETS");
 
 app.MapGet("/api/ets/mileage", () =>
 {
@@ -244,4 +224,4 @@ app.MapGet("/api/ets/uurcodes", () => ETSUurcodeHelper.GetUurcodes()).WithName("
 
 app.MapGet("api/timechimp/updateUurcodes", () => TimeChimpUurcodeHelper.UpdateUurcodes()).WithName("UpdateUurcodes");
 
-app.Run("http://localhost:5001");
+app.Run();

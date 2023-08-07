@@ -4,7 +4,7 @@
     {
         public Int32? id { get; set; }
         public String? email { get; set; }
-        public String? userName { get; set; }
+        public String userName { get; set; }
         public String displayName { get; set; }
         public Int32? accountType { get; set; }
         public Boolean? isLocked { get; set; }
@@ -30,7 +30,7 @@
 
         public EmployeeTimeChimp(EmployeeETS employeeETS)
         {
-            employeeNumber = employeeETS.PN_WERKNEMERSNR;
+            employeeNumber = employeeETS.PN_ID;
             userName = employeeETS.PN_EMAIL;
             displayName = employeeETS.PN_NAM;
             language = employeeETS.PN_TAAL switch
