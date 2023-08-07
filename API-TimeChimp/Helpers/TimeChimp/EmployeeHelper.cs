@@ -43,7 +43,7 @@ namespace Api.Devion.Helpers.TimeChimp
             return employee;
         }
 
-        public static EmployeeTimeChimp GetEmployee(String employeeId)
+        public static EmployeeTimeChimp GetEmployee(Int32 employeeId)
         {
             var client = new BearerTokenHttpClient();
 

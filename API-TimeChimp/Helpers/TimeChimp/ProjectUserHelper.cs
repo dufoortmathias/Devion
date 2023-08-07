@@ -6,8 +6,7 @@ public class TimeChimpProjectUserHelper
     {
         var client = new BearerTokenHttpClient();
         String json = JsonTool.ConvertFrom(projectUser);
-        Console.WriteLine("Adding projectUser: " + json);
-        String response = client.PutAsync("projectusers", json).Result;
+        String response = client.PostAsync("projectusers", json).Result;
 
         Console.WriteLine("ProjectUser added: " + response);
         return projectUser;
@@ -26,34 +25,59 @@ public class TimeChimpProjectUserHelper
     {
         var client = new BearerTokenHttpClient();
 
-        String response = client.GetAsync($"projectusers/project/{projectId.ToString()}").Result;
-        Console.WriteLine("ProjectUsers: " + response);
+        String response = client.GetAsync($"projectusers/project/{projectId}").Result;
         List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
         return projectUsers;
     }
 
-    public static object AddProjectUserProject(string projectId)
+    public static object AddProjectUserProject(string projectNumber)
     {
-        projectId = TimeChimpProjectHelper.GetProjects().Find(p => p.code.Equals(projectId)).id.ToString();
-        var project = TimeChimpProjectHelper.GetProject(Int32.Parse(projectId));
-        var projectId2 = TimeChimpProjectHelper.GetProjects().Find(p => p.code.Equals("00000020001")).id.ToString();
-        var project2 = TimeChimpProjectHelper.GetProject(Int32.Parse(projectId2));
+        Int32 projectId = TimeChimpProjectHelper.GetProjects().Find(p => p.code.Equals(projectNumber)).id.Value;
+        ProjectTimeChimp project = TimeChimpProjectHelper.GetProject(projectId);
 
-        var projectUser2 = GetProjectUsersByProject(project2.id.Value);
-        var projectUser = new List<ProjectUserTimechimp>();
+        List<ProjectUserTimechimp> projectUsers = GetProjectUsersByProject(projectId);
 
-        foreach (var user in projectUser2)
+        List<ProjectUserTimechimp> projectUsersAdded = new();
+        foreach (EmployeeTimeChimp employee in TimeChimpEmployeeHelper.GetEmployees())
         {
-            user.projectId = project.id;
-            projectUser.Add(user);
+            if (!projectUsers.Exists(e => e.userId.Equals(employee.id)))
+            {
+                ProjectUserTimechimp projectUser = new ProjectUserTimechimp(employee, project);
+                ProjectUserTimechimp response = AddProjectUser(projectUser);
+                projectUsersAdded.Add(projectUser);
+            }
         }
+        return projectUsersAdded;
+    }
 
-        foreach (var user in projectUser)
+    public static List<ProjectUserTimechimp> GetProjectUsersByUser(int userId)
+    {
+        var client = new BearerTokenHttpClient();
+
+        String response = client.GetAsync($"projectusers/user/{userId}").Result;
+        List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
+        return projectUsers;
+    }
+
+    public static object AddProjectUserEmployee(string employeeNumber)
+    {
+        Int32 employeeId = TimeChimpEmployeeHelper.GetEmployees().ToList().Find(e => e.employeeNumber.Equals(employeeNumber)).id.Value;
+        EmployeeTimeChimp employee = TimeChimpEmployeeHelper.GetEmployee(employeeId);
+
+        List<ProjectUserTimechimp> projectUsers = GetProjectUsersByUser(employeeId);
+
+        List<ProjectUserTimechimp> projectUsersAdded = new();
+        var projects = TimeChimpProjectHelper.GetProjects();
+        Console.WriteLine(projects.Count);
+        foreach (ProjectTimeChimp project in projects)
         {
-            var response = AddProjectUser(user);
-            Console.WriteLine("ProjectUser added: " + JsonTool.ConvertFromWithNullValues(response));
+            if (!projectUsers.Exists(e => e.projectId.Equals(project.id)))
+            {
+                ProjectUserTimechimp projectUser = new ProjectUserTimechimp(employee, project);
+                ProjectUserTimechimp response = AddProjectUser(projectUser);
+                projectUsersAdded.Add(projectUser);
+            }
         }
-
-        return projectUser;
+        return projectUsersAdded;
     }
 }

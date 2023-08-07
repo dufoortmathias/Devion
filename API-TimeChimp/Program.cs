@@ -185,7 +185,7 @@ app.MapGet("/api/ets/mileage", () =>
             ids.Add(mileage.id);
         }
 
-        EmployeeTimeChimp employee = TimeChimpEmployeeHelper.GetEmployee(mileage.userId.ToString());
+        EmployeeTimeChimp employee = TimeChimpEmployeeHelper.GetEmployee(mileage.userId);
         mileage.userId = Int32.Parse(employee.employeeNumber);
     }
 
@@ -228,6 +228,8 @@ app.MapGet("/api/timechimp/projectusers", () => TimeChimpProjectUserHelper.GetPr
 
 app.MapGet("/api/timechimp/projectusers/project", (int projectId) => TimeChimpProjectUserHelper.GetProjectUsersByProject(projectId)).WithName("GetProjectUsersByProject");
 
-app.MapPost("/api/timechimp/projectuser", (string projectId) => TimeChimpProjectUserHelper.AddProjectUserProject(projectId)).WithName("AddProjectUser");
+app.MapPost("/api/timechimp/projectuserproject", (string projectId) => TimeChimpProjectUserHelper.AddProjectUserProject(projectId)).WithName("AddProjectUserProject");
 
-app.Run("http://localhost:5001");
+app.MapPost("/api/timechimp/projectuseruser", (string userId) => TimeChimpProjectUserHelper.AddProjectUserEmployee(userId)).WithName("AddProjectUserUser");
+
+app.Run();
