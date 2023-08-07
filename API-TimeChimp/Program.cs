@@ -42,7 +42,7 @@ app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => TimeChimpC
 
 app.MapGet("/api/ets/customerids", (String dateString) => ETSCustomerHelper.GetCustomerIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetCustomerIds");
 
-app.MapPost("/api/ets/updateCustomer", (String customerId) =>
+app.MapPost("/api/ets/synccustomer", (String customerId) =>
 {
     CustomersETS ETSCustomer = ETSCustomerHelper.GetCustomer(customerId);
 
@@ -62,11 +62,11 @@ app.MapPost("/api/ets/updateCustomer", (String customerId) =>
     {
         return Results.Ok(TimeChimpCustomerHelper.CreateCustomer(TCCustomer));
     }
-}).WithName("UpdateCustomerTimechimp");
+}).WithName("SyncCustomerTimechimp");
 
 app.MapGet("/api/ets/contactids", (String dateString) => ETSContactHelper.GetContactIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetContactIds");
 
-app.MapPost("/api/ets/updateContact", (Int32 contactId) =>
+app.MapPost("/api/ets/synccontact", (Int32 contactId) =>
 {
     contactsETS ETSContact = ETSContactHelper.GetContact(contactId);
 
@@ -86,11 +86,11 @@ app.MapPost("/api/ets/updateContact", (Int32 contactId) =>
     {
         return Results.Ok(TimeChimpContactHelper.CreateContact(TCContact));
     }
-}).WithName("UpdateContactTimechimp");
+}).WithName("SyncContactTimechimp");
 
 app.MapGet("/api/ets/projectids", (String dateString) => ETSProjectHelper.GetProjectIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetProjectIds");
 
-app.MapPost("/api/ets/updateProject", (String projectId) =>
+app.MapPost("/api/ets/syncproject", (String projectId) =>
 {
     ProjectETS ETSProject = ETSProjectHelper.GetProject(projectId);
 
@@ -132,6 +132,30 @@ app.MapPost("/api/ets/updateProject", (String projectId) =>
     }
 
     return Results.Ok(TimeChimpProjectHelper.GetProject(createdMainProject.id.Value));
-}).WithName("UpdateProjectTimechimp");
+}).WithName("SyncProjectTimechimp");
+
+app.MapGet("/api/ets/employeeids", (String dateString) => ETSEmployeeHelper.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
+
+app.MapPost("/api/ets/syncemployee", (String employeeId) =>
+{
+    EmployeeETS ETSEmployee = ETSEmployeeHelper.GetEmployee(employeeId);
+
+    // Handle when contact doesn't exist in ETS
+    if (ETSEmployee == null)
+    {
+        return Results.Problem($"ETS doesn't contain an employee with id = {employeeId}");
+    }
+
+    EmployeeTimeChimp TCEmployee = new(ETSEmployee);
+
+    if (TimeChimpEmployeeHelper.EmployeeExists(ETSEmployee))
+    {
+        return Results.Ok(TimeChimpEmployeeHelper.UpdateEmployee(TCEmployee));
+    }
+    else
+    {
+        return Results.Ok(TimeChimpEmployeeHelper.CreateEmployee(TCEmployee));
+    }
+}).WithName("SyncEmployeeTimechimp");
 
 app.Run();
