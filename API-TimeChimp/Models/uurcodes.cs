@@ -3,7 +3,7 @@ namespace Api.Devion.Models;
 public class uurcodesTimeChimp
 {
     public int id { get; set; }
-    public string active { get; set; }
+    public Boolean active { get; set; }
     public string name { get; set; }
     public string code { get; set; }
     public string hourlyRate { get; set; }
@@ -22,7 +22,7 @@ public class uurcodesTimeChimp
         this.billable = true;
         this.common = true;
         this.unspecified = false;
-        this.active = "true";
+        this.active = true;
         this.tagIds = new int[] { };
         this.tagNames = new string[] { };
         this.hourlyRate = null;
