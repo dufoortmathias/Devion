@@ -1,4 +1,6 @@
-﻿namespace Api.Devion.Helpers.TimeChimp
+﻿using System.Runtime.InteropServices;
+
+namespace Api.Devion.Helpers.TimeChimp
 {
     public static class TimeChimpProjectHelper
     {
@@ -12,7 +14,7 @@
             var client = new BearerTokenHttpClient();
 
             String response = client.GetAsync($"projects/{projectId}").Result;
-
+            Console.WriteLine(response);
             ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return project;
         }
@@ -30,6 +32,7 @@
         public static ProjectTimeChimp CreateProject(ProjectTimeChimp project)
         {
             var client = new BearerTokenHttpClient();
+
             String json = JsonTool.ConvertFrom(project);
             String response = client.PostAsync("projects", json).Result;
 
@@ -37,13 +40,19 @@
             return projectResponse;
         }
 
-        public static ProjectTimeChimp UpdateProject(ProjectTimeChimp project)
+        public static ProjectTimeChimp UpdateProject(ProjectTimeChimp projectUpdate)
         {
-            if (project.id == null)
+            if (projectUpdate.id == null)
             {
-                project.id = GetProjects().ToList().Find(p => p.code.Equals(project.code)).id;
+                projectUpdate.id = GetProjects().ToList().Find(p => p.code.Equals(projectUpdate.code)).id;
             }
 
+            ProjectTimeChimp project = GetProject(projectUpdate.id.Value);
+
+            project.name = projectUpdate.name;
+            project.endDate = projectUpdate.endDate;
+            project.startDate = projectUpdate.startDate;
+            project.active = projectUpdate.active;
 
             var client = new BearerTokenHttpClient();
             String response = client.PutAsync("projects", JsonTool.ConvertFrom(project)).Result;

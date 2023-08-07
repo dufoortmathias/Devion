@@ -82,8 +82,6 @@
                 useSubprojects = false; //TODO: add value to seperate file
                 invoiceMethod = 2; //TODO: add value to seperate file
                 budgetMethod = 1; //TODO: add value to seperate file
-                projectTasks = null;
-                projectUsers = null;
             }
         }
     }
