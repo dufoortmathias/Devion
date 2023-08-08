@@ -73,7 +73,14 @@ def get_uurcodes_data():
         return None
 
 
-# # post data to update
+# post data to update
+
+json_uurcodes = get_uurcodes_data()
+
+if json_uurcodes is not None:
+    response = requests.post(endpoint + f"timechimp/updateUurcodes")
+
+
 # json_customer = get_customer_data()
 
 # if json_customer is not None:
@@ -94,10 +101,10 @@ def get_uurcodes_data():
 #         response = requests.post(endpoint + f"ets/updateEmployee?employeeId={item}")
 
 json_project = get_project_data()
+i = 0
 
 if json_project is not None:
     lengte = len(json_project)
-    i = 100
     for item in json_project:
         response = requests.post(endpoint + f"ets/updateProject?projectId={item}")
         print(f"{i}/{lengte}")
@@ -113,10 +120,6 @@ if json_project is not None:
 # if json_mileages is not None:
 #     response = requests.get(endpoint + f"ets/mileage")
 
-json_uurcodes = get_uurcodes_data()
-
-if json_uurcodes is not None:
-    response = requests.post(endpoint + f"timechimp/updateUurcodes")
 
 endTime = datetime.now()
 

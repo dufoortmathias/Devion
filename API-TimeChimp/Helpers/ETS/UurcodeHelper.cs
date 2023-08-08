@@ -7,7 +7,7 @@ public class ETSUurcodeHelper
         // connection with ETS
         var client = new FirebirdClientETS();
 
-        var query = "SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD NOT LIKE '9%'";
+        var query = "SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD LIKE '0%'";
 
         //get data from ETS
         var response = client.selectQuery(query);
