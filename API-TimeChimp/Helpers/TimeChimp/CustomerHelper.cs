@@ -1,45 +1,45 @@
 namespace Api.Devion.Helpers.TimeChimp;
 
-public static class TimeChimpCustomerHelper
+public class TimeChimpCustomerHelper : TimeChimpHelper
 {
-    public static Boolean CustomerExists(String customerId)
+    public TimeChimpCustomerHelper(BearerTokenHttpClient client) : base(client)
+    {
+    }
+
+    public Boolean CustomerExists(String customerId)
     {
         return GetCustomers().Any(customer => customer.relationId != null && customer.relationId.Equals(customerId));
     }
 
-    public static List<customerTimeChimp> GetCustomers()
+    public List<customerTimeChimp> GetCustomers()
     {
         // connection with timechimp
-        var client = new BearerTokenHttpClient();
-        var response = client.GetAsync("customers");
+        var response = TCClient.GetAsync("v1/customers");
         List<customerTimeChimp> customers = JsonTool.ConvertTo<List<customerTimeChimp>>(response.Result);
         return customers;
     }
 
-    public static customerTimeChimp CreateCustomer(customerTimeChimp customer)
+    public customerTimeChimp CreateCustomer(customerTimeChimp customer)
     {
         //connection with timechimp
-        var client = new BearerTokenHttpClient();
-        var response = client.PostAsync("customers", JsonTool.ConvertFrom(customer));
+        var response = TCClient.PostAsync("v1/customers", JsonTool.ConvertFrom(customer));
         customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
         return customerResponse;
     }
 
-    public static customerTimeChimp UpdateCustomer(customerTimeChimp customer)
+    public customerTimeChimp UpdateCustomer(customerTimeChimp customer)
     {
         //connection with timechimp
-        var client = new BearerTokenHttpClient();
         customer.id = GetCustomers().Find(c => c.relationId.Equals(customer.relationId)).id;
-        var response = client.PutAsync("customers", JsonTool.ConvertFrom(customer));
+        var response = TCClient.PutAsync("v1/customers", JsonTool.ConvertFrom(customer));
         customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
         return customerResponse;
     }
 
-    public static customerTimeChimp GetCustomer(String customerId)
+    public customerTimeChimp GetCustomer(String customerId)
     {
         //connection with timechimp
-        var client = new BearerTokenHttpClient();
-        var response = client.GetAsync($"customers/{customerId}");
+        var response = TCClient.GetAsync($"v1/customers/{customerId}");
         customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
         return customerResponse;
     }

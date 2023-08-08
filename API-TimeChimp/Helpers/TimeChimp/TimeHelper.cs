@@ -1,19 +1,22 @@
 namespace Api.Devion.Helpers.TimeChimp;
 
-public static class TimeChimpTimeHelper
+public class TimeChimpTimeHelper : TimeChimpHelper
 {
-    public static List<timeETS> GetTimesLastWeek()
+    private FirebirdClientETS ETSClient;
+
+    public TimeChimpTimeHelper(BearerTokenHttpClient clientTC, FirebirdClientETS clientETS) : base(clientTC)
     {
-        // connection with timechimp
-        var client = new BearerTokenHttpClient();
+        ETSClient = clientETS;
+    }
 
-
+    public List<timeETS> GetTimesLastWeek()
+    {
         // get date from today and 7 days ago
         DateOnly today = DateOnly.FromDateTime(DateTime.Now);
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
 
         //get data from timechimp
-        var response = client.GetAsync($"time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
+        var response = TCClient.GetAsync($"v1/time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
         //convert data to timeTimeChimp object
         List<timeTimeChimp> times = JsonTool.ConvertTo<List<timeTimeChimp>>(response.Result);
 
@@ -24,7 +27,7 @@ public static class TimeChimpTimeHelper
             if (time.timechimpStatus == 2)
             {
                 // get project code
-                response = client.GetAsync($"projects/{time.PLA_PROJECT}");
+                response = TCClient.GetAsync($"v1/projects/{time.PLA_PROJECT}");
                 ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response.Result);
 
                 // split project code
@@ -37,17 +40,17 @@ public static class TimeChimpTimeHelper
                     time.PLA_SUBPROJECT = subProjectCode;
                     time.PLA_CAPTION = "Proj:" + time.PLA_PROJECT + "/ " + time.PLA_SUBPROJECT;
                     timeTimeChimp timechimp = times.Find(chimp => chimp.id == time.timechimpId);
-                    ProjectETS projectETS = ETSProjectHelper.GetProject(time.PLA_PROJECT);
+                    ProjectETS projectETS = new ETSProjectHelper(ETSClient).GetProject(time.PLA_PROJECT);
                     time.PLA_TEKST = time.PLA_PROJECT + ":" + time.PLA_SUBPROJECT + "\n" + projectETS.PR_KROM + "\n" + timechimp.projectName + "\n" + timechimp.userDisplayName + ": " + "\nWerkbon:";
 
                 }
 
                 //get uurcode
-                uurcodesTimeChimp uurcode = TimeChimpUurcodeHelper.GetUurcode(time.PLA_UURCODE);
+                uurcodesTimeChimp uurcode = new TimeChimpUurcodeHelper(TCClient, ETSClient).GetUurcode(time.PLA_UURCODE);
                 time.PLA_UURCODE = uurcode.code;
 
                 //get personeelsnummer
-                response = client.GetAsync($"users/{time.PLA_PERSOON}");
+                response = TCClient.GetAsync($"v1/users/{time.PLA_PERSOON}");
                 EmployeeTimeChimp user = JsonTool.ConvertTo<EmployeeTimeChimp>(response.Result);
                 time.PLA_PERSOON = user.employeeNumber;
                 timesETSFiltered.Add(time);
@@ -57,13 +60,12 @@ public static class TimeChimpTimeHelper
         return timesETSFiltered;
     }
 
-    public static changeRegistrationStatusTimeChimp changeStatus(List<int> ids)
+    public changeRegistrationStatusTimeChimp changeStatus(List<int> ids)
     {
-        var client = new BearerTokenHttpClient();
         changeRegistrationStatusTimeChimp changes = new changeRegistrationStatusTimeChimp();
         changes.registrationIds = ids;
         changes.status = 3;
-        var response = client.PostAsync("time/changestatusintern", JsonTool.ConvertFrom(changes));
+        var response = TCClient.PostAsync("time/changestatusintern", JsonTool.ConvertFrom(changes));
         return changes;
     }
 }

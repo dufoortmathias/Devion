@@ -1,54 +1,50 @@
 namespace Api.Devion.Helpers.TimeChimp
 {
-    public static class TimeChimpEmployeeHelper
+    public class TimeChimpEmployeeHelper : TimeChimpHelper
     {
-        public static Boolean EmployeeExists(String employeeId)
+        public TimeChimpEmployeeHelper(BearerTokenHttpClient client) : base(client)
+        {
+        }
+
+        public Boolean EmployeeExists(String employeeId)
         {
             return GetEmployees().Any(employee => employee.employeeNumber != null && employee.employeeNumber.Equals(employeeId));
         }
 
-        public static List<EmployeeTimeChimp> GetEmployees()
+        public List<EmployeeTimeChimp> GetEmployees()
         {
-            var client = new BearerTokenHttpClient();
-
-            String response = client.GetAsync("users").Result;
+            String response = TCClient.GetAsync("v1/users").Result;
 
             List<EmployeeTimeChimp> employees = JsonTool.ConvertTo<List<EmployeeTimeChimp>>(response);
             return employees;
         }
 
-        public static EmployeeTimeChimp CreateEmployee(EmployeeTimeChimp employee)
+        public EmployeeTimeChimp CreateEmployee(EmployeeTimeChimp employee)
         {
-            var client = new BearerTokenHttpClient();
-
             employee.email = employee.userName;
             employee.sendInvitation = true;
 
             String json = JsonTool.ConvertFrom(employee);
-            String response = client.PostAsync($"users", json).Result;
+            String response = TCClient.PostAsync($"v1/users", json).Result;
 
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;
         }
 
-        public static EmployeeTimeChimp UpdateEmployee(EmployeeTimeChimp employee)
+        public EmployeeTimeChimp UpdateEmployee(EmployeeTimeChimp employee)
         {
-            var client = new BearerTokenHttpClient();
-
             employee.id = GetEmployees().Find(e => e.userName != null && e.userName.Equals(employee.userName)).id;            
             
             String json = JsonTool.ConvertFrom(employee);
-            String response = client.PutAsync("users", json).Result;
+            String response = TCClient.PutAsync("v1/users", json).Result;
 
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;
         }
 
-        public static EmployeeTimeChimp GetEmployee(Int32 employeeId)
+        public EmployeeTimeChimp GetEmployee(Int32 employeeId)
         {
-            var client = new BearerTokenHttpClient();
-
-            String response = client.GetAsync($"users/{employeeId}").Result;
+            String response = TCClient.GetAsync($"v1/users/{employeeId}").Result;
 
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
             return employeeResponse;

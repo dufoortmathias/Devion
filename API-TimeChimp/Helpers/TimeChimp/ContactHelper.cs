@@ -1,39 +1,39 @@
 namespace Api.Devion.Helpers.TimeChimp;
 
-public class TimeChimpContactHelper
+public class TimeChimpContactHelper : TimeChimpHelper
 {
-    public static Boolean ContactExists(contactsETS contactETS)
+    public TimeChimpContactHelper(BearerTokenHttpClient client) : base(client)
+    {
+    }
+
+    public Boolean ContactExists(contactsETS contactETS)
     {
         return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_TAV));
     }
 
-    public static List<contactsTimeChimp> GetContacts()
+    public List<contactsTimeChimp> GetContacts()
     {
         // connection with timechimp
-        var client = new BearerTokenHttpClient();
-        var response = client.GetAsync("contacts");
+        var response = TCClient.GetAsync("v1/contacts");
         List<contactsTimeChimp> contacts = JsonTool.ConvertTo<List<contactsTimeChimp>>(response.Result);
         return contacts;
     }
 
-    public static contactsTimeChimp CreateContact(contactsTimeChimp contact)
+    public contactsTimeChimp CreateContact(contactsTimeChimp contact)
     {
         //connection with timechimp
-        var client = new BearerTokenHttpClient();
-        var response = client.PostAsync("contacts", JsonTool.ConvertFrom(contact));
+        var response = TCClient.PostAsync("v1/contacts", JsonTool.ConvertFrom(contact));
         contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response.Result);
         return contactResponse;
     }
 
-    public static contactsTimeChimp UpdateContact(contactsTimeChimp contact)
+    public contactsTimeChimp UpdateContact(contactsTimeChimp contact)
     {
-        var client = new BearerTokenHttpClient();
-
         // receive original contact from TimeChimp
         contactsTimeChimp originalContact;
         if (contact.id != null)
         {
-            var response = client.GetAsync($"contacts/{contact.id}").Result;
+            var response = TCClient.GetAsync($"v1/contacts/{contact.id}").Result;
             originalContact = JsonTool.ConvertTo<contactsTimeChimp>(response);
         }
         else
@@ -51,7 +51,7 @@ public class TimeChimpContactHelper
 
         // get ids from customers
         var customerIds = new List<int>();
-        List<customerTimeChimp> customers = TimeChimpCustomerHelper.GetCustomers();
+        List<customerTimeChimp> customers = new TimeChimpCustomerHelper(TCClient).GetCustomers();
         foreach (var customerId in contact.customerIds)
         {
             var id = "00000" + customerId.ToString();
@@ -69,7 +69,7 @@ public class TimeChimpContactHelper
 
         // update contact TimeChimp
         var json = JsonTool.ConvertFrom(originalContact);
-        var response2 = client.PutAsync("contacts", json).Result;
+        var response2 = TCClient.PutAsync("v1/contacts", json).Result;
         contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response2);
         return contactResponse;
 

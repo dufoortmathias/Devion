@@ -48,14 +48,6 @@
         {
             code = projectETS.PR_NR;
             name = projectETS.PR_KROM;
-            if (projectETS.PR_KLNR != null)
-            {
-                customerId = TimeChimpCustomerHelper.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(projectETS.PR_KLNR)).id.Value;
-            }
-            else
-            {
-                customerId = 0;
-            }
             startDate = projectETS.PR_START_PRODUCTIE;
             active = projectETS.PR_STAT.Equals('L');
             useSubprojects = true; //TODO: add value to seperate file

@@ -1,44 +1,44 @@
 namespace Api.Devion.Helpers.TimeChimp;
 
-public class TimeChimpProjectUserHelper
+public class TimeChimpProjectUserHelper : TimeChimpHelper
 {
-    public static ProjectUserTimechimp AddProjectUser(ProjectUserTimechimp projectUser)
+    public TimeChimpProjectUserHelper(BearerTokenHttpClient client) : base(client)
     {
-        var client = new BearerTokenHttpClient();
+    }
+
+    public ProjectUserTimechimp AddProjectUser(ProjectUserTimechimp projectUser)
+    {
         String json = JsonTool.ConvertFrom(projectUser);
-        String response = client.PostAsync("projectusers", json).Result;
+        String response = TCClient.PostAsync("v1/projectusers", json).Result;
 
         Console.WriteLine("ProjectUser added: " + response);
         return projectUser;
     }
 
-    public static List<ProjectUserTimechimp> GetProjectUsers()
+    public List<ProjectUserTimechimp> GetProjectUsers()
     {
-        var client = new BearerTokenHttpClient();
-
-        String response = client.GetAsync("projectusers").Result;
+        String response = TCClient.GetAsync("v1/projectusers").Result;
         List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
         return projectUsers;
     }
 
-    public static List<ProjectUserTimechimp> GetProjectUsersByProject(int projectId)
+    public List<ProjectUserTimechimp> GetProjectUsersByProject(int projectId)
     {
-        var client = new BearerTokenHttpClient();
-
-        String response = client.GetAsync($"projectusers/project/{projectId}").Result;
+        String response = TCClient.GetAsync($"v1/projectusers/project/{projectId}").Result;
         List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
         return projectUsers;
     }
 
-    public static object AddProjectUserProject(string projectNumber)
+    public object AddProjectUserProject(string projectNumber)
     {
-        Int32 projectId = TimeChimpProjectHelper.GetProjects().Find(p => p.code.Equals(projectNumber)).id.Value;
-        ProjectTimeChimp project = TimeChimpProjectHelper.GetProject(projectId);
+        TimeChimpProjectHelper projectHelper = new(TCClient);
+        Int32 projectId = projectHelper.GetProjects().Find(p => p.code.Equals(projectNumber)).id.Value;
+        ProjectTimeChimp project = projectHelper.GetProject(projectId);
 
         List<ProjectUserTimechimp> projectUsers = GetProjectUsersByProject(projectId);
 
         List<ProjectUserTimechimp> projectUsersAdded = new();
-        foreach (EmployeeTimeChimp employee in TimeChimpEmployeeHelper.GetEmployees())
+        foreach (EmployeeTimeChimp employee in new TimeChimpEmployeeHelper(TCClient).GetEmployees())
         {
             if (!projectUsers.Exists(e => e.userId.Equals(employee.id)))
             {
@@ -50,26 +50,23 @@ public class TimeChimpProjectUserHelper
         return projectUsersAdded;
     }
 
-    public static List<ProjectUserTimechimp> GetProjectUsersByUser(int userId)
+    public List<ProjectUserTimechimp> GetProjectUsersByUser(int userId)
     {
-        var client = new BearerTokenHttpClient();
-
-        String response = client.GetAsync($"projectusers/user/{userId}").Result;
+        String response = TCClient.GetAsync($"v1/projectusers/user/{userId}").Result;
         List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
         return projectUsers;
     }
 
-    public static object AddProjectUserEmployee(string employeeNumber)
+    public object AddProjectUserEmployee(string employeeNumber)
     {
-        Int32 employeeId = TimeChimpEmployeeHelper.GetEmployees().ToList().Find(e => e.employeeNumber.Equals(employeeNumber)).id.Value;
-        EmployeeTimeChimp employee = TimeChimpEmployeeHelper.GetEmployee(employeeId);
+        TimeChimpEmployeeHelper employeeHelper = new(TCClient);
+        Int32 employeeId = employeeHelper.GetEmployees().ToList().Find(e => e.employeeNumber.Equals(employeeNumber)).id.Value;
+        EmployeeTimeChimp employee = employeeHelper.GetEmployee(employeeId);
 
         List<ProjectUserTimechimp> projectUsers = GetProjectUsersByUser(employeeId);
 
         List<ProjectUserTimechimp> projectUsersAdded = new();
-        var projects = TimeChimpProjectHelper.GetProjects();
-        Console.WriteLine(projects.Count);
-        foreach (ProjectTimeChimp project in projects)
+        foreach (ProjectTimeChimp project in new TimeChimpProjectHelper(TCClient).GetProjects())
         {
             if (!projectUsers.Exists(e => e.projectId.Equals(project.id)))
             {
