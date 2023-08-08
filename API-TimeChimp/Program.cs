@@ -141,7 +141,28 @@ app.MapPost("/api/ets/syncproject", (String projectId) =>
 }).WithName("SyncProjectTimechimp");
 
 app.MapGet("/api/ets/employeeids", (String dateString) => ETSEmployeeHelper.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
-app.MapGet("/api/ets/times", () => ETSTimeHelper.GetTime()).WithName("GetTimesFromETS");
+app.MapGet("/api/ets/timeids", (String dateString) => TimeChimpTimeHelper.GetTimes(DateTime.Parse(dateString))).WithName("GetTimesFromETS");
+
+app.MapPost("/api/ets/synctime", (String timeId) =>
+{
+    timeTimeChimp TCTime = TimeChimpTimeHelper.GetTime(timeId);
+
+    // Handle when time doesn't exist in ETS
+    if (TCTime == null)
+    {
+        return Results.Problem($"ETS doesn't contain a time with id = {timeId}");
+    }
+
+    timeETS ETSTime = new(TCTime);
+
+    ETSTimeHelper.addTime(ETSTime);
+    List<int> ids = new List<int>();
+    ids.Add(TCTime.id);
+    TimeChimpTimeHelper.changeStatus(ids);
+
+    return Results.Ok(ETSTime);
+
+}).WithName("SyncTimeTimechimp");
 
 app.MapPost("/api/ets/syncemployee", (String employeeId) =>
 {
@@ -221,9 +242,28 @@ app.MapGet("/api/timechimp/mileages", () => TimeChimpMileageHelper.GetMileages()
 
 app.MapGet("/api/timechimp/uurcodes", () => TimeChimpUurcodeHelper.GetUurcodes()).WithName("GetUurcodes");
 
-app.MapGet("/api/ets/uurcodes", () => ETSUurcodeHelper.GetUurcodes()).WithName("GetUurcodesFromETS");
+app.MapGet("/api/ets/uurcodeids", (string dateString) => ETSUurcodeHelper.GetUurcodes(DateTime.Parse(dateString))).WithName("GetUurcodesFromETS");
 
-app.MapPost("/api/timechimp/updateUurcodes", () => TimeChimpUurcodeHelper.UpdateUurcodes()).WithName("UpdateUurcodes");
+app.MapPost("/api/timechimp/syncuurcodes", (string uurcodeId) =>
+{
+    uurcodesETS ETSuurcode = ETSUurcodeHelper.GetUurcode(uurcodeId);
+
+    if (ETSuurcode == null)
+    {
+        return Results.Problem($"ETS doesn't contain an uurcode with id = {uurcodeId}");
+    }
+
+    uurcodesTimeChimp uurcodeTimeChimp = new(ETSuurcode);
+
+    if (TimeChimpUurcodeHelper.uurcodeExists(uurcodeId))
+    {
+        return Results.Ok(TimeChimpUurcodeHelper.UpdateUurcode(uurcodeTimeChimp));
+    }
+    else
+    {
+        return Results.Ok(TimeChimpUurcodeHelper.CreateUurcode(uurcodeTimeChimp));
+    }
+}).WithName("UpdateUurcodes");
 
 app.MapGet("/api/ets/subprojects", (string mainprojectid) => ETSProjectHelper.GetSubprojects(mainprojectid)).WithName("GetSubprojects");
 

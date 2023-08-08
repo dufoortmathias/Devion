@@ -57,6 +57,41 @@ public static class TimeChimpTimeHelper
         return timesETSFiltered;
     }
 
+    public static String[] GetTimes(DateTime date)
+    {
+        // connection with timechimp
+        var client = new BearerTokenHttpClient();
+
+        //get data from timechimp
+        var response = client.GetAsync($"time/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.ToString("yyyy-MM-dd")}");
+        //convert data to timeTimeChimp object
+        List<timeTimeChimp> times = JsonTool.ConvertTo<List<timeTimeChimp>>(response.Result);
+
+        List<string> timeIds = new List<string>();
+        foreach (timeTimeChimp time in times)
+        {
+            if (time.status == 2)
+            {
+                timeIds.Add(time.id.ToString());
+            }
+        }
+        return timeIds.ToArray();
+    }
+
+    public static timeTimeChimp GetTime(string timeId)
+    {
+        // connection with timechimp
+        var client = new BearerTokenHttpClient();
+
+        //get data from timechimp
+        var response = client.GetAsync($"time/{timeId}");
+
+        //convert data to timechimp object
+        timeTimeChimp time = JsonTool.ConvertTo<timeTimeChimp>(response.Result);
+
+        return time;
+    }
+
     public static changeRegistrationStatusTimeChimp changeStatus(List<int> ids)
     {
         var client = new BearerTokenHttpClient();

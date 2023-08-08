@@ -63,21 +63,16 @@ public class TimeChimpUurcodeHelper
         return uurcodeResponse;
     }
 
-    public static List<uurcodesTimeChimp> UpdateUurcodes()
+    public static uurcodesTimeChimp UpdateUurcode(uurcodesTimeChimp uurcode)
     {
-        List<uurcodesETS> uurcodes = ETSUurcodeHelper.GetUurcodes();
-        List<uurcodesTimeChimp> uurcodesUpdated = new List<uurcodesTimeChimp>();
+        // connection with timechimp
+        var client = new BearerTokenHttpClient();
 
-        foreach (uurcodesETS uurcode in uurcodes)
-        {
-            if (!uurcodeExists(uurcode.UR_COD))
-            {
-                uurcodesTimeChimp uurcodeTimeChimp = new uurcodesTimeChimp(uurcode);
-                var response = TimeChimpUurcodeHelper.CreateUurcode(uurcodeTimeChimp);
-                uurcodesUpdated.Add(response);
-            }
-        }
+        //get data from timechimp
+        var response = client.PutAsync($"tasks", JsonTool.ConvertFrom(uurcode));
+        //convert data to timeTimeChimp object
+        uurcodesTimeChimp uurcodeResponse = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
 
-        return uurcodesUpdated;
+        return uurcodeResponse;
     }
 }
