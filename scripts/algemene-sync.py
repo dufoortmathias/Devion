@@ -85,9 +85,9 @@ def sync_employees(employee_ids):
         response = requests.post(f"{base_URL}ets/syncemployee?employeeId={employee_id}")
         if response.ok:
             synced.append(employee_id)
-            log(f"Syncronization employee ({employee_id}) succeeded")
+            log(f"Syncronization employee {employee_id} succeeded")
         else:
-            log(f"Syncronization employee ({employee_id}) failed!")
+            log(f"Syncronization employee {employee_id} failed! ({json.loads(response.text)['detail']})")
     return synced
 
 # Updates or creates uurcodes with a specific id in TimeChimp with the data from ETS
@@ -100,7 +100,7 @@ def sync_uurcodes(uurcode_ids):
             synced.append(uurcode_id)
             log(f"Syncronization uurcode ({uurcode_id}) succeeded")
         else:
-            log(f"Syncronization uurcode ({uurcode_id}) failed!")
+            log(f"Syncronization uurcode ({uurcode_id}) failed! ({json.loads(response.text)['detail']})")
     return synced
 
 # Updates or creates customers with a specific id in TimeChimp with the data from ETS
@@ -113,7 +113,7 @@ def sync_customers(customer_ids):
             synced.append(customer_id)
             log(f"Syncronization customer ({customer_id}) succeeded")
         else:
-            log(f"Syncronization customer ({customer_id}) failed!")
+            log(f"Syncronization customer ({customer_id}) failed! ({json.loads(response.text)['detail']})")
     return synced
 
 # Updates or creates contacts with a specific id in TimeChimp with the data from ETS
@@ -126,7 +126,7 @@ def sync_contacts(contact_ids):
             synced.append(contact_id)
             log(f"Syncronization contact ({contact_id}) succeeded")
         else:
-            log(f"Syncronization contact ({contact_id}) failed!")
+            log(f"Syncronization contact ({contact_id}) failed! ({json.loads(response.text)['detail']})")
     return synced
 
 # Updates or creates projects with a specific id in TimeChimp with the data from ETS, together with its subprojects
@@ -139,7 +139,7 @@ def sync_projects(project_ids):
             synced.append(project_id)
             log(f"Syncronization project ({project_id}) succeeded")
         else:
-            log(f"Syncronization project ({project_id}) failed!")
+            log(f"Syncronization project ({project_id}) failed! ({json.loads(response.text)['detail']})")
     return synced
 
 # Updates or creates times with a specific id in TimeChimp with the data from ETS
@@ -152,7 +152,7 @@ def sync_times(time_ids):
             synced.append(time_id)
             log(f"Syncronization time ({time_id}) succeeded")
         else:
-            log(f"Syncronization time ({time_id}) failed!")
+            log(f"Syncronization time ({time_id}) failed! ({json.loads(response.text)['detail']})")
     return synced
 
 # Updates or creates all mileages from TimeChimp to ETS
