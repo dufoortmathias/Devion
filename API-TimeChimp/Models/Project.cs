@@ -42,8 +42,10 @@
         public Boolean? useSubprojects { get; set; }
         public Int32[]? subprojectIds { get; set; }
 
+        //constructor without specific parameters
         public ProjectTimeChimp() { }
 
+        //constructor to from timechimp class to ets class (mainproject)
         public ProjectTimeChimp(ProjectETS projectETS)
         {
             code = projectETS.PR_NR;
@@ -55,6 +57,7 @@
             budgetMethod = 1; //TODO: add value to seperate file
         }
 
+        //constructor to from timechimp class to ets class (subproject)
         public ProjectTimeChimp(SubprojectETS subprojectETS, ProjectTimeChimp mainProject)
         {
             if (subprojectETS != null && mainProject != null)
