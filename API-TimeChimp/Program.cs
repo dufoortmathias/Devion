@@ -205,8 +205,38 @@ app.MapPost("/api/ets/syncproject", (String projectId) =>
 //get employeeids from ets
 app.MapGet("/api/ets/employeeids", (String dateString) => new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
 
-//get times from ets
-app.MapGet("/api/ets/times", () => new ETSTimeHelper(ETSClient, TimeChimpClient).GetTime()).WithName("GetTimesFromETS");
+//get timesids from timechimp
+app.MapGet("/api/ets/timesids", (String dateString) => new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimes(DateTime.Parse(dateString))).WithName("GetTimeIds");
+
+//sync time from timechimp to ets
+app.MapPost("api/ets/synctime", (String timeId) =>
+{
+    ETSTimeHelper timeHelperETS = new(ETSClient, TimeChimpClient);
+    TimeChimpTimeHelper timeHelperTC = new(TimeChimpClient, ETSClient);
+
+    // Get time from TimeChimp
+    timeTimeChimp TCTime = timeHelperTC.GetTime(timeId);
+
+    // Handle when time doesn't exist in TimeChimp
+    if (TCTime == null)
+    {
+        return Results.Problem($"TimeChimp doesn't contain a time with id = {timeId}");
+    }
+
+    // Change to ETS class
+    timeETS ETSTime = new(TCTime);
+
+    // add time to ETS
+    timeHelperETS.addTime(ETSTime);
+
+    List<int> ids = new List<int>();
+    ids.Add(TCTime.id);
+
+    //change status to invoiced (3)
+    timeHelperTC.changeStatus(ids);
+
+    return Results.Ok(timeHelperTC.GetTime(timeId));
+}).WithName("SyncTimeETS");
 
 //sync employee from ets to timechimp
 app.MapPost("/api/ets/syncemployee", (String employeeId) =>
@@ -299,10 +329,10 @@ app.MapGet("/api/ets/mileage", () =>
 app.MapGet("/api/timechimp/mileages", () => new TimeChimpMileageHelper(TimeChimpClient).GetMileages()).WithName("GetMileagesFromTimechimp");
 
 //get uurcodes from timechimp
-app.MapGet("/api/timechimp/uurcodes", (string dateString) => new TimeChimpUurcodeHelper(TimeChimpClient, ETSClient).GetUurcodes(DateTime.Parse(dateString))).WithName("GetUurcodes");
+app.MapGet("/api/timechimp/uurcodes", () => new TimeChimpUurcodeHelper(TimeChimpClient, ETSClient).GetUurcodes()).WithName("GetUurcodes");
 
 //get uurcodes from ets
-app.MapGet("/api/ets/uurcodes", () => new ETSUurcodeHelper(ETSClient).GetUurcodes()).WithName("GetUurcodesFromETS");
+app.MapGet("/api/ets/uurcodes", (string dateString) => new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))).WithName("GetUurcodesFromETS");
 
 //sync uurcodes from ets to timechimp
 app.MapPost("/api/timechimp/updateUurcodes", (string uurcodeId) =>

@@ -44,7 +44,7 @@ public class ETSTimeHelper : ETSHelper
         {
             time.PLA_ID = max[0].MAX + 1;
         }
-        customerTimeChimp customer =  new TimeChimpCustomerHelper(TCClient).GetCustomer(time.PLA_KLANT.ToString());
+        customerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(time.PLA_KLANT.ToString());
         time.PLA_KLANT = customer.relationId;
         response = ETSClient.insertQuery($"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE) " +
                                         $"VALUES ({time.PLA_ID}, {time.PLA_KLEUR}, '{time.PLA_CAPTION}', '{time.PLA_START.Value.ToString("yyyy-MM-dd HH:mm:ss")}', " +
