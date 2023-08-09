@@ -13,8 +13,10 @@ public class ProjectUserTimechimp
     public object[]? hourlyRates { get; set; }
     public bool? projectManager { get; set; }
 
+    //constructor without specific parameters
     public ProjectUserTimechimp() { }
 
+    //constructor to from timechimp class to ets class
     public ProjectUserTimechimp(EmployeeTimeChimp employee, ProjectTimeChimp subproject)
     {
         projectId = subproject.id;
