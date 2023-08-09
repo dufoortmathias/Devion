@@ -13,8 +13,10 @@ public class uurcodesTimeChimp
     public int[] tagIds { get; set; }
     public string[] tagNames { get; set; }
 
+    //constructor without specific parameters
     public uurcodesTimeChimp() { }
 
+    //constructor to from ets class to timechimp class
     public uurcodesTimeChimp(uurcodesETS uurcode)
     {
         this.name = uurcode.UR_OMS;
