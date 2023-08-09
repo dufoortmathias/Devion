@@ -48,9 +48,11 @@ public class timeETS
     public string? PLA_KLANT { get; set; }
     public string? PLA_UURCODE { get; set; }
 
+    //constructor without specific parameters
     public timeETS()
     { }
 
+    //constructor to from timechimp class to ets class
     public timeETS(timeTimeChimp time)
     {
         this.timechimpStatus = time.status;
