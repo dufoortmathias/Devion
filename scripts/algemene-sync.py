@@ -7,7 +7,7 @@ import datetime
 ## Start time script
 start_time = datetime.datetime.now()
 ## Base URL API
-base_URL = "http://localhost:5142/api/"
+base_URL = "http://localhost:5001/api/"
 ## Name of data file that stores information about last time this script 
 date_filename = "data.json"
 ## Defines format of how datetime objects should be tranlated to a String
@@ -85,9 +85,9 @@ def sync_employees(employee_ids):
         response = requests.post(f"{base_URL}ets/syncemployee?employeeId={employee_id}")
         if response.ok:
             synced.append(employee_id)
-            log(f"Syncronisation employee ({employee_id}) succeeded")
+            log(f"Syncronization employee ({employee_id}) succeeded")
         else:
-            log(f"Syncronisation employee ({employee_id}) failed!")
+            log(f"Syncronization employee ({employee_id}) failed!")
     return synced
 
 # Updates or creates uurcodes with a specific id in TimeChimp with the data from ETS
@@ -98,9 +98,9 @@ def sync_uurcodes(uurcode_ids):
         response = requests.post(f"{base_URL}ets/syncuurcode?uurcodeId={uurcode_id}")
         if response.ok:
             synced.append(uurcode_id)
-            log(f"Syncronisation uurcode ({uurcode_id}) succeeded")
+            log(f"Syncronization uurcode ({uurcode_id}) succeeded")
         else:
-            log(f"Syncronisation uurcode ({uurcode_id}) failed!")
+            log(f"Syncronization uurcode ({uurcode_id}) failed!")
     return synced
 
 # Updates or creates customers with a specific id in TimeChimp with the data from ETS
@@ -111,9 +111,9 @@ def sync_customers(customer_ids):
         response = requests.post(f"{base_URL}ets/synccustomer?customerId={customer_id}")
         if response.ok:
             synced.append(customer_id)
-            log(f"Syncronisation customer ({customer_id}) succeeded")
+            log(f"Syncronization customer ({customer_id}) succeeded")
         else:
-            log(f"Syncronisation customer ({customer_id}) failed!")
+            log(f"Syncronization customer ({customer_id}) failed!")
     return synced
 
 # Updates or creates contacts with a specific id in TimeChimp with the data from ETS
@@ -124,9 +124,9 @@ def sync_contacts(contact_ids):
         response = requests.post(f"{base_URL}ets/synccontact?contactId={contact_id}")
         if response.ok:
             synced.append(contact_id)
-            log(f"Syncronisation contact ({contact_id}) succeeded")
+            log(f"Syncronization contact ({contact_id}) succeeded")
         else:
-            log(f"Syncronisation contact ({contact_id}) failed!")
+            log(f"Syncronization contact ({contact_id}) failed!")
     return synced
 
 # Updates or creates projects with a specific id in TimeChimp with the data from ETS, together with its subprojects
@@ -137,9 +137,9 @@ def sync_projects(project_ids):
         response = requests.post(f"{base_URL}ets/syncproject?projectId={project_id}")
         if response.ok:
             synced.append(project_id)
-            log(f"Syncronisation project ({project_id}) succeeded")
+            log(f"Syncronization project ({project_id}) succeeded")
         else:
-            log(f"Syncronisation project ({project_id}) failed!")
+            log(f"Syncronization project ({project_id}) failed!")
     return synced
 
 # Updates or creates times with a specific id in TimeChimp with the data from ETS
@@ -147,12 +147,12 @@ def sync_projects(project_ids):
 def sync_times(time_ids):
     synced = []
     for time_id in time_ids:
-        response = requests.post(f"{base_URL}ets/syncproject?projectId={time_id}")
+        response = requests.post(f"{base_URL}ets/synctime?timeId={time_id}")
         if response.ok:
             synced.append(time_id)
-            log(f"Syncronisation time ({time_id}) succeeded")
+            log(f"Syncronization time ({time_id}) succeeded")
         else:
-            log(f"Syncronisation time ({time_id}) failed!")
+            log(f"Syncronization time ({time_id}) failed!")
     return synced
 
 # Updates or creates all mileages from TimeChimp to ETS
@@ -161,6 +161,9 @@ def sync_mileages():
     if response.ok:
         return True
     return False
+
+
+
 
 # # Sync Employees
 ## Checks if json already contains data from previous failed employee syncs, creates this field with empty list if false
@@ -175,8 +178,11 @@ json_data["failed_employees"] = list(set(employee_ids) - set(synced_employee_ids
 ## Log total results sync employees
 log("")
 log("Employees:")
-log(f"Total syncronisations succeeded: {len(synced_employee_ids)}")
-log(f"Total syncronisations failed: {len(employee_ids)-len(synced_employee_ids)}")
+if len(employee_ids) == 0:
+    log(f"Nothing to syncronize")
+else:
+    log(f"Total amount syncronization succeeded: {len(synced_employee_ids)}")
+    log(f"Total amount syncronization failed: {len(employee_ids)-len(synced_employee_ids)}")
 log("")
 
 # Sync Uurcodes
@@ -192,8 +198,11 @@ json_data["failed_uurcodes"] = list(set(uurcode_ids) - set(synced_uurcode_ids))
 ## Log total results sync uurcodes
 log("")
 log("Uurcodes:")
-log(f"Total syncronisations succeeded: {len(synced_uurcode_ids)}")
-log(f"Total syncronisations failed: {len(uurcode_ids)-len(synced_uurcode_ids)}")
+if len(uurcode_ids) == 0:
+    log(f"Nothing to syncronize")
+else:
+    log(f"Total amount syncronization succeeded: {len(synced_uurcode_ids)}")
+    log(f"Total amount syncronization failed: {len(uurcode_ids)-len(synced_uurcode_ids)}")
 log("")
 
 # Sync customers
@@ -209,8 +218,11 @@ json_data["failed_customers"] = list(set(customer_ids) - set(synced_customer_ids
 ## Log total results sync customers
 log("")
 log("Customers:")
-log(f"Total syncronisations succeeded: {len(synced_customer_ids)}")
-log(f"Total syncronisations failed: {len(customer_ids)-len(synced_customer_ids)}")
+if len(customer_ids) == 0:
+    log(f"Nothing to syncronize")
+else:
+    log(f"Total amount syncronization succeeded: {len(synced_customer_ids)}")
+    log(f"Total amount syncronization failed: {len(customer_ids)-len(synced_customer_ids)}")
 log("")
 
 # Sync contacts
@@ -226,8 +238,11 @@ json_data["failed_contacts"] = list(set(contact_ids) - set(synced_contact_ids))
 ## Log total results sync contacts
 log("")
 log("Contacts:")
-log(f"Total syncronisations succeeded: {len(synced_contact_ids)}")
-log(f"Total syncronisations failed: {len(contact_ids)-len(synced_contact_ids)}")
+if len(contact_ids) == 0:
+    log(f"Nothing to syncronize")
+else:
+    log(f"Total amount syncronization succeeded: {len(synced_contact_ids)}")
+    log(f"Total amount syncronization failed: {len(contact_ids)-len(synced_contact_ids)}")
 log("")
 
 # Sync projects
@@ -243,8 +258,11 @@ json_data["failed_projects"] = list(set(project_ids) - set(synced_project_ids))
 ## Log total results sync projects
 log("")
 log("Projects:")
-log(f"Total syncronisations succeeded: {len(synced_project_ids)}")
-log(f"Total syncronisations failed: {len(project_ids)-len(synced_project_ids)}")
+if len(project_ids) == 0:
+    log(f"Nothing to syncronize")
+else:
+    log(f"Total amount syncronization succeeded: {len(synced_project_ids)}")
+    log(f"Total amount syncronization failed: {len(project_ids)-len(synced_project_ids)}")
 log("")
 
 # Sync times
@@ -254,14 +272,17 @@ if "failed_times" not in json_data:
 ## Retrieves times to sync and adds times where previous sync attempt failed
 time_ids = get_times_to_sync() + json_data["failed_times"]
 ## Syncs these times and receives times where sync was successful
-synced_time_ids = sync_times(project_ids)
+synced_time_ids = sync_times(time_ids)
 ## Updates json to contain new failed time sync attempts
 json_data["failed_times"] = list(set(time_ids) - set(synced_time_ids))
 ## Log total results sync times
 log("")
 log("Times:")
-log(f"Total syncronisations succeeded: {len(synced_time_ids)}")
-log(f"Total syncronisations failed: {len(time_ids)-len(synced_time_ids)}")
+if len(time_ids) == 0:
+    log(f"Nothing to syncronize")
+else:
+    log(f"Total amount syncronization succeeded: {len(synced_time_ids)}")
+    log(f"Total amount syncronization failed: {len(time_ids)-len(synced_time_ids)}")
 log("")
 
 # Sync mileages
@@ -273,10 +294,9 @@ end_time = datetime.datetime.now()
 duration = end_time - start_time
 minutes = int(duration.total_seconds()/60)
 seconds = duration.total_seconds() % 60
-log(f"Duration: {minutes} minutes {seconds} seconds")
+log(f"Duration: {minutes} min {seconds} sec")
 
 log_filename = f"logs/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
-
 # Create log file
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 with open(log_filename, 'w+') as log_file:
