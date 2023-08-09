@@ -299,13 +299,38 @@ app.MapGet("/api/ets/mileage", () =>
 app.MapGet("/api/timechimp/mileages", () => new TimeChimpMileageHelper(TimeChimpClient).GetMileages()).WithName("GetMileagesFromTimechimp");
 
 //get uurcodes from timechimp
-app.MapGet("/api/timechimp/uurcodes", () => new TimeChimpUurcodeHelper(TimeChimpClient, ETSClient).GetUurcodes()).WithName("GetUurcodes");
+app.MapGet("/api/timechimp/uurcodes", (string dateString) => new TimeChimpUurcodeHelper(TimeChimpClient, ETSClient).GetUurcodes(DateTime.Parse(dateString))).WithName("GetUurcodes");
 
 //get uurcodes from ets
 app.MapGet("/api/ets/uurcodes", () => new ETSUurcodeHelper(ETSClient).GetUurcodes()).WithName("GetUurcodesFromETS");
 
 //sync uurcodes from ets to timechimp
-app.MapPost("/api/timechimp/updateUurcodes", () => new TimeChimpUurcodeHelper(TimeChimpClient, ETSClient).UpdateUurcodes()).WithName("UpdateUurcodes");
+app.MapPost("/api/timechimp/updateUurcodes", (string uurcodeId) =>
+{
+    //get uurcode from ets
+    uurcodesETS ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
+
+    // Handle when uurcode doesn't exist in ETS
+    if (ETSUurcode == null)
+    {
+        return Results.Problem($"ETS doesn't contain an uurcode with id = {uurcodeId}");
+    }
+
+    //change to timechimp class
+    uurcodesTimeChimp TCUurcode = new(ETSUurcode);
+
+    TimeChimpUurcodeHelper uurcodeHelper = new(TimeChimpClient, ETSClient);
+
+    //check if uurcode exists in timechimp
+    if (uurcodeHelper.uurcodeExists(uurcodeId))
+    {
+        return Results.Ok(uurcodeHelper.UpdateUurcode(TCUurcode));
+    }
+    else
+    {
+        return Results.Ok(uurcodeHelper.CreateUurcode(TCUurcode));
+    }
+}).WithName("UpdateUurcodes");
 
 //get subprojects from ets
 app.MapGet("/api/ets/subprojects", (string mainprojectid) => new ETSProjectHelper(ETSClient).GetSubprojects(mainprojectid)).WithName("GetSubprojects");
