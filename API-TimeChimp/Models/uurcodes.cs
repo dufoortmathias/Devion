@@ -33,6 +33,6 @@ public class uurcodesTimeChimp
 
 public class uurcodesETS
 {
-    public string UR_COD { get; set; }
-    public string UR_OMS { get; set; }
+    public string? UR_COD { get; set; }
+    public string? UR_OMS { get; set; }
 }

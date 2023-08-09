@@ -6,6 +6,7 @@ public class ETSTimeHelper : ETSHelper
     public ETSTimeHelper(FirebirdClientETS FBClient, BearerTokenHttpClient clientTC) : base(FBClient)
     {
         TCClient = clientTC;
+        ETSClient = FBClient;
     }
 
     public List<timeETS> GetTime()
@@ -46,10 +47,21 @@ public class ETSTimeHelper : ETSHelper
         }
         customerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(time.PLA_KLANT.ToString());
         time.PLA_KLANT = customer.relationId;
-        response = ETSClient.insertQuery($"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE) " +
-                                        $"VALUES ({time.PLA_ID}, {time.PLA_KLEUR}, '{time.PLA_CAPTION}', '{time.PLA_START.Value.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-                                        $"'{time.PLA_EINDE.Value.ToString("yyyy-MM-dd HH:mm:ss")}', '{time.PLA_KM_PAUZE}', '{time.PLA_TEKST}', " +
-                                        $"'{time.PLA_PROJECT}', '{time.PLA_SUBPROJECT}', '{time.PLA_PERSOON}', '{time.PLA_KLANT}', '{time.PLA_UURCODE}')");
+        time.PLA_UURCODE = new TimeChimpUurcodeHelper(TCClient, ETSClient).GetUurcode(time.PLA_UURCODE).code.ToString();
+        time.PLA_PERSOON = new TimeChimpEmployeeHelper(TCClient).GetEmployee(Int32.Parse(time.PLA_PERSOON)).employeeNumber.ToString();
+        var projectId = new TimeChimpProjectHelper(TCClient).GetProject(Int32.Parse(time.PLA_PROJECT)).code;
+        time.PLA_SUBPROJECT = projectId.Substring(projectId.Length - 4);
+        time.PLA_PROJECT = projectId.Substring(0, projectId.Length - 4);
+        time.PLA_CAPTION = "Proj:" + time.PLA_PROJECT + "/ " + time.PLA_SUBPROJECT;
+        timeTimeChimp timechimp = new TimeChimpTimeHelper(TCClient, ETSClient).GetTime(time.timechimpId.ToString());
+        ProjectETS projectETS = new ETSProjectHelper(ETSClient).GetProject(time.PLA_PROJECT);
+        time.PLA_TEKST = time.PLA_PROJECT + ":" + time.PLA_SUBPROJECT + "\n" + projectETS.PR_KROM + "\n" + timechimp.projectName + "\n" + timechimp.userDisplayName + ": " + "\nWerkbon:";
+        var query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE) " +
+                    $"VALUES ({time.PLA_ID}, {time.PLA_KLEUR}, '{time.PLA_CAPTION}', '{time.PLA_START.Value.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+                    $"'{time.PLA_EINDE.Value.ToString("yyyy-MM-dd HH:mm:ss")}', '{time.PLA_KM_PAUZE}', '{time.PLA_TEKST}', " +
+                    $"'{time.PLA_PROJECT}', '{time.PLA_SUBPROJECT}', '{time.PLA_PERSOON}', '{time.PLA_KLANT}', '{time.PLA_UURCODE}')";
+        Console.WriteLine(query);
+        response = ETSClient.insertQuery(query);
         return response;
     }
 

@@ -20,16 +20,16 @@ app.UseHttpsRedirection();
 Console.WriteLine(config["TimeChimp:BaseURL"]);
 
 // TimeChimp DEVION
-BearerTokenHttpClient TimeChimpClient = new(config["TimeChimp:BaseURL"], config["TimeChimp:BearerTokenDevion"]);
+// BearerTokenHttpClient TimeChimpClient = new(config["TimeChimp:BaseURL"], config["TimeChimp:BearerTokenDevion"]);
 
 // TimeChimp METABIL
-// BearerTokenHttpClient TimeChimpClient = new(config["TimeChimp:BaseURL"], config["TimeChimp:BearerTokenMetabil"]);
+BearerTokenHttpClient TimeChimpClient = new(config["TimeChimp:BaseURL"], config["TimeChimp:BearerTokenMetabil"]);
 
 // ETS DEVION
-FirebirdClientETS ETSClient = new(config["ETS:Server"], config["ETS:UserDevion"], config["ETS:PasswordDevion"], config["ETS:DatabaseDevion"]);
+// FirebirdClientETS ETSClient = new(config["ETS:Server"], config["ETS:UserDevion"], config["ETS:PasswordDevion"], config["ETS:DatabaseDevion"]);
 
 // ETS METABIL
-// FirebirdClientETS ETSClient = new(config["ETS:Server"], config["ETS:UserMetabil"], config["ETS:PasswordMetabil"], config["ETS:DatabaseMetabil"]);
+FirebirdClientETS ETSClient = new(config["ETS:Server"], config["ETS:UserMetabil"], config["ETS:PasswordMetabil"], config["ETS:DatabaseMetabil"]);
 
 //get customers from timechimp
 app.MapGet("/api/timechimp/customers", () => new TimeChimpCustomerHelper(TimeChimpClient).GetCustomers()).WithName("GetCustomers");
@@ -206,7 +206,7 @@ app.MapPost("/api/ets/syncproject", (String projectId) =>
 app.MapGet("/api/ets/employeeids", (String dateString) => new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
 
 //get timesids from timechimp
-app.MapGet("/api/ets/timesids", (String dateString) => new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimes(DateTime.Parse(dateString))).WithName("GetTimeIds");
+app.MapGet("/api/ets/timeids", (String dateString) => new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimes(DateTime.Parse(dateString))).WithName("GetTimeIds");
 
 //sync time from timechimp to ets
 app.MapPost("api/ets/synctime", (String timeId) =>
@@ -230,7 +230,7 @@ app.MapPost("api/ets/synctime", (String timeId) =>
     timeHelperETS.addTime(ETSTime);
 
     List<int> ids = new List<int>();
-    ids.Add(TCTime.id);
+    ids.Add(Int32.Parse(timeId));
 
     //change status to invoiced (3)
     timeHelperTC.changeStatus(ids);
@@ -332,10 +332,10 @@ app.MapGet("/api/timechimp/mileages", () => new TimeChimpMileageHelper(TimeChimp
 app.MapGet("/api/timechimp/uurcodes", () => new TimeChimpUurcodeHelper(TimeChimpClient, ETSClient).GetUurcodes()).WithName("GetUurcodes");
 
 //get uurcodes from ets
-app.MapGet("/api/ets/uurcodes", (string dateString) => new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))).WithName("GetUurcodesFromETS");
+app.MapGet("/api/ets/uurcodeids", (string dateString) => new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))).WithName("GetUurcodesFromETS");
 
 //sync uurcodes from ets to timechimp
-app.MapPost("/api/timechimp/updateUurcodes", (string uurcodeId) =>
+app.MapPost("/api/ets/syncuurcode", (string uurcodeId) =>
 {
     //get uurcode from ets
     uurcodesETS ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
@@ -377,4 +377,4 @@ app.MapPost("/api/timechimp/projectuserproject", (string projectId) => new TimeC
 //add projectuser to employee in timechimp
 app.MapPost("/api/timechimp/projectuseruser", (string userId) => new TimeChimpProjectUserHelper(TimeChimpClient).AddProjectUserEmployee(userId)).WithName("AddProjectUserUser");
 
-app.Run();
+app.Run("http://localhost:5001");

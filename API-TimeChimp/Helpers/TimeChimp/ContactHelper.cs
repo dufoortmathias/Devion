@@ -6,23 +6,30 @@ public class TimeChimpContactHelper : TimeChimpHelper
     {
     }
 
+    //check if contact exists
     public Boolean ContactExists(contactsETS contactETS)
     {
         return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_TAV));
     }
 
+    //get all contacts
     public List<contactsTimeChimp> GetContacts()
     {
-        // connection with timechimp
+        //get data from timechimp
         var response = TCClient.GetAsync("v1/contacts");
+
+        //convert data to contactTimeChimp object
         List<contactsTimeChimp> contacts = JsonTool.ConvertTo<List<contactsTimeChimp>>(response.Result);
         return contacts;
     }
 
+    //create contact
     public contactsTimeChimp CreateContact(contactsTimeChimp contact)
     {
-        //connection with timechimp
+        //send data to timechimp
         var response = TCClient.PostAsync("v1/contacts", JsonTool.ConvertFrom(contact));
+
+        //convert response to contactTimeChimp object
         contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response.Result);
         return contactResponse;
     }

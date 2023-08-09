@@ -7,7 +7,7 @@ public class ETSUurcodeHelper : ETSHelper
     }
 
 
-    public List<uurcodesETS> GetUurcodes(DateTime date)
+    public List<string> GetUurcodes(DateTime date)
     {
         var query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD LIKE '0%' AND DATE_CHANGED >= '{date.ToString("MM / dd / yyyy HH: mm")}'";
 
@@ -16,7 +16,13 @@ public class ETSUurcodeHelper : ETSHelper
         //convert data to uurcodesETS object
         List<uurcodesETS> uurcodes = JsonTool.ConvertTo<List<uurcodesETS>>(response);
 
-        return uurcodes;
+        //create list with all uurcodeids
+        List<string> uurcodesIds = new List<string>();
+        foreach (uurcodesETS uurcode in uurcodes)
+        {
+            uurcodesIds.Add(uurcode.UR_COD);
+        }
+        return uurcodesIds;
     }
 
     public uurcodesETS GetUurcode(string uurcodeId)
@@ -25,8 +31,9 @@ public class ETSUurcodeHelper : ETSHelper
 
         //get data from ETS
         var response = ETSClient.selectQuery(query);
+        Console.WriteLine(response);
         //convert data to uurcodesETS object
-        uurcodesETS uurcode = JsonTool.ConvertTo<uurcodesETS>(response);
+        uurcodesETS uurcode = JsonTool.ConvertTo<List<uurcodesETS>>(response).FirstOrDefault();
 
         return uurcode;
     }

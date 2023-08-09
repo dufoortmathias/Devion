@@ -65,12 +65,14 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     }
 
 
-    public List<uurcodesTimeChimp> UpdateUurcode(uurcodesTimeChimp uurcode)
+    public uurcodesTimeChimp UpdateUurcode(uurcodesTimeChimp uurcode)
     {
+        var uurcode2 = GetUurcodes().Find(uur => uur.code == uurcode.code);
+        uurcode.id = uurcode2.id;
         //get data from timechimp
-        var response = TCClient.PutAsync($"v1/tasks", JsonTool.ConvertFrom(uurcode));
+        var response = TCClient.PutAsync($"v1/tasks/", JsonTool.ConvertFrom(uurcode));
         //convert data to timeTimeChimp object
-        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response.Result);
+        uurcodesTimeChimp uurcodes = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
 
         return uurcodes;
     }

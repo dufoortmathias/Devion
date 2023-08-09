@@ -66,7 +66,7 @@ public class TimeChimpTimeHelper : TimeChimpHelper
     public String[] GetTimes(DateTime date)
     {
         //get data from timechimp
-        var response = TCClient.GetAsync($"v1/time/date/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.ToString("yyyy-MM-dd")}");
+        var response = TCClient.GetAsync($"v1/time/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.ToString("yyyy-MM-dd")}");
 
         //convert data to timeTimeChimp object
         List<timeTimeChimp> times = JsonTool.ConvertTo<List<timeTimeChimp>>(response.Result);
@@ -88,9 +88,10 @@ public class TimeChimpTimeHelper : TimeChimpHelper
     {
         //get data from timechimp
         var response = TCClient.GetAsync($"v1/time/{timeId}");
-
+        Console.WriteLine(response.Result);
         //convert data to timeTimeChimp object
         timeTimeChimp time = JsonTool.ConvertTo<timeTimeChimp>(response.Result);
+
 
         return time;
     }
@@ -101,7 +102,7 @@ public class TimeChimpTimeHelper : TimeChimpHelper
         changeRegistrationStatusTimeChimp changes = new changeRegistrationStatusTimeChimp();
         changes.registrationIds = ids;
         changes.status = 3;
-        var response = TCClient.PostAsync("time/changestatusintern", JsonTool.ConvertFrom(changes));
+        var response = TCClient.PostAsync("v1/time/changestatusintern", JsonTool.ConvertFrom(changes));
         return changes;
     }
 }
