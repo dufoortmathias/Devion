@@ -13,7 +13,6 @@ date_filename = "data.json"
 ## Defines format of how datetime objects should be tranlated to a String
 dateformat = "%d/%m/%Y %H:%M:%S"
 
-
 # Reads data from the json file, if the file doesn't exist it will create one
 global json_data
 if os.path.exists(date_filename):
@@ -48,6 +47,12 @@ def get_employees_to_sync():
     if response.ok:
         return response.json()
 
+# Receives ids from all uurcodes that have changed in ETS after last sync
+def get_uurcodes_to_sync():
+    response = requests.get(f"{base_URL}ets/uurcodeids?dateString={json_data['last_sync']}")
+    if response.ok:
+        return response.json()
+
 # Receives ids from all customers that have changed in ETS after last sync
 def get_customers_to_sync():
     response = requests.get(f"{base_URL}ets/customerids?dateString={json_data['last_sync']}")
@@ -66,6 +71,12 @@ def get_projects_to_sync():
     if response.ok:
         return response.json()
 
+# Receives ids from all times that have changed in ETS after last sync 
+def get_times_to_sync():
+    response = requests.get(f"{base_URL}ets/timeids?dateString={json_data['last_sync']}")
+    if response.ok:
+        return response.json()
+
 # Updates or creates employees with a specific id in TimeChimp with the data from ETS
 # Returns list of employees that have been successfully synchronized
 def sync_employees(employee_ids):
@@ -77,6 +88,19 @@ def sync_employees(employee_ids):
             log(f"Syncronisation employee ({employee_id}) succeeded")
         else:
             log(f"Syncronisation employee ({employee_id}) failed!")
+    return synced
+
+# Updates or creates uurcodes with a specific id in TimeChimp with the data from ETS
+# Returns list of uurcodes that have been successfully synchronized
+def sync_uurcodes(uurcode_ids):
+    synced = []
+    for uurcode_id in uurcode_ids:
+        response = requests.post(f"{base_URL}ets/syncuurcode?uurcodeId={uurcode_id}")
+        if response.ok:
+            synced.append(uurcode_id)
+            log(f"Syncronisation uurcode ({uurcode_id}) succeeded")
+        else:
+            log(f"Syncronisation uurcode ({uurcode_id}) failed!")
     return synced
 
 # Updates or creates customers with a specific id in TimeChimp with the data from ETS
@@ -118,7 +142,27 @@ def sync_projects(project_ids):
             log(f"Syncronisation project ({project_id}) failed!")
     return synced
 
-# Sync Employees
+# Updates or creates times with a specific id in TimeChimp with the data from ETS
+# Returns list of times that have been successfully synchronized
+def sync_times(time_ids):
+    synced = []
+    for time_id in time_ids:
+        response = requests.post(f"{base_URL}ets/syncproject?projectId={time_id}")
+        if response.ok:
+            synced.append(time_id)
+            log(f"Syncronisation time ({time_id}) succeeded")
+        else:
+            log(f"Syncronisation time ({time_id}) failed!")
+    return synced
+
+# Updates or creates all mileages from TimeChimp to ETS
+def sync_mileages():
+    response = requests.get(f"{base_URL}ets/mileage")
+    if response.ok:
+        return True
+    return False
+
+# # Sync Employees
 ## Checks if json already contains data from previous failed employee syncs, creates this field with empty list if false
 if "failed_employees" not in json_data:
     json_data["failed_employees"] = []
@@ -135,16 +179,22 @@ log(f"Total syncronisations succeeded: {len(synced_employee_ids)}")
 log(f"Total syncronisations failed: {len(employee_ids)-len(synced_employee_ids)}")
 log("")
 
-# Sync uurcodes
-# TODO
-
-# def get_uurcodes_data():
-#     response = requests.get(endpoint + f"ets/uurcodes")
-
-#     if response.status_code == 200:
-#         return response.json()
-#     else:
-#         return None
+# Sync Uurcodes
+## Checks if json already contains data from previous failed uurcode syncs, creates this field with empty list if false
+if "failed_uurcodes" not in json_data:
+    json_data["failed_uurcodes"] = []
+## Retrieves uurcodes to sync and adds uurcodes where previous sync attempt failed
+uurcode_ids = get_uurcodes_to_sync() + json_data["failed_uurcodes"]
+## Syncs these uurcodes and receives uurcodes where sync was successful
+synced_uurcode_ids = sync_uurcodes(uurcode_ids)
+## Updates json to contain new failed uurcode sync attempts
+json_data["failed_uurcodes"] = list(set(uurcode_ids) - set(synced_uurcode_ids))
+## Log total results sync uurcodes
+log("")
+log("Uurcodes:")
+log(f"Total syncronisations succeeded: {len(synced_uurcode_ids)}")
+log(f"Total syncronisations failed: {len(uurcode_ids)-len(synced_uurcode_ids)}")
+log("")
 
 # Sync customers
 ## Checks if json already contains data from previous failed customer syncs, creates this field with empty list if false
@@ -184,58 +234,52 @@ log("")
 ## Checks if json already contains data from previous failed project syncs, creates this field with empty list if false
 if "failed_projects" not in json_data:
     json_data["failed_projects"] = []
-## Retrieves projects to sync and adds contacts where previous sync attempt failed
+## Retrieves projects to sync and adds projects where previous sync attempt failed
 project_ids = get_projects_to_sync() + json_data["failed_projects"]
 ## Syncs these projects and receives projects where sync was successful
-synced_project_ids = sync_contacts(project_ids)
+synced_project_ids = sync_projects(project_ids)
 ## Updates json to contain new failed project sync attempts
 json_data["failed_projects"] = list(set(project_ids) - set(synced_project_ids))
 ## Log total results sync projects
 log("")
 log("Projects:")
-log(f"Total syncronisations succeeded: {len(synced_contact_ids)}")
-log(f"Total syncronisations failed: {len(contact_ids)-len(synced_contact_ids)}")
+log(f"Total syncronisations succeeded: {len(synced_project_ids)}")
+log(f"Total syncronisations failed: {len(project_ids)-len(synced_project_ids)}")
 log("")
 
 # Sync times
-# TODO
-
-# def get_uren_data():
-#     response = requests.get(endpoint + f"ets/times")
-
-#     if response.status_code == 200:
-#         return response.json()
-#     else:
-#         return None
-
-# # json_uren = get_uren_data()
-
-# # if json_uren is not None:
-# #     response = requests.post(endpoint + f"ets/times")
+## Checks if json already contains data from previous failed time syncs, creates this field with empty list if false
+if "failed_times" not in json_data:
+    json_data["failed_times"] = []
+## Retrieves times to sync and adds times where previous sync attempt failed
+time_ids = get_times_to_sync() + json_data["failed_times"]
+## Syncs these times and receives times where sync was successful
+synced_time_ids = sync_times(project_ids)
+## Updates json to contain new failed time sync attempts
+json_data["failed_times"] = list(set(time_ids) - set(synced_time_ids))
+## Log total results sync times
+log("")
+log("Times:")
+log(f"Total syncronisations succeeded: {len(synced_time_ids)}")
+log(f"Total syncronisations failed: {len(time_ids)-len(synced_time_ids)}")
+log("")
 
 # Sync mileages
-# TODO
+# TODO add milage sync
 
-# def get_mileages_data():
-#     response = requests.get(endpoint + f"timechimp/mileages")
-
-#     if response.status_code == 200:
-#         return response.json()
-#     else:
-#         return None
-
-# # json_mileages = get_mileages_data()
-
-# # if json_mileages is not None:
-# #     response = requests.get(endpoint + f"ets/mileage")
 
 # Determine runtime script
 end_time = datetime.datetime.now()
 duration = end_time - start_time
-log(f"Duration: {duration}")
+minutes = int(duration.total_seconds()/60)
+seconds = duration.total_seconds() % 60
+log(f"Duration: {minutes} minutes {seconds} seconds")
+
+log_filename = f"logs/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
 
 # Create log file
-with open(f"log-{start_time.strftime('%d%m%y-%H%M%S')}.txt", 'w') as log_file:
+os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+with open(log_filename, 'w+') as log_file:
     log_file.write(output)
 
 # Update the json data file
