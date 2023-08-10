@@ -9,8 +9,17 @@ public class ETSMileageHelper : ETSHelper
     //get all mileages
     public List<mileageETS> GetMileages()
     {
+        //create query
+        string query = "SELECT PLA_ID, PLA_KM, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KM_DERDEN, PLA_KM_VERGOEDING, PLA_START FROM tbl_planning";
+
         //get data form ETS
-        var response = ETSClient.selectQuery("SELECT PLA_ID, PLA_KM, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KM_DERDEN, PLA_KM_VERGOEDING, PLA_START FROM tbl_planning");
+        var response = ETSClient.selectQuery(query);
+
+        //check if response is succesfull
+        if (response == null)
+        {
+            throw new Exception("Error getting mileages from ETS with query: " + query);
+        }
 
         //convert data to mileageETS object
         List<mileageETS> mileages = JsonTool.ConvertTo<List<mileageETS>>(response);
@@ -25,6 +34,12 @@ public class ETSMileageHelper : ETSHelper
 
         //get data from ETS
         var responseGet = ETSClient.selectQuery(queryGet);
+
+        //check if response is succesfull
+        if (responseGet == null)
+        {
+            throw new Exception("Error getting mileages from ETS with query: " + queryGet);
+        }
 
         //convert data to mileageETS object
         List<mileageETS> mileages = JsonTool.ConvertTo<List<mileageETS>>(responseGet);
@@ -49,6 +64,13 @@ public class ETSMileageHelper : ETSHelper
 
         //send data to ETS
         var response = ETSClient.updateQuery(query);
+
+        //check if response is succesfull
+        if (response == null)
+        {
+            throw new Exception("Error updating mileage in ETS with query: " + query);
+        }
+
         return response;
     }
 }
