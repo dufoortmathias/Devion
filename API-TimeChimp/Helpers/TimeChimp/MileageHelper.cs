@@ -6,40 +6,46 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     {
     }
 
-    //get mileages
-    public List<mileageTimeChimp> GetMileages()
+    //get mileage
+    public MileageTimeChimp GetMileage(Int32 mileageId)
     {
-        //get data from timechimp
-        var response = TCClient.GetAsync("v1/mileage");
+        String enpoint = $"v1/mileage/{mileageId}";
 
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error getting mileages from timechimp with endpoint: v1/mileage");
-        }
+        //get data from timechimp
+        String response = TCClient.GetAsync(enpoint);
 
         //convert data to mileageTimeChimp object
-        List<mileageTimeChimp> mileages = JsonTool.ConvertTo<List<mileageTimeChimp>>(response.Result);
+        MileageTimeChimp mileage = JsonTool.ConvertTo<MileageTimeChimp>(response);
+        return mileage;
+    }
+
+    //get mileages
+    public List<MileageTimeChimp> GetMileages()
+    {
+        //get data from timechimp
+        String response = TCClient.GetAsync("v1/mileage");
+
+        //convert data to mileageTimeChimp object
+        List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
         return mileages;
     }
 
-    //get mileages by date
-    public List<mileageTimeChimp> GetMileagesByDate(DateTime date)
+    //get approved mileages by date
+    public List<Int32> GetApprovedMileageIdsByDate(DateTime date)
     {
-        //get data from timechimp between date and now
-        var response = TCClient.GetAsync($"v1/mileage/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.Date.ToString("yyyy-MM-dd")}");
+        String endpoint = $"v1/mileage/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.Date.ToString("yyyy-MM-dd")}";
 
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception($"Error getting mileages from timechimp with endpoint: v1/mileage/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.Date.ToString("yyyy-MM-dd")}");
-        }
+        //get data from timechimp between date and now
+        String response = TCClient.GetAsync(endpoint);
 
         //convert data to mileageTimeChimp object
-        List<mileageTimeChimp> mileages = JsonTool.ConvertTo<List<mileageTimeChimp>>(response.Result);
+        List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
 
         //return all mileages with status approved (2)
-        return mileages.FindAll(mileage => mileage.statusIntern == 2);
+        return mileages
+            .FindAll(mileage => mileage.statusIntern == 2)
+            .Select(mileage => mileage.id)
+            .ToList();
     }
 
     //change status of mileage
@@ -53,13 +59,7 @@ public class TimeChimpMileageHelper : TimeChimpHelper
         changes.status = 3;
 
         //send data to timechimp
-        var response = TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error changing status of mileage in timechimp with endpoint: v1/mileage/changestatusintern");
-        }
+        String response = TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
 
         return changes;
     }

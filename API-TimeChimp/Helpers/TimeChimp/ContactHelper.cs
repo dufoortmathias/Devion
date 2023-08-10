@@ -16,16 +16,10 @@ public class TimeChimpContactHelper : TimeChimpHelper
     public List<contactsTimeChimp> GetContacts()
     {
         //get data from timechimp
-        var response = TCClient.GetAsync("v1/contacts");
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error getting contacts from TimeChimp with endpoint: v1/contacts");
-        }
+        String response = TCClient.GetAsync("v1/contacts");
 
         //convert data to contactTimeChimp object
-        List<contactsTimeChimp> contacts = JsonTool.ConvertTo<List<contactsTimeChimp>>(response.Result);
+        List<contactsTimeChimp> contacts = JsonTool.ConvertTo<List<contactsTimeChimp>>(response);
         return contacts;
     }
 
@@ -33,16 +27,10 @@ public class TimeChimpContactHelper : TimeChimpHelper
     public contactsTimeChimp CreateContact(contactsTimeChimp contact)
     {
         //send data to timechimp
-        var response = TCClient.PostAsync("v1/contacts", JsonTool.ConvertFrom(contact));
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error creating contact in TimeChimp with endpoint: v1/contacts");
-        }
+        String response = TCClient.PostAsync("v1/contacts", JsonTool.ConvertFrom(contact));
 
         //convert response to contactTimeChimp object
-        contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response.Result);
+        contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response);
         return contactResponse;
     }
 
@@ -53,15 +41,9 @@ public class TimeChimpContactHelper : TimeChimpHelper
         if (contact.id != null)
         {
             // get original contact
-            var response = TCClient.GetAsync($"v1/contacts/{contact.id}");
+            String response = TCClient.GetAsync($"v1/contacts/{contact.id}");
 
-            //check if response is succesfull
-            if (!response.IsCompletedSuccessfully)
-            {
-                throw new Exception($"Error getting contact from TimeChimp with endpoint: v1/contacts/{contact.id}");
-            }
-
-            originalContact = JsonTool.ConvertTo<contactsTimeChimp>(response.Result);
+            originalContact = JsonTool.ConvertTo<contactsTimeChimp>(response);
         }
         else
         {
@@ -113,15 +95,9 @@ public class TimeChimpContactHelper : TimeChimpHelper
             throw new Exception("Error converting contact to json");
         }
 
-        var response2 = TCClient.PutAsync("v1/contacts", json);
+        String response2 = TCClient.PutAsync("v1/contacts", json);
 
-        //check if response is succesfull
-        if (!response2.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error updating contact in TimeChimp with endpoint: v1/contacts");
-        }
-
-        contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response2.Result);
+        contactsTimeChimp contactResponse = JsonTool.ConvertTo<contactsTimeChimp>(response2);
         return contactResponse;
 
     }

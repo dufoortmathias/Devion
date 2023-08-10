@@ -308,18 +308,31 @@ app.MapPost("/api/ets/syncemployee", (String employeeId) =>
 
 }).WithName("SyncEmployeeTimechimp");
 
-//sync mileages from timechimp to ets
-app.MapGet("/api/ets/mileage", () =>
+//get mileageids from timechimp that were changed after specific time
+app.MapGet("/api/ets/mileageids", (String dateString) =>
 {
     try
     {
-        //get mileages from ets
-        List<mileageETS> mileages = new ETSMileageHelper(ETSClient).GetMileages();
+        return Results.Ok(new TimeChimpMileageHelper(TimeChimpClient).GetApprovedMileageIdsByDate(DateTime.Parse(dateString)));
+    }
+    catch (Exception exception)
+    {
+        return Results.Problem(exception.Message);
+    }
+}).WithName("GetMileageIds");
 
-        //get mileages from timechimp
-        List<mileageTimeChimp> mileagesTimeChimp = new TimeChimpMileageHelper(TimeChimpClient).GetMileagesByDate(DateTime.Now.AddDays(-7));
+//sync mileages from timechimp to ets
+app.MapGet("/api/ets/syncmileage", (Int32 mileageId) =>
+{
+    try
+    {
+        MileageTimeChimp mileage = new TimeChimpMileageHelper(TimeChimpClient).GetMileage(mileageId);
 
-        List<int> ids = new List<int>();
+        mileage.projectId = new TimeChimpProjectHelper(TimeChimpClient).GetProjectId(mileage.projectId);
+        mileage.userId = int.Parse(new TimeChimpEmployeeHelper(TimeChimpClient).GetEmployee(mileage.userId).employeeNumber);
+
+        MileageETS mileageETS = new MileageETS(mileage);
+        var response = new ETSMileageHelper(ETSClient).UpdateMileage(mileageETS);
 
         //get projectID
         foreach (mileageTimeChimp mileage in mileagesTimeChimp)
@@ -356,9 +369,9 @@ app.MapGet("/api/ets/mileage", () =>
         }
 
         //change status
-        var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(ids);
+        //var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(ids);
 
-        return Results.Ok(mileagesETS);
+        return Results.Ok();
     }
     catch (Exception e)
     {
