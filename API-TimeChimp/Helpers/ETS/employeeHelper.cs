@@ -26,7 +26,7 @@ public class ETSEmployeeHelper : ETSHelper
         //get data from ETS
         string json = ETSClient.selectQuery(query);
 
-        //get all ids from the json
+        //get all ids from json
         List<string> ids = JsonTool.ConvertTo<List<EmployeeETS>>(json)
             .Select(employee => employee.PN_ID)
             .ToList();
