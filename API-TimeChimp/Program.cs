@@ -32,46 +32,46 @@ BearerTokenHttpClient TimeChimpClient = new(config["TimeChimp:BaseURL"], config[
 FirebirdClientETS ETSClient = new(config["ETS:Server"], config["ETS:UserMetabil"], config["ETS:PasswordMetabil"], config["ETS:DatabaseMetabil"]);
 
 //get customers from timechimp
-app.MapGet("/api/timechimp/customers", () => new TimeChimpCustomerHelper(TimeChimpClient).GetCustomers()).WithName("GetCustomers");
+app.MapGet("/api/timechimp/customers", () => { try { return Results.Ok(new TimeChimpCustomerHelper(TimeChimpClient).GetCustomers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetCustomers");
 
 //create customer in timechimp
-app.MapPost("/api/timechimp/customer", (customerTimeChimp customer) => new TimeChimpCustomerHelper(TimeChimpClient).CreateCustomer(customer)).WithName("CreateCustomer");
+app.MapPost("/api/timechimp/customer", (customerTimeChimp customer) => { try { return Results.Ok(new TimeChimpCustomerHelper(TimeChimpClient).CreateCustomer(customer)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("CreateCustomer");
 
 //get projects from timechimp
-app.MapGet("/api/timechimp/projects", () => new TimeChimpProjectHelper(TimeChimpClient).GetProjects()).WithName("GetProjects");
+app.MapGet("/api/timechimp/projects", () => { try { return Results.Ok(new TimeChimpProjectHelper(TimeChimpClient).GetProjects()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetProjects");
 
 //create project in timechimp
-app.MapPost("/api/timechimp/project", (ProjectTimeChimp project) => new TimeChimpProjectHelper(TimeChimpClient).CreateProject(project)).WithName("CreateProject");
+app.MapPost("/api/timechimp/project", (ProjectTimeChimp project) => { try { return Results.Ok(new TimeChimpProjectHelper(TimeChimpClient).CreateProject(project)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("CreateProject");
 
 //update project in timechimp
-app.MapPut("/api/timechimp/project", (ProjectTimeChimp project) => new TimeChimpProjectHelper(TimeChimpClient).UpdateProject(project)).WithName("UpdateProject");
+app.MapPut("/api/timechimp/project", (ProjectTimeChimp project) => { try { return Results.Ok(new TimeChimpProjectHelper(TimeChimpClient).UpdateProject(project)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("UpdateProject");
 
 //get times from timechimp last week
-app.MapGet("api/timechimp/times", () => new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimesLastWeek()).WithName("GetTimesFromLastWeek");
+app.MapGet("api/timechimp/times", () => { try { return Results.Ok(new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimesLastWeek()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetTimesFromLastWeek");
 
 //update employee in timechimp
-app.MapPut("/api/timechimp/employee", (EmployeeTimeChimp employee) => new TimeChimpEmployeeHelper(TimeChimpClient).UpdateEmployee(employee)).WithName("UpdateEmployee");
+app.MapPut("/api/timechimp/employee", (EmployeeTimeChimp employee) => { try { return Results.Ok(new TimeChimpEmployeeHelper(TimeChimpClient).UpdateEmployee(employee)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("UpdateEmployee");
 
 //create employee in timechimp
-app.MapPost("/api/timechimp/employee", (EmployeeTimeChimp employee) => new TimeChimpEmployeeHelper(TimeChimpClient).CreateEmployee(employee)).WithName("CreateEmployee");
+app.MapPost("/api/timechimp/employee", (EmployeeTimeChimp employee) => { try { return Results.Ok(new TimeChimpEmployeeHelper(TimeChimpClient).CreateEmployee(employee)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("CreateEmployee");
 
 //get employees from timechimp
-app.MapGet("/api/timechimp/employees", () => new TimeChimpEmployeeHelper(TimeChimpClient).GetEmployees()).WithName("GetEmployees");
+app.MapGet("/api/timechimp/employees", () => { try { return Results.Ok(new TimeChimpEmployeeHelper(TimeChimpClient).GetEmployees()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetEmployees");
 
 //get contacts from timechimp
-app.MapGet("/api/timechimp/contacts", () => new TimeChimpContactHelper(TimeChimpClient).GetContacts()).WithName("GetContacts");
+app.MapGet("/api/timechimp/contacts", () => { try { return Results.Ok(new TimeChimpContactHelper(TimeChimpClient).GetContacts()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetContacts");
 
 //create contact in timechimp
-app.MapPost("/api/timechimp/contact", (contactsTimeChimp contact) => new TimeChimpContactHelper(TimeChimpClient).CreateContact(contact)).WithName("PostContact");
+app.MapPost("/api/timechimp/contact", (contactsTimeChimp contact) => { try { return Results.Ok(new TimeChimpContactHelper(TimeChimpClient).CreateContact(contact)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("PostContact");
 
 //update contact in timechimp
-app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => new TimeChimpContactHelper(TimeChimpClient).UpdateContact(contact)).WithName("PutContact");
+app.MapPut("/api/timechimp/contacten", (contactsTimeChimp contact) => { try { return Results.Ok(new TimeChimpContactHelper(TimeChimpClient).UpdateContact(contact)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("PutContact");
 
 //get mileages from timechimp and send the to ets
-app.MapGet("/api/timechimp/mileage", () => new TimeChimpMileageHelper(TimeChimpClient).GetMileages()).WithName("GetMileages");
+app.MapGet("/api/timechimp/mileage", () => { try { return Results.Ok(new TimeChimpMileageHelper(TimeChimpClient).GetMileages()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetMileages");
 
 //get customerids from ets
-app.MapGet("/api/ets/customerids", (String dateString) => new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetCustomerIds");
+app.MapGet("/api/ets/customerids", (String dateString) => { try { return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetCustomerIds");
 
 //sync customer from ets to timechimp
 app.MapPost("/api/ets/synccustomer", (String customerId) =>
@@ -109,7 +109,7 @@ app.MapPost("/api/ets/synccustomer", (String customerId) =>
 }).WithName("SyncCustomerTimechimp");
 
 //get contactids from ets
-app.MapGet("/api/ets/contactids", (String dateString) => new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetContactIds");
+app.MapGet("/api/ets/contactids", (String dateString) => { try { return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetContactIds");
 
 //sync contact from ets to timechimp
 app.MapPost("/api/ets/synccontact", (Int32 contactId) =>
@@ -140,7 +140,7 @@ app.MapPost("/api/ets/synccontact", (Int32 contactId) =>
 }).WithName("SyncContactTimechimp");
 
 //get projectids from ets
-app.MapGet("/api/ets/projectids", (String dateString) => new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetProjectIds");
+app.MapGet("/api/ets/projectids", (String dateString) => { try { return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetProjectIds");
 
 //sync project from ets to timechimp
 app.MapPost("/api/ets/syncproject", (String projectId) =>
@@ -217,10 +217,10 @@ app.MapPost("/api/ets/syncproject", (String projectId) =>
 }).WithName("SyncProjectTimechimp");
 
 //get employeeids from ets
-app.MapGet("/api/ets/employeeids", (String dateString) => new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))).WithName("GetEmployeeIds");
+app.MapGet("/api/ets/employeeids", (String dateString) => { try { return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetEmployeeIds");
 
 //get timesids from timechimp
-app.MapGet("/api/ets/timeids", (String dateString) => new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimes(DateTime.Parse(dateString))).WithName("GetTimeIds");
+app.MapGet("/api/ets/timeids", (String dateString) => { try { return Results.Ok(new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetTimeIds");
 
 //sync time from timechimp to ets
 app.MapPost("api/ets/synctime", (String timeId) =>
@@ -300,11 +300,12 @@ app.MapPost("/api/ets/syncemployee", (String employeeId) =>
 
             return Results.Ok(employee);
         }
-    } catch (Exception exception)
+    }
+    catch (Exception exception)
     {
         return Results.Problem(exception.Message);
     }
-    
+
 }).WithName("SyncEmployeeTimechimp");
 
 //sync mileages from timechimp to ets
@@ -338,7 +339,7 @@ app.MapGet("/api/ets/mileage", () =>
         foreach (mileageTimeChimp mileage in mileagesTimeChimp)
         {
             // check if there is a mileage for a retour of the current mileage
-            mileageTimeChimp mileages2 = copyMileages.Find(mileage2 => mileage2.projectId == mileage.projectId && mileage2.userId == mileage.userId && mileage2.distance == mileage.distance && mileage2.fromAddress == mileage.toAddress && mileage2.toAddress == mileage.fromAddress);
+            mileageTimeChimp? mileages2 = copyMileages.Find(mileage2 => mileage2.projectId == mileage.projectId && mileage2.userId == mileage.userId && mileage2.distance == mileage.distance && mileage2.fromAddress == mileage.toAddress && mileage2.toAddress == mileage.fromAddress);
             if (mileages2 != null)
             {
                 mileage.distance = mileage.distance * 2;
@@ -366,13 +367,13 @@ app.MapGet("/api/ets/mileage", () =>
 }).WithName("GetMileagesFromETS");
 
 //get mileages from timechimp
-app.MapGet("/api/timechimp/mileages", () => new TimeChimpMileageHelper(TimeChimpClient).GetMileages()).WithName("GetMileagesFromTimechimp");
+app.MapGet("/api/timechimp/mileages", () => { try { return Results.Ok(new TimeChimpMileageHelper(TimeChimpClient).GetMileages()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetMileagesFromTimechimp");
 
 //get uurcodes from timechimp
-app.MapGet("/api/timechimp/uurcodes", () => new TimeChimpUurcodeHelper(TimeChimpClient, ETSClient).GetUurcodes()).WithName("GetUurcodes");
+app.MapGet("/api/timechimp/uurcodes", () => { try { return Results.Ok(new TimeChimpUurcodeHelper(TimeChimpClient, ETSClient).GetUurcodes()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetUurcodes");
 
 //get uurcodes from ets
-app.MapGet("/api/ets/uurcodeids", (string dateString) => new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))).WithName("GetUurcodesFromETS");
+app.MapGet("/api/ets/uurcodeids", (string dateString) => { try { return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetUurcodesFromETS");
 
 //sync uurcodes from ets to timechimp
 app.MapPost("/api/ets/syncuurcode", (string uurcodeId) =>
@@ -410,9 +411,9 @@ app.MapPost("/api/ets/syncuurcode", (string uurcodeId) =>
 }).WithName("UpdateUurcodes");
 
 //get subprojects from ets
-app.MapGet("/api/ets/subprojects", (string mainprojectid) => new ETSProjectHelper(ETSClient).GetSubprojects(mainprojectid)).WithName("GetSubprojects");
+app.MapGet("/api/ets/subprojects", (string mainprojectid) => { try { return Results.Ok(new ETSProjectHelper(ETSClient).GetSubprojects(mainprojectid)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetSubprojects");
 
 //get projectusers from timechimp
-app.MapGet("/api/timechimp/projectusers", () => new TimeChimpProjectUserHelper(TimeChimpClient).GetProjectUsers()).WithName("GetProjectUsers");
+app.MapGet("/api/timechimp/projectusers", () => { try { return Results.Ok(new TimeChimpProjectUserHelper(TimeChimpClient).GetProjectUsers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetProjectUsers");
 
-app.Run();
+app.Run("http://localhost:5001");
