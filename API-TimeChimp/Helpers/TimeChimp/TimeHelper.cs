@@ -16,8 +16,21 @@ public class TimeChimpTimeHelper : TimeChimpHelper
         DateOnly today = DateOnly.FromDateTime(DateTime.Now);
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
 
+        //check if dates are empty
+        if (today == null || lastWeek == null)
+        {
+            throw new Exception("Error getting dates for times last week");
+        }
+
         //get data from timechimp
         var response = TCClient.GetAsync($"v1/time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
+
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception($"Error getting all times from timechimp with endpoint: v1/time/daterange/{lastWeek.ToString("yyyy-MM-dd")}/{today.ToString("yyyy-MM-dd")}");
+        }
+
         //convert data to timeTimeChimp object
         List<timeTimeChimp> times = JsonTool.ConvertTo<List<timeTimeChimp>>(response.Result);
 
@@ -25,10 +38,19 @@ public class TimeChimpTimeHelper : TimeChimpHelper
         List<timeETS> timesETSFiltered = new List<timeETS>();
         foreach (timeETS time in timesETS)
         {
+            //check if status is approved (2)
             if (time.timechimpStatus == 2)
             {
                 // get project code
                 response = TCClient.GetAsync($"v1/projects/{time.PLA_PROJECT}");
+
+                //check if response is succesfull
+                if (!response.IsCompletedSuccessfully)
+                {
+                    throw new Exception($"Error getting project from timechimp with endpoint: v1/projects/{time.PLA_PROJECT}");
+                }
+
+                //convert data to projectTimeChimp object
                 ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response.Result);
 
                 // split project code
@@ -53,6 +75,14 @@ public class TimeChimpTimeHelper : TimeChimpHelper
 
                 //get personeelsnummer
                 response = TCClient.GetAsync($"v1/users/{time.PLA_PERSOON}");
+
+                //check if response is succesfull
+                if (!response.IsCompletedSuccessfully)
+                {
+                    throw new Exception($"Error getting user from timechimp with endpoint: v1/users/{time.PLA_PERSOON}");
+                }
+
+                //convert data to employeeTimeChimp object
                 EmployeeTimeChimp user = JsonTool.ConvertTo<EmployeeTimeChimp>(response.Result);
                 time.PLA_PERSOON = user.employeeNumber;
                 timesETSFiltered.Add(time);
@@ -67,6 +97,12 @@ public class TimeChimpTimeHelper : TimeChimpHelper
     {
         //get data from timechimp
         var response = TCClient.GetAsync($"v1/time/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.ToString("yyyy-MM-dd")}");
+
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception($"Error getting all times from timechimp with endpoint: v1/time/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.ToString("yyyy-MM-dd")}");
+        }
 
         //convert data to timeTimeChimp object
         List<timeTimeChimp> times = JsonTool.ConvertTo<List<timeTimeChimp>>(response.Result);
@@ -88,7 +124,13 @@ public class TimeChimpTimeHelper : TimeChimpHelper
     {
         //get data from timechimp
         var response = TCClient.GetAsync($"v1/time/{timeId}");
-        Console.WriteLine(response.Result);
+
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception($"Error getting time from timechimp with endpoint: v1/time/{timeId}");
+        }
+
         //convert data to timeTimeChimp object
         timeTimeChimp time = JsonTool.ConvertTo<timeTimeChimp>(response.Result);
 
@@ -102,7 +144,16 @@ public class TimeChimpTimeHelper : TimeChimpHelper
         changeRegistrationStatusTimeChimp changes = new changeRegistrationStatusTimeChimp();
         changes.registrationIds = ids;
         changes.status = 3;
+
+        //send data to timechimp
         var response = TCClient.PostAsync("v1/time/changestatusintern", JsonTool.ConvertFrom(changes));
+
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception("Error changing status of time in timechimp with endpoint: v1/time/changestatusintern");
+        }
+
         return changes;
     }
 }
