@@ -15,6 +15,12 @@
             //get data from ETS
             string json = ETSClient.selectQuery(query);
 
+            //check if json is not empty
+            if (json == null)
+            {
+                throw new Exception("Error getting project from ETS with query: " + query);
+            }
+
             //convert data to projectETS object
             ProjectETS project = JsonTool.ConvertTo<ProjectETS[]>(json).First();
             return project;
@@ -29,6 +35,8 @@
             //get data from ETS
             string json = ETSClient.selectQuery(query);
 
+            //check if json is not empty
+
             //convert data to subprojectETS object
             List<SubprojectETS> subprojects = JsonTool.ConvertTo<List<SubprojectETS>>(json);
             return subprojects;
@@ -42,6 +50,12 @@
 
             //get data from ETS
             string json = ETSClient.selectQuery(query);
+
+            //check if json is not empty
+            if (json == null)
+            {
+                throw new Exception("Error getting projectids from ETS with query: " + query);
+            }
 
             //get all ids from the json
             String[] ids = JsonTool.ConvertTo<ProjectETS[]>(json)
