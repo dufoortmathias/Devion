@@ -6,7 +6,7 @@ public class ETSUurcodeHelper : ETSHelper
     {
     }
 
-
+    // get all uurcodes that are changed after the given date
     public List<string> GetUurcodes(DateTime date)
     {
         var query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD LIKE '0%' AND DATE_CHANGED >= '{date.ToString("MM / dd / yyyy HH: mm")}'";
@@ -25,6 +25,7 @@ public class ETSUurcodeHelper : ETSHelper
         return uurcodesIds;
     }
 
+    // get uurcode by uurcodeId
     public uurcodesETS GetUurcode(string uurcodeId)
     {
         var query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD = '{uurcodeId}'";
