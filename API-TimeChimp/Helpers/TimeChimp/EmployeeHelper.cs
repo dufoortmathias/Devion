@@ -34,10 +34,18 @@ namespace Api.Devion.Helpers.TimeChimp
             String json = JsonTool.ConvertFrom(employee);
 
             //send data to timechimp
-            String response = TCClient.PostAsync($"v1/users", json).Result;
+            Task<string> response = TCClient.PostAsync($"v1/users", json);
+
+            //throw an error when post request fails with status WaitingForActivation
+            //this status means an employee already exists with that email and is waiting for approval
+            if (response.Status.Equals(TaskStatus.WaitingForActivation))
+            {
+                throw new Exception($"In TimeChimp an employee with email \"{employee.email}\" already exists that is not active");
+            }
 
             //convert response to employeeTimeChimp object
-            EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
+            EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response.Result);
+
             return employeeResponse;
         }
 

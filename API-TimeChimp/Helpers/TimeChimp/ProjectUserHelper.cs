@@ -42,7 +42,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     }
 
     //add all user for project
-    public object AddProjectUserProject(string projectNumber)
+    public object AddAllProjectUserForProject(string projectNumber)
     {
         TimeChimpProjectHelper projectHelper = new(TCClient);
 
@@ -62,7 +62,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
             if (!projectUsers.Exists(e => e.userId.Equals(employee.id)))
             {
                 //create projectuser
-                ProjectUserTimechimp projectUser = new ProjectUserTimechimp(employee, project);
+                ProjectUserTimechimp projectUser = new ProjectUserTimechimp(employee.id.Value, project.id.Value);
                 ProjectUserTimechimp response = AddProjectUser(projectUser);
                 projectUsersAdded.Add(projectUser);
             }
@@ -82,17 +82,9 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     }
 
     //add all projectusers for employee
-    public object AddProjectUserEmployee(string employeeNumber)
+    public object AddAllProjectUserForEmployee(Int32 employeeId)
     {
-        TimeChimpEmployeeHelper employeeHelper = new(TCClient);
-
-        //get employeeId from timechimp
-        Int32 employeeId = employeeHelper.GetEmployees().ToList().Find(e => e.employeeNumber.Equals(employeeNumber)).id.Value;
-
-        //get employee from timechimp
-        EmployeeTimeChimp employee = employeeHelper.GetEmployee(employeeId);
-
-        //get projectusers ny user from timechimp
+        //get projectusers by user from timechimp
         List<ProjectUserTimechimp> projectUsers = GetProjectUsersByUser(employeeId);
 
         List<ProjectUserTimechimp> projectUsersAdded = new();
@@ -101,7 +93,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
             //check if user is not already added to project
             if (!projectUsers.Exists(e => e.projectId.Equals(project.id)))
             {
-                ProjectUserTimechimp projectUser = new ProjectUserTimechimp(employee, project);
+                ProjectUserTimechimp projectUser = new ProjectUserTimechimp(employeeId, project.id.Value);
                 ProjectUserTimechimp response = AddProjectUser(projectUser);
                 projectUsersAdded.Add(projectUser);
             }

@@ -241,37 +241,49 @@ app.MapPost("api/ets/synctime", (String timeId) =>
 //sync employee from ets to timechimp
 app.MapPost("/api/ets/syncemployee", (String employeeId) =>
 {
-    //get employee from ets
-    EmployeeETS ETSEmployee = new ETSEmployeeHelper(ETSClient).GetEmployee(employeeId);
-
-    // Handle when contact doesn't exist in ETS
-    if (ETSEmployee == null)
+    try
     {
-        return Results.Problem($"ETS doesn't contain an employee with id = {employeeId}");
-    }
+        //get employee from ets
+        EmployeeETS ETSEmployee = new ETSEmployeeHelper(ETSClient).GetEmployee(employeeId);
 
-    //change to timechimp class
-    EmployeeTimeChimp TCEmployee = new(ETSEmployee);
-
-    TimeChimpEmployeeHelper employeeHelper = new(TimeChimpClient);
-
-    //check if employee exists in timechimp
-    if (employeeHelper.EmployeeExists(employeeId))
-    {
-        return Results.Ok(employeeHelper.UpdateEmployee(TCEmployee));
-    }
-    else
-    {
-        //check if employee has an emailaddress
-        if (TCEmployee.userName == null)
+        // Handle when contact doesn't exist in ETS
+        if (ETSEmployee == null)
         {
-            return Results.Problem($"Can't create the employee {TCEmployee.displayName} without an emailaddress");
+            return Results.Problem($"ETS doesn't contain an employee with id = {employeeId}");
         }
 
-        EmployeeTimeChimp employee = employeeHelper.CreateEmployee(TCEmployee);
-        TCEmployee.id = employee.id;
-        return Results.Ok(employeeHelper.UpdateEmployee(TCEmployee));
+        //change to timechimp class
+        EmployeeTimeChimp TCEmployee = new(ETSEmployee);
+
+        TimeChimpEmployeeHelper employeeHelper = new(TimeChimpClient);
+
+        //check if employee exists in timechimp
+        if (employeeHelper.EmployeeExists(employeeId))
+        {
+            return Results.Ok(employeeHelper.UpdateEmployee(TCEmployee));
+        }
+        else
+        {
+            //check if employee has an emailaddress
+            if (TCEmployee.userName == null)
+            {
+                return Results.Problem($"Can't create the employee {TCEmployee.displayName} without an emailaddress");
+            }
+
+            EmployeeTimeChimp employee = employeeHelper.CreateEmployee(TCEmployee);
+            TCEmployee.id = employee.id;
+            employee = employeeHelper.UpdateEmployee(TCEmployee);
+
+            //adds employee to all existing projects in TimeChimp
+            new TimeChimpProjectUserHelper(TimeChimpClient).AddAllProjectUserForEmployee(employee.id.Value);
+
+            return Results.Ok(employee);
+        }
+    } catch (Exception exception)
+    {
+        return Results.Problem(exception.Message);
     }
+    
 }).WithName("SyncEmployeeTimechimp");
 
 //sync mileages from timechimp to ets
@@ -368,13 +380,4 @@ app.MapGet("/api/ets/subprojects", (string mainprojectid) => new ETSProjectHelpe
 //get projectusers from timechimp
 app.MapGet("/api/timechimp/projectusers", () => new TimeChimpProjectUserHelper(TimeChimpClient).GetProjectUsers()).WithName("GetProjectUsers");
 
-//get projectusers from timechimp by project
-app.MapGet("/api/timechimp/projectusers/project", (int projectId) => new TimeChimpProjectUserHelper(TimeChimpClient).GetProjectUsersByProject(projectId)).WithName("GetProjectUsersByProject");
-
-//add projectuser to project in timechimp
-app.MapPost("/api/timechimp/projectuserproject", (string projectId) => new TimeChimpProjectUserHelper(TimeChimpClient).AddProjectUserProject(projectId)).WithName("AddProjectUserProject");
-
-//add projectuser to employee in timechimp
-app.MapPost("/api/timechimp/projectuseruser", (string userId) => new TimeChimpProjectUserHelper(TimeChimpClient).AddProjectUserEmployee(userId)).WithName("AddProjectUserUser");
-
-app.Run("http://localhost:5001");
+app.Run();

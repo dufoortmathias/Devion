@@ -17,10 +17,10 @@ public class ProjectUserTimechimp
     public ProjectUserTimechimp() { }
 
     //constructor to from timechimp class to ets class
-    public ProjectUserTimechimp(EmployeeTimeChimp employee, ProjectTimeChimp subproject)
+    public ProjectUserTimechimp(Int32 employeeId, Int32 subprojectId)
     {
-        projectId = subproject.id;
-        userId = employee.id;
+        projectId = subprojectId;
+        userId = employeeId;
         // userDisplayName = employee.displayName;
         active = true;
         projectManager = false;
