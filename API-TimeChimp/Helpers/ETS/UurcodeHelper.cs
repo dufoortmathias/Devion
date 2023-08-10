@@ -13,6 +13,13 @@ public class ETSUurcodeHelper : ETSHelper
 
         //get data from ETS
         var response = ETSClient.selectQuery(query);
+
+        //check if json is not empty
+        if (response == null)
+        {
+            throw new Exception("Error getting uurcodes from ETS with query: " + query);
+        }
+
         //convert data to uurcodesETS object
         List<uurcodesETS> uurcodes = JsonTool.ConvertTo<List<uurcodesETS>>(response);
 
@@ -32,7 +39,13 @@ public class ETSUurcodeHelper : ETSHelper
 
         //get data from ETS
         var response = ETSClient.selectQuery(query);
-        Console.WriteLine(response);
+
+        //check if json is not empty
+        if (response == null)
+        {
+            throw new Exception("Error getting uurcode from ETS with query: " + query);
+        }
+
         //convert data to uurcodesETS object
         uurcodesETS uurcode = JsonTool.ConvertTo<List<uurcodesETS>>(response).FirstOrDefault();
 
