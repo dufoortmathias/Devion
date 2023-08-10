@@ -30,7 +30,7 @@ public class ETSMileageHelper : ETSHelper
     public string UpdateMileage(MileageETS mileage)
     {
         //create query to get projectid and subprojectid for the mileage
-        var queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = {mileage.PLA_PROJECT} AND PLA_SUBPROJECT = {mileage.PLA_SUBPROJECT} AND PLA_START = {mileage.PLA_START.Date} AND PLA_PERSOON {mileage.PLA_PERSOON};";
+        var queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = '{mileage.PLA_PROJECT}' AND PLA_SUBPROJECT = '{mileage.PLA_SUBPROJECT}' AND PLA_START LIKE '{mileage.PLA_START.ToString("yyyy-MM-dd")}%' AND PLA_PERSOON = '{mileage.PLA_PERSOON}';";
 
         //get data from ETS
         var responseGet = ETSClient.selectQuery(queryGet);
@@ -57,7 +57,7 @@ public class ETSMileageHelper : ETSHelper
         }
 
         //update query
-        var query = $"UPDATE tbl_planning SET PLA_KM_HEEN_TERUG = 0, PLA_KM = {mileage.PLA_KM}, PLA_KM_DERDEN = '{mileage.PLA_KM_DERDEN}', PLA_KM_VERGOEDING = '{mileage.PLA_KM_VERGOEDING}' WHERE PLA_ID = {mileage.PLA_ID};";
+        var query = $"UPDATE tbl_planning SET PLA_KM_HEEN_TERUG = 0, PLA_KM = {mileage.PLA_KM + mileages.First().PLA_KM}, PLA_KM_DERDEN = '{mileage.PLA_KM_DERDEN}', PLA_KM_VERGOEDING = '{mileage.PLA_KM_VERGOEDING}' WHERE PLA_ID = {mileage.PLA_ID};";
 
         //send data to ETS
         var response = ETSClient.updateQuery(query);

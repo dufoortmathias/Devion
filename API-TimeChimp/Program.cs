@@ -335,7 +335,7 @@ app.MapGet("/api/ets/syncmileage", (Int32 mileageId) =>
         var response = new ETSMileageHelper(ETSClient).UpdateMileage(mileageETS);
 
         //change status
-        //var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(ids);
+        var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(mileageId);
 
         return Results.Ok();
     }

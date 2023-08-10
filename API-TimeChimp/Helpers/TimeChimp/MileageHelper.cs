@@ -49,13 +49,13 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     }
 
     //change status of mileage
-    public changeRegistrationStatusTimeChimp changeStatus(List<int> ids)
+    public changeRegistrationStatusTimeChimp changeStatus(int id)
     {
         //create new object
         changeRegistrationStatusTimeChimp changes = new changeRegistrationStatusTimeChimp();
 
         //set properties
-        changes.registrationIds = ids;
+        changes.registrationIds = new List<int> { id };
         changes.status = 3;
 
         //send data to timechimp
