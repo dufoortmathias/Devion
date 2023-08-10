@@ -15,6 +15,12 @@ public class ETSCustomerHelper : ETSHelper
         //get data from ETS
         string json = ETSClient.selectQuery(query);
 
+        //check if json is not empty
+        if (json == null)
+        {
+            throw new Exception("Error getting customerids from ETS with query: " + query);
+        }
+
         //get all ids from the json
         String[] ids = JsonTool.ConvertTo<CustomersETS[]>(json)
             .Select(customer => customer.KL_COD)
@@ -31,6 +37,13 @@ public class ETSCustomerHelper : ETSHelper
         //get data from ETS
         string json = ETSClient.selectQuery(query);
 
+        //check if json is not empty
+        if (json == null)
+        {
+            throw new Exception("Error getting customers from ETS with query: " + query);
+        }
+
+
         //convert data to customerETS object
         List<CustomersETS> customers = JsonTool.ConvertTo<List<CustomersETS>>(json);
         return customers;
@@ -44,6 +57,12 @@ public class ETSCustomerHelper : ETSHelper
 
         //get data form ETS
         String json = ETSClient.selectQuery(query);
+
+        //check if json is not empty
+        if (json == null)
+        {
+            throw new Exception("Error getting customer from ETS with query: " + query);
+        }
 
         //convert data to customerETS object
         CustomersETS customer = JsonTool.ConvertTo<CustomersETS[]>(json).FirstOrDefault();

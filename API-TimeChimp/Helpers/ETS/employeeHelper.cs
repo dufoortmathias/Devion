@@ -9,8 +9,17 @@ public class ETSEmployeeHelper : ETSHelper
     //get all employees
     public List<EmployeeETS> GetEmployees()
     {
+        //create query
+        string query = "SELECT * FROM J2W_PNPX";
+
         //get data form ETS
-        var response = ETSClient.selectQuery("select * from J2W_PNPX");
+        var response = ETSClient.selectQuery(query);
+
+        //check if response is succesfull
+        if (response == null)
+        {
+            throw new Exception("Error getting employees from ETS with query: " + query);
+        }
 
         //convert data to employeeETS object
         List<EmployeeETS> employees = JsonTool.ConvertTo<List<EmployeeETS>>(response);
@@ -25,6 +34,12 @@ public class ETSEmployeeHelper : ETSHelper
 
         //get data from ETS
         string json = ETSClient.selectQuery(query);
+
+        //check if json is not empty
+        if (json == null)
+        {
+            throw new Exception("Error getting employeeids from ETS with query: " + query);
+        }
 
         //get all ids from json
         List<string> ids = JsonTool.ConvertTo<List<EmployeeETS>>(json)
@@ -41,6 +56,12 @@ public class ETSEmployeeHelper : ETSHelper
 
         //get data from ETS
         String json = ETSClient.selectQuery(query);
+
+        //check if json is not empty
+        if (json == null)
+        {
+            throw new Exception("Error getting employee from ETS with query: " + query);
+        }
 
         //convert data to employeeETS object
         EmployeeETS employee = JsonTool.ConvertTo<EmployeeETS[]>(json).FirstOrDefault();

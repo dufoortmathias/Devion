@@ -76,28 +76,35 @@ app.MapGet("/api/ets/customerids", (String dateString) => new ETSCustomerHelper(
 //sync customer from ets to timechimp
 app.MapPost("/api/ets/synccustomer", (String customerId) =>
 {
-    //get customer from ets
-    CustomersETS ETSCustomer = new ETSCustomerHelper(ETSClient).GetCustomer(customerId);
-
-    // Handle when customer doesn't exist in ETS
-    if (ETSCustomer == null)
+    try
     {
-        return Results.Problem($"ETS doesn't contain a customer with id = {customerId}");
+        //get customer from ets
+        CustomersETS ETSCustomer = new ETSCustomerHelper(ETSClient).GetCustomer(customerId);
+
+        // Handle when customer doesn't exist in ETS
+        if (ETSCustomer == null)
+        {
+            return Results.Problem($"ETS doesn't contain a customer with id = {customerId}");
+        }
+
+        //change to timechimp class
+        customerTimeChimp TCCustomer = new(ETSCustomer);
+
+        TimeChimpCustomerHelper customerHelper = new(TimeChimpClient);
+
+        //check if customer exists in timechimp
+        if (customerHelper.CustomerExists(customerId))
+        {
+            return Results.Ok(customerHelper.UpdateCustomer(TCCustomer));
+        }
+        else
+        {
+            return Results.Ok(customerHelper.CreateCustomer(TCCustomer));
+        }
     }
-
-    //change to timechimp class
-    customerTimeChimp TCCustomer = new(ETSCustomer);
-
-    TimeChimpCustomerHelper customerHelper = new(TimeChimpClient);
-
-    //check if customer exists in timechimp
-    if (customerHelper.CustomerExists(customerId))
+    catch (Exception e)
     {
-        return Results.Ok(customerHelper.UpdateCustomer(TCCustomer));
-    }
-    else
-    {
-        return Results.Ok(customerHelper.CreateCustomer(TCCustomer));
+        return Results.Problem(e.Message);
     }
 }).WithName("SyncCustomerTimechimp");
 
@@ -138,68 +145,75 @@ app.MapGet("/api/ets/projectids", (String dateString) => new ETSProjectHelper(ET
 //sync project from ets to timechimp
 app.MapPost("/api/ets/syncproject", (String projectId) =>
 {
-    ETSProjectHelper projectHelperETS = new(ETSClient);
-    TimeChimpProjectHelper projectHelperTC = new(TimeChimpClient);
-
-    // Get project from ETS
-    ProjectETS ETSProject = projectHelperETS.GetProject(projectId);
-
-    // Handle when project doesn't exist in ETS
-    if (ETSProject == null)
+    try
     {
-        return Results.Problem($"ETS doesn't contain a project with id = {projectId}");
-    }
-    else if (ETSProject.PR_KLNR == null)
-    {
-        return Results.Problem($"The ETS record for project with id = {projectId} doesn't has a customernumber");
-    }
+        ETSProjectHelper projectHelperETS = new(ETSClient);
+        TimeChimpProjectHelper projectHelperTC = new(TimeChimpClient);
 
-    // Change to TimeChimp class
-    ProjectTimeChimp TCProject = new(ETSProject);
+        // Get project from ETS
+        ProjectETS ETSProject = projectHelperETS.GetProject(projectId);
 
-    // check if there is a client
-    if (ETSProject.PR_KLNR != null)
-    {
-        TCProject.customerId = new TimeChimpCustomerHelper(TimeChimpClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)).id.Value;
-    }
-    else
-    {
-        TCProject.customerId = 0;
-    }
-
-    ProjectTimeChimp createdMainProject;
-
-    // Check if project exists in TimeChimp
-    if (projectHelperTC.ProjectExists(projectId))
-    {
-        createdMainProject = projectHelperTC.UpdateProject(TCProject);
-    }
-    else
-    {
-        createdMainProject = projectHelperTC.CreateProject(TCProject);
-        createdMainProject = projectHelperTC.UpdateProject(TCProject);
-    }
-
-    // get subprojects from ETS
-    List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
-    foreach (SubprojectETS ETSSubproject in ETSSubprojects)
-    {
-        // Change to TimeChimp class
-        ProjectTimeChimp TCSubproject = new(ETSSubproject, TCProject);
-        TCSubproject.mainProjectId = TCProject.id;
-
-        if (projectHelperTC.ProjectExists(TCSubproject.code))
+        // Handle when project doesn't exist in ETS
+        if (ETSProject == null)
         {
-            projectHelperTC.UpdateProject(TCSubproject);
+            return Results.Problem($"ETS doesn't contain a project with id = {projectId}");
+        }
+        else if (ETSProject.PR_KLNR == null)
+        {
+            return Results.Problem($"The ETS record for project with id = {projectId} doesn't has a customernumber");
+        }
+
+        // Change to TimeChimp class
+        ProjectTimeChimp TCProject = new(ETSProject);
+
+        // check if there is a client
+        if (ETSProject.PR_KLNR != null)
+        {
+            TCProject.customerId = new TimeChimpCustomerHelper(TimeChimpClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)).id.Value;
         }
         else
         {
-            projectHelperTC.CreateProject(TCSubproject);
-            projectHelperTC.UpdateProject(TCSubproject);
+            TCProject.customerId = 0;
         }
-    }
 
-    return Results.Ok(projectHelperTC.GetProject(createdMainProject.id.Value));
+        ProjectTimeChimp createdMainProject;
+
+        // Check if project exists in TimeChimp
+        if (projectHelperTC.ProjectExists(projectId))
+        {
+            createdMainProject = projectHelperTC.UpdateProject(TCProject);
+        }
+        else
+        {
+            createdMainProject = projectHelperTC.CreateProject(TCProject);
+            createdMainProject = projectHelperTC.UpdateProject(TCProject);
+        }
+
+        // get subprojects from ETS
+        List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
+        foreach (SubprojectETS ETSSubproject in ETSSubprojects)
+        {
+            // Change to TimeChimp class
+            ProjectTimeChimp TCSubproject = new(ETSSubproject, TCProject);
+            TCSubproject.mainProjectId = TCProject.id;
+
+            if (projectHelperTC.ProjectExists(TCSubproject.code))
+            {
+                projectHelperTC.UpdateProject(TCSubproject);
+            }
+            else
+            {
+                projectHelperTC.CreateProject(TCSubproject);
+                projectHelperTC.UpdateProject(TCSubproject);
+            }
+        }
+
+        return Results.Ok(projectHelperTC.GetProject(createdMainProject.id.Value));
+    }
+    catch (Exception e)
+    {
+        return Results.Problem(e.Message);
+    }
 }).WithName("SyncProjectTimechimp");
 
 //get employeeids from ets
@@ -211,31 +225,38 @@ app.MapGet("/api/ets/timeids", (String dateString) => new TimeChimpTimeHelper(Ti
 //sync time from timechimp to ets
 app.MapPost("api/ets/synctime", (String timeId) =>
 {
-    ETSTimeHelper timeHelperETS = new(ETSClient, TimeChimpClient);
-    TimeChimpTimeHelper timeHelperTC = new(TimeChimpClient, ETSClient);
-
-    // Get time from TimeChimp
-    timeTimeChimp TCTime = timeHelperTC.GetTime(timeId);
-
-    // Handle when time doesn't exist in TimeChimp
-    if (TCTime == null)
+    try
     {
-        return Results.Problem($"TimeChimp doesn't contain a time with id = {timeId}");
+        ETSTimeHelper timeHelperETS = new(ETSClient, TimeChimpClient);
+        TimeChimpTimeHelper timeHelperTC = new(TimeChimpClient, ETSClient);
+
+        // Get time from TimeChimp
+        timeTimeChimp TCTime = timeHelperTC.GetTime(timeId);
+
+        // Handle when time doesn't exist in TimeChimp
+        if (TCTime == null)
+        {
+            return Results.Problem($"TimeChimp doesn't contain a time with id = {timeId}");
+        }
+
+        // Change to ETS class
+        timeETS ETSTime = new(TCTime);
+
+        // add time to ETS
+        timeHelperETS.addTime(ETSTime);
+
+        List<int> ids = new List<int>();
+        ids.Add(Int32.Parse(timeId));
+
+        //change status to invoiced (3)
+        timeHelperTC.changeStatus(ids);
+
+        return Results.Ok(timeHelperTC.GetTime(timeId));
     }
-
-    // Change to ETS class
-    timeETS ETSTime = new(TCTime);
-
-    // add time to ETS
-    timeHelperETS.addTime(ETSTime);
-
-    List<int> ids = new List<int>();
-    ids.Add(Int32.Parse(timeId));
-
-    //change status to invoiced (3)
-    timeHelperTC.changeStatus(ids);
-
-    return Results.Ok(timeHelperTC.GetTime(timeId));
+    catch (Exception e)
+    {
+        return Results.Problem(e.Message);
+    }
 }).WithName("SyncTimeETS");
 
 //sync employee from ets to timechimp
@@ -289,52 +310,59 @@ app.MapPost("/api/ets/syncemployee", (String employeeId) =>
 //sync mileages from timechimp to ets
 app.MapGet("/api/ets/mileage", () =>
 {
-    //get mileages from ets
-    List<mileageETS> mileages = new ETSMileageHelper(ETSClient).GetMileages();
-
-    //get mileages from timechimp
-    List<mileageTimeChimp> mileagesTimeChimp = new TimeChimpMileageHelper(TimeChimpClient).GetMileagesByDate(DateTime.Now.AddDays(-7));
-
-    List<int> ids = new List<int>();
-
-    //get projectID
-    foreach (mileageTimeChimp mileage in mileagesTimeChimp)
+    try
     {
-        if (mileage.projectId != null)
+        //get mileages from ets
+        List<mileageETS> mileages = new ETSMileageHelper(ETSClient).GetMileages();
+
+        //get mileages from timechimp
+        List<mileageTimeChimp> mileagesTimeChimp = new TimeChimpMileageHelper(TimeChimpClient).GetMileagesByDate(DateTime.Now.AddDays(-7));
+
+        List<int> ids = new List<int>();
+
+        //get projectID
+        foreach (mileageTimeChimp mileage in mileagesTimeChimp)
         {
-            mileage.projectId = new TimeChimpProjectHelper(TimeChimpClient).GetProjectId(mileage.projectId);
-            ids.Add(mileage.id);
+            if (mileage.projectId != null)
+            {
+                mileage.projectId = new TimeChimpProjectHelper(TimeChimpClient).GetProjectId(mileage.projectId);
+                ids.Add(mileage.id);
+            }
+
+            EmployeeTimeChimp employee = new TimeChimpEmployeeHelper(TimeChimpClient).GetEmployee(mileage.userId);
+            mileage.userId = int.Parse(employee.employeeNumber);
         }
 
-        EmployeeTimeChimp employee = new TimeChimpEmployeeHelper(TimeChimpClient).GetEmployee(mileage.userId);
-        mileage.userId = Int32.Parse(employee.employeeNumber);
-    }
 
-
-    List<mileageTimeChimp> copyMileages = new List<mileageTimeChimp>(mileagesTimeChimp);
-    foreach (mileageTimeChimp mileage in mileagesTimeChimp)
-    {
-        // check if there is a mileage for a retour of the current mileage
-        mileageTimeChimp mileages2 = copyMileages.Find(mileage2 => mileage2.projectId == mileage.projectId && mileage2.userId == mileage.userId && mileage2.distance == mileage.distance && mileage2.fromAddress == mileage.toAddress && mileage2.toAddress == mileage.fromAddress);
-        if (mileages2 != null)
+        List<mileageTimeChimp> copyMileages = new List<mileageTimeChimp>(mileagesTimeChimp);
+        foreach (mileageTimeChimp mileage in mileagesTimeChimp)
         {
-            mileage.distance = mileage.distance * 2;
+            // check if there is a mileage for a retour of the current mileage
+            mileageTimeChimp mileages2 = copyMileages.Find(mileage2 => mileage2.projectId == mileage.projectId && mileage2.userId == mileage.userId && mileage2.distance == mileage.distance && mileage2.fromAddress == mileage.toAddress && mileage2.toAddress == mileage.fromAddress);
+            if (mileages2 != null)
+            {
+                mileage.distance = mileage.distance * 2;
+            }
         }
+
+        //change to etsclass
+        List<mileageETS> mileagesETS = copyMileages.Select(mileage => new mileageETS(mileage)).ToList();
+
+        //update ets
+        foreach (var mileage in mileagesETS)
+        {
+            var response = new ETSMileageHelper(ETSClient).UpdateMileage(mileage);
+        }
+
+        //change status
+        var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(ids);
+
+        return Results.Ok(mileagesETS);
     }
-
-    //change to etsclass
-    List<mileageETS> mileagesETS = copyMileages.Select(mileage => new mileageETS(mileage)).ToList();
-
-    //update ets
-    foreach (var mileage in mileagesETS)
+    catch (Exception e)
     {
-        var response = new ETSMileageHelper(ETSClient).UpdateMileage(mileage);
+        return Results.Problem(e.Message);
     }
-
-    //change status
-    var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(ids);
-
-    return mileagesETS;
 }).WithName("GetMileagesFromETS");
 
 //get mileages from timechimp
@@ -349,28 +377,35 @@ app.MapGet("/api/ets/uurcodeids", (string dateString) => new ETSUurcodeHelper(ET
 //sync uurcodes from ets to timechimp
 app.MapPost("/api/ets/syncuurcode", (string uurcodeId) =>
 {
-    //get uurcode from ets
-    uurcodesETS ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
-
-    // Handle when uurcode doesn't exist in ETS
-    if (ETSUurcode == null)
+    try
     {
-        return Results.Problem($"ETS doesn't contain an uurcode with id = {uurcodeId}");
+        //get uurcode from ets
+        uurcodesETS ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
+
+        // Handle when uurcode doesn't exist in ETS
+        if (ETSUurcode == null)
+        {
+            return Results.Problem($"ETS doesn't contain an uurcode with id = {uurcodeId}");
+        }
+
+        //change to timechimp class
+        uurcodesTimeChimp TCUurcode = new(ETSUurcode);
+
+        TimeChimpUurcodeHelper uurcodeHelper = new(TimeChimpClient, ETSClient);
+
+        //check if uurcode exists in timechimp
+        if (uurcodeHelper.uurcodeExists(uurcodeId))
+        {
+            return Results.Ok(uurcodeHelper.UpdateUurcode(TCUurcode));
+        }
+        else
+        {
+            return Results.Ok(uurcodeHelper.CreateUurcode(TCUurcode));
+        }
     }
-
-    //change to timechimp class
-    uurcodesTimeChimp TCUurcode = new(ETSUurcode);
-
-    TimeChimpUurcodeHelper uurcodeHelper = new(TimeChimpClient, ETSClient);
-
-    //check if uurcode exists in timechimp
-    if (uurcodeHelper.uurcodeExists(uurcodeId))
+    catch (Exception e)
     {
-        return Results.Ok(uurcodeHelper.UpdateUurcode(TCUurcode));
-    }
-    else
-    {
-        return Results.Ok(uurcodeHelper.CreateUurcode(TCUurcode));
+        return Results.Problem(e.Message);
     }
 }).WithName("UpdateUurcodes");
 

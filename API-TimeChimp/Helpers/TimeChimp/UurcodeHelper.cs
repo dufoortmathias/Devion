@@ -14,12 +14,20 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     {
         //get data from timechimp
         var response = TCClient.GetAsync($"v1/tasks");
+
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception("Error getting uurcodes from timechimp with endpoint: v1/tasks");
+        }
+
         //convert data to timeTimeChimp object
         List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response.Result);
 
         //search for uurcode
         uurcodesTimeChimp uurcode = uurcodes.Find(uurcode => uurcode.code == code);
 
+        //check if uurcode exists
         if (uurcode != null)
         {
             return true;
@@ -35,6 +43,13 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     {
         //get data from timechimp
         var response = TCClient.GetAsync($"v1/tasks");
+
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception("Error getting uurcodes from timechimp with endpoint: v1/tasks");
+        }
+
         //convert data to timeTimeChimp object
         List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response.Result);
 
@@ -47,6 +62,12 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
         //get data frm timechimp
         var response = TCClient.GetAsync($"v1/tasks/{uurcodeId}");
 
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception($"Error getting uurcode from timechimp with endpoint: v1/tasks/{uurcodeId}");
+        }
+
         //convert data to timechimp object
         uurcodesTimeChimp uurcode = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
 
@@ -58,6 +79,13 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     {
         //get data from timechimp
         var response = TCClient.PostAsync($"v1/tasks", JsonTool.ConvertFrom(uurcode));
+
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception("Error creating uurcode in timechimp with endpoint: v1/tasks");
+        }
+
         //convert data to timeTimeChimp object
         uurcodesTimeChimp uurcodeResponse = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
 
@@ -68,9 +96,23 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     public uurcodesTimeChimp UpdateUurcode(uurcodesTimeChimp uurcode)
     {
         var uurcode2 = GetUurcodes().Find(uur => uur.code == uurcode.code);
+
+        //check if uurcode exists
+        if (uurcode2 == null)
+        {
+            throw new Exception($"Error updating uurcode in timechimp with endpoint: v1/tasks/{uurcode.id}");
+        }
+
         uurcode.id = uurcode2.id;
         //get data from timechimp
         var response = TCClient.PutAsync($"v1/tasks/", JsonTool.ConvertFrom(uurcode));
+
+        //check if response is succesfull
+        if (!response.IsCompletedSuccessfully)
+        {
+            throw new Exception($"Error updating uurcode in timechimp with endpoint: v1/tasks/{uurcode.id}");
+        }
+
         //convert data to timeTimeChimp object
         uurcodesTimeChimp uurcodes = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
 
