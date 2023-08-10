@@ -19,13 +19,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         }
 
         //add projectuser
-        var response = TCClient.PostAsync("v1/projectusers", json);
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error adding projectuser to timechimp with endpoint: v1/projectusers");
-        }
+        String response = TCClient.PostAsync("v1/projectusers", json);
 
         return projectUser;
     }
@@ -34,16 +28,10 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public List<ProjectUserTimechimp> GetProjectUsers()
     {
         //get data form timechimp
-        var response = TCClient.GetAsync("v1/projectusers");
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error getting projectusers from timechimp with endpoint: v1/projectusers");
-        }
+        String response = TCClient.GetAsync("v1/projectusers");
 
         //convert data to projectuserTimeChimp object
-        List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response.Result);
+        List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
         return projectUsers;
     }
 
@@ -51,16 +39,10 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public List<ProjectUserTimechimp> GetProjectUsersByProject(int projectId)
     {
         //get data form timechimp
-        var response = TCClient.GetAsync($"v1/projectusers/project/{projectId}");
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception($"Error getting projectusers from timechimp with endpoint: v1/projectusers/project/{projectId}");
-        }
+        String response = TCClient.GetAsync($"v1/projectusers/project/{projectId}");
 
         //convert data to projectuserTimeChimp object
-        List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response.Result);
+        List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
         return projectUsers;
     }
 
@@ -122,16 +104,10 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public List<ProjectUserTimechimp> GetProjectUsersByUser(int userId)
     {
         //get data from timechimp
-        var response = TCClient.GetAsync($"v1/projectusers/user/{userId}");
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception($"Error getting projectusers from timechimp with endpoint: v1/projectusers/user/{userId}");
-        }
+        String response = TCClient.GetAsync($"v1/projectusers/user/{userId}");
 
         //convert data to projectuserTimeChimp object
-        List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response.Result);
+        List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
         return projectUsers;
     }
 
@@ -139,9 +115,6 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public object AddAllProjectUserForEmployee(Int32 employeeId)
     {
         TimeChimpEmployeeHelper employeeHelper = new(TCClient);
-
-        //get employeeId from timechimp
-        Int32 employeeId = employeeHelper.GetEmployees().ToList().Find(e => e.employeeNumber.Equals(employeeNumber)).id.Value;
 
         //check if employeeid is not null
         if (employeeId == null)

@@ -16,15 +16,10 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     public List<customerTimeChimp> GetCustomers()
     {
         //get data from timechimp
-        var response = TCClient.GetAsync("v1/customers");
+        String response = TCClient.GetAsync("v1/customers");
 
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error getting all customers from timechimp with endpoint: v1/customers");
-        }
         //convert data to customerTimeChimp object
-        List<customerTimeChimp> customers = JsonTool.ConvertTo<List<customerTimeChimp>>(response.Result);
+        List<customerTimeChimp> customers = JsonTool.ConvertTo<List<customerTimeChimp>>(response);
         return customers;
     }
 
@@ -32,15 +27,10 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     public customerTimeChimp CreateCustomer(customerTimeChimp customer)
     {
         //send data to timechimp
-        var response = TCClient.PostAsync("v1/customers", JsonTool.ConvertFrom(customer));
+        String response = TCClient.PostAsync("v1/customers", JsonTool.ConvertFrom(customer));
 
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error creating customer in timechimp with endpoint: v1/customers");
-        }
         //convert response to customerTimeChimp object
-        customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
+        customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response);
         return customerResponse;
     }
 
@@ -57,16 +47,10 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
         }
 
         //send data to timechimp
-        var response = TCClient.PutAsync("v1/customers", JsonTool.ConvertFrom(customer));
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error updating customer in timechimp with endpoint: v1/customers");
-        }
+        String response = TCClient.PutAsync("v1/customers", JsonTool.ConvertFrom(customer));
 
         //convert response to customerTimeChimp object
-        customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
+        customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response);
         return customerResponse;
     }
 
@@ -74,16 +58,10 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     public customerTimeChimp GetCustomer(String customerId)
     {
         //get data form timechimp
-        var response = TCClient.GetAsync($"v1/customers/{customerId}");
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception($"Error getting customer from timechimp with endpoint: v1/customers/{customerId}");
-        }
+        String response = TCClient.GetAsync($"v1/customers/{customerId}");
 
         //convert data to customerTimeChimp object
-        customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response.Result);
+        customerTimeChimp customerResponse = JsonTool.ConvertTo<customerTimeChimp>(response);
         return customerResponse;
     }
 }

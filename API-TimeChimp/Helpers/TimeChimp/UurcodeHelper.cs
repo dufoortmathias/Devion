@@ -13,16 +13,10 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     public Boolean uurcodeExists(string code)
     {
         //get data from timechimp
-        var response = TCClient.GetAsync($"v1/tasks");
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error getting uurcodes from timechimp with endpoint: v1/tasks");
-        }
+        String response = TCClient.GetAsync($"v1/tasks");
 
         //convert data to timeTimeChimp object
-        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response.Result);
+        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response);
 
         //search for uurcode
         uurcodesTimeChimp uurcode = uurcodes.Find(uurcode => uurcode.code == code);
@@ -42,16 +36,10 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     public List<uurcodesTimeChimp> GetUurcodes()
     {
         //get data from timechimp
-        var response = TCClient.GetAsync($"v1/tasks");
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error getting uurcodes from timechimp with endpoint: v1/tasks");
-        }
+        String response = TCClient.GetAsync($"v1/tasks");
 
         //convert data to timeTimeChimp object
-        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response.Result);
+        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response);
 
         return uurcodes;
     }
@@ -60,16 +48,10 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     public uurcodesTimeChimp GetUurcode(string uurcodeId)
     {
         //get data frm timechimp
-        var response = TCClient.GetAsync($"v1/tasks/{uurcodeId}");
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception($"Error getting uurcode from timechimp with endpoint: v1/tasks/{uurcodeId}");
-        }
+        String response = TCClient.GetAsync($"v1/tasks/{uurcodeId}");
 
         //convert data to timechimp object
-        uurcodesTimeChimp uurcode = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
+        uurcodesTimeChimp uurcode = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
 
         return uurcode;
     }
@@ -78,16 +60,10 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     public uurcodesTimeChimp CreateUurcode(uurcodesTimeChimp uurcode)
     {
         //get data from timechimp
-        var response = TCClient.PostAsync($"v1/tasks", JsonTool.ConvertFrom(uurcode));
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception("Error creating uurcode in timechimp with endpoint: v1/tasks");
-        }
+        String response = TCClient.PostAsync($"v1/tasks", JsonTool.ConvertFrom(uurcode));
 
         //convert data to timeTimeChimp object
-        uurcodesTimeChimp uurcodeResponse = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
+        uurcodesTimeChimp uurcodeResponse = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
 
         return uurcodeResponse;
     }
@@ -105,16 +81,10 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
 
         uurcode.id = uurcode2.id;
         //get data from timechimp
-        var response = TCClient.PutAsync($"v1/tasks/", JsonTool.ConvertFrom(uurcode));
-
-        //check if response is succesfull
-        if (!response.IsCompletedSuccessfully)
-        {
-            throw new Exception($"Error updating uurcode in timechimp with endpoint: v1/tasks/{uurcode.id}");
-        }
+        String response = TCClient.PutAsync($"v1/tasks/", JsonTool.ConvertFrom(uurcode));
 
         //convert data to timeTimeChimp object
-        uurcodesTimeChimp uurcodes = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
+        uurcodesTimeChimp uurcodes = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
 
         return uurcodes;
     }

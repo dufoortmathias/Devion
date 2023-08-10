@@ -2,9 +2,9 @@ namespace Api.Devion.Client;
 
 public interface IBearerTokenHttpClient
 {
-    Task<string> GetAsync(string endpoint);
-    Task<string> PostAsync(string endpoint, string jsonPayload);
-    Task<string> PutAsync(string endpoint, string jsonPayload);
+    String GetAsync(string endpoint);
+    String PostAsync(string endpoint, string jsonPayload);
+    String PutAsync(string endpoint, string jsonPayload);
 }
 
 public class BearerTokenHttpClient : IBearerTokenHttpClient
@@ -23,65 +23,65 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
     }
 
     //get async
-    public async Task<string> GetAsync(string endpoint)
+    public String GetAsync(string endpoint)
     {
         // Send the request to the API endpoint with response
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        HttpResponseMessage response = _httpClient.GetAsync(endpoint).Result;
 
         //check if statuscode is success
         if (response.IsSuccessStatusCode)
         {
             // Return the response body
-            return await response.Content.ReadAsStringAsync();
+            return response.Content.ReadAsStringAsync().Result;
         }
         else
         {
             // Handle error response if needed
-            return null;
+            throw new Exception($"GET error with endpoint: {_httpClient.BaseAddress + endpoint}\n{response.RequestMessage}");
         }
     }
 
     //post async
-    public async Task<string> PostAsync(string endpoint, string jsonPayload)
+    public String PostAsync(string endpoint, string jsonPayload)
     {
         // Create a StringContent object with the JSON payload
         var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
         //send the request to the API endpoint with response
-        HttpResponseMessage response = await _httpClient.PostAsync(endpoint, content);
+        HttpResponseMessage response = _httpClient.PostAsync(endpoint, content).Result;
 
         //check if statuscode is success
         if (response.IsSuccessStatusCode)
         {
             // Return the response body
-            return await response.Content.ReadAsStringAsync();
+            return response.Content.ReadAsStringAsync().Result;
         }
         else
         {
             // Handle error response if needed
-            return null;
+            throw new Exception($"POST error with endpoint: {_httpClient.BaseAddress + endpoint}\n{response.RequestMessage}");
         }
     }
 
     //put async
-    public async Task<string> PutAsync(string endpoint, string jsonPayload)
+    public String PutAsync(string endpoint, string jsonPayload)
     {
         // Create a StringContent object with the JSON payload
         var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
         //send the request to the API endpoint with response
-        HttpResponseMessage response = await _httpClient.PutAsync(endpoint, content);
+        HttpResponseMessage response = _httpClient.PutAsync(endpoint, content).Result;
 
         //check if statuscode is success
         if (response.IsSuccessStatusCode)
         {
             // Return the response body
-            return await response.Content.ReadAsStringAsync();
+            return response.Content.ReadAsStringAsync().Result;
         }
         else
         {
             // Handle error response if needed
-            return null;
+            throw new Exception($"PUT error with endpoint: {_httpClient.BaseAddress + endpoint}\n{response.RequestMessage}");
         }
     }
 }

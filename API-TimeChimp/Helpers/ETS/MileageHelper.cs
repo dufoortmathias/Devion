@@ -7,7 +7,7 @@ public class ETSMileageHelper : ETSHelper
     }
 
     //get all mileages
-    public List<mileageETS> GetMileages()
+    public List<MileageETS> GetMileages()
     {
         //create query
         string query = "SELECT PLA_ID, PLA_KM, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KM_DERDEN, PLA_KM_VERGOEDING, PLA_START FROM tbl_planning";
@@ -22,15 +22,15 @@ public class ETSMileageHelper : ETSHelper
         }
 
         //convert data to mileageETS object
-        List<mileageETS> mileages = JsonTool.ConvertTo<List<mileageETS>>(response);
+        List<MileageETS> mileages = JsonTool.ConvertTo<List<MileageETS>>(response);
         return mileages;
     }
 
     //add a mileage
-    public string UpdateMileage(mileageETS mileage)
+    public string UpdateMileage(MileageETS mileage)
     {
         //create query to get projectid and subprojectid for the mileage
-        var queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = {mileage.PLA_PROJECT} AND PLA_SUBPROJECT = {mileage.PLA_SUBPROJECT};";
+        var queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = {mileage.PLA_PROJECT} AND PLA_SUBPROJECT = {mileage.PLA_SUBPROJECT} AND PLA_START = {mileage.PLA_START.Date} AND PLA_PERSOON {mileage.PLA_PERSOON};";
 
         //get data from ETS
         var responseGet = ETSClient.selectQuery(queryGet);
@@ -42,7 +42,7 @@ public class ETSMileageHelper : ETSHelper
         }
 
         //convert data to mileageETS object
-        List<mileageETS> mileages = JsonTool.ConvertTo<List<mileageETS>>(responseGet);
+        List<MileageETS> mileages = JsonTool.ConvertTo<List<MileageETS>>(responseGet);
 
         //check if there are mileages found
         if (mileages.Count == 0)
@@ -51,12 +51,9 @@ public class ETSMileageHelper : ETSHelper
         }
 
         //set PLA_ID
-        foreach (mileageETS mileageETS in mileages)
+        foreach (MileageETS mileageETS in mileages)
         {
-            if (mileageETS.PLA_START.Date == mileage.PLA_START.Date && mileageETS.PLA_PERSOON == mileage.PLA_PERSOON)
-            {
-                mileage.PLA_ID = mileageETS.PLA_ID;
-            }
+            mileage.PLA_ID = mileageETS.PLA_ID;
         }
 
         //update query

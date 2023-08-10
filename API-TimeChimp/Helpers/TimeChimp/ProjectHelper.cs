@@ -16,16 +16,10 @@
         public ProjectTimeChimp GetProject(Int32 projectId)
         {
             //get data form timechimp
-            var response = TCClient.GetAsync($"v1/projects/{projectId}");
-
-            //check if response is succesfull
-            if (!response.IsCompletedSuccessfully)
-            {
-                throw new Exception($"Error getting project from timechimp with endpoint: v1/projects/{projectId}");
-            }
+            String response = TCClient.GetAsync($"v1/projects/{projectId}");
 
             //convert data to projectTimeChimp object
-            ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response.Result);
+            ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return project;
         }
 
@@ -33,16 +27,10 @@
         public List<ProjectTimeChimp> GetProjects()
         {
             //get data from timechimp
-            var response = TCClient.GetAsync("v2/projects");
-
-            //check if response is succesfull
-            if (!response.IsCompletedSuccessfully)
-            {
-                throw new Exception("Error getting all projects from timechimp with endpoint: v2/projects");
-            }
+            String response = TCClient.GetAsync("v2/projects");
 
             //convert data to projectTimeChimp object
-            List<ProjectTimeChimp> projects = JsonTool.ConvertTo<List<ProjectTimeChimp>>(response.Result);
+            List<ProjectTimeChimp> projects = JsonTool.ConvertTo<List<ProjectTimeChimp>>(response);
             return projects;
         }
 
@@ -59,16 +47,10 @@
             }
 
             //add project to timechimp
-            var response = TCClient.PostAsync("v1/projects", json);
-
-            //check if response is succesfull
-            if (!response.IsCompletedSuccessfully)
-            {
-                throw new Exception("Error creating project in timechimp with endpoint: v1/projects");
-            }
+            String response = TCClient.PostAsync("v1/projects", json);
 
             //convert response to projectTimeChimp object
-            ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response.Result);
+            ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return projectResponse;
         }
 
@@ -97,16 +79,10 @@
             project.active = projectUpdate.active;
 
             //send data to timechimp
-            var response = TCClient.PutAsync("v1/projects", JsonTool.ConvertFrom(project));
-
-            //check if response is succesfull
-            if (!response.IsCompletedSuccessfully)
-            {
-                throw new Exception("Error updating project in timechimp with endpoint: v1/projects");
-            }
+            String response = TCClient.PutAsync("v1/projects", JsonTool.ConvertFrom(project));
 
             //convert response to projectTimeChimp object
-            ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response.Result);
+            ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return projectResponse;
         }
 

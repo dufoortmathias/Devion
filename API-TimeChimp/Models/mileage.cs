@@ -1,6 +1,6 @@
 namespace Api.Devion.Models;
 
-public class mileageTimeChimp
+public class MileageTimeChimp
 {
     public int id { get; set; }
     public int custumerId { get; set; }
@@ -24,7 +24,7 @@ public class mileageTimeChimp
     public DateTime modified { get; set; }
 }
 
-public class mileageETS
+public class MileageETS
 {
     public int? PLA_ID { get; set; }
     public int? PLA_KM { get; set; }
@@ -35,10 +35,11 @@ public class mileageETS
     public string? PLA_KM_DERDEN { get; set; }
     public string? PLA_KM_VERGOEDING { get; set; }
 
-    public mileageETS() { }
+    public MileageETS() { }
 
-    public mileageETS(mileageTimeChimp mileage)
+    public MileageETS(MileageTimeChimp mileage)
     {
+        //TODO set length project_id string in env variables file
         PLA_KM = (int)mileage.distance;
         var project = "0000000000" + mileage.projectId.ToString();
         PLA_PROJECT = project.Substring(0, Math.Min(project.Length, 7));
