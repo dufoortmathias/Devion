@@ -1,3 +1,5 @@
+using Api.Devion.Models;
+
 namespace Api.Devion.Helpers.ETS;
 
 public class ETSMileageHelper : ETSHelper
@@ -27,7 +29,7 @@ public class ETSMileageHelper : ETSHelper
     }
 
     //add a mileage
-    public string UpdateMileage(MileageETS mileage)
+    public MileageETS UpdateMileage(MileageETS mileage)
     {
         //create query to get projectid and subprojectid for the mileage
         var queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = '{mileage.PLA_PROJECT}' AND PLA_SUBPROJECT = '{mileage.PLA_SUBPROJECT}' AND PLA_START LIKE '{mileage.PLA_START.ToString("yyyy-MM-dd")}%' AND PLA_PERSOON = '{mileage.PLA_PERSOON}';";
@@ -42,22 +44,27 @@ public class ETSMileageHelper : ETSHelper
         }
 
         //convert data to mileageETS object
-        List<MileageETS> mileages = JsonTool.ConvertTo<List<MileageETS>>(responseGet);
+        List<MileageETS> mileagesETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet);
 
-        //check if there are mileages found
-        if (mileages.Count == 0)
+        //select record from ETS to update mileage
+        //select record with mileages 
+        Int32 index = 0;
+        MileageETS? mileageETS = null;
+        while (mileageETS == null || mileageETS.PLA_KM > mileage.PLA_KM)
         {
-            return "No mileage found";
+            if (index == mileagesETS.Count)
+            {
+                throw new Exception("No time record in ETS for this mileage");
+            }
+            mileageETS = mileagesETS[index++];
         }
 
-        //set PLA_ID
-        foreach (MileageETS mileageETS in mileages)
-        {
-            mileage.PLA_ID = mileageETS.PLA_ID;
-        }
+        mileage.PLA_KM += mileageETS.PLA_KM;
+        mileage.PLA_ID = mileageETS.PLA_ID;
+
 
         //update query
-        var query = $"UPDATE tbl_planning SET PLA_KM_HEEN_TERUG = 0, PLA_KM = {mileage.PLA_KM + mileages.First().PLA_KM}, PLA_KM_DERDEN = '{mileage.PLA_KM_DERDEN}', PLA_KM_VERGOEDING = '{mileage.PLA_KM_VERGOEDING}' WHERE PLA_ID = {mileage.PLA_ID};";
+        var query = $"UPDATE tbl_planning SET PLA_KM = {mileage.PLA_KM}, PLA_KM_DERDEN = '{mileage.PLA_KM_DERDEN}', PLA_KM_VERGOEDING = '{mileage.PLA_KM_VERGOEDING}' WHERE PLA_ID = {mileage.PLA_ID};";
 
         //send data to ETS
         var response = ETSClient.updateQuery(query);
@@ -68,6 +75,6 @@ public class ETSMileageHelper : ETSHelper
             throw new Exception("Error updating mileage in ETS with query: " + query);
         }
 
-        return response;
+        return mileage;
     }
 }

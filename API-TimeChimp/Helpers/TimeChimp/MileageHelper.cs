@@ -45,6 +45,7 @@ public class TimeChimpMileageHelper : TimeChimpHelper
         return mileages
             .FindAll(mileage => mileage.statusIntern == 2)
             .Select(mileage => mileage.id)
+            .Reverse()
             .ToList();
     }
 

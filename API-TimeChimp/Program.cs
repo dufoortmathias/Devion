@@ -328,6 +328,11 @@ app.MapGet("/api/ets/syncmileage", (Int32 mileageId) =>
     {
         MileageTimeChimp mileage = new TimeChimpMileageHelper(TimeChimpClient).GetMileage(mileageId);
 
+        if (mileage.status == 3)
+        {
+            throw new Exception($"Mileage with id ({mileageId}) already invoiced");
+        }
+
         mileage.projectId = new TimeChimpProjectHelper(TimeChimpClient).GetProjectId(mileage.projectId);
         mileage.userId = int.Parse(new TimeChimpEmployeeHelper(TimeChimpClient).GetEmployee(mileage.userId).employeeNumber);
 
@@ -337,7 +342,7 @@ app.MapGet("/api/ets/syncmileage", (Int32 mileageId) =>
         //change status
         var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(mileageId);
 
-        return Results.Ok();
+        return Results.Ok(response);
     }
     catch (Exception e)
     {

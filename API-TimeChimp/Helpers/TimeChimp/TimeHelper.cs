@@ -92,6 +92,7 @@ public class TimeChimpTimeHelper : TimeChimpHelper
                 timeIds.Add(time.id.ToString());
             }
         }
+        timeIds.Reverse();
         return timeIds.ToArray();
     }
 
