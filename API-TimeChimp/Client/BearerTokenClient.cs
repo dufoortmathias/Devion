@@ -37,7 +37,7 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
         else
         {
             // Handle error response if needed
-            throw new Exception($"GET error with endpoint: {_httpClient.BaseAddress + endpoint}\n{response.RequestMessage}");
+            throw new Exception($"GET {response.StatusCode} with endpoint: {_httpClient.BaseAddress + endpoint}");
         }
     }
 
@@ -59,7 +59,7 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
         else
         {
             // Handle error response if needed
-            throw new Exception($"POST error with endpoint: {_httpClient.BaseAddress + endpoint}\n{response.RequestMessage}");
+            throw new Exception($"POST {response.StatusCode} with endpoint: {_httpClient.BaseAddress + endpoint}");
         }
     }
 
@@ -81,7 +81,7 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
         else
         {
             // Handle error response if needed
-            throw new Exception($"PUT error with endpoint: {_httpClient.BaseAddress + endpoint}\n{response.RequestMessage}");
+            throw new Exception($"PUT {response.StatusCode} with endpoint: {_httpClient.BaseAddress + endpoint}");
         }
     }
 }
