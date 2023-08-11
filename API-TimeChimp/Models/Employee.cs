@@ -26,8 +26,10 @@
         public String? citizenServiceNumber { get; set; }
         public Boolean? sendInvitation { get; set; }
 
+        //constructor without specific parameters
         public EmployeeTimeChimp() { }
 
+        //constructor to from ets class to timechimp class
         public EmployeeTimeChimp(EmployeeETS employeeETS)
         {
             employeeNumber = employeeETS.PN_ID;

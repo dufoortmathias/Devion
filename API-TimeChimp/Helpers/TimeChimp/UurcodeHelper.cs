@@ -9,15 +9,19 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
         ETSClient = clientETS;
     }
 
+    //check if uurcode exists
     public Boolean uurcodeExists(string code)
     {
         //get data from timechimp
-        var response = TCClient.GetAsync($"v1/tasks");
-        //convert data to timeTimeChimp object
-        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response.Result);
+        String response = TCClient.GetAsync($"v1/tasks");
 
+        //convert data to timeTimeChimp object
+        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response);
+
+        //search for uurcode
         uurcodesTimeChimp uurcode = uurcodes.Find(uurcode => uurcode.code == code);
 
+        //check if uurcode exists
         if (uurcode != null)
         {
             return true;
@@ -27,52 +31,61 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
             return false;
         }
     }
+
+    //get all uurcodes
     public List<uurcodesTimeChimp> GetUurcodes()
     {
         //get data from timechimp
-        var response = TCClient.GetAsync($"v1/tasks");
+        String response = TCClient.GetAsync($"v1/tasks");
+
         //convert data to timeTimeChimp object
-        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response.Result);
+        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response);
 
         return uurcodes;
     }
 
+    //get uurcode by id
     public uurcodesTimeChimp GetUurcode(string uurcodeId)
     {
         //get data frm timechimp
-        var response = TCClient.GetAsync($"v1/tasks/{uurcodeId}");
+        String response = TCClient.GetAsync($"v1/tasks/{uurcodeId}");
 
         //convert data to timechimp object
-        uurcodesTimeChimp uurcode = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
+        uurcodesTimeChimp uurcode = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
 
         return uurcode;
     }
 
+    //create uurcode
     public uurcodesTimeChimp CreateUurcode(uurcodesTimeChimp uurcode)
     {
         //get data from timechimp
-        var response = TCClient.PostAsync($"v1/tasks", JsonTool.ConvertFrom(uurcode));
+        String response = TCClient.PostAsync($"v1/tasks", JsonTool.ConvertFrom(uurcode));
+
         //convert data to timeTimeChimp object
-        uurcodesTimeChimp uurcodeResponse = JsonTool.ConvertTo<uurcodesTimeChimp>(response.Result);
+        uurcodesTimeChimp uurcodeResponse = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
 
         return uurcodeResponse;
     }
 
-    public List<uurcodesTimeChimp> UpdateUurcodes()
-    {
-        List<uurcodesETS> uurcodes = new ETSUurcodeHelper(ETSClient).GetUurcodes();
-        List<uurcodesTimeChimp> uurcodesUpdated = new List<uurcodesTimeChimp>();
 
-        foreach (uurcodesETS uurcode in uurcodes)
+    public uurcodesTimeChimp UpdateUurcode(uurcodesTimeChimp uurcode)
+    {
+        var uurcode2 = GetUurcodes().Find(uur => uur.code == uurcode.code);
+
+        //check if uurcode exists
+        if (uurcode2 == null)
         {
-            if (!uurcodeExists(uurcode.UR_COD))
-            {
-                uurcodesTimeChimp uurcodeTimeChimp = new uurcodesTimeChimp(uurcode);
-                var response = new TimeChimpUurcodeHelper(TCClient, ETSClient).CreateUurcode(uurcodeTimeChimp);
-                uurcodesUpdated.Add(response);
-            }
+            throw new Exception($"Error updating uurcode in timechimp with endpoint: v1/tasks/{uurcode.id}");
         }
 
-        return uurcodesUpdated;
+        uurcode.id = uurcode2.id;
+        //get data from timechimp
+        String response = TCClient.PutAsync($"v1/tasks/", JsonTool.ConvertFrom(uurcode));
+
+        //convert data to timeTimeChimp object
+        uurcodesTimeChimp uurcodes = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
+
+        return uurcodes;
     }
 }

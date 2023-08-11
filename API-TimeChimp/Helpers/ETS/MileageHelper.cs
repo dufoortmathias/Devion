@@ -1,3 +1,5 @@
+using Api.Devion.Models;
+
 namespace Api.Devion.Helpers.ETS;
 
 public class ETSMileageHelper : ETSHelper
@@ -6,33 +8,73 @@ public class ETSMileageHelper : ETSHelper
     {
     }
 
-    public List<mileageETS> GetMileages()
+    //get all mileages
+    public List<MileageETS> GetMileages()
     {
-        var response = ETSClient.selectQuery("SELECT PLA_ID, PLA_KM, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KM_DERDEN, PLA_KM_VERGOEDING, PLA_START FROM tbl_planning");
-        List<mileageETS> mileages = JsonTool.ConvertTo<List<mileageETS>>(response);
+        //create query
+        string query = "SELECT PLA_ID, PLA_KM, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KM_DERDEN, PLA_KM_VERGOEDING, PLA_START FROM tbl_planning";
+
+        //get data form ETS
+        var response = ETSClient.selectQuery(query);
+
+        //check if response is succesfull
+        if (response == null)
+        {
+            throw new Exception("Error getting mileages from ETS with query: " + query);
+        }
+
+        //convert data to mileageETS object
+        List<MileageETS> mileages = JsonTool.ConvertTo<List<MileageETS>>(response);
         return mileages;
     }
 
-    public string UpdateMileage(mileageETS mileage)
+    //add a mileage
+    public MileageETS UpdateMileage(MileageETS mileage)
     {
-        var queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = {mileage.PLA_PROJECT} AND PLA_SUBPROJECT = {mileage.PLA_SUBPROJECT};";
+        //create query to get projectid and subprojectid for the mileage
+        var queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = '{mileage.PLA_PROJECT}' AND PLA_SUBPROJECT = '{mileage.PLA_SUBPROJECT}' AND PLA_START LIKE '{mileage.PLA_START.ToString("yyyy-MM-dd")}%' AND PLA_PERSOON = '{mileage.PLA_PERSOON}';";
+
+        //get data from ETS
         var responseGet = ETSClient.selectQuery(queryGet);
-        List<mileageETS> mileages = JsonTool.ConvertTo<List<mileageETS>>(responseGet);
-        if (mileages.Count == 0)
+
+        //check if response is succesfull
+        if (responseGet == null)
         {
-            return "No mileage found";
-        }
-        foreach (mileageETS mileageETS in mileages)
-        {
-            if (mileageETS.PLA_START.Date == mileage.PLA_START.Date && mileageETS.PLA_PERSOON == mileage.PLA_PERSOON)
-            {
-                mileage.PLA_ID = mileageETS.PLA_ID;
-            }
+            throw new Exception("Error getting mileages from ETS with query: " + queryGet);
         }
 
+        //convert data to mileageETS object
+        List<MileageETS> mileagesETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet);
+
+        //select record from ETS to update mileage
+        //select record with mileages 
+        Int32 index = 0;
+        MileageETS? mileageETS = null;
+        while (mileageETS == null || mileageETS.PLA_KM > mileage.PLA_KM)
+        {
+            if (index == mileagesETS.Count)
+            {
+                throw new Exception("No time record in ETS for this mileage");
+            }
+            mileageETS = mileagesETS[index++];
+        }
+
+        mileage.PLA_KM += mileageETS.PLA_KM;
+        mileage.PLA_ID = mileageETS.PLA_ID;
+
+
         //update query
-        var query = $"UPDATE tbl_planning SET PLA_KM_HEEN_TERUG = 0, PLA_KM = {mileage.PLA_KM}, PLA_KM_DERDEN = '{mileage.PLA_KM_DERDEN}', PLA_KM_VERGOEDING = '{mileage.PLA_KM_VERGOEDING}' WHERE PLA_ID = {mileage.PLA_ID};";
+        var query = $"UPDATE tbl_planning SET PLA_KM = {mileage.PLA_KM}, PLA_KM_DERDEN = '{mileage.PLA_KM_DERDEN}', PLA_KM_VERGOEDING = '{mileage.PLA_KM_VERGOEDING}' WHERE PLA_ID = {mileage.PLA_ID};";
+
+        //send data to ETS
         var response = ETSClient.updateQuery(query);
-        return response;
+
+        //check if response is succesfull
+        if (response == null)
+        {
+            throw new Exception("Error updating mileage in ETS with query: " + query);
+        }
+
+        return mileage;
     }
 }

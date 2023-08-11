@@ -33,8 +33,10 @@ public class customerTimeChimp
     public contactsTimeChimp[]? contacts { get; set; }
     public DateTime modified { get; set; }
 
+    //constructor without specific parameters
     public customerTimeChimp() { }
 
+    //constructor to from ets class to timechimp class
     public customerTimeChimp(CustomersETS customerETS)
     {
         name = customerETS.KL_NAM;

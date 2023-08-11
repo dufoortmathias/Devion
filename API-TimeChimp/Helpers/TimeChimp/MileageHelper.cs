@@ -6,26 +6,62 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     {
     }
 
-    public List<mileageTimeChimp> GetMileages()
+    //get mileage
+    public MileageTimeChimp GetMileage(Int32 mileageId)
     {
-        var response = TCClient.GetAsync("v1/mileage").Result;
-        List<mileageTimeChimp> mileages = JsonTool.ConvertTo<List<mileageTimeChimp>>(response);
+        String enpoint = $"v1/mileage/{mileageId}";
+
+        //get data from timechimp
+        String response = TCClient.GetAsync(enpoint);
+
+        //convert data to mileageTimeChimp object
+        MileageTimeChimp mileage = JsonTool.ConvertTo<MileageTimeChimp>(response);
+        return mileage;
+    }
+
+    //get mileages
+    public List<MileageTimeChimp> GetMileages()
+    {
+        //get data from timechimp
+        String response = TCClient.GetAsync("v1/mileage");
+
+        //convert data to mileageTimeChimp object
+        List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
         return mileages;
     }
 
-    public List<mileageTimeChimp> GetMileagesByDate(DateTime date)
+    //get approved mileages by date
+    public List<Int32> GetApprovedMileageIdsByDate(DateTime date)
     {
-        var response = TCClient.GetAsync($"v1/mileage/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.Date.ToString("yyyy-MM-dd")}").Result;
-        List<mileageTimeChimp> mileages = JsonTool.ConvertTo<List<mileageTimeChimp>>(response);
-        return mileages.FindAll(mileage => mileage.statusIntern == 2);
+        String endpoint = $"v1/mileage/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.Date.ToString("yyyy-MM-dd")}";
+
+        //get data from timechimp between date and now
+        String response = TCClient.GetAsync(endpoint);
+
+        //convert data to mileageTimeChimp object
+        List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
+
+        //return all mileages with status approved (2)
+        return mileages
+            .FindAll(mileage => mileage.statusIntern == 2)
+            .Select(mileage => mileage.id)
+            .Reverse()
+            .ToList();
     }
 
-    public changeRegistrationStatusTimeChimp changeStatus(List<int> ids)
+    //change status of mileage
+    public changeRegistrationStatusTimeChimp changeStatus(int id)
     {
+        //create new object
         changeRegistrationStatusTimeChimp changes = new changeRegistrationStatusTimeChimp();
-        changes.registrationIds = ids;
+
+        //set properties
+        changes.registrationIds = new List<int> { id };
         changes.status = 3;
-        var response = TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
+
+        //send data to timechimp
+        String response = TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
+
         return changes;
     }
 }

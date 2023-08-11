@@ -48,9 +48,11 @@ public class timeETS
     public string? PLA_KLANT { get; set; }
     public string? PLA_UURCODE { get; set; }
 
+    //constructor without specific parameters
     public timeETS()
     { }
 
+    //constructor to from timechimp class to ets class
     public timeETS(timeTimeChimp time)
     {
         this.timechimpStatus = time.status;
@@ -58,7 +60,7 @@ public class timeETS
         this.PLA_START = time.start.ToLocalTime();
         this.PLA_EINDE = time.end.ToLocalTime();
         DateTime baseDateTime = DateTime.Parse("1899-12-30T00:00:00");
-        this.PLA_KM_PAUZE = baseDateTime.AddMinutes((double)time.pause * 60).ToString("yyyy-MM-dd HH:mm:ss");
+        this.PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddMinutes((double)time.pause * 60).ToString("yyyy-MM-dd HH:mm:ss");
         this.PLA_PROJECT = time.projectId.ToString();
         this.PLA_SUBPROJECT = time.projectTaskId.ToString();
         this.PN_NAM = time.userDisplayName;

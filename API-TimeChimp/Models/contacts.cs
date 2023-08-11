@@ -11,8 +11,10 @@ public class contactsTimeChimp
     public int? id { get; set; }
     public int[]? customerIds { get; set; }
 
+    //constructor without specific parameters
     public contactsTimeChimp() { }
 
+    //constructor to from ets class to timechimp class
     public contactsTimeChimp(contactsETS contactETS)
     {
         name = contactETS.CO_TAV;
