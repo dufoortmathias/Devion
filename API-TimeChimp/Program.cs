@@ -70,7 +70,7 @@ while (config[$"Companies:{companyIndex}:Name"] != null)
     app.MapGet($"/api/{company.ToLower()}/timechimp/mileage", () => { try { return Results.Ok(new TimeChimpMileageHelper(TimeChimpClient).GetMileages()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetMileages");
 
     //get customerids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (String dateString) => { try { return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(dateString.Length == 0 ? DateTime.MinValue : DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomerIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (String dateString) => { try { return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomerIds");
 
     //sync customer from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/synccustomer", (String customerId) =>
