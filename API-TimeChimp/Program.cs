@@ -1,3 +1,7 @@
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System.Text.Json.Nodes;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
@@ -17,15 +21,14 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 
-Console.WriteLine(config["TimeChimp:BaseURL"]);
-
-String[] companies = new string[] { "Metabil" /*, "Devion" */};
-
-int i = 0;
-foreach (String company in companies)
+int companyIndex = 0;
+while (config[$"Companies:{companyIndex}:Name"] != null)
 {
-    BearerTokenHttpClient TimeChimpClient = new(config["TimeChimp:BaseURL"], config[$"TimeChimp:BearerToken{company}"]);
-    FirebirdClientETS ETSClient = new(config["ETS:Server"], config[$"ETS:User{company}"], config[$"ETS:Password{company}"], config[$"ETS:Database{company}"]);
+    BearerTokenHttpClient TimeChimpClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
+    FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
+
+    String company = config[$"Companies:{companyIndex}:Name"];
+    companyIndex++;
 
     //get customers from timechimp
     app.MapGet($"/api/{company.ToLower()}/timechimp/customers", () => { try { return Results.Ok(new TimeChimpCustomerHelper(TimeChimpClient).GetCustomers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomers");
