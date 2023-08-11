@@ -322,7 +322,7 @@ app.MapGet("/api/ets/mileageids", (String dateString) =>
 }).WithName("GetMileageIds");
 
 //sync mileages from timechimp to ets
-app.MapGet("/api/ets/syncmileage", (Int32 mileageId) =>
+app.MapPost("/api/ets/syncmileage", (Int32 mileageId) =>
 {
     try
     {
@@ -348,7 +348,7 @@ app.MapGet("/api/ets/syncmileage", (Int32 mileageId) =>
     {
         return Results.Problem(e.Message);
     }
-}).WithName("GetMileagesFromETS");
+}).WithName("SyncMileageETS");
 
 //get mileages from timechimp
 app.MapGet("/api/timechimp/mileages", () => { try { return Results.Ok(new TimeChimpMileageHelper(TimeChimpClient).GetMileages()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetMileagesFromTimechimp");
@@ -400,4 +400,4 @@ app.MapGet("/api/ets/subprojects", (string mainprojectid) => { try { return Resu
 //get projectusers from timechimp
 app.MapGet("/api/timechimp/projectusers", () => { try { return Results.Ok(new TimeChimpProjectUserHelper(TimeChimpClient).GetProjectUsers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName("GetProjectUsers");
 
-app.Run("http://localhost:5001");
+app.Run();
