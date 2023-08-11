@@ -339,42 +339,8 @@ app.MapGet("/api/ets/syncmileage", (Int32 mileageId) =>
         MileageETS mileageETS = new MileageETS(mileage);
         var response = new ETSMileageHelper(ETSClient).UpdateMileage(mileageETS);
 
-        //get projectID
-        foreach (mileageTimeChimp mileage in mileagesTimeChimp)
-        {
-            if (mileage.projectId != null)
-            {
-                mileage.projectId = new TimeChimpProjectHelper(TimeChimpClient).GetProjectId(mileage.projectId);
-                ids.Add(mileage.id);
-            }
-
-            EmployeeTimeChimp employee = new TimeChimpEmployeeHelper(TimeChimpClient).GetEmployee(mileage.userId);
-            mileage.userId = int.Parse(employee.employeeNumber);
-        }
-
-
-        List<mileageTimeChimp> copyMileages = new List<mileageTimeChimp>(mileagesTimeChimp);
-        foreach (mileageTimeChimp mileage in mileagesTimeChimp)
-        {
-            // check if there is a mileage for a retour of the current mileage
-            mileageTimeChimp? mileages2 = copyMileages.Find(mileage2 => mileage2.projectId == mileage.projectId && mileage2.userId == mileage.userId && mileage2.distance == mileage.distance && mileage2.fromAddress == mileage.toAddress && mileage2.toAddress == mileage.fromAddress);
-            if (mileages2 != null)
-            {
-                mileage.distance = mileage.distance * 2;
-            }
-        }
-
-        //change to etsclass
-        List<mileageETS> mileagesETS = copyMileages.Select(mileage => new mileageETS(mileage)).ToList();
-
-        //update ets
-        foreach (var mileage in mileagesETS)
-        {
-            var response = new ETSMileageHelper(ETSClient).UpdateMileage(mileage);
-        }
-
-        //change status
-        var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(mileageId);
+        //change status
+        var responseStatus = new TimeChimpMileageHelper(TimeChimpClient).changeStatus(mileageId);
 
         return Results.Ok(response);
     }
