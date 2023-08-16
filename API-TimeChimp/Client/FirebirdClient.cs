@@ -49,7 +49,7 @@ public class FirebirdClientETS
     }
 
     //insert query
-    public string insertQuery(string query)
+    public void insertQuery(string query)
     {
         //create connection
         FbConnection connection = new FbConnection(_connectionString);
@@ -63,12 +63,11 @@ public class FirebirdClientETS
 
             //close the connection
             connection.Close();
-            return "success";
         }
     }
 
     //update query
-    public string updateQuery(string query)
+    public void updateQuery(string query)
     {
         //create connection
         FbConnection connection = new FbConnection(_connectionString);
@@ -82,7 +81,6 @@ public class FirebirdClientETS
 
             //close the connection
             connection.Close();
-            return "success";
         }
     }
 

@@ -1,6 +1,8 @@
+using System.Net.Sockets;
+
 namespace Api.Devion.Models;
 
-public class timeTimeChimp
+public class TimeTimeChimp
 {
     public int id { get; set; }
     public int customerId { get; set; }
@@ -30,7 +32,7 @@ public class timeTimeChimp
     public SubmitForApprovalsTimeChimp[]? submitForApprovals { get; set; }
 }
 
-public class timeETS
+public class TimeETS
 {
     public int? timechimpStatus { get; set; }
     public int timechimpId { get; set; }
@@ -49,11 +51,11 @@ public class timeETS
     public string? PLA_UURCODE { get; set; }
 
     //constructor without specific parameters
-    public timeETS()
+    public TimeETS()
     { }
 
     //constructor to from timechimp class to ets class
-    public timeETS(timeTimeChimp time)
+    public TimeETS(TimeTimeChimp time)
     {
         this.timechimpStatus = time.status;
         this.timechimpId = time.id;
@@ -61,22 +63,7 @@ public class timeETS
         this.PLA_EINDE = time.end.ToLocalTime();
         DateTime baseDateTime = DateTime.Parse("1899-12-30T00:00:00");
         this.PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddMinutes((double)time.pause * 60).ToString("yyyy-MM-dd HH:mm:ss");
-        this.PLA_PROJECT = time.projectId.ToString();
-        this.PLA_SUBPROJECT = time.projectTaskId.ToString();
         this.PN_NAM = time.userDisplayName;
-        this.PLA_PERSOON = time.userId.ToString();
         this.PLA_KLEUR = 12971235;
-        this.PLA_UURCODE = time.TaskId.ToString();
-        this.PLA_KLANT = time.customerId.ToString();
     }
-}
-
-public class naamTimeETS
-{
-    public string? PN_NAM { get; set; }
-}
-
-public class maxValue
-{
-    public int? MAX { get; set; }
 }
