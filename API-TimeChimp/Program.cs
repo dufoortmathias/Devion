@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Text.Json.Nodes;
@@ -216,7 +217,7 @@ while (config[$"Companies:{companyIndex}:Name"] != null)
     }).WithName($"{company}SyncProjectTimechimp");
 
     //get employeeids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (String dateString) => { try { return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetEmployeeIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (String dateString, String teamName) => { try { return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetEmployeeIds");
 
     //get timesids from timechimp
     app.MapGet($"/api/{company.ToLower()}/ets/timeids", (String dateString) => { try { return Results.Ok(new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetTimeIds");

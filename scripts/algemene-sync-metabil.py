@@ -13,6 +13,8 @@ base_URL = f"http://localhost:5142/api/{company}/"
 date_filename = "data.json"
 ## Defines format of how datetime objects should be tranlated to a String
 dateformat = "%d/%m/%Y %H:%M:%S"
+## Name of the team in ETS to sync employees in TimeChimp
+team_name_ETS_sync_TimeChimp = "TimeChimpUsers"
 
 
 
@@ -45,7 +47,7 @@ def log(message):
 
 # Receives ids from all employees that have changed in ETS after last sync
 def get_employees_to_sync():
-    response = requests.get(f"{base_URL}ets/employeeids?dateString={json_data['last_sync']}")
+    response = requests.get(f"{base_URL}ets/employeeids?dateString={json_data['last_sync']}&{team_name_ETS_sync_TimeChimp}")
     if response.ok:
         return response.json()
 
