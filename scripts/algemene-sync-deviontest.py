@@ -4,12 +4,12 @@ import os
 import datetime
 
 # Init vars
-company = "metabil"
+company = "deviontest"
 ## Start time script
 start_time = datetime.datetime.now()
 ## Base URL API
 base_URL = f"http://localhost:5142/api/{company}/"
-## Name of data file that stores information about last time this script
+## Name of data file that stores information about last time this script 
 date_filename = f"data_{company}.json"
 ## Defines format of how datetime objects should be tranlated to a String
 dateformat = "%d/%m/%Y %H:%M:%S"
@@ -196,24 +196,24 @@ def sync_mileages(mileage_ids):
 try:
 
     # # Sync Employees
-    ## Checks if json already contains data from previous failed employee syncs, creates this field with empty list if false
-    if "failed_employees" not in json_data:
-        json_data["failed_employees"] = []
-    ## Retrieves employees to sync and adds employees where previous sync attempt failed
-    employee_ids = get_employees_to_sync() + json_data["failed_employees"]
-    ## Syncs these employees and receives employees where sync was successful
-    synced_employee_ids = sync_employees(employee_ids)
-    ## Updates json to contain new failed employee sync attempts
-    json_data["failed_employees"] = list(set(employee_ids) - set(synced_employee_ids))
-    ## Log total results sync employees
-    log("")
-    log("Employees:")
-    if len(employee_ids) == 0:
-        log(f"Nothing to syncronize")
-    else:
-        log(f"Total amount syncronization succeeded: {len(synced_employee_ids)}")
-        log(f"Total amount syncronization failed: {len(employee_ids)-len(synced_employee_ids)}")
-    log("")
+    # ## Checks if json already contains data from previous failed employee syncs, creates this field with empty list if false
+    # if "failed_employees" not in json_data:
+    #     json_data["failed_employees"] = []
+    # ## Retrieves employees to sync and adds employees where previous sync attempt failed
+    # employee_ids = get_employees_to_sync() + json_data["failed_employees"]
+    # ## Syncs these employees and receives employees where sync was successful
+    # synced_employee_ids = sync_employees(employee_ids)
+    # ## Updates json to contain new failed employee sync attempts
+    # json_data["failed_employees"] = list(set(employee_ids) - set(synced_employee_ids))
+    # ## Log total results sync employees
+    # log("")
+    # log("Employees:")
+    # if len(employee_ids) == 0:
+    #     log(f"Nothing to syncronize")
+    # else:
+    #     log(f"Total amount syncronization succeeded: {len(synced_employee_ids)}")
+    #     log(f"Total amount syncronization failed: {len(employee_ids)-len(synced_employee_ids)}")
+    # log("")
 
     # Sync Uurcodes
     ## Checks if json already contains data from previous failed uurcode syncs, creates this field with empty list if false
@@ -275,65 +275,65 @@ try:
         log(f"Total amount syncronization failed: {len(contact_ids)-len(synced_contact_ids)}")
     log("")
 
-    # Sync projects
-    ## Checks if json already contains data from previous failed project syncs, creates this field with empty list if false
-    if "failed_projects" not in json_data:
-        json_data["failed_projects"] = []
-    ## Retrieves projects to sync and adds projects where previous sync attempt failed
-    project_ids = get_projects_to_sync() + json_data["failed_projects"]
-    ## Syncs these projects and receives projects where sync was successful
-    synced_project_ids = sync_projects(project_ids)
-    ## Updates json to contain new failed project sync attempts
-    json_data["failed_projects"] = list(set(project_ids) - set(synced_project_ids))
-    ## Log total results sync projects
-    log("")
-    log("Projects:")
-    if len(project_ids) == 0:
-        log(f"Nothing to syncronize")
-    else:
-        log(f"Total amount syncronization succeeded: {len(synced_project_ids)}")
-        log(f"Total amount syncronization failed: {len(project_ids)-len(synced_project_ids)}")
-    log("")
+    # # Sync projects
+    # ## Checks if json already contains data from previous failed project syncs, creates this field with empty list if false
+    # if "failed_projects" not in json_data:
+    #     json_data["failed_projects"] = []
+    # ## Retrieves projects to sync and adds projects where previous sync attempt failed
+    # project_ids = get_projects_to_sync() + json_data["failed_projects"]
+    # ## Syncs these projects and receives projects where sync was successful
+    # synced_project_ids = sync_projects(project_ids)
+    # ## Updates json to contain new failed project sync attempts
+    # json_data["failed_projects"] = list(set(project_ids) - set(synced_project_ids))
+    # ## Log total results sync projects
+    # log("")
+    # log("Projects:")
+    # if len(project_ids) == 0:
+    #     log(f"Nothing to syncronize")
+    # else:
+    #     log(f"Total amount syncronization succeeded: {len(synced_project_ids)}")
+    #     log(f"Total amount syncronization failed: {len(project_ids)-len(synced_project_ids)}")
+    # log("")
 
-    # Sync times
-    ## Checks if json already contains data from previous failed time syncs, creates this field with empty list if false
-    if "failed_times" not in json_data:
-        json_data["failed_times"] = []
-    ## Retrieves times to sync and adds times where previous sync attempt failed
-    time_ids = get_times_to_sync() + json_data["failed_times"]
-    ## Syncs these times and receives times where sync was successful
-    synced_time_ids = sync_times(time_ids)
-    ## Updates json to contain new failed time sync attempts
-    json_data["failed_times"] = list(set(time_ids) - set(synced_time_ids))
-    ## Log total results sync times
-    log("")
-    log("Times:")
-    if len(time_ids) == 0:
-        log(f"Nothing to syncronize")
-    else:
-        log(f"Total amount syncronization succeeded: {len(synced_time_ids)}")
-        log(f"Total amount syncronization failed: {len(time_ids)-len(synced_time_ids)}")
-    log("")
+    # # Sync times
+    # ## Checks if json already contains data from previous failed time syncs, creates this field with empty list if false
+    # if "failed_times" not in json_data:
+    #     json_data["failed_times"] = []
+    # ## Retrieves times to sync and adds times where previous sync attempt failed
+    # time_ids = get_times_to_sync() + json_data["failed_times"]
+    # ## Syncs these times and receives times where sync was successful
+    # synced_time_ids = sync_times(time_ids)
+    # ## Updates json to contain new failed time sync attempts
+    # json_data["failed_times"] = list(set(time_ids) - set(synced_time_ids))
+    # ## Log total results sync times
+    # log("")
+    # log("Times:")
+    # if len(time_ids) == 0:
+    #     log(f"Nothing to syncronize")
+    # else:
+    #     log(f"Total amount syncronization succeeded: {len(synced_time_ids)}")
+    #     log(f"Total amount syncronization failed: {len(time_ids)-len(synced_time_ids)}")
+    # log("")
 
-    # Sync mileages
-    ## Checks if json already contains data from previous failed mileage syncs, creates this field with empty list if false
-    if "failed_mileages" not in json_data:
-        json_data["failed_mileages"] = []
-    ## Retrieves mileages to sync and adds mileages where previous sync attempt failed
-    mileage_ids = get_mileages_to_sync() + json_data["failed_mileages"]
-    ## Syncs these mileages and receives mileages where sync was successful
-    synced_mileage_ids = sync_mileages(mileage_ids)
-    ## Updates json to contain new failed mileage sync attempts
-    json_data["failed_mileages"] = list(set(mileage_ids) - set(synced_mileage_ids))
-    ## Log total results sync mileages
-    log("")
-    log("Mileages:")
-    if len(mileage_ids) == 0:
-        log(f"Nothing to syncronize")
-    else:
-        log(f"Total amount syncronization succeeded: {len(synced_mileage_ids)}")
-        log(f"Total amount syncronization failed: {len(mileage_ids)-len(synced_mileage_ids)}")
-    log("")
+    # # Sync mileages
+    # ## Checks if json already contains data from previous failed mileage syncs, creates this field with empty list if false
+    # if "failed_mileages" not in json_data:
+    #     json_data["failed_mileages"] = []
+    # ## Retrieves mileages to sync and adds mileages where previous sync attempt failed
+    # mileage_ids = get_mileages_to_sync() + json_data["failed_mileages"]
+    # ## Syncs these mileages and receives mileages where sync was successful
+    # synced_mileage_ids = sync_mileages(mileage_ids)
+    # ## Updates json to contain new failed mileage sync attempts
+    # json_data["failed_mileages"] = list(set(mileage_ids) - set(synced_mileage_ids))
+    # ## Log total results sync mileages
+    # log("")
+    # log("Mileages:")
+    # if len(mileage_ids) == 0:
+    #     log(f"Nothing to syncronize")
+    # else:
+    #     log(f"Total amount syncronization succeeded: {len(synced_mileage_ids)}")
+    #     log(f"Total amount syncronization failed: {len(mileage_ids)-len(synced_mileage_ids)}")
+    # log("")
 
     # Determine runtime script
     end_time = datetime.datetime.now()
