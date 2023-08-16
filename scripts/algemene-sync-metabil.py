@@ -15,8 +15,8 @@ date_filename = "data.json"
 dateformat = "%d/%m/%Y %H:%M:%S"
 ## Name of the team in ETS to sync employees in TimeChimp
 team_name_ETS_sync_TimeChimp = "TimeChimpUsers"
-
-
+## Amout weeks back to sync time and mileages
+amount_weeks = 5
 
 # Reads data from the json file, if the file doesn't exist it will create one
 global json_data
@@ -87,7 +87,7 @@ def get_projects_to_sync():
 
 # Receives ids from all times that have changed in ETS after last sync 
 def get_times_to_sync():
-    response = requests.get(f"{base_URL}ets/timeids?dateString={json_data['last_sync']}")
+    response = requests.get(f"{base_URL}ets/timeids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}")
     if response.ok:
         return response.json()
     else:
@@ -95,7 +95,7 @@ def get_times_to_sync():
 
 # Receives ids from all mileages that have changed in ETS after last sync 
 def get_mileages_to_sync():
-    response = requests.get(f"{base_URL}ets/mileageids?dateString={json_data['last_sync']}")
+    response = requests.get(f"{base_URL}ets/mileageids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}")
     if response.ok:
         return response.json()
     else:
