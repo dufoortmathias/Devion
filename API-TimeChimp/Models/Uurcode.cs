@@ -1,6 +1,6 @@
 namespace Api.Devion.Models;
 
-public class uurcodesTimeChimp
+public class UurcodeTimeChimp
 {
     public int id { get; set; }
     public Boolean active { get; set; }
@@ -14,10 +14,10 @@ public class uurcodesTimeChimp
     public string[] tagNames { get; set; }
 
     //constructor without specific parameters
-    public uurcodesTimeChimp() { }
+    public UurcodeTimeChimp() { }
 
     //constructor to from ets class to timechimp class
-    public uurcodesTimeChimp(uurcodesETS uurcode)
+    public UurcodeTimeChimp(UurcodeETS uurcode)
     {
         this.name = uurcode.UR_OMS;
         this.code = uurcode.UR_COD;
@@ -31,7 +31,7 @@ public class uurcodesTimeChimp
     }
 }
 
-public class uurcodesETS
+public class UurcodeETS
 {
     public string? UR_COD { get; set; }
     public string? UR_OMS { get; set; }

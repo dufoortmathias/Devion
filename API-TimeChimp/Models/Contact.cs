@@ -1,6 +1,6 @@
 namespace Api.Devion.Models;
 
-public class contactsTimeChimp
+public class ContactTimeChimp
 {
     public string? name { get; set; }
     public string? jobTitle { get; set; }
@@ -12,10 +12,10 @@ public class contactsTimeChimp
     public int[]? customerIds { get; set; }
 
     //constructor without specific parameters
-    public contactsTimeChimp() { }
+    public ContactTimeChimp() { }
 
     //constructor to from ets class to timechimp class
-    public contactsTimeChimp(contactsETS contactETS)
+    public ContactTimeChimp(ContactETS contactETS)
     {
         name = contactETS.CO_TAV;
         email = contactETS.CO_EMAIL;
@@ -25,7 +25,7 @@ public class contactsTimeChimp
     }
 }
 
-public class contactsETS
+public class ContactETS
 {
     public Int32? C_CODE { get; set; }
     public string? CO_KLCOD { get; set; }

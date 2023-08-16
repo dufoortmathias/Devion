@@ -50,18 +50,18 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     }
 
     //change status of mileage
-    public changeRegistrationStatusTimeChimp changeStatus(int id)
+    public MileageTimeChimp changeStatus(int mileageId)
     {
         //create new object
-        changeRegistrationStatusTimeChimp changes = new changeRegistrationStatusTimeChimp();
-
-        //set properties
-        changes.registrationIds = new List<int> { id };
-        changes.status = 3;
+        Dictionary<String, Object> changes = new()
+        {
+            {"registrationIds", new Int32[] { mileageId } },
+            {"status", 3 }
+        };
 
         //send data to timechimp
         String response = TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
 
-        return changes;
+        return new TimeChimpMileageHelper(TCClient).GetMileage(mileageId);
     }
 }

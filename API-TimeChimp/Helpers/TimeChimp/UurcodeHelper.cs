@@ -16,10 +16,10 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
         String response = TCClient.GetAsync($"v1/tasks");
 
         //convert data to timeTimeChimp object
-        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response);
+        List<UurcodeTimeChimp> uurcodes = JsonTool.ConvertTo<List<UurcodeTimeChimp>>(response);
 
         //search for uurcode
-        uurcodesTimeChimp uurcode = uurcodes.Find(uurcode => uurcode.code == code);
+        UurcodeTimeChimp uurcode = uurcodes.Find(uurcode => uurcode.code == code);
 
         //check if uurcode exists
         if (uurcode != null)
@@ -33,43 +33,43 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     }
 
     //get all uurcodes
-    public List<uurcodesTimeChimp> GetUurcodes()
+    public List<UurcodeTimeChimp> GetUurcodes()
     {
         //get data from timechimp
         String response = TCClient.GetAsync($"v1/tasks");
 
         //convert data to timeTimeChimp object
-        List<uurcodesTimeChimp> uurcodes = JsonTool.ConvertTo<List<uurcodesTimeChimp>>(response);
+        List<UurcodeTimeChimp> uurcodes = JsonTool.ConvertTo<List<UurcodeTimeChimp>>(response);
 
         return uurcodes;
     }
 
     //get uurcode by id
-    public uurcodesTimeChimp GetUurcode(Int32 uurcodeId)
+    public UurcodeTimeChimp GetUurcode(Int32 uurcodeId)
     {
         //get data frm timechimp
         String response = TCClient.GetAsync($"v1/tasks/{uurcodeId}");
 
         //convert data to timechimp object
-        uurcodesTimeChimp uurcode = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
+        UurcodeTimeChimp uurcode = JsonTool.ConvertTo<UurcodeTimeChimp>(response);
 
         return uurcode;
     }
 
     //create uurcode
-    public uurcodesTimeChimp CreateUurcode(uurcodesTimeChimp uurcode)
+    public UurcodeTimeChimp CreateUurcode(UurcodeTimeChimp uurcode)
     {
         //get data from timechimp
         String response = TCClient.PostAsync($"v1/tasks", JsonTool.ConvertFrom(uurcode));
 
         //convert data to timeTimeChimp object
-        uurcodesTimeChimp uurcodeResponse = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
+        UurcodeTimeChimp uurcodeResponse = JsonTool.ConvertTo<UurcodeTimeChimp>(response);
 
         return uurcodeResponse;
     }
 
 
-    public uurcodesTimeChimp UpdateUurcode(uurcodesTimeChimp uurcode)
+    public UurcodeTimeChimp UpdateUurcode(UurcodeTimeChimp uurcode)
     {
         var uurcode2 = GetUurcodes().Find(uur => uur.code == uurcode.code);
 
@@ -84,7 +84,7 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
         String response = TCClient.PutAsync($"v1/tasks/", JsonTool.ConvertFrom(uurcode));
 
         //convert data to timeTimeChimp object
-        uurcodesTimeChimp uurcodes = JsonTool.ConvertTo<uurcodesTimeChimp>(response);
+        UurcodeTimeChimp uurcodes = JsonTool.ConvertTo<UurcodeTimeChimp>(response);
 
         return uurcodes;
     }

@@ -34,7 +34,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     app.MapGet($"/api/{company.ToLower()}/timechimp/customers", () => { try { return Results.Ok(new TimeChimpCustomerHelper(TCClient).GetCustomers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomers");
 
     //create customer in timechimp
-    app.MapPost($"/api/{company.ToLower()}/timechimp/customer", (customerTimeChimp customer) => { try { return Results.Ok(new TimeChimpCustomerHelper(TCClient).CreateCustomer(customer)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}CreateCustomer");
+    app.MapPost($"/api/{company.ToLower()}/timechimp/customer", (CustomerTimeChimp customer) => { try { return Results.Ok(new TimeChimpCustomerHelper(TCClient).CreateCustomer(customer)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}CreateCustomer");
 
     //get projects from timechimp
     app.MapGet($"/api/{company.ToLower()}/timechimp/projects", () => { try { return Results.Ok(new TimeChimpProjectHelper(TCClient).GetProjects()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetProjects");
@@ -61,10 +61,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     app.MapGet($"/api/{company.ToLower()}/timechimp/contacts", () => { try { return Results.Ok(new TimeChimpContactHelper(TCClient).GetContacts()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetContacts");
 
     //create contact in timechimp
-    app.MapPost($"/api/{company.ToLower()}/timechimp/contact", (contactsTimeChimp contact) => { try { return Results.Ok(new TimeChimpContactHelper(TCClient).CreateContact(contact)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}PostContact");
+    app.MapPost($"/api/{company.ToLower()}/timechimp/contact", (ContactTimeChimp contact) => { try { return Results.Ok(new TimeChimpContactHelper(TCClient).CreateContact(contact)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}PostContact");
 
     //update contact in timechimp
-    app.MapPut($"/api/{company.ToLower()}/timechimp/contacten", (contactsTimeChimp contact) => { try { return Results.Ok(new TimeChimpContactHelper(TCClient).UpdateContact(contact)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}PutContact");
+    app.MapPut($"/api/{company.ToLower()}/timechimp/contacten", (ContactTimeChimp contact) => { try { return Results.Ok(new TimeChimpContactHelper(TCClient).UpdateContact(contact)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}PutContact");
 
     //get mileages from timechimp and send the to ets
     app.MapGet($"/api/{company.ToLower()}/timechimp/mileage", () => { try { return Results.Ok(new TimeChimpMileageHelper(TCClient).GetMileages()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetMileages");
@@ -78,7 +78,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get customer from ets
-            CustomersETS ETSCustomer = new ETSCustomerHelper(ETSClient).GetCustomer(customerId);
+            CustomerETS ETSCustomer = new ETSCustomerHelper(ETSClient).GetCustomer(customerId);
 
             // Handle when customer doesn't exist in ETS
             if (ETSCustomer == null)
@@ -87,7 +87,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
 
             //change to timechimp class
-            customerTimeChimp TCCustomer = new(ETSCustomer);
+            CustomerTimeChimp TCCustomer = new(ETSCustomer);
 
             TimeChimpCustomerHelper customerHelper = new(TCClient);
 
@@ -114,7 +114,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     app.MapPost($"/api/{company.ToLower()}/ets/synccontact", (Int32 contactId) =>
     {
         //get contact from ets
-        contactsETS ETSContact = new ETSContactHelper(ETSClient).GetContact(contactId);
+        ContactETS ETSContact = new ETSContactHelper(ETSClient).GetContact(contactId);
 
         // Handle when contact doesn't exist in ETS
         if (ETSContact == null)
@@ -123,7 +123,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
 
         //change to timechimp class
-        contactsTimeChimp TCContact = new(ETSContact);
+        ContactTimeChimp TCContact = new(ETSContact);
 
         TimeChimpContactHelper contactHelper = new(TCClient);
 
@@ -360,7 +360,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get uurcode from ets
-            uurcodesETS ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
+            UurcodeETS ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
 
             // Handle when uurcode doesn't exist in ETS
             if (ETSUurcode == null)
@@ -369,7 +369,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
 
             //change to timechimp class
-            uurcodesTimeChimp TCUurcode = new(ETSUurcode);
+            UurcodeTimeChimp TCUurcode = new(ETSUurcode);
 
             TimeChimpUurcodeHelper uurcodeHelper = new(TCClient, ETSClient);
 

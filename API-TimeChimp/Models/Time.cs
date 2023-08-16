@@ -4,6 +4,22 @@ namespace Api.Devion.Models;
 
 public class TimeTimeChimp
 {
+    public class SubmitForApprovalsTimeChimp
+    {
+        public int[] ids { get; set; }
+        public string? message { get; set; }
+        public string? baseUrl { get; set; }
+        public int[] contactPersonIds { get; set; }
+    }
+
+    public class TagTimeChimp
+    {
+        public int id { get; set; }
+        public string? name { get; set; }
+        public Boolean active { get; set; }
+        public int type { get; set; }
+    }
+
     public int id { get; set; }
     public int customerId { get; set; }
     public string? customerName { get; set; }
@@ -27,7 +43,7 @@ public class TimeTimeChimp
     public int status { get; set; }
     public int statusIntern { get; set; }
     public int statusExtern { get; set; }
-    public tagTimeChimp[]? tags { get; set; }
+    public TagTimeChimp[]? tags { get; set; }
     public DateTime modified { get; set; }
     public SubmitForApprovalsTimeChimp[]? submitForApprovals { get; set; }
 }
@@ -62,7 +78,7 @@ public class TimeETS
         this.PLA_START = time.start.ToLocalTime();
         this.PLA_EINDE = time.end.ToLocalTime();
         DateTime baseDateTime = DateTime.Parse("1899-12-30T00:00:00");
-        this.PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddMinutes((double)time.pause * 60).ToString("yyyy-MM-dd HH:mm:ss");
+        this.PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddHours(time.pause.Value).ToString("yyyy-MM-dd HH:mm:ss");
         this.PN_NAM = time.userDisplayName;
         this.PLA_KLEUR = 12971235;
     }

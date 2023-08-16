@@ -57,11 +57,11 @@ public class ETSTimeHelper : ETSHelper
         timeETS.PLA_ID = max + 1;
 
         //get data from ETS for the customer
-        customerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(timeTC.customerId) ?? throw new Exception("Error getting customer from TimeChimp with id: " + timeTC.customerId);
+        CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(timeTC.customerId) ?? throw new Exception("Error getting customer from TimeChimp with id: " + timeTC.customerId);
         timeETS.PLA_KLANT = customer.relationId;
 
         //get data from ETS for the uurcode
-        uurcodesTimeChimp uurCode = new TimeChimpUurcodeHelper(TCClient, ETSClient).GetUurcode(timeTC.TaskId) ?? throw new Exception("Error getting uurcode from TimeChimp with id: " + timeTC.TaskId);
+        UurcodeTimeChimp uurCode = new TimeChimpUurcodeHelper(TCClient, ETSClient).GetUurcode(timeTC.TaskId) ?? throw new Exception("Error getting uurcode from TimeChimp with id: " + timeTC.TaskId);
         timeETS.PLA_UURCODE = uurCode.code;
 
         //get data from ETS for the project

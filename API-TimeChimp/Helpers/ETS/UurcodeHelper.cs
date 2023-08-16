@@ -21,11 +21,11 @@ public class ETSUurcodeHelper : ETSHelper
         }
 
         //convert data to uurcodesETS object
-        List<uurcodesETS> uurcodes = JsonTool.ConvertTo<List<uurcodesETS>>(response);
+        List<UurcodeETS> uurcodes = JsonTool.ConvertTo<List<UurcodeETS>>(response);
 
         //create list with all uurcodeids
         List<string> uurcodesIds = new List<string>();
-        foreach (uurcodesETS uurcode in uurcodes)
+        foreach (UurcodeETS uurcode in uurcodes)
         {
             uurcodesIds.Add(uurcode.UR_COD);
         }
@@ -33,7 +33,7 @@ public class ETSUurcodeHelper : ETSHelper
     }
 
     // get uurcode by uurcodeId
-    public uurcodesETS GetUurcode(string uurcodeId)
+    public UurcodeETS GetUurcode(string uurcodeId)
     {
         var query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD = '{uurcodeId}'";
 
@@ -47,7 +47,7 @@ public class ETSUurcodeHelper : ETSHelper
         }
 
         //convert data to uurcodesETS object
-        uurcodesETS uurcode = JsonTool.ConvertTo<List<uurcodesETS>>(response).FirstOrDefault();
+        UurcodeETS uurcode = JsonTool.ConvertTo<List<UurcodeETS>>(response).FirstOrDefault();
 
         return uurcode;
     }
