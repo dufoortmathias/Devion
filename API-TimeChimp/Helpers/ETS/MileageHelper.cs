@@ -31,7 +31,7 @@ public class ETSMileageHelper : ETSHelper
     //add a mileage
     public MileageETS UpdateMileage(MileageETS mileage)
     {
-        //create query to get projectid and subprojectid for the mileage
+        //create query to get mileages data from ETS that belong to current TimeChimp mileage
         var queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = '{mileage.PLA_PROJECT}' AND PLA_SUBPROJECT = '{mileage.PLA_SUBPROJECT}' AND PLA_START LIKE '{mileage.PLA_START.ToString("yyyy-MM-dd")}%' AND PLA_PERSOON = '{mileage.PLA_PERSOON}';";
 
         //get data from ETS
@@ -43,21 +43,9 @@ public class ETSMileageHelper : ETSHelper
             throw new Exception("Error getting mileages from ETS with query: " + queryGet);
         }
 
-        //convert data to mileageETS object
-        List<MileageETS> mileagesETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet);
-
-        //select record from ETS to update mileage
-        //select record with mileages 
-        Int32 index = 0;
-        MileageETS? mileageETS = null;
-        while (mileageETS == null || mileageETS.PLA_KM > mileage.PLA_KM)
-        {
-            if (index == mileagesETS.Count)
-            {
-                throw new Exception("No time record in ETS for this mileage");
-            }
-            mileageETS = mileagesETS[index++];
-        }
+        //convert first data  record to mileageETS object
+        //the first mileage data object from ETS is always used to store new mileage registrations 
+        MileageETS mileageETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet).First();
 
         mileage.PLA_KM += mileageETS.PLA_KM;
         mileage.PLA_ID = mileageETS.PLA_ID;
