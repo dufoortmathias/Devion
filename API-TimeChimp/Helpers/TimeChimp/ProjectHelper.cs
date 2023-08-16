@@ -7,9 +7,9 @@
         }
 
         //check if project exists
-        public Boolean ProjectExists(String projectId)
+        public ProjectTimeChimp? FindProject(String projectId)
         {
-            return GetProjects().Any(project => project.code != null && project.code.Equals(projectId));
+            return GetProjects().Find(project => project.code != null && project.code.Equals(projectId));
         }
 
         //get project by id
@@ -57,12 +57,6 @@
         //update project
         public ProjectTimeChimp UpdateProject(ProjectTimeChimp projectUpdate)
         {
-            //check if projectid is null
-            if (projectUpdate.id == null)
-            {
-                projectUpdate.id = GetProjects().ToList().Find(p => p.code.Equals(projectUpdate.code)).id;
-            }
-
             //get project from timechimp
             ProjectTimeChimp project = GetProject(projectUpdate.id.Value);
 
