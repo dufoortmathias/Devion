@@ -7,7 +7,7 @@
         }
 
         // get project by projectId
-        public ProjectETS GetProject(String projectId)
+        public ProjectETS GetProject(string projectId)
         {
             //create query
             string query = $"SELECT * FROM PROJPX WHERE PR_NR = {projectId}";
@@ -27,7 +27,7 @@
         }
 
         //get all subprojects from a project
-        public List<SubprojectETS> GetSubprojects(String projectId)
+        public List<SubprojectETS> GetSubprojects(string projectId)
         {
             //create query
             string query = $"SELECT * FROM SUBPROJ WHERE VOLNR like '{projectId}%'";
@@ -43,10 +43,10 @@
         }
 
         //get all projectids that are changed after the given date
-        public String[] GetProjectIdsChangedAfter(DateTime date)
+        public string[] GetProjectIdsChangedAfter(DateTime date)
         {
             //create query
-            string query = $"SELECT PROJPX.PR_NR FROM PROJPX WHERE DATE_CHANGED BETWEEN '{date.ToString("MM/dd/yyyy HH:mm")}' AND '{DateTime.Now.ToString("MM/dd/yyyy HH:mm")}'";
+            string query = $"SELECT PROJPX.PR_NR FROM PROJPX WHERE DATE_CHANGED BETWEEN '{date:MM/dd/yyyy HH:mm}' AND '{DateTime.Now:MM/dd/yyyy HH:mm}'";
 
             //get data from ETS
             string json = ETSClient.selectQuery(query);
@@ -58,7 +58,7 @@
             }
 
             //get all ids from the json
-            String[] ids = JsonTool.ConvertTo<ProjectETS[]>(json)
+            string[] ids = JsonTool.ConvertTo<ProjectETS[]>(json)
                 .Select(project => project.PR_NR)
                 .ToArray();
             return ids;

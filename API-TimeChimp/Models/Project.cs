@@ -2,45 +2,45 @@
 {
     public class ProjectTimeChimp
     {
-        public Double? remainingBudgetHours { get; set; }
-        public Int32[]? tagIds { get; set; }
-        public String[]? tagNames { get; set; }
-        public Boolean? unspecified { get; set; }
+        public double? remainingBudgetHours { get; set; }
+        public int[]? tagIds { get; set; }
+        public string[]? tagNames { get; set; }
+        public bool? unspecified { get; set; }
         public DateTime? invoiceDate { get; set; }
-        public Boolean? invoiceInInstallments { get; set; }
-        public Double? budgetNotificationPercentage { get; set; }
-        public Boolean? budgetNotificationHasBeenSent { get; set; }
-        public String? clientId { get; set; }
-        public Int32? invoiceStatus { get; set; }
-        public Int32? invoiceId { get; set; }
-        public String? color { get; set; }
-        public Boolean? visibleOnSchedule { get; set; }
-        public String? externalUrl { get; set; }
-        public String? externalName { get; set; }
-        public String? invoiceReference { get; set; }
-        public Object[]? projectTasks { get; set; }
-        public Object[]? projectUsers { get; set; }
-        public Int32? id { get; set; }
-        public Boolean? active { get; set; }
-        public Int32 customerId { get; set; }
-        public String? customerName { get; set; }
-        public String? name { get; set; }
-        public String? code { get; set; }
-        public String? notes { get; set; }
-        public Int32 invoiceMethod { get; set; }
-        public Double? hourlyRate { get; set; }
-        public Double? rate { get; set; }
-        public Int32 budgetMethod { get; set; }
-        public Double? budgetRate { get; set; }
-        public Double? budgetHours { get; set; }
+        public bool? invoiceInInstallments { get; set; }
+        public double? budgetNotificationPercentage { get; set; }
+        public bool? budgetNotificationHasBeenSent { get; set; }
+        public string? clientId { get; set; }
+        public int? invoiceStatus { get; set; }
+        public int? invoiceId { get; set; }
+        public string? color { get; set; }
+        public bool? visibleOnSchedule { get; set; }
+        public string? externalUrl { get; set; }
+        public string? externalName { get; set; }
+        public string? invoiceReference { get; set; }
+        public object[]? projectTasks { get; set; }
+        public object[]? projectUsers { get; set; }
+        public int? id { get; set; }
+        public bool? active { get; set; }
+        public int customerId { get; set; }
+        public string? customerName { get; set; }
+        public string? name { get; set; }
+        public string? code { get; set; }
+        public string? notes { get; set; }
+        public int invoiceMethod { get; set; }
+        public double? hourlyRate { get; set; }
+        public double? rate { get; set; }
+        public int budgetMethod { get; set; }
+        public double? budgetRate { get; set; }
+        public double? budgetHours { get; set; }
         public DateTime? startDate { get; set; }
         public DateTime? endDate { get; set; }
-        public Object? projectSubscription { get; set; }
+        public object? projectSubscription { get; set; }
         public DateTime? modified { get; set; }
-        public Int32? mainProjectId { get; set; }
-        public Int32[]? projectManagerIds { get; set; }
-        public Boolean? useSubprojects { get; set; }
-        public Int32[]? subprojectIds { get; set; }
+        public int? mainProjectId { get; set; }
+        public int[]? projectManagerIds { get; set; }
+        public bool? useSubprojects { get; set; }
+        public int[]? subprojectIds { get; set; }
 
         //constructor without specific parameters
         public ProjectTimeChimp() { }
@@ -66,14 +66,7 @@
                 name = subprojectETS.SU_OMS;
                 customerId = mainProject.customerId;
                 startDate = subprojectETS.SU_START_PRODUCTIE;
-                if (subprojectETS.SU_AFGEWERKT == 1)
-                {
-                    active = false;
-                }
-                else
-                {
-                    active = true;
-                }
+                active = subprojectETS.SU_AFGEWERKT != 1;
                 useSubprojects = false; //TODO: add value to seperate file
                 invoiceMethod = 2; //TODO: add value to seperate file
                 budgetMethod = 1; //TODO: add value to seperate file
@@ -82,21 +75,21 @@
     }
     public class ProjectETS
     {
-        public String? PR_NR { get; set; }
-        public String? PR_KLNR { get; set; }
-        public String? PR_KROM { get; set; }
+        public string? PR_NR { get; set; }
+        public string? PR_KLNR { get; set; }
+        public string? PR_KROM { get; set; }
         public DateTime? PR_START_PRODUCTIE { get; set; }
         public DateTime? PR_BELOOFD { get; set; }
-        public Char? PR_STAT { get; set; }
+        public char? PR_STAT { get; set; }
     }
 
     public class SubprojectETS
     {
-        public String SU_NR { get; set; }
-        public String SU_SUB { get; set; }
-        public String SU_OMS { get; set; }
-        public String VOLNR { get; set; }
-        public Int32? SU_AFGEWERKT { get; set; }
+        public string? SU_NR { get; set; }
+        public string? SU_SUB { get; set; }
+        public string? SU_OMS { get; set; }
+        public string? VOLNR { get; set; }
+        public int? SU_AFGEWERKT { get; set; }
         public DateTime? SU_START_PRODUCTIE { get; set; }
     }
 }

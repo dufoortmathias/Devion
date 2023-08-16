@@ -1,18 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using System.Text.Json.Nodes;
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var builder = WebApplication.CreateBuilder(args);
-
-var config = builder.Configuration;
+ConfigurationManager config = builder.Configuration;
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -28,7 +23,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     BearerTokenHttpClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
-    String company = config[$"Companies:{companyIndex}:Name"];
+    string company = config[$"Companies:{companyIndex}:Name"];
 
     //get customers from timechimp
     app.MapGet($"/api/{company.ToLower()}/timechimp/customers", () => { try { return Results.Ok(new TimeChimpCustomerHelper(TCClient).GetCustomers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomers");
@@ -70,10 +65,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     app.MapGet($"/api/{company.ToLower()}/timechimp/mileage", () => { try { return Results.Ok(new TimeChimpMileageHelper(TCClient).GetMileages()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetMileages");
 
     //get customerids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (String dateString) => { try { return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomerIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (string dateString) => { try { return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomerIds");
 
     //sync customer from ets to timechimp
-    app.MapPost($"/api/{company.ToLower()}/ets/synccustomer", (String customerId) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/synccustomer", (string customerId) =>
     {
         try
         {
@@ -92,14 +87,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             TimeChimpCustomerHelper customerHelper = new(TCClient);
 
             //check if customer exists in timechimp
-            if (customerHelper.CustomerExists(customerId))
-            {
-                return Results.Ok(customerHelper.UpdateCustomer(TCCustomer));
-            }
-            else
-            {
-                return Results.Ok(customerHelper.CreateCustomer(TCCustomer));
-            }
+            return customerHelper.CustomerExists(customerId)
+                ? Results.Ok(customerHelper.UpdateCustomer(TCCustomer))
+                : Results.Ok(customerHelper.CreateCustomer(TCCustomer));
         }
         catch (Exception e)
         {
@@ -108,10 +98,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}SyncCustomerTimechimp");
 
     //get contactids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/contactids", (String dateString) => { try { return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetContactIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/contactids", (string dateString) => { try { return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetContactIds");
 
     //sync contact from ets to timechimp
-    app.MapPost($"/api/{company.ToLower()}/ets/synccontact", (Int32 contactId) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/synccontact", (int contactId) =>
     {
         //get contact from ets
         ContactETS ETSContact = new ETSContactHelper(ETSClient).GetContact(contactId);
@@ -128,21 +118,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         TimeChimpContactHelper contactHelper = new(TCClient);
 
         //check if contact exists in timechimp
-        if (contactHelper.ContactExists(ETSContact))
-        {
-            return Results.Ok(contactHelper.UpdateContact(TCContact));
-        }
-        else
-        {
-            return Results.Ok(contactHelper.CreateContact(TCContact));
-        }
+        return contactHelper.ContactExists(ETSContact)
+            ? Results.Ok(contactHelper.UpdateContact(TCContact))
+            : Results.Ok(contactHelper.CreateContact(TCContact));
     }).WithName($"{company}SyncContactTimechimp");
 
     //get projectids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/projectids", (String dateString) => { try { return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetProjectIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/projectids", (string dateString) => { try { return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetProjectIds");
 
     //sync project from ets to timechimp
-    app.MapPost($"/api/{company.ToLower()}/ets/syncproject", (String projectId) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/syncproject", (string projectId) =>
     {
         try
         {
@@ -218,13 +203,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}SyncProjectTimechimp");
 
     //get employeeids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (String dateString, String teamName) => { try { return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetEmployeeIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (string dateString, string teamName) => { try { return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetEmployeeIds");
 
     //get timesids from timechimp
-    app.MapGet($"/api/{company.ToLower()}/ets/timeids", (String dateString) => { try { return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetTimeIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/timeids", (string dateString) => { try { return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetTimeIds");
 
     //sync time from timechimp to ets
-    app.MapPost($"/api/{company.ToLower()}/ets/synctime", (Int32 timeId) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/synctime", (int timeId) =>
     {
         try
         {
@@ -255,7 +240,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}SyncTimeETS");
 
     //sync employee from ets to timechimp
-    app.MapPost($"/api/{company.ToLower()}/ets/syncemployee", (String employeeId) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/syncemployee", (string employeeId) =>
     {
         try
         {
@@ -291,7 +276,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 employee = employeeHelper.UpdateEmployee(TCEmployee);
 
                 //adds employee to all existing projects in TimeChimp
-                new TimeChimpProjectUserHelper(TCClient).AddAllProjectUserForEmployee(employee.id.Value);
+                _ = new TimeChimpProjectUserHelper(TCClient).AddAllProjectUserForEmployee(employee.id.Value);
 
                 return Results.Ok(employee);
             }
@@ -304,7 +289,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}SyncEmployeeTimechimp");
 
     //get mileageids from timechimp that were changed after specific time
-    app.MapGet($"/api/{company.ToLower()}/ets/mileageids", (String dateString) =>
+    app.MapGet($"/api/{company.ToLower()}/ets/mileageids", (string dateString) =>
     {
         try
         {
@@ -317,7 +302,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}GetMileageIds");
 
     //sync mileages from timechimp to ets
-    app.MapPost($"/api/{company.ToLower()}/ets/syncmileage", (Int32 mileageId) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/syncmileage", (int mileageId) =>
     {
         try
         {
@@ -331,11 +316,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             mileage.projectId = new TimeChimpProjectHelper(TCClient).GetProjectId(mileage.projectId);
             mileage.userId = int.Parse(new TimeChimpEmployeeHelper(TCClient).GetEmployee(mileage.userId).employeeNumber);
 
-            MileageETS mileageETS = new MileageETS(mileage);
-            var response = new ETSMileageHelper(ETSClient).UpdateMileage(mileageETS);
+            MileageETS mileageETS = new(mileage);
+            MileageETS response = new ETSMileageHelper(ETSClient).UpdateMileage(mileageETS);
 
             //change status
-            var responseStatus = new TimeChimpMileageHelper(TCClient).changeStatus(mileageId);
+            MileageTimeChimp responseStatus = new TimeChimpMileageHelper(TCClient).changeStatus(mileageId);
 
             return Results.Ok(response);
         }
@@ -374,14 +359,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             TimeChimpUurcodeHelper uurcodeHelper = new(TCClient, ETSClient);
 
             //check if uurcode exists in timechimp
-            if (uurcodeHelper.uurcodeExists(uurcodeId))
-            {
-                return Results.Ok(uurcodeHelper.UpdateUurcode(TCUurcode));
-            }
-            else
-            {
-                return Results.Ok(uurcodeHelper.CreateUurcode(TCUurcode));
-            }
+            return uurcodeHelper.uurcodeExists(uurcodeId)
+                ? Results.Ok(uurcodeHelper.UpdateUurcode(TCUurcode))
+                : Results.Ok(uurcodeHelper.CreateUurcode(TCUurcode));
         }
         catch (Exception e)
         {

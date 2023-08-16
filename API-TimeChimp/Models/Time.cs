@@ -1,22 +1,20 @@
-using System.Net.Sockets;
-
 namespace Api.Devion.Models;
 
 public class TimeTimeChimp
 {
     public class SubmitForApprovalsTimeChimp
     {
-        public int[] ids { get; set; }
+        public int[]? ids { get; set; }
         public string? message { get; set; }
         public string? baseUrl { get; set; }
-        public int[] contactPersonIds { get; set; }
+        public int[]? contactPersonIds { get; set; }
     }
 
     public class TagTimeChimp
     {
         public int id { get; set; }
         public string? name { get; set; }
-        public Boolean active { get; set; }
+        public bool active { get; set; }
         public int type { get; set; }
     }
 
@@ -32,12 +30,12 @@ public class TimeTimeChimp
     public string? userDisplayName { get; set; }
     public string[]? userTags { get; set; }
     public DateTime date { get; set; }
-    public Double? hours { get; set; }
+    public double? hours { get; set; }
     public string? notes { get; set; }
     public string? startEnd { get; set; }
     public DateTime start { get; set; }
     public DateTime end { get; set; }
-    public Double? pause { get; set; }
+    public double? pause { get; set; }
     public string? externalName { get; set; }
     public string? externalUrl { get; set; }
     public int status { get; set; }
@@ -73,13 +71,13 @@ public class TimeETS
     //constructor to from timechimp class to ets class
     public TimeETS(TimeTimeChimp time)
     {
-        this.timechimpStatus = time.status;
-        this.timechimpId = time.id;
-        this.PLA_START = time.start.ToLocalTime();
-        this.PLA_EINDE = time.end.ToLocalTime();
+        timechimpStatus = time.status;
+        timechimpId = time.id;
+        PLA_START = time.start.ToLocalTime();
+        PLA_EINDE = time.end.ToLocalTime();
         DateTime baseDateTime = DateTime.Parse("1899-12-30T00:00:00");
-        this.PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddHours(time.pause.Value).ToString("yyyy-MM-dd HH:mm:ss");
-        this.PN_NAM = time.userDisplayName;
-        this.PLA_KLEUR = 12971235;
+        PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddHours(time.pause.Value).ToString("yyyy-MM-dd HH:mm:ss");
+        PN_NAM = time.userDisplayName;
+        PLA_KLEUR = 12971235;
     }
 }

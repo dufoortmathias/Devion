@@ -48,7 +48,7 @@ public class CustomerTimeChimp
         postalCode = customerETS.KL_PNR;
         website = customerETS.KL_WEBPAGE;
         relationId = customerETS.KL_COD;
-        active = customerETS.KL_BOE == "K" ? true : false;
+        active = customerETS.KL_BOE == "K";
     }
 }
 

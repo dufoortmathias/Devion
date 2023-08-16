@@ -7,12 +7,12 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     }
 
     //get mileage
-    public MileageTimeChimp GetMileage(Int32 mileageId)
+    public MileageTimeChimp GetMileage(int mileageId)
     {
-        String enpoint = $"v1/mileage/{mileageId}";
+        string enpoint = $"v1/mileage/{mileageId}";
 
         //get data from timechimp
-        String response = TCClient.GetAsync(enpoint);
+        string response = TCClient.GetAsync(enpoint);
 
         //convert data to mileageTimeChimp object
         MileageTimeChimp mileage = JsonTool.ConvertTo<MileageTimeChimp>(response);
@@ -23,7 +23,7 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     public List<MileageTimeChimp> GetMileages()
     {
         //get data from timechimp
-        String response = TCClient.GetAsync("v1/mileage");
+        string response = TCClient.GetAsync("v1/mileage");
 
         //convert data to mileageTimeChimp object
         List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
@@ -31,12 +31,12 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     }
 
     //get approved mileages by date
-    public List<Int32> GetApprovedMileageIdsByDate(DateTime date)
+    public List<int> GetApprovedMileageIdsByDate(DateTime date)
     {
-        String endpoint = $"v1/mileage/daterange/{date.ToString("yyyy-MM-dd")}/{DateTime.Now.Date.ToString("yyyy-MM-dd")}";
+        string endpoint = $"v1/mileage/daterange/{date:yyyy-MM-dd}/{DateTime.Now.Date:yyyy-MM-dd}";
 
         //get data from timechimp between date and now
-        String response = TCClient.GetAsync(endpoint);
+        string response = TCClient.GetAsync(endpoint);
 
         //convert data to mileageTimeChimp object
         List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
@@ -53,14 +53,14 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     public MileageTimeChimp changeStatus(int mileageId)
     {
         //create new object
-        Dictionary<String, Object> changes = new()
+        Dictionary<string, object> changes = new()
         {
-            {"registrationIds", new Int32[] { mileageId } },
+            {"registrationIds", new int[] { mileageId } },
             {"status", 3 }
         };
 
         //send data to timechimp
-        String response = TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
+        _ = TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
 
         return new TimeChimpMileageHelper(TCClient).GetMileage(mileageId);
     }

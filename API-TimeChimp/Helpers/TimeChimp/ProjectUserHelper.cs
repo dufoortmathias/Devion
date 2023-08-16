@@ -10,7 +10,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public ProjectUserTimechimp AddProjectUser(ProjectUserTimechimp projectUser)
     {
         //convert projectuser to json
-        String json = JsonTool.ConvertFrom(projectUser);
+        string json = JsonTool.ConvertFrom(projectUser);
 
         //check if json is not empty
         if (json == null)
@@ -19,7 +19,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         }
 
         //add projectuser
-        String response = TCClient.PostAsync("v1/projectusers", json);
+        _ = TCClient.PostAsync("v1/projectusers", json);
 
         return projectUser;
     }
@@ -28,7 +28,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public List<ProjectUserTimechimp> GetProjectUsers()
     {
         //get data form timechimp
-        String response = TCClient.GetAsync("v1/projectusers");
+        string response = TCClient.GetAsync("v1/projectusers");
 
         //convert data to projectuserTimeChimp object
         List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
@@ -39,7 +39,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public List<ProjectUserTimechimp> GetProjectUsersByProject(int projectId)
     {
         //get data form timechimp
-        String response = TCClient.GetAsync($"v1/projectusers/project/{projectId}");
+        string response = TCClient.GetAsync($"v1/projectusers/project/{projectId}");
 
         //convert data to projectuserTimeChimp object
         List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
@@ -52,7 +52,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         TimeChimpProjectHelper projectHelper = new(TCClient);
 
         //get projectId from timechimp
-        Int32 projectId = projectHelper.GetProjects().Find(p => p.code.Equals(projectNumber)).id.Value;
+        int projectId = projectHelper.GetProjects().Find(p => p.code.Equals(projectNumber)).id.Value;
 
         //check if projectID is not null
         if (projectId == null)
@@ -85,7 +85,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
             if (!projectUsers.Exists(e => e.userId.Equals(employee.id)))
             {
                 //create projectuser
-                ProjectUserTimechimp projectUser = new ProjectUserTimechimp(employee.id.Value, project.id.Value);
+                ProjectUserTimechimp projectUser = new(employee.id.Value, project.id.Value);
                 ProjectUserTimechimp response = AddProjectUser(projectUser);
 
                 //check if projectuser is not null
@@ -104,7 +104,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public List<ProjectUserTimechimp> GetProjectUsersByUser(int userId)
     {
         //get data from timechimp
-        String response = TCClient.GetAsync($"v1/projectusers/user/{userId}");
+        string response = TCClient.GetAsync($"v1/projectusers/user/{userId}");
 
         //convert data to projectuserTimeChimp object
         List<ProjectUserTimechimp> projectUsers = JsonTool.ConvertTo<List<ProjectUserTimechimp>>(response);
@@ -112,7 +112,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     }
 
     //add all projectusers for employee
-    public object AddAllProjectUserForEmployee(Int32 employeeId)
+    public object AddAllProjectUserForEmployee(int employeeId)
     {
         TimeChimpEmployeeHelper employeeHelper = new(TCClient);
 
@@ -146,7 +146,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
             //check if user is not already added to project
             if (!projectUsers.Exists(e => e.projectId.Equals(project.id)))
             {
-                ProjectUserTimechimp projectUser = new ProjectUserTimechimp(employeeId, project.id.Value);
+                ProjectUserTimechimp projectUser = new(employeeId, project.id.Value);
                 ProjectUserTimechimp response = AddProjectUser(projectUser);
 
                 //check if projectuser is not null

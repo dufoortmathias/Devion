@@ -2,9 +2,9 @@ namespace Api.Devion.Client;
 
 public interface IBearerTokenHttpClient
 {
-    String GetAsync(string endpoint);
-    String PostAsync(string endpoint, string jsonPayload);
-    String PutAsync(string endpoint, string jsonPayload);
+    string GetAsync(string endpoint);
+    string PostAsync(string endpoint, string jsonPayload);
+    string PutAsync(string endpoint, string jsonPayload);
 }
 
 public class BearerTokenHttpClient : IBearerTokenHttpClient
@@ -12,7 +12,7 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
     private readonly HttpClient _httpClient;
 
     // Create a new instance of HttpClient that is configured with the base address of the API and the bearer token
-    public BearerTokenHttpClient(String url, String token)
+    public BearerTokenHttpClient(string url, string token)
     {
         _httpClient = new HttpClient
         {
@@ -23,7 +23,7 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
     }
 
     //get async
-    public String GetAsync(string endpoint)
+    public string GetAsync(string endpoint)
     {
         // Send the request to the API endpoint with response
         HttpResponseMessage response = _httpClient.GetAsync(endpoint).Result;
@@ -42,10 +42,10 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
     }
 
     //post async
-    public String PostAsync(string endpoint, string jsonPayload)
+    public string PostAsync(string endpoint, string jsonPayload)
     {
         // Create a StringContent object with the JSON payload
-        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+        StringContent content = new(jsonPayload, Encoding.UTF8, "application/json");
 
         //send the request to the API endpoint with response
         HttpResponseMessage response = _httpClient.PostAsync(endpoint, content).Result;
@@ -64,10 +64,10 @@ public class BearerTokenHttpClient : IBearerTokenHttpClient
     }
 
     //put async
-    public String PutAsync(string endpoint, string jsonPayload)
+    public string PutAsync(string endpoint, string jsonPayload)
     {
         // Create a StringContent object with the JSON payload
-        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+        StringContent content = new(jsonPayload, Encoding.UTF8, "application/json");
 
         //send the request to the API endpoint with response
         HttpResponseMessage response = _httpClient.PutAsync(endpoint, content).Result;

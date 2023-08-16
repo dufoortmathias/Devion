@@ -2,9 +2,9 @@ namespace Api.Devion.Models;
 
 public class ProjectUserTimechimp
 {
-    public Int32? id { get; set; }
-    public Int32? projectId { get; set; }
-    public Int32? userId { get; set; }
+    public int? id { get; set; }
+    public int? projectId { get; set; }
+    public int? userId { get; set; }
     public string? userDisplayName { get; set; }
     public double? hourlyRate { get; set; }
     public double? budgetHours { get; set; }
@@ -17,7 +17,7 @@ public class ProjectUserTimechimp
     public ProjectUserTimechimp() { }
 
     //constructor to from timechimp class to ets class
-    public ProjectUserTimechimp(Int32 employeeId, Int32 subprojectId)
+    public ProjectUserTimechimp(int employeeId, int subprojectId)
     {
         projectId = subprojectId;
         userId = employeeId;

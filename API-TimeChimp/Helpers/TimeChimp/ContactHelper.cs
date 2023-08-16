@@ -7,7 +7,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
     }
 
     //check if contact exists
-    public Boolean ContactExists(ContactETS contactETS)
+    public bool ContactExists(ContactETS contactETS)
     {
         return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_TAV));
     }
@@ -16,7 +16,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
     public List<ContactTimeChimp> GetContacts()
     {
         //get data from timechimp
-        String response = TCClient.GetAsync("v1/contacts");
+        string response = TCClient.GetAsync("v1/contacts");
 
         //convert data to contactTimeChimp object
         List<ContactTimeChimp> contacts = JsonTool.ConvertTo<List<ContactTimeChimp>>(response);
@@ -27,7 +27,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
     public ContactTimeChimp CreateContact(ContactTimeChimp contact)
     {
         //send data to timechimp
-        String response = TCClient.PostAsync("v1/contacts", JsonTool.ConvertFrom(contact));
+        string response = TCClient.PostAsync("v1/contacts", JsonTool.ConvertFrom(contact));
 
         //convert response to contactTimeChimp object
         ContactTimeChimp contactResponse = JsonTool.ConvertTo<ContactTimeChimp>(response);
@@ -41,7 +41,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
         if (contact.id != null)
         {
             // get original contact
-            String response = TCClient.GetAsync($"v1/contacts/{contact.id}");
+            string response = TCClient.GetAsync($"v1/contacts/{contact.id}");
 
             originalContact = JsonTool.ConvertTo<ContactTimeChimp>(response);
         }
@@ -66,15 +66,15 @@ public class TimeChimpContactHelper : TimeChimpHelper
         originalContact.active = contact.active;
 
         // get ids from customers
-        var customerIds = new List<int>();
+        List<int> customerIds = new();
         // get all customers
         List<CustomerTimeChimp> customers = new TimeChimpCustomerHelper(TCClient).GetCustomers();
-        foreach (var customerId in contact.customerIds)
+        foreach (int customerId in contact.customerIds)
         {
             // get customer id
-            var id = "00000" + customerId.ToString();
+            string id = "00000" + customerId.ToString();
             //get the last 6 digits of the id
-            id = id.Substring(id.Length - 6);
+            id = id[^6..];
             foreach (CustomerTimeChimp customer in customers)
             {
                 if (customer.relationId.Equals(id))
@@ -87,7 +87,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
         originalContact.customerIds = customerIds.ToArray();
 
         // update contact TimeChimp
-        var json = JsonTool.ConvertFrom(originalContact);
+        string json = JsonTool.ConvertFrom(originalContact);
 
         //check if json is not empty
         if (json == null)
@@ -95,7 +95,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
             throw new Exception("Error converting contact to json");
         }
 
-        String response2 = TCClient.PutAsync("v1/contacts", json);
+        string response2 = TCClient.PutAsync("v1/contacts", json);
 
         ContactTimeChimp contactResponse = JsonTool.ConvertTo<ContactTimeChimp>(response2);
         return contactResponse;

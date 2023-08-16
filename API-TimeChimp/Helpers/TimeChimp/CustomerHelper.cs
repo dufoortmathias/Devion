@@ -7,7 +7,7 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     }
 
     //check if customer exists
-    public Boolean CustomerExists(String customerId)
+    public bool CustomerExists(string customerId)
     {
         return GetCustomers().Any(customer => customer.relationId != null && customer.relationId.Equals(customerId));
     }
@@ -16,7 +16,7 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     public List<CustomerTimeChimp> GetCustomers()
     {
         //get data from timechimp
-        String response = TCClient.GetAsync("v1/customers");
+        string response = TCClient.GetAsync("v1/customers");
 
         //convert data to customerTimeChimp object
         List<CustomerTimeChimp> customers = JsonTool.ConvertTo<List<CustomerTimeChimp>>(response);
@@ -27,7 +27,7 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     public CustomerTimeChimp CreateCustomer(CustomerTimeChimp customer)
     {
         //send data to timechimp
-        String response = TCClient.PostAsync("v1/customers", JsonTool.ConvertFrom(customer));
+        string response = TCClient.PostAsync("v1/customers", JsonTool.ConvertFrom(customer));
 
         //convert response to customerTimeChimp object
         CustomerTimeChimp customerResponse = JsonTool.ConvertTo<CustomerTimeChimp>(response);
@@ -47,7 +47,7 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
         }
 
         //send data to timechimp
-        String response = TCClient.PutAsync("v1/customers", JsonTool.ConvertFrom(customer));
+        string response = TCClient.PutAsync("v1/customers", JsonTool.ConvertFrom(customer));
 
         //convert response to customerTimeChimp object
         CustomerTimeChimp customerResponse = JsonTool.ConvertTo<CustomerTimeChimp>(response);
@@ -55,10 +55,10 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     }
 
     //get customer by id
-    public CustomerTimeChimp GetCustomer(Int32 customerId)
+    public CustomerTimeChimp GetCustomer(int customerId)
     {
         //get data form timechimp
-        String response = TCClient.GetAsync($"v1/customers/{customerId}");
+        string response = TCClient.GetAsync($"v1/customers/{customerId}");
 
         //convert data to customerTimeChimp object
         CustomerTimeChimp customerResponse = JsonTool.ConvertTo<CustomerTimeChimp>(response);
