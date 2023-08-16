@@ -321,7 +321,7 @@ while (config[$"Companies:{companyIndex}:Name"] != null)
     }).WithName($"{company}GetMileageIds");
 
     //sync mileages from timechimp to ets
-    app.MapGet($"/api/{company.ToLower()}/ets/syncmileage", (Int32 mileageId) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/syncmileage", (Int32 mileageId) =>
     {
         try
         {

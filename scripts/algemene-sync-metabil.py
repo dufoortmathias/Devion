@@ -8,7 +8,7 @@ company = "metabil"
 ## Start time script
 start_time = datetime.datetime.now()
 ## Base URL API
-base_URL = f"http://localhost:5142/api/{company}"
+base_URL = f"http://localhost:5142/api/{company}/"
 ## Name of data file that stores information about last time this script 
 date_filename = "data.json"
 ## Defines format of how datetime objects should be tranlated to a String
@@ -95,7 +95,7 @@ def sync_employees(employee_ids):
             synced.append(employee_id)
             log(f"Syncronization employee {employee_id} succeeded")
         else:
-            log(f"Syncronization employee {employee_id} failed! ({json.loads(response.text)['detail']})")
+            log(f"Syncronization employee {employee_id} failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
     return synced
 
 # Updates or creates uurcodes with a specific id in TimeChimp with the data from ETS
@@ -108,7 +108,7 @@ def sync_uurcodes(uurcode_ids):
             synced.append(uurcode_id)
             log(f"Syncronization uurcode ({uurcode_id}) succeeded")
         else:
-            log(f"Syncronization uurcode ({uurcode_id}) failed! ({json.loads(response.text)['detail']})")
+            log(f"Syncronization uurcode ({uurcode_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
     return synced
 
 # Updates or creates customers with a specific id in TimeChimp with the data from ETS
@@ -121,7 +121,7 @@ def sync_customers(customer_ids):
             synced.append(customer_id)
             log(f"Syncronization customer ({customer_id}) succeeded")
         else:
-            log(f"Syncronization customer ({customer_id}) failed! ({json.loads(response.text)['detail']})")
+            log(f"Syncronization customer ({customer_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
     return synced
 
 # Updates or creates contacts with a specific id in TimeChimp with the data from ETS
@@ -134,7 +134,7 @@ def sync_contacts(contact_ids):
             synced.append(contact_id)
             log(f"Syncronization contact ({contact_id}) succeeded")
         else:
-            log(f"Syncronization contact ({contact_id}) failed! ({json.loads(response.text)['detail']})")
+            log(f"Syncronization contact ({contact_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
     return synced
 
 # Updates or creates projects with a specific id in TimeChimp with the data from ETS, together with its subprojects
@@ -147,7 +147,7 @@ def sync_projects(project_ids):
             synced.append(project_id)
             log(f"Syncronization project ({project_id}) succeeded")
         else:
-            log(f"Syncronization project ({project_id}) failed! ({json.loads(response.text)['detail']})")
+            log(f"Syncronization project ({project_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
     return synced
 
 # Updates or creates times with a specific id in TimeChimp with the data from ETS
@@ -160,7 +160,7 @@ def sync_times(time_ids):
             synced.append(time_id)
             log(f"Syncronization time ({time_id}) succeeded")
         else:
-            log(f"Syncronization time ({time_id}) failed! ({json.loads(response.text)['detail']})")
+            log(f"Syncronization time ({time_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
     return synced
 
 # Updates or creates mileages with a specific id in mileageChimp with the data from ETS
@@ -173,7 +173,7 @@ def sync_mileages(mileage_ids):
             synced.append(mileage_id)
             log(f"Syncronization mileage ({mileage_id}) succeeded")
         else:
-            log(f"Syncronization mileage ({mileage_id}) failed! ({json.loads(response.text)['detail']})")
+            log(f"Syncronization mileage ({mileage_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
     return synced
 
 
@@ -319,8 +319,8 @@ try:
         log(f"Total amount syncronization failed: {len(mileage_ids)-len(synced_mileage_ids)}")
     log("")
 
-except:
-    log("API not accesable")
+except Exception as e:
+    log(e)
     log("")
 
 # Determine runtime script
