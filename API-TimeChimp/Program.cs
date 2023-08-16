@@ -22,14 +22,13 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 
-int companyIndex = 0;
-while (config[$"Companies:{companyIndex}:Name"] != null)
+int companyIndex = -1;
+while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
     BearerTokenHttpClient TimeChimpClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
     String company = config[$"Companies:{companyIndex}:Name"];
-    companyIndex++;
 
     //get customers from timechimp
     app.MapGet($"/api/{company.ToLower()}/timechimp/customers", () => { try { return Results.Ok(new TimeChimpCustomerHelper(TimeChimpClient).GetCustomers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomers");
@@ -47,7 +46,7 @@ while (config[$"Companies:{companyIndex}:Name"] != null)
     app.MapPut($"/api/{company.ToLower()}/timechimp/project", (ProjectTimeChimp project) => { try { return Results.Ok(new TimeChimpProjectHelper(TimeChimpClient).UpdateProject(project)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}UpdateProject");
 
     //get times from timechimp last week
-    app.MapGet($"/api/{company.ToLower()}/timechimp/times", () => { try { return Results.Ok(new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimesLastWeek()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetTimesFromLastWeek");
+    app.MapGet($"/api/{company.ToLower()}/timechimp/times", () => { try { return Results.Ok(new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimes(DateTime.Now.AddDays(-7))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetTimesFromLastWeek");
 
     //update employee in timechimp
     app.MapPut($"/api/{company.ToLower()}/timechimp/employee", (EmployeeTimeChimp employee) => { try { return Results.Ok(new TimeChimpEmployeeHelper(TimeChimpClient).UpdateEmployee(employee)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}UpdateEmployee");
@@ -223,7 +222,7 @@ while (config[$"Companies:{companyIndex}:Name"] != null)
     app.MapGet($"/api/{company.ToLower()}/ets/timeids", (String dateString) => { try { return Results.Ok(new TimeChimpTimeHelper(TimeChimpClient, ETSClient).GetTimes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetTimeIds");
 
     //sync time from timechimp to ets
-    app.MapPost($"/api/{company.ToLower()}/ets/synctime", (String timeId) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/synctime", (Int32 timeId) =>
     {
         try
         {
@@ -231,7 +230,7 @@ while (config[$"Companies:{companyIndex}:Name"] != null)
             TimeChimpTimeHelper timeHelperTC = new(TimeChimpClient, ETSClient);
 
             // Get time from TimeChimp
-            timeTimeChimp TCTime = timeHelperTC.GetTime(timeId);
+            TimeTimeChimp TCTime = timeHelperTC.GetTime(timeId);
 
             // Handle when time doesn't exist in TimeChimp
             if (TCTime == null)
@@ -239,19 +238,13 @@ while (config[$"Companies:{companyIndex}:Name"] != null)
                 return Results.Problem($"TimeChimp doesn't contain a time with id = {timeId}");
             }
 
-            // Change to ETS class
-            timeETS ETSTime = new(TCTime);
-
             // add time to ETS
-            timeHelperETS.addTime(ETSTime);
-
-            List<int> ids = new List<int>();
-            ids.Add(Int32.Parse(timeId));
+            timeHelperETS.AddTime(TCTime);
 
             //change status to invoiced (3)
-            timeHelperTC.changeStatus(ids);
+            TimeTimeChimp time = timeHelperTC.InvoiceTime(timeId);
 
-            return Results.Ok(timeHelperTC.GetTime(timeId));
+            return Results.Ok(time);
         }
         catch (Exception e)
         {

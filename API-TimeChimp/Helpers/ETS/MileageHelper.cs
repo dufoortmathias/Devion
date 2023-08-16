@@ -55,13 +55,7 @@ public class ETSMileageHelper : ETSHelper
         var query = $"UPDATE tbl_planning SET PLA_KM = {mileage.PLA_KM}, PLA_KM_DERDEN = '{mileage.PLA_KM_DERDEN}', PLA_KM_VERGOEDING = '{mileage.PLA_KM_VERGOEDING}' WHERE PLA_ID = {mileage.PLA_ID};";
 
         //send data to ETS
-        var response = ETSClient.updateQuery(query);
-
-        //check if response is succesfull
-        if (response == null)
-        {
-            throw new Exception("Error updating mileage in ETS with query: " + query);
-        }
+        ETSClient.updateQuery(query);
 
         return mileage;
     }

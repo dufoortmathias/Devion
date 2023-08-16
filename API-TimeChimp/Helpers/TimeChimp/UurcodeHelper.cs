@@ -45,7 +45,7 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
     }
 
     //get uurcode by id
-    public uurcodesTimeChimp GetUurcode(string uurcodeId)
+    public uurcodesTimeChimp GetUurcode(Int32 uurcodeId)
     {
         //get data frm timechimp
         String response = TCClient.GetAsync($"v1/tasks/{uurcodeId}");

@@ -55,7 +55,7 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     }
 
     //get customer by id
-    public customerTimeChimp GetCustomer(String customerId)
+    public customerTimeChimp GetCustomer(Int32 customerId)
     {
         //get data form timechimp
         String response = TCClient.GetAsync($"v1/customers/{customerId}");
