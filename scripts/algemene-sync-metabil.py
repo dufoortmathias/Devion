@@ -47,45 +47,59 @@ def log(message):
 
 # Receives ids from all employees that have changed in ETS after last sync
 def get_employees_to_sync():
-    response = requests.get(f"{base_URL}ets/employeeids?dateString={json_data['last_sync']}&{team_name_ETS_sync_TimeChimp}")
+    response = requests.get(f"{base_URL}ets/employeeids?dateString={json_data['last_sync']}&teamName={team_name_ETS_sync_TimeChimp}")
     if response.ok:
         return response.json()
+    else:
+        raise Exception(response.content)
 
 # Receives ids from all uurcodes that have changed in ETS after last sync
 def get_uurcodes_to_sync():
     response = requests.get(f"{base_URL}ets/uurcodeids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
+    else:
+        raise Exception(response.content)
 
 # Receives ids from all customers that have changed in ETS after last sync
 def get_customers_to_sync():
     response = requests.get(f"{base_URL}ets/customerids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
+    else:
+        raise Exception(response.content)
    
 # Receives ids from all contacts that have changed in ETS after last sync 
 def get_contacts_to_sync():
     response = requests.get(f"{base_URL}ets/contactids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
+    else:
+        raise Exception(response.content)
     
 # Receives ids from all projects that have changed in ETS after last sync 
 def get_projects_to_sync():
     response = requests.get(f"{base_URL}ets/projectids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
+    else:
+        raise Exception(response.content)
 
 # Receives ids from all times that have changed in ETS after last sync 
 def get_times_to_sync():
     response = requests.get(f"{base_URL}ets/timeids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
+    else:
+        raise Exception(response.content)
 
 # Receives ids from all mileages that have changed in ETS after last sync 
 def get_mileages_to_sync():
     response = requests.get(f"{base_URL}ets/mileageids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
+    else:
+        raise Exception(response.content)
     
 # Updates or creates employees with a specific id in TimeChimp with the data from ETS
 # Returns list of employees that have been successfully synchronized
@@ -321,27 +335,26 @@ try:
         log(f"Total amount syncronization failed: {len(mileage_ids)-len(synced_mileage_ids)}")
     log("")
 
+    # Determine runtime script
+    end_time = datetime.datetime.now()
+    duration = end_time - start_time
+    minutes = int(duration.total_seconds()/60)
+    seconds = duration.total_seconds() % 60
+    log(f"Duration: {minutes} min {seconds} sec")
+
+    # Update the json data file
+    with open("data.json", 'w+') as json_file:
+        # Update last sync field in json to date script started
+        json_data["last_sync"] = start_time.strftime(dateformat)
+
+        # Write data to the json file
+        json_file.write(json.dumps(json_data, indent=2))
 except Exception as e:
     log(e)
     log("")
-
-# Determine runtime script
-end_time = datetime.datetime.now()
-duration = end_time - start_time
-minutes = int(duration.total_seconds()/60)
-seconds = duration.total_seconds() % 60
-log(f"Duration: {minutes} min {seconds} sec")
 
 log_filename = f"logs/{company}/{start_time.year}/{start_time.month}/{start_time.day}/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
 # Create log file
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 with open(log_filename, 'w+') as log_file:
     log_file.write(output)
-
-# Update the json data file
-with open("data.json", 'w+') as json_file:
-    # Update last sync field in json to date script started
-    json_data["last_sync"] = start_time.strftime(dateformat)
-
-    # Write data to the json file
-    json_file.write(json.dumps(json_data, indent=2))

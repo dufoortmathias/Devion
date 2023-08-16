@@ -40,7 +40,7 @@ public class MileageETS
     public MileageETS(MileageTimeChimp mileage)
     {
         //TODO set length project_id string in env variables file
-        PLA_KM = (int)mileage.distance;
+        PLA_KM = (Int32) Math.Ceiling(mileage.distance);
         var project = "0000000000" + mileage.projectId.ToString();
         PLA_PROJECT = project.Substring(0, Math.Min(project.Length, 7));
         PLA_SUBPROJECT = project.Substring(project.Length - 4);

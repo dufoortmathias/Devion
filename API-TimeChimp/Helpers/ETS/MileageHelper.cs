@@ -44,20 +44,7 @@ public class ETSMileageHelper : ETSHelper
         }
 
         //convert data to mileageETS object
-        List<MileageETS> mileagesETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet);
-
-        //select record from ETS to update mileage
-        //select record with mileages 
-        Int32 index = 0;
-        MileageETS? mileageETS = null;
-        while (mileageETS == null || mileageETS.PLA_KM > mileage.PLA_KM)
-        {
-            if (index == mileagesETS.Count)
-            {
-                throw new Exception("No time record in ETS for this mileage");
-            }
-            mileageETS = mileagesETS[index++];
-        }
+        MileageETS mileageETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet).First();
 
         mileage.PLA_KM += mileageETS.PLA_KM;
         mileage.PLA_ID = mileageETS.PLA_ID;
