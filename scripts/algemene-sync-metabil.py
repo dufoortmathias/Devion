@@ -1,3 +1,7 @@
+# python -m venv .venv
+# .\.venv\Scripts\activate.bat
+# pip install -r requirements.txt
+
 import requests
 import sys
 import json
