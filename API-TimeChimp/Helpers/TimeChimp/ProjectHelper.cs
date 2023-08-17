@@ -7,16 +7,16 @@
         }
 
         //check if project exists
-        public Boolean ProjectExists(String projectId)
+        public ProjectTimeChimp? FindProject(string projectId)
         {
-            return GetProjects().Any(project => project.code != null && project.code.Equals(projectId));
+            return GetProjects().Find(project => project.code != null && project.code.Equals(projectId));
         }
 
         //get project by id
-        public ProjectTimeChimp GetProject(Int32 projectId)
+        public ProjectTimeChimp GetProject(int projectId)
         {
             //get data form timechimp
-            String response = TCClient.GetAsync($"v1/projects/{projectId}");
+            string response = TCClient.GetAsync($"v1/projects/{projectId}");
 
             //convert data to projectTimeChimp object
             ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response);
@@ -27,7 +27,7 @@
         public List<ProjectTimeChimp> GetProjects()
         {
             //get data from timechimp
-            String response = TCClient.GetAsync("v2/projects");
+            string response = TCClient.GetAsync("v2/projects");
 
             //convert data to projectTimeChimp object
             List<ProjectTimeChimp> projects = JsonTool.ConvertTo<List<ProjectTimeChimp>>(response);
@@ -38,7 +38,7 @@
         public ProjectTimeChimp CreateProject(ProjectTimeChimp project)
         {
             //convert project to json
-            String json = JsonTool.ConvertFrom(project);
+            string json = JsonTool.ConvertFrom(project);
 
             //check if json is not empty
             if (json == null)
@@ -47,7 +47,7 @@
             }
 
             //add project to timechimp
-            String response = TCClient.PostAsync("v1/projects", json);
+            string response = TCClient.PostAsync("v1/projects", json);
 
             //convert response to projectTimeChimp object
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
@@ -57,12 +57,6 @@
         //update project
         public ProjectTimeChimp UpdateProject(ProjectTimeChimp projectUpdate)
         {
-            //check if projectid is null
-            if (projectUpdate.id == null)
-            {
-                projectUpdate.id = GetProjects().ToList().Find(p => p.code.Equals(projectUpdate.code)).id;
-            }
-
             //get project from timechimp
             ProjectTimeChimp project = GetProject(projectUpdate.id.Value);
 
@@ -79,17 +73,11 @@
             project.active = projectUpdate.active;
 
             //send data to timechimp
-            String response = TCClient.PutAsync("v1/projects", JsonTool.ConvertFrom(project));
+            string response = TCClient.PutAsync("v1/projects", JsonTool.ConvertFrom(project));
 
             //convert response to projectTimeChimp object
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return projectResponse;
-        }
-
-        //get project id
-        public int GetProjectId(int projectId)
-        {
-            return Int32.Parse(GetProjects().ToList().Find(p => p.id.Equals(projectId)).code);
         }
     }
 }

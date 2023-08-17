@@ -13,7 +13,7 @@ public class ETSEmployeeHelper : ETSHelper
         string query = "SELECT * FROM J2W_PNPX";
 
         //get data form ETS
-        var response = ETSClient.selectQuery(query);
+        string response = ETSClient.selectQuery(query);
 
         //check if response is succesfull
         if (response == null)
@@ -27,14 +27,14 @@ public class ETSEmployeeHelper : ETSHelper
     }
 
     //get all employeeids that are changed after the given date
-    public List<string> GetEmployeeIdsChangedAfter(DateTime date, String teamName)
+    public List<string> GetEmployeeIdsChangedAfter(DateTime date, string teamName)
     {
         //create query
         string query =
             $"SELECT J2W_PNPX.PN_ID " +
             $"FROM J2W_PNPX " +
             $"INNER JOIN TBL_PERSONEEL_PLOEG ON TBL_PERSONEEL_PLOEG.PPL_ID = J2W_PNPX.PN_PERSONEEL_PLOEG_ID " +
-            $"WHERE J2W_PNPX.DATE_CHANGED >= '{date.ToString("MM/dd/yyyy HH:mm")}' AND TBL_PERSONEEL_PLOEG.PPL_OMSCHRIJVING = '{teamName}'";
+            $"WHERE J2W_PNPX.DATE_CHANGED >= '{date:MM/dd/yyyy HH:mm}' AND TBL_PERSONEEL_PLOEG.PPL_OMSCHRIJVING = '{teamName}'";
 
         //get data from ETS
         string json = ETSClient.selectQuery(query);
@@ -53,13 +53,13 @@ public class ETSEmployeeHelper : ETSHelper
     }
 
     //get employee by employeeId
-    public EmployeeETS GetEmployee(String employeeId)
+    public EmployeeETS GetEmployee(string employeeId)
     {
         //create query
         string query = $"select * from J2W_PNPX where PN_ID = {employeeId}";
 
         //get data from ETS
-        String json = ETSClient.selectQuery(query);
+        string json = ETSClient.selectQuery(query);
 
         //check if json is not empty
         if (json == null)

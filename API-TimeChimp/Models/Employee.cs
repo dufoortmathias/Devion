@@ -2,29 +2,29 @@
 {
     public class EmployeeTimeChimp
     {
-        public Int32? id { get; set; }
-        public String? email { get; set; }
-        public String userName { get; set; }
-        public String displayName { get; set; }
-        public Int32? accountType { get; set; }
-        public Boolean? isLocked { get; set; }
-        public String? picture { get; set; }
-        public String?[] tagNames { get; set; }
-        public String? language { get; set; }
-        public Double? contractHours { get; set; }
-        public Double? contractHourlyRate { get; set; }
-        public Double? contractCostHourlyRate { get; set; }
+        public int? id { get; set; }
+        public string? email { get; set; }
+        public string userName { get; set; }
+        public string displayName { get; set; }
+        public int? accountType { get; set; }
+        public bool? isLocked { get; set; }
+        public string? picture { get; set; }
+        public string?[] tagNames { get; set; }
+        public string? language { get; set; }
+        public double? contractHours { get; set; }
+        public double? contractHourlyRate { get; set; }
+        public double? contractCostHourlyRate { get; set; }
         public DateTime? contractStartDate { get; set; }
         public DateTime? contractEndDate { get; set; }
         public DateTime? created { get; set; }
-        public String? teamName { get; set; }
-        public String? employeeNumber { get; set; }
-        public Boolean? active { get; set; }
-        public String? contractNumber { get; set; }
-        public String? badgeNumber { get; set; }
-        public Int32? roleId { get; set; }
-        public String? citizenServiceNumber { get; set; }
-        public Boolean? sendInvitation { get; set; }
+        public string? teamName { get; set; }
+        public string? employeeNumber { get; set; }
+        public bool? active { get; set; }
+        public string? contractNumber { get; set; }
+        public string? badgeNumber { get; set; }
+        public int? roleId { get; set; }
+        public string? citizenServiceNumber { get; set; }
+        public bool? sendInvitation { get; set; }
 
         //constructor without specific parameters
         public EmployeeTimeChimp() { }
@@ -45,17 +45,17 @@
             };
             badgeNumber = employeeETS.PN_BADGENR;
             roleId = 1; //TODO: add value to seperate file
-            tagNames = new String?[] { };
+            tagNames = new string?[] { };
         }
     }
 
     public class EmployeeETS
     {
-        public String? PN_ID { get; set; }
-        public String? PN_NAM { get; set; }
-        public String? PN_EMAIL { get; set; }
-        public String? PN_WERKNEMERSNR { get; set; }
-        public String? PN_BADGENR { get; set; }
-        public Char? PN_TAAL { get; set; }
+        public string? PN_ID { get; set; }
+        public string? PN_NAM { get; set; }
+        public string? PN_EMAIL { get; set; }
+        public string? PN_WERKNEMERSNR { get; set; }
+        public string? PN_BADGENR { get; set; }
+        public char? PN_TAAL { get; set; }
     }
 }

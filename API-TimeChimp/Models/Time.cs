@@ -1,7 +1,23 @@
 namespace Api.Devion.Models;
 
-public class timeTimeChimp
+public class TimeTimeChimp
 {
+    public class SubmitForApprovalsTimeChimp
+    {
+        public int[]? ids { get; set; }
+        public string? message { get; set; }
+        public string? baseUrl { get; set; }
+        public int[]? contactPersonIds { get; set; }
+    }
+
+    public class TagTimeChimp
+    {
+        public int id { get; set; }
+        public string? name { get; set; }
+        public bool active { get; set; }
+        public int type { get; set; }
+    }
+
     public int id { get; set; }
     public int customerId { get; set; }
     public string? customerName { get; set; }
@@ -14,23 +30,23 @@ public class timeTimeChimp
     public string? userDisplayName { get; set; }
     public string[]? userTags { get; set; }
     public DateTime date { get; set; }
-    public Double? hours { get; set; }
+    public double? hours { get; set; }
     public string? notes { get; set; }
     public string? startEnd { get; set; }
     public DateTime start { get; set; }
     public DateTime end { get; set; }
-    public Double? pause { get; set; }
+    public double? pause { get; set; }
     public string? externalName { get; set; }
     public string? externalUrl { get; set; }
     public int status { get; set; }
     public int statusIntern { get; set; }
     public int statusExtern { get; set; }
-    public tagTimeChimp[]? tags { get; set; }
+    public TagTimeChimp[]? tags { get; set; }
     public DateTime modified { get; set; }
     public SubmitForApprovalsTimeChimp[]? submitForApprovals { get; set; }
 }
 
-public class timeETS
+public class TimeETS
 {
     public int? timechimpStatus { get; set; }
     public int timechimpId { get; set; }
@@ -49,34 +65,19 @@ public class timeETS
     public string? PLA_UURCODE { get; set; }
 
     //constructor without specific parameters
-    public timeETS()
+    public TimeETS()
     { }
 
     //constructor to from timechimp class to ets class
-    public timeETS(timeTimeChimp time)
+    public TimeETS(TimeTimeChimp time)
     {
-        this.timechimpStatus = time.status;
-        this.timechimpId = time.id;
-        this.PLA_START = time.start.ToLocalTime();
-        this.PLA_EINDE = time.end.ToLocalTime();
+        timechimpStatus = time.status;
+        timechimpId = time.id;
+        PLA_START = time.start.ToLocalTime();
+        PLA_EINDE = time.end.ToLocalTime();
         DateTime baseDateTime = DateTime.Parse("1899-12-30T00:00:00");
-        this.PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddMinutes((double)time.pause * 60).ToString("yyyy-MM-dd HH:mm:ss");
-        this.PLA_PROJECT = time.projectId.ToString();
-        this.PLA_SUBPROJECT = time.projectTaskId.ToString();
-        this.PN_NAM = time.userDisplayName;
-        this.PLA_PERSOON = time.userId.ToString();
-        this.PLA_KLEUR = 12971235;
-        this.PLA_UURCODE = time.TaskId.ToString();
-        this.PLA_KLANT = time.customerId.ToString();
+        PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddHours(time.pause.Value).ToString("yyyy-MM-dd HH:mm:ss");
+        PN_NAM = time.userDisplayName;
+        PLA_KLEUR = 12971235;
     }
-}
-
-public class naamTimeETS
-{
-    public string? PN_NAM { get; set; }
-}
-
-public class maxValue
-{
-    public int? MAX { get; set; }
 }
