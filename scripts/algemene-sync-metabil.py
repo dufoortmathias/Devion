@@ -2,6 +2,11 @@ import requests
 import json
 import os
 import datetime
+import smtplib, ssl
+from email import encoders
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
 
 # Init vars
 company = "metabil"
@@ -17,6 +22,12 @@ dateformat = "%d/%m/%Y %H:%M:%S"
 team_name_ETS_sync_TimeChimp = "TimeChimpUsers"
 ## Amout weeks back to sync time and mileages
 amount_weeks = 5
+sender_email = "deviontest@gmail.com"
+password = "ysbsgiiqdleuttmx"
+notify_emails = [
+    "deviontest@gmail.com"
+]
+send_mail = False
 
 # Reads data from the json file, if the file doesn't exist it will create one
 global json_data
@@ -335,13 +346,6 @@ try:
         log(f"Total amount syncronization failed: {len(mileage_ids)-len(synced_mileage_ids)}")
     log("")
 
-    # Determine runtime script
-    end_time = datetime.datetime.now()
-    duration = end_time - start_time
-    minutes = int(duration.total_seconds()/60)
-    seconds = duration.total_seconds() % 60
-    log(f"Duration: {minutes} min {seconds} sec")
-
     # Update the json data file
     with open("data.json", 'w+') as json_file:
         # Update last sync field in json to date script started
@@ -350,11 +354,63 @@ try:
         # Write data to the json file
         json_file.write(json.dumps(json_data, indent=2))
 except Exception as e:
+    send_mail = True
+
     log(e)
     log("")
+
+# Determine runtime script
+end_time = datetime.datetime.now()
+duration = end_time - start_time
+minutes = int(duration.total_seconds()/60)
+seconds = duration.total_seconds() % 60
+log(f"Duration: {minutes} min {seconds} sec")
 
 log_filename = f"logs/{company}/{start_time.year}/{start_time.month}/{start_time.day}/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
 # Create log file
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 with open(log_filename, 'w+') as log_file:
     log_file.write(output)
+
+# notify people if something went wrong
+if send_mail:
+    # Create a secure SSL context
+    context = ssl.create_default_context()
+
+    message = MIMEMultipart()
+
+    message["From"] = sender_email
+    message["Subject"] = "Script sync TimeChimp failed"
+
+    body = f"""
+Er ging iets mis met het TimeChimp script!
+Bekijk bijlage voor meer informatie.
+"""
+
+    # Add body to email
+    message.attach(MIMEText(body, "plain"))
+
+    # Open log file in binary mode
+    with open(log_filename, "rb") as attachment:
+        # Add file as application/octet-stream
+        # Email client can usually download this automatically as attachment
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+
+    # Encode file in ASCII characters to send by email    
+    encoders.encode_base64(part)
+
+    # Add header as key/value pair to attachment part
+    part.add_header(
+        "Content-Disposition",
+        f"attachment; filename= {log_filename.split('/')[-1]}",
+    )
+
+    # Add attachment to message and convert message to string
+    message.attach(part)
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(sender_email, password)
+        for email in notify_emails:
+            message["To"] = email
+            server.sendmail(sender_email, email, message.as_string())
