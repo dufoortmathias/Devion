@@ -1,4 +1,5 @@
 import requests
+import sys
 import json
 import os
 import datetime
@@ -8,14 +9,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 
+if __name__ == "__main__":
+    company = sys.argv[1].lower()
+
 # Init vars
-company = "metabil"
 ## Start time script
 start_time = datetime.datetime.now()
 ## Base URL API
 base_URL = f"http://localhost:5142/api/{company}/"
 ## Name of data file that stores information about last time this script 
-date_filename = "data.json"
+date_filename = f"data_{company}.json"
 ## Defines format of how datetime objects should be tranlated to a String
 dateformat = "%d/%m/%Y %H:%M:%S"
 ## Name of the team in ETS to sync employees in TimeChimp
