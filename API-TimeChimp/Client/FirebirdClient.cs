@@ -55,7 +55,7 @@ public class FirebirdClientETS
         connection.Open();
 
         //execute the insert query
-        _ = command.ExecuteNonQuery();
+        //_ = command.ExecuteNonQuery();
 
         //close the connection
         connection.Close();
@@ -71,7 +71,7 @@ public class FirebirdClientETS
         connection.Open();
 
         //execute the insert query
-        _ = command.ExecuteNonQuery();
+        //_ = command.ExecuteNonQuery();
 
         //close the connection
         connection.Close();
