@@ -79,11 +79,5 @@
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
             return projectResponse;
         }
-
-        //get project id
-        public int GetProjectId(int projectId)
-        {
-            return int.Parse(GetProjects().ToList().Find(p => p.id.Equals(projectId)).code);
-        }
     }
 }

@@ -30,7 +30,7 @@ public class ETSMileageHelper : ETSHelper
     public MileageETS UpdateMileage(MileageETS mileage)
     {
         //create query to get mileages data from ETS that belong to current TimeChimp mileage
-        string queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = '{mileage.PLA_PROJECT}' AND PLA_SUBPROJECT = '{mileage.PLA_SUBPROJECT}' AND PLA_START LIKE '{mileage.PLA_START:yyyy-MM-dd}%' AND PLA_PERSOON = '{mileage.PLA_PERSOON}';";
+        string queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = '{mileage.PLA_PROJECT}' AND PLA_SUBPROJECT {(mileage.PLA_SUBPROJECT.Length == 0 ? "IS NULL" : "= " + mileage.PLA_SUBPROJECT)} AND PLA_START LIKE '{mileage.PLA_START:yyyy-MM-dd}%' AND PLA_PERSOON = '{mileage.PLA_PERSOON}';";
 
         //get data from ETS
         string responseGet = ETSClient.selectQuery(queryGet);

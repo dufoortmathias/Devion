@@ -7,11 +7,19 @@ import sys
 import json
 import os
 import datetime
-import smtplib, ssl
+import smtplib
+import ssl
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
+from urllib3.exceptions import InsecureRequestWarning
+
+# Suppress only the single warning from urllib3 needed.
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
+# Create a secure SSL context
+context = ssl.create_default_context()
 
 if __name__ == "__main__":
     company = sys.argv[1].lower()
@@ -20,9 +28,9 @@ if __name__ == "__main__":
 ## Start time script
 start_time = datetime.datetime.now()
 ## Base URL API
-base_URL = f"http://localhost:5142/api/{company}/"
+base_URL = f"https://localhost:7223/api/{company}/"
 ## Name of data file that stores information about last time this script 
-date_filename = f"data_{company}.json"
+data_filename = f"data_{company}.json"
 ## Defines format of how datetime objects should be tranlated to a String
 dateformat = "%d/%m/%Y %H:%M:%S"
 ## Name of the team in ETS to sync employees in TimeChimp
@@ -38,8 +46,8 @@ send_mail = False
 
 # Reads data from the json file, if the file doesn't exist it will create one
 global json_data
-if os.path.exists(date_filename):
-    with open(date_filename, 'r') as json_file:
+if os.path.exists(data_filename):
+    with open(data_filename, 'r') as json_file:
         json_data = json.loads(json_file.read())
 else:
     print("Failed to load json")
@@ -48,7 +56,7 @@ else:
     json_data = json.loads(output)
     json_data["last_sync"] = "01/01/2000 00:00:00"
 
-    with open(date_filename, 'w+') as json_file:
+    with open(data_filename, 'w+') as json_file:
         json_file.write(json.dumps(json_data, indent=2))
 
     print("New json created")
@@ -65,7 +73,7 @@ def log(message):
 
 # Receives ids from all employees that have changed in ETS after last sync
 def get_employees_to_sync():
-    response = requests.get(f"{base_URL}ets/employeeids?dateString={json_data['last_sync']}&teamName={team_name_ETS_sync_TimeChimp}")
+    response = requests.get(f"{base_URL}ets/employeeids?dateString={json_data['last_sync']}&teamName={team_name_ETS_sync_TimeChimp}", verify=False)
     if response.ok:
         return response.json()
     else:
@@ -73,7 +81,7 @@ def get_employees_to_sync():
 
 # Receives ids from all uurcodes that have changed in ETS after last sync
 def get_uurcodes_to_sync():
-    response = requests.get(f"{base_URL}ets/uurcodeids?dateString={json_data['last_sync']}")
+    response = requests.get(f"{base_URL}ets/uurcodeids?dateString={json_data['last_sync']}", verify=False)
     if response.ok:
         return response.json()
     else:
@@ -81,7 +89,7 @@ def get_uurcodes_to_sync():
 
 # Receives ids from all customers that have changed in ETS after last sync
 def get_customers_to_sync():
-    response = requests.get(f"{base_URL}ets/customerids?dateString={json_data['last_sync']}")
+    response = requests.get(f"{base_URL}ets/customerids?dateString={json_data['last_sync']}", verify=False)
     if response.ok:
         return response.json()
     else:
@@ -89,7 +97,7 @@ def get_customers_to_sync():
    
 # Receives ids from all contacts that have changed in ETS after last sync 
 def get_contacts_to_sync():
-    response = requests.get(f"{base_URL}ets/contactids?dateString={json_data['last_sync']}")
+    response = requests.get(f"{base_URL}ets/contactids?dateString={json_data['last_sync']}", verify=False)
     if response.ok:
         return response.json()
     else:
@@ -97,7 +105,7 @@ def get_contacts_to_sync():
     
 # Receives ids from all projects that have changed in ETS after last sync 
 def get_projects_to_sync():
-    response = requests.get(f"{base_URL}ets/projectids?dateString={json_data['last_sync']}")
+    response = requests.get(f"{base_URL}ets/projectids?dateString={json_data['last_sync']}", verify=False)
     if response.ok:
         return response.json()
     else:
@@ -105,7 +113,7 @@ def get_projects_to_sync():
 
 # Receives ids from all times that have changed in ETS after last sync 
 def get_times_to_sync():
-    response = requests.get(f"{base_URL}ets/timeids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}")
+    response = requests.get(f"{base_URL}ets/timeids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}", verify=False)
     if response.ok:
         return response.json()
     else:
@@ -113,7 +121,7 @@ def get_times_to_sync():
 
 # Receives ids from all mileages that have changed in ETS after last sync 
 def get_mileages_to_sync():
-    response = requests.get(f"{base_URL}ets/mileageids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}")
+    response = requests.get(f"{base_URL}ets/mileageids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}", verify=False)
     if response.ok:
         return response.json()
     else:
@@ -124,7 +132,7 @@ def get_mileages_to_sync():
 def sync_employees(employee_ids):
     synced = []
     for employee_id in employee_ids:
-        response = requests.post(f"{base_URL}ets/syncemployee?employeeId={employee_id}")
+        response = requests.post(f"{base_URL}ets/syncemployee?employeeId={employee_id}", verify=False)
         if response.ok:
             synced.append(employee_id)
             log(f"Syncronization employee {employee_id} succeeded")
@@ -137,7 +145,7 @@ def sync_employees(employee_ids):
 def sync_uurcodes(uurcode_ids):
     synced = []
     for uurcode_id in uurcode_ids:
-        response = requests.post(f"{base_URL}ets/syncuurcode?uurcodeId={uurcode_id}")
+        response = requests.post(f"{base_URL}ets/syncuurcode?uurcodeId={uurcode_id}", verify=False)
         if response.ok:
             synced.append(uurcode_id)
             log(f"Syncronization uurcode ({uurcode_id}) succeeded")
@@ -150,7 +158,7 @@ def sync_uurcodes(uurcode_ids):
 def sync_customers(customer_ids):
     synced = []
     for customer_id in customer_ids:
-        response = requests.post(f"{base_URL}ets/synccustomer?customerId={customer_id}")
+        response = requests.post(f"{base_URL}ets/synccustomer?customerId={customer_id}", verify=False)
         if response.ok:
             synced.append(customer_id)
             log(f"Syncronization customer ({customer_id}) succeeded")
@@ -163,7 +171,7 @@ def sync_customers(customer_ids):
 def sync_contacts(contact_ids):
     synced = []
     for contact_id in contact_ids:
-        response = requests.post(f"{base_URL}ets/synccontact?contactId={contact_id}")
+        response = requests.post(f"{base_URL}ets/synccontact?contactId={contact_id}", verify=False)
         if response.ok:
             synced.append(contact_id)
             log(f"Syncronization contact ({contact_id}) succeeded")
@@ -176,7 +184,7 @@ def sync_contacts(contact_ids):
 def sync_projects(project_ids):
     synced = []
     for project_id in project_ids:
-        response = requests.post(f"{base_URL}ets/syncproject?projectId={project_id}")
+        response = requests.post(f"{base_URL}ets/syncproject?projectId={project_id}", verify=False)
         if response.ok:
             synced.append(project_id)
             log(f"Syncronization project ({project_id}) succeeded")
@@ -189,7 +197,7 @@ def sync_projects(project_ids):
 def sync_times(time_ids):
     synced = []
     for time_id in time_ids:
-        response = requests.post(f"{base_URL}ets/synctime?timeId={time_id}")
+        response = requests.post(f"{base_URL}ets/synctime?timeId={time_id}", verify=False)
         if response.ok:
             synced.append(time_id)
             log(f"Syncronization time ({time_id}) succeeded")
@@ -202,7 +210,7 @@ def sync_times(time_ids):
 def sync_mileages(mileage_ids):
     synced = []
     for mileage_id in mileage_ids:
-        response = requests.post(f"{base_URL}ets/syncmileage?mileageId={mileage_id}")
+        response = requests.post(f"{base_URL}ets/syncmileage?mileageId={mileage_id}", verify=False)
         if response.ok:
             synced.append(mileage_id)
             log(f"Syncronization mileage ({mileage_id}) succeeded")
@@ -218,7 +226,7 @@ try:
     if "failed_employees" not in json_data:
         json_data["failed_employees"] = []
     ## Retrieves employees to sync and adds employees where previous sync attempt failed
-    employee_ids = get_employees_to_sync() + json_data["failed_employees"]
+    employee_ids = list(set(get_employees_to_sync() + json_data["failed_employees"]))
     ## Syncs these employees and receives employees where sync was successful
     synced_employee_ids = sync_employees(employee_ids)
     ## Updates json to contain new failed employee sync attempts
@@ -238,7 +246,7 @@ try:
     if "failed_uurcodes" not in json_data:
         json_data["failed_uurcodes"] = []
     ## Retrieves uurcodes to sync and adds uurcodes where previous sync attempt failed
-    uurcode_ids = get_uurcodes_to_sync() + json_data["failed_uurcodes"]
+    uurcode_ids = list(set(get_uurcodes_to_sync() + json_data["failed_uurcodes"]))
     ## Syncs these uurcodes and receives uurcodes where sync was successful
     synced_uurcode_ids = sync_uurcodes(uurcode_ids)
     ## Updates json to contain new failed uurcode sync attempts
@@ -258,7 +266,7 @@ try:
     if "failed_customers" not in json_data:
         json_data["failed_customers"] = []
     ## Retrieves customers to sync and adds customers where previous sync attempt failed
-    customer_ids = get_customers_to_sync() + json_data["failed_customers"]
+    customer_ids = list(set(get_customers_to_sync() + json_data["failed_customers"]))
     ## Syncs these customers and receives customers where sync was successful
     synced_customer_ids = sync_customers(customer_ids)
     ## Updates json to contain new failed customer sync attempts
@@ -278,7 +286,7 @@ try:
     if "failed_contacts" not in json_data:
         json_data["failed_contacts"] = []
     ## Retrieves contacts to sync and adds contacts where previous sync attempt failed
-    contact_ids = get_contacts_to_sync() + json_data["failed_contacts"]
+    contact_ids = list(set(get_contacts_to_sync() + json_data["failed_contacts"]))
     ## Syncs these contacts and receives contacts where sync was successful
     synced_contact_ids = sync_contacts(contact_ids)
     ## Updates json to contain new failed contact sync attempts
@@ -298,7 +306,7 @@ try:
     if "failed_projects" not in json_data:
         json_data["failed_projects"] = []
     ## Retrieves projects to sync and adds projects where previous sync attempt failed
-    project_ids = get_projects_to_sync() + json_data["failed_projects"]
+    project_ids = list(set(get_projects_to_sync() + json_data["failed_projects"]))
     ## Syncs these projects and receives projects where sync was successful
     synced_project_ids = sync_projects(project_ids)
     ## Updates json to contain new failed project sync attempts
@@ -318,7 +326,7 @@ try:
     if "failed_times" not in json_data:
         json_data["failed_times"] = []
     ## Retrieves times to sync and adds times where previous sync attempt failed
-    time_ids = get_times_to_sync() + json_data["failed_times"]
+    time_ids = list(set(get_times_to_sync() + json_data["failed_times"]))
     ## Syncs these times and receives times where sync was successful
     synced_time_ids = sync_times(time_ids)
     ## Updates json to contain new failed time sync attempts
@@ -338,7 +346,7 @@ try:
     if "failed_mileages" not in json_data:
         json_data["failed_mileages"] = []
     ## Retrieves mileages to sync and adds mileages where previous sync attempt failed
-    mileage_ids = get_mileages_to_sync() + json_data["failed_mileages"]
+    mileage_ids = list(set(get_mileages_to_sync() + json_data["failed_mileages"]))
     ## Syncs these mileages and receives mileages where sync was successful
     synced_mileage_ids = sync_mileages(mileage_ids)
     ## Updates json to contain new failed mileage sync attempts
@@ -354,7 +362,7 @@ try:
     log("")
 
     # Update the json data file
-    with open("data.json", 'w+') as json_file:
+    with open(data_filename, 'w+') as json_file:
         # Update last sync field in json to date script started
         json_data["last_sync"] = start_time.strftime(dateformat)
 
@@ -381,9 +389,6 @@ with open(log_filename, 'w+') as log_file:
 
 # notify people if something went wrong
 if send_mail:
-    # Create a secure SSL context
-    context = ssl.create_default_context()
-
     message = MIMEMultipart()
 
     message["From"] = sender_email

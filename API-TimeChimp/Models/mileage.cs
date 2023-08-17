@@ -37,18 +37,20 @@ public class MileageETS
 
     public MileageETS() { }
 
-    public MileageETS(MileageTimeChimp mileage)
+    public MileageETS(MileageTimeChimp mileage, string projectNumber, string employeeNumber)
     {
         //TODO set length project_id string in env variables file
         PLA_KM = (int)Math.Ceiling(mileage.distance);
-        string project = "0000000000" + mileage.projectId.ToString();
+        string project = projectNumber;
         PLA_PROJECT = project[..Math.Min(project.Length, 7)];
-        PLA_SUBPROJECT = project[^4..];
-        project = project.Remove(project.Length - 4, 4);
-        PLA_PROJECT = project[^7..];
+        PLA_SUBPROJECT = project[7..];
         PLA_START = mileage.date.Date;
-        string persoon = "0000" + mileage.userId.ToString();
+        string persoon = employeeNumber;
         PLA_PERSOON = persoon[^4..];
+        if (mileage.vehicleName == null)
+        {
+            throw new Exception($"In TimeChimp mileage with id \"{mileage.id}\" doesn't has a vehicle assigned");
+        }
         PLA_KM_DERDEN = mileage.vehicleName[^4..];
         PLA_KM_VERGOEDING = "1";
     }

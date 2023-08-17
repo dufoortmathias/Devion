@@ -358,10 +358,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 throw new Exception($"Mileage with id ({mileageId}) already invoiced");
             }
 
-            mileage.projectId = new TimeChimpProjectHelper(TCClient).GetProjectId(mileage.projectId);
-            mileage.userId = int.Parse(new TimeChimpEmployeeHelper(TCClient).GetEmployee(mileage.userId).employeeNumber);
+            string projectNumber = new TimeChimpProjectHelper(TCClient).GetProject(mileage.projectId).code;
+            string employeeNumber = new TimeChimpEmployeeHelper(TCClient).GetEmployee(mileage.userId).employeeNumber;
 
-            MileageETS mileageETS = new(mileage);
+            MileageETS mileageETS = new(mileage, projectNumber, employeeNumber);
             MileageETS response = new ETSMileageHelper(ETSClient).UpdateMileage(mileageETS);
 
             //change status
