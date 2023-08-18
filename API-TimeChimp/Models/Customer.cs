@@ -32,6 +32,7 @@ public class CustomerTimeChimp
     public double VatRatePercentage { get; set; }
     public ContactTimeChimp[]? contacts { get; set; }
     public DateTime modified { get; set; }
+    public bool intern { get; set; }
 
     //constructor without specific parameters
     public CustomerTimeChimp() { }
