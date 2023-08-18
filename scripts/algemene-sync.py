@@ -25,7 +25,10 @@ requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 context = ssl.create_default_context()
 
 if __name__ == "__main__":
-    company = sys.argv[1].lower()
+    try:
+        company = sys.argv[1].lower()
+    except:
+        company = ""
 
 # Init vars
 ## Start time script
@@ -46,18 +49,24 @@ notify_emails = [
     "deviontest@gmail.com"
 ]
 send_mail = False
+first_sync_time = "01/01/2000 00:00:00"
 
 # Reads data from the json file, if the file doesn't exist it will create one
 global json_data
 if os.path.exists(data_filename):
     with open(data_filename, 'r') as json_file:
-        json_data = json.loads(json_file.read())
+        try: 
+            json_data = json.loads(json_file.read()) 
+        except: 
+            json_data = json.loads("{}")
+    if "last_sync" not in json_data:
+        json_data["last_sync"] = first_sync_time
 else:
     print("Failed to load json")
 
     output = "{}"
     json_data = json.loads(output)
-    json_data["last_sync"] = "01/01/2000 00:00:00"
+    json_data["last_sync"] = first_sync_time
 
     with open(data_filename, 'w+') as json_file:
         json_file.write(json.dumps(json_data, indent=2))
@@ -71,8 +80,8 @@ output = f"Sync TimeChimp log: van {json_data['last_sync']} tot {start_time.strf
 # Logs a message by printing it in the console and saving it to put it in the log file
 def log(message):
     global output
-    output = f"{output}{message}\n"
-    print(message)
+    output = f"{output}{message}"
+    print(message, end='', flush=True)
 
 def get_with_retry(url, retries=0, delay=6):
     response = None
@@ -156,91 +165,105 @@ def get_mileages_to_sync():
 # Returns list of employees that have been successfully synchronized
 def sync_employees(employee_ids):
     synced = []
-    for employee_id in employee_ids:
+    for (index, employee_id) in enumerate(employee_ids):
+        log(f"{int(index/len(employee_ids)*100)}% ")
+        log(f"Synchronize employee {employee_id} ")
         response = post_with_retry(f"{base_URL}ets/syncemployee?employeeId={employee_id}")
         if response.ok:
             synced.append(employee_id)
-            log(f"Syncronization employee {employee_id} succeeded")
+            log("succeeded\n")
         else:
-            log(f"Syncronization employee {employee_id} failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
+            log(f"failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})\n")
     return synced
 
 # Updates or creates uurcodes with a specific id in TimeChimp with the data from ETS
 # Returns list of uurcodes that have been successfully synchronized
 def sync_uurcodes(uurcode_ids):
     synced = []
-    for uurcode_id in uurcode_ids:
+    for (index, uurcode_id) in enumerate(uurcode_ids):
+        log(f"{int(index/len(uurcode_ids)*100)}% ")
+        log(f"Synchronize uurcode ({uurcode_id}) ")
         response = post_with_retry(f"{base_URL}ets/syncuurcode?uurcodeId={uurcode_id}")
         if response.ok:
             synced.append(uurcode_id)
-            log(f"Syncronization uurcode ({uurcode_id}) succeeded")
+            log("succeeded\n")
         else:
-            log(f"Syncronization uurcode ({uurcode_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
+            log(f"failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})\n")
     return synced
 
 # Updates or creates customers with a specific id in TimeChimp with the data from ETS
 # Returns list of customers that have been successfully synchronized
 def sync_customers(customer_ids):
     synced = []
-    for customer_id in customer_ids:
+    for (index, customer_id) in enumerate(customer_ids):
+        log(f"{int(index/len(customer_ids)*100)}% ")
+        log(f"Synchronize customer ({customer_id}) ")
         response = post_with_retry(f"{base_URL}ets/synccustomer?customerId={customer_id}")
         if response.ok:
             synced.append(customer_id)
-            log(f"Syncronization customer ({customer_id}) succeeded")
+            log("succeeded\n")
         else:
-            log(f"Syncronization customer ({customer_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
+            log(f"failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})\n")
     return synced
 
 # Updates or creates contacts with a specific id in TimeChimp with the data from ETS
 # Returns list of contacts that have been successfully synchronized
 def sync_contacts(contact_ids):
     synced = []
-    for contact_id in contact_ids:
+    for (index, contact_id) in enumerate(contact_ids):
+        log(f"{int(index/len(contact_ids)*100)}% ")
+        log(f"Synchronize contact ({contact_id}) ")
         response = post_with_retry(f"{base_URL}ets/synccontact?contactId={contact_id}")
         if response.ok:
             synced.append(contact_id)
-            log(f"Syncronization contact ({contact_id}) succeeded")
+            log("succeeded\n")
         else:
-            log(f"Syncronization contact ({contact_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
+            log(f"failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})\n")
     return synced
 
 # Updates or creates projects with a specific id in TimeChimp with the data from ETS, together with its subprojects
 # Returns list of projects that have been successfully synchronized
 def sync_projects(project_ids):
     synced = []
-    for project_id in project_ids:
+    for (index, project_id) in enumerate(project_ids):
+        log(f"{int(index/len(project_ids)*100)}% ")
+        log(f"Synchronize project ({project_id}) ")
         response = post_with_retry(f"{base_URL}ets/syncproject?projectId={project_id}")
         if response.ok:
             synced.append(project_id)
-            log(f"Syncronization project ({project_id}) succeeded")
+            log("succeeded\n")
         else:
-            log(f"Syncronization project ({project_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
+            log(f"failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})\n")
     return synced
 
 # Updates or creates times with a specific id in TimeChimp with the data from ETS
 # Returns list of times that have been successfully synchronized
 def sync_times(time_ids):
     synced = []
-    for time_id in time_ids:
+    for (index, time_id) in enumerate(time_ids):
+        log(f"{int(index/len(time_ids)*100)}% ")
+        log(f"Synchronize time ({time_id}) ")
         response = post_with_retry(f"{base_URL}ets/synctime?timeId={time_id}")
         if response.ok:
             synced.append(time_id)
-            log(f"Syncronization time ({time_id}) succeeded")
+            log("succeeded\n")
         else:
-            log(f"Syncronization time ({time_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
+            log(f"failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})\n")
     return synced
 
 # Updates or creates mileages with a specific id in mileageChimp with the data from ETS
 # Returns list of mileages that have been successfully synchronized
 def sync_mileages(mileage_ids):
     synced = []
-    for mileage_id in mileage_ids:
+    for (index, mileage_id) in enumerate(mileage_ids):
+        log(f"{int(index/len(mileage_ids)*100)}% ")
+        log(f"Synchronize mileage ({mileage_id}) ")
         response = post_with_retry(f"{base_URL}ets/syncmileage?mileageId={mileage_id}")
         if response.ok:
             synced.append(mileage_id)
-            log(f"Syncronization mileage ({mileage_id}) succeeded")
+            log("succeeded\n")
         else:
-            log(f"Syncronization mileage ({mileage_id}) failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})")
+            log(f"failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})\n")
     return synced
 
 
@@ -254,17 +277,18 @@ try:
     employee_ids = list(set(get_employees_to_sync() + json_data["failed_employees"]))
     ## Syncs these employees and receives employees where sync was successful
     synced_employee_ids = sync_employees(employee_ids)
+    if len(employee_ids) > 0:
+        log("\n")
     ## Updates json to contain new failed employee sync attempts
     json_data["failed_employees"] = list(set(employee_ids) - set(synced_employee_ids))
     ## Log total results sync employees
-    log("")
-    log("Employees:")
+    log("Employees:\n")
     if len(employee_ids) == 0:
         log(f"Nothing to syncronize")
     else:
-        log(f"Total amount syncronization succeeded: {len(synced_employee_ids)}")
-        log(f"Total amount syncronization failed: {len(employee_ids)-len(synced_employee_ids)}")
-    log("")
+        log(f"Total amount Synchronize succeeded: {len(synced_employee_ids)}\n")
+        log(f"Total amount Synchronize failed: {len(employee_ids)-len(synced_employee_ids)}")
+    log("\n\n")
 
     # Sync Uurcodes
     ## Checks if json already contains data from previous failed uurcode syncs, creates this field with empty list if false
@@ -274,17 +298,18 @@ try:
     uurcode_ids = list(set(get_uurcodes_to_sync() + json_data["failed_uurcodes"]))
     ## Syncs these uurcodes and receives uurcodes where sync was successful
     synced_uurcode_ids = sync_uurcodes(uurcode_ids)
+    if len(uurcode_ids) > 0:
+        log("\n")
     ## Updates json to contain new failed uurcode sync attempts
     json_data["failed_uurcodes"] = list(set(uurcode_ids) - set(synced_uurcode_ids))
     ## Log total results sync uurcodes
-    log("")
-    log("Uurcodes:")
+    log("Uurcodes:\n")
     if len(uurcode_ids) == 0:
         log(f"Nothing to syncronize")
     else:
-        log(f"Total amount syncronization succeeded: {len(synced_uurcode_ids)}")
-        log(f"Total amount syncronization failed: {len(uurcode_ids)-len(synced_uurcode_ids)}")
-    log("")
+        log(f"Total amount Synchronize succeeded: {len(synced_uurcode_ids)}\n")
+        log(f"Total amount Synchronize failed: {len(uurcode_ids)-len(synced_uurcode_ids)}")
+    log("\n\n")
 
     # Sync customers
     ## Checks if json already contains data from previous failed customer syncs, creates this field with empty list if false
@@ -294,17 +319,18 @@ try:
     customer_ids = list(set(get_customers_to_sync() + json_data["failed_customers"]))
     ## Syncs these customers and receives customers where sync was successful
     synced_customer_ids = sync_customers(customer_ids)
+    if len(customer_ids) > 0:
+        log("\n")
     ## Updates json to contain new failed customer sync attempts
     json_data["failed_customers"] = list(set(customer_ids) - set(synced_customer_ids))
     ## Log total results sync customers
-    log("")
-    log("Customers:")
+    log("Customers:\n")
     if len(customer_ids) == 0:
         log(f"Nothing to syncronize")
     else:
-        log(f"Total amount syncronization succeeded: {len(synced_customer_ids)}")
-        log(f"Total amount syncronization failed: {len(customer_ids)-len(synced_customer_ids)}")
-    log("")
+        log(f"Total amount Synchronize succeeded: {len(synced_customer_ids)}\n")
+        log(f"Total amount Synchronize failed: {len(customer_ids)-len(synced_customer_ids)}")
+    log("\n\n")
 
     # Sync contacts
     ## Checks if json already contains data from previous failed contact syncs, creates this field with empty list if false
@@ -314,17 +340,18 @@ try:
     contact_ids = list(set(get_contacts_to_sync() + json_data["failed_contacts"]))
     ## Syncs these contacts and receives contacts where sync was successful
     synced_contact_ids = sync_contacts(contact_ids)
+    if len(contact_ids) > 0:
+        log("\n")
     ## Updates json to contain new failed contact sync attempts
     json_data["failed_contacts"] = list(set(contact_ids) - set(synced_contact_ids))
     ## Log total results sync contacts
-    log("")
-    log("Contacts:")
+    log("Contacts:\n")
     if len(contact_ids) == 0:
         log(f"Nothing to syncronize")
     else:
-        log(f"Total amount syncronization succeeded: {len(synced_contact_ids)}")
-        log(f"Total amount syncronization failed: {len(contact_ids)-len(synced_contact_ids)}")
-    log("")
+        log(f"Total amount Synchronize succeeded: {len(synced_contact_ids)}\n")
+        log(f"Total amount Synchronize failed: {len(contact_ids)-len(synced_contact_ids)}")
+    log("\n\n")
 
     # Sync projects
     ## Checks if json already contains data from previous failed project syncs, creates this field with empty list if false
@@ -334,17 +361,18 @@ try:
     project_ids = list(set(get_projects_to_sync() + json_data["failed_projects"]))
     ## Syncs these projects and receives projects where sync was successful
     synced_project_ids = sync_projects(project_ids)
+    if len(project_ids) > 0:
+        log("\n")
     ## Updates json to contain new failed project sync attempts
     json_data["failed_projects"] = list(set(project_ids) - set(synced_project_ids))
     ## Log total results sync projects
-    log("")
-    log("Projects:")
+    log("Projects:\n")
     if len(project_ids) == 0:
         log(f"Nothing to syncronize")
     else:
-        log(f"Total amount syncronization succeeded: {len(synced_project_ids)}")
-        log(f"Total amount syncronization failed: {len(project_ids)-len(synced_project_ids)}")
-    log("")
+        log(f"Total amount Synchronize succeeded: {len(synced_project_ids)}\n")
+        log(f"Total amount Synchronize failed: {len(project_ids)-len(synced_project_ids)}")
+    log("\n\n")
 
     # Sync times
     ## Checks if json already contains data from previous failed time syncs, creates this field with empty list if false
@@ -354,17 +382,18 @@ try:
     time_ids = list(set(get_times_to_sync() + json_data["failed_times"]))
     ## Syncs these times and receives times where sync was successful
     synced_time_ids = sync_times(time_ids)
+    if len(time_ids) > 0:
+        log("\n")
     ## Updates json to contain new failed time sync attempts
     json_data["failed_times"] = list(set(time_ids) - set(synced_time_ids))
     ## Log total results sync times
-    log("")
-    log("Times:")
+    log("Times:\n")
     if len(time_ids) == 0:
         log(f"Nothing to syncronize")
     else:
-        log(f"Total amount syncronization succeeded: {len(synced_time_ids)}")
-        log(f"Total amount syncronization failed: {len(time_ids)-len(synced_time_ids)}")
-    log("")
+        log(f"Total amount Synchronize succeeded: {len(synced_time_ids)}\n")
+        log(f"Total amount Synchronize failed: {len(time_ids)-len(synced_time_ids)}")
+    log("\n\n")
 
     # Sync mileages
     ## Checks if json already contains data from previous failed mileage syncs, creates this field with empty list if false
@@ -374,17 +403,18 @@ try:
     mileage_ids = list(set(get_mileages_to_sync() + json_data["failed_mileages"]))
     ## Syncs these mileages and receives mileages where sync was successful
     synced_mileage_ids = sync_mileages(mileage_ids)
+    if len(mileage_ids) > 0:
+        log("\n")
     ## Updates json to contain new failed mileage sync attempts
     json_data["failed_mileages"] = list(set(mileage_ids) - set(synced_mileage_ids))
     ## Log total results sync mileages
-    log("")
-    log("Mileages:")
+    log("Mileages:\n")
     if len(mileage_ids) == 0:
         log(f"Nothing to syncronize")
     else:
-        log(f"Total amount syncronization succeeded: {len(synced_mileage_ids)}")
-        log(f"Total amount syncronization failed: {len(mileage_ids)-len(synced_mileage_ids)}")
-    log("")
+        log(f"Total amount Synchronize succeeded: {len(synced_mileage_ids)}\n")
+        log(f"Total amount Synchronize failed: {len(mileage_ids)-len(synced_mileage_ids)}")
+    log("\n\n")
 
     # Update the json data file
     with open(data_filename, 'w+') as json_file:
@@ -397,7 +427,7 @@ except Exception as e:
     send_mail = True
 
     log(e)
-    log("")
+    log("\n\n")
 
 # Determine runtime script
 end_time = datetime.datetime.now()
