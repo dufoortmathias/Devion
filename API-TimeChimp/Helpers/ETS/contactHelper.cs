@@ -34,7 +34,7 @@ public class ETSContactHelper : ETSHelper
     public List<ContactETS> GetContacts()
     {
         //create query
-        string query = "select C.CO_KLCOD, C.CO_TAV, C.CO_TAV2, C.CO_TEL, C.CO_FAX, C.CO_GSM, C.CO_EMAIL, C.CO_ACTIEF, F.FUT_OMSCHRIJVING from contact as C left join tbl_functie_taal as F on C.CO_FUNCTIE = F.FUT_ID";
+        string query = "select C.*, F.FUT_OMSCHRIJVING from contact as C left join tbl_functie_taal as F on C.CO_FUNCTIE = F.FUT_ID";
 
         //get data form ETS
         string response = ETSClient.selectQuery(query);
@@ -54,7 +54,7 @@ public class ETSContactHelper : ETSHelper
     public ContactETS GetContact(int contactId)
     {
         //create query
-        string query = $"select C.CO_KLCOD, C.CO_TAV, C.CO_TAV2, C.CO_TEL, C.CO_FAX, C.CO_GSM, C.CO_EMAIL, C.CO_ACTIEF, F.FUT_OMSCHRIJVING from contact as C left join tbl_functie_taal as F on C.CO_FUNCTIE = F.FUT_ID where c.C_CODE = {contactId}";
+        string query = $"select C.*, F.FUT_OMSCHRIJVING from contact as C left join tbl_functie_taal as F on C.CO_FUNCTIE = F.FUT_ID where c.C_CODE = {contactId}";
 
         //data from ETS
         string response = ETSClient.selectQuery(query);
