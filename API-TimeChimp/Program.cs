@@ -115,25 +115,34 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     //sync contact from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/synccontact", (int contactId) =>
     {
-        //get contact from ets
-        ContactETS ETSContact = new ETSContactHelper(ETSClient).GetContact(contactId);
-
-        // Handle when contact doesn't exist in ETS
-        if (ETSContact == null)
+        try
         {
-            return Results.Problem($"ETS doesn't contain a contact with id = {contactId}");
+            //get contact from ets
+            ContactETS ETSContact = new ETSContactHelper(ETSClient).GetContact(contactId);
+
+            // Handle when contact doesn't exist in ETS
+            if (ETSContact == null)
+            {
+                throw new Exception($"ETS doesn't contain a contact with id = {contactId}");
+            }
+
+            int customerId = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null & c.relationId.Equals(ETSContact.CO_KLCOD)).id.Value;
+
+            //change to timechimp class
+            ContactTimeChimp TCContact = new(ETSContact, customerId);
+
+            TimeChimpContactHelper contactHelper = new(TCClient);
+
+            //check if contact exists in timechimp
+            return contactHelper.ContactExists(ETSContact)
+                ? Results.Ok(contactHelper.UpdateContact(TCContact))
+                : Results.Ok(contactHelper.CreateContact(TCContact));
         }
-
-        //change to timechimp class
-        ContactTimeChimp TCContact = new(ETSContact);
-
-        TimeChimpContactHelper contactHelper = new(TCClient);
-
-        //check if contact exists in timechimp
-        return contactHelper.ContactExists(ETSContact)
-            ? Results.Ok(contactHelper.UpdateContact(TCContact))
-            : Results.Ok(contactHelper.CreateContact(TCContact));
-    }).WithName($"{company}SyncContactTimechimp");
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+}).WithName($"{company}SyncContactTimechimp");
 
     //get uurcodes from ets
     app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) => { try { return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetUurcodesFromETS");
@@ -241,7 +250,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
             else if (ETSProject.PR_KLNR == null)
             {
-                return Results.Problem($"The ETS record for project with id = {projectId} doesn't has a customernumber");
+                return Results.Problem($"The ETS record for project with id = {projectId} has no customernumber");
             }
 
             // Change to TimeChimp class

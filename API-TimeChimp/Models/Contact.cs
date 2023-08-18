@@ -15,13 +15,17 @@ public class ContactTimeChimp
     public ContactTimeChimp() { }
 
     //constructor to from ets class to timechimp class
-    public ContactTimeChimp(ContactETS contactETS)
+    public ContactTimeChimp(ContactETS contactETS, int customerId)
     {
-        name = contactETS.CO_TAV;
+        if (contactETS.CO_TAV == null)
+        {
+            throw new Exception("Contact has no name");
+        }
+        name = contactETS.CO_CONTACTPERSOON;
         email = contactETS.CO_EMAIL;
         phone = contactETS.CO_GSM;
         jobTitle = contactETS.FUT_OMSCHRIJVING;
-        customerIds = new int[] { int.Parse(contactETS.CO_KLCOD) };
+        customerIds = new int[] { customerId };
     }
 }
 
@@ -37,4 +41,5 @@ public class ContactETS
     public string? CO_EMAIL { get; set; }
     public string? CO_ACTIEF { get; set; }
     public string? FUT_OMSCHRIJVING { get; set; }
+    public string? CO_CONTACTPERSOON { get; set; }
 }

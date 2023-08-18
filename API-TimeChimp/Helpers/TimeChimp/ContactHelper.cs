@@ -9,7 +9,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
     //check if contact exists
     public bool ContactExists(ContactETS contactETS)
     {
-        return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_TAV));
+        return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_CONTACTPERSOON));
     }
 
     //get all contacts

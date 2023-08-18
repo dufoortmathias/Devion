@@ -2,13 +2,16 @@
 # .\.venv\Scripts\activate.bat
 # pip install -r requirements.txt
 
-import requests
 import sys
 import json
 import os
 import datetime
 import smtplib
 import ssl
+
+import requests
+import time
+
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -71,9 +74,31 @@ def log(message):
     output = f"{output}{message}\n"
     print(message)
 
+def get_with_retry(url, retries=0, delay=6):
+    response = None
+    for i in range(retries+1):
+        response = requests.get(url, verify=False)
+        if response.status_code == 200:
+            return response
+        
+        if i != retries:
+            time.sleep(delay)
+    return response
+
+def post_with_retry(url, retries=0, delay=6):
+    response = None
+    for i in range(retries+1):
+        response = requests.post(url, verify=False)
+        if response.status_code == 200:
+            return response
+        
+        if i != retries:
+            time.sleep(delay)
+    return response
+
 # Receives ids from all employees that have changed in ETS after last sync
 def get_employees_to_sync():
-    response = requests.get(f"{base_URL}ets/employeeids?dateString={json_data['last_sync']}&teamName={team_name_ETS_sync_TimeChimp}", verify=False)
+    response = get_with_retry(f"{base_URL}ets/employeeids?dateString={json_data['last_sync']}&teamName={team_name_ETS_sync_TimeChimp}")
     if response.ok:
         return response.json()
     else:
@@ -81,7 +106,7 @@ def get_employees_to_sync():
 
 # Receives ids from all uurcodes that have changed in ETS after last sync
 def get_uurcodes_to_sync():
-    response = requests.get(f"{base_URL}ets/uurcodeids?dateString={json_data['last_sync']}", verify=False)
+    response = get_with_retry(f"{base_URL}ets/uurcodeids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
     else:
@@ -89,7 +114,7 @@ def get_uurcodes_to_sync():
 
 # Receives ids from all customers that have changed in ETS after last sync
 def get_customers_to_sync():
-    response = requests.get(f"{base_URL}ets/customerids?dateString={json_data['last_sync']}", verify=False)
+    response = get_with_retry(f"{base_URL}ets/customerids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
     else:
@@ -97,7 +122,7 @@ def get_customers_to_sync():
    
 # Receives ids from all contacts that have changed in ETS after last sync 
 def get_contacts_to_sync():
-    response = requests.get(f"{base_URL}ets/contactids?dateString={json_data['last_sync']}", verify=False)
+    response = get_with_retry(f"{base_URL}ets/contactids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
     else:
@@ -105,7 +130,7 @@ def get_contacts_to_sync():
     
 # Receives ids from all projects that have changed in ETS after last sync 
 def get_projects_to_sync():
-    response = requests.get(f"{base_URL}ets/projectids?dateString={json_data['last_sync']}", verify=False)
+    response = get_with_retry(f"{base_URL}ets/projectids?dateString={json_data['last_sync']}")
     if response.ok:
         return response.json()
     else:
@@ -113,7 +138,7 @@ def get_projects_to_sync():
 
 # Receives ids from all times that have changed in ETS after last sync 
 def get_times_to_sync():
-    response = requests.get(f"{base_URL}ets/timeids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}", verify=False)
+    response = get_with_retry(f"{base_URL}ets/timeids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}")
     if response.ok:
         return response.json()
     else:
@@ -121,7 +146,7 @@ def get_times_to_sync():
 
 # Receives ids from all mileages that have changed in ETS after last sync 
 def get_mileages_to_sync():
-    response = requests.get(f"{base_URL}ets/mileageids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}", verify=False)
+    response = get_with_retry(f"{base_URL}ets/mileageids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}")
     if response.ok:
         return response.json()
     else:
@@ -132,7 +157,7 @@ def get_mileages_to_sync():
 def sync_employees(employee_ids):
     synced = []
     for employee_id in employee_ids:
-        response = requests.post(f"{base_URL}ets/syncemployee?employeeId={employee_id}", verify=False)
+        response = post_with_retry(f"{base_URL}ets/syncemployee?employeeId={employee_id}")
         if response.ok:
             synced.append(employee_id)
             log(f"Syncronization employee {employee_id} succeeded")
@@ -145,7 +170,7 @@ def sync_employees(employee_ids):
 def sync_uurcodes(uurcode_ids):
     synced = []
     for uurcode_id in uurcode_ids:
-        response = requests.post(f"{base_URL}ets/syncuurcode?uurcodeId={uurcode_id}", verify=False)
+        response = post_with_retry(f"{base_URL}ets/syncuurcode?uurcodeId={uurcode_id}")
         if response.ok:
             synced.append(uurcode_id)
             log(f"Syncronization uurcode ({uurcode_id}) succeeded")
@@ -158,7 +183,7 @@ def sync_uurcodes(uurcode_ids):
 def sync_customers(customer_ids):
     synced = []
     for customer_id in customer_ids:
-        response = requests.post(f"{base_URL}ets/synccustomer?customerId={customer_id}", verify=False)
+        response = post_with_retry(f"{base_URL}ets/synccustomer?customerId={customer_id}")
         if response.ok:
             synced.append(customer_id)
             log(f"Syncronization customer ({customer_id}) succeeded")
@@ -171,7 +196,7 @@ def sync_customers(customer_ids):
 def sync_contacts(contact_ids):
     synced = []
     for contact_id in contact_ids:
-        response = requests.post(f"{base_URL}ets/synccontact?contactId={contact_id}", verify=False)
+        response = post_with_retry(f"{base_URL}ets/synccontact?contactId={contact_id}")
         if response.ok:
             synced.append(contact_id)
             log(f"Syncronization contact ({contact_id}) succeeded")
@@ -184,7 +209,7 @@ def sync_contacts(contact_ids):
 def sync_projects(project_ids):
     synced = []
     for project_id in project_ids:
-        response = requests.post(f"{base_URL}ets/syncproject?projectId={project_id}", verify=False)
+        response = post_with_retry(f"{base_URL}ets/syncproject?projectId={project_id}")
         if response.ok:
             synced.append(project_id)
             log(f"Syncronization project ({project_id}) succeeded")
@@ -197,7 +222,7 @@ def sync_projects(project_ids):
 def sync_times(time_ids):
     synced = []
     for time_id in time_ids:
-        response = requests.post(f"{base_URL}ets/synctime?timeId={time_id}", verify=False)
+        response = post_with_retry(f"{base_URL}ets/synctime?timeId={time_id}")
         if response.ok:
             synced.append(time_id)
             log(f"Syncronization time ({time_id}) succeeded")
@@ -210,7 +235,7 @@ def sync_times(time_ids):
 def sync_mileages(mileage_ids):
     synced = []
     for mileage_id in mileage_ids:
-        response = requests.post(f"{base_URL}ets/syncmileage?mileageId={mileage_id}", verify=False)
+        response = post_with_retry(f"{base_URL}ets/syncmileage?mileageId={mileage_id}")
         if response.ok:
             synced.append(mileage_id)
             log(f"Syncronization mileage ({mileage_id}) succeeded")
