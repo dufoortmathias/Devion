@@ -1,3 +1,5 @@
+using Api.Devion.Models;
+
 namespace Api.Devion.Helpers.TimeChimp;
 
 public class TimeChimpContactHelper : TimeChimpHelper
@@ -9,7 +11,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
     //check if contact exists
     public bool ContactExists(ContactETS contactETS)
     {
-        return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_CONTACTPERSOON));
+        return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_CONTACTPERSOON) && ((contact.email == null && contactETS.CO_EMAIL == null) || contact.email.Equals(contactETS.CO_EMAIL)));
     }
 
     //get all contacts
@@ -39,7 +41,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
         if (contact.id == null)
         {
             // find TimeChimp id of contact
-            contact.id = GetContacts().Find(c => c.name.Equals(contact.name)).id;
+            contact.id = GetContacts().Find(c => c.name.Equals(contact.name) && ((c.email != null && c.email.Equals(contact.email)) || c.email == null)).id;
         }
 
         // update contact TimeChimp
