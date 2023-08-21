@@ -44,8 +44,28 @@
       <svg class="c-app_logo">
         <use xlink:href="#c-icon--devion"></use>
       </svg>
-      <div class="c-form-field">
-        <button class="o-button-reset c-button js-sync-button">Sync all</button>
+      <div class="c-app_body">
+        <label class="c-label" for="selectBestelbon"
+          >Selecteer een bestelbon</label
+        >
+        <span class="c-custom-select">
+          <select
+            class="c-input c-custom-select_input"
+            name="selectBestelbon"
+            id="selectBestelbon"
+          >
+            <option value="" disabled selected hidden>Bestelbon</option>
+            <option value="020202">020202</option>
+            <option value="132456">123456</option>
+          </select>
+          <svg
+            class="c-custom-select_icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+          >
+            <path d=" M7, 1015, 5, 5-5Z" />
+          </svg>
+        </span>
       </div>
     </div>
   </body>
