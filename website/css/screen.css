@@ -5,13 +5,13 @@
 @font-face {
   font-family: "Inter Web";
   font-weight: 400;
-  src: url("../fonts/Inter-Regular.woff2") format("woff2");
+  src: url("../fonts/Inter-Regular.ttf") format("ttf");
 }
 
 @font-face {
   font-family: "Inter Web";
   font-weight: 700;
-  src: url("../fonts/Inter-Bold.woff2") format("woff2");
+  src: url("../fonts/Inter-Bold.ttf") format("ttf");
 }
 
 /*------------------------------------*\
@@ -56,18 +56,21 @@
 
   /* font settings */
   --global-font-family: "Inter Web", Helvetica, arial, sans-serif;
-  --global-font-size: 16px;
+  --global-fontSize: 16px;
 
   /* transition settings */
   --global-transitionTiming-alpha: 0.1s ease-out;
 
   /* input settings */
-  --global-input-backgroundColor: var(--global-color-neutral-xxxx-light);
+  --global-input-backgroundColor: White;
   --global-input-color: var(--global-color-neutral-xxxx-dark);
   --global-input-borderColor: var(--global-color-neutral-xxx-light);
   --global-input-hover-borderColor: var(--global-color-neutral-xx-light);
   --global-input-focus-borderColor: var(--global-color-alpha);
   --global-input-boxShadow: 0 0 0 3px var(--global-color-alpha-x-transparent);
+
+  --global-page-color: var(--global-color-neutral-xxxx-dark);
+  --global-page-backgroundColor: #fff;
 
   /* whitespace settings */
   --global-baseline: 8px;
@@ -86,7 +89,7 @@
   --global-whitespace-xxl: calc(var(--global-whitespace) * 3);
   /*  = 72px */
 
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     :root {
       --global-page-color: White;
       --global-page-backgroundColor: var(--global-color-neutral-xxxx-dark);
@@ -106,7 +109,7 @@
         --global-color-error-transparent
       );
     }
-  }
+  } */
 }
 
 /*------------------------------------*\
@@ -126,7 +129,7 @@ html {
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--global-background-color);
+  background-color: var(--global-page-backgroundColor);
 }
 
 *,
@@ -393,6 +396,11 @@ input::placeholder {
   grid-template-areas: "logo topbar" "body body";
 }
 
+.c-form-field {
+  display: flex;
+  align-items: center;
+}
+
 .c-app_logo {
   padding: 0 var(--global-whitespace-lg);
   height: var(--c-app__topbar-height);
@@ -417,24 +425,27 @@ input::placeholder {
   box-shadow: var(--global-boxShadow);
   z-index: 10;
   height: calc(100vh - var(--c-app__topbar-height));
+  width: 50vw;
 }
 
 .c-label {
   margin-bottom: 0;
-  font-size: var(--global-whitespace-md);
+  font-size: var(--global-fontSize);
+  width: 100%;
 }
 
 .c-custom-select {
   display: block;
   position: relative;
-  width: 30vw;
+  margin-left: var(--global-whitespace-md);
+  width: 100%;
 }
 
 .c-custom-select__symbol {
-  width: calc(var(--global-whitespace) * 3);
-  height: calc(var(--global-whitespace) * 3);
+  width: calc(var(--global-baseline) * 3);
+  height: calc(var(--global-baseline) * 3);
+  fill: var(--global-color-neutral-x-light);
   position: absolute;
-  fill: var(--global-color-alpha);
   right: 12px;
   top: 12px;
   pointer-events: none;
@@ -445,15 +456,70 @@ input::placeholder {
   -moz-appearance: none;
   appearance: none;
   width: 100%;
-  border: var(--global-borderWidth) solid var(--global-borderColor);
+  border: var(--global-borderWidth) solid var(--global-input-borderColor);
   border-radius: var(--global-borderRadius);
-  color: var(--global-color-input);
+  color: var(--global-input-color);
   font-size: var(--global-fontSize);
   padding: calc(var(--global-baseline) * 1.5 - var(--global-borderWidth))
     var(--global-whitespace-md);
   line-height: calc(var(--global-baseline) * 3);
   outline: none;
   transition: border var(--global-transitionTiming-alpha);
+}
+
+.c-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--global-whitespace-md) 0;
+}
+
+.c-button {
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: var(--global-borderRadius);
+  border: var(--global-borderWidth) solid var(--global-color-alpha-dark);
+  background-color: var(--global-color-alpha);
+  color: #fff;
+  padding: calc(var(--global-baseline) * 1.5 - var(--global-borderWidth))
+    var(--global-whitespace-md);
+  line-height: calc(var(--global-baseline) * 3);
+  width: 100%;
+  outline: none;
+  transition: all var(--global-transitionTiming-alpha);
+}
+
+.c-button:hover {
+  background-color: var(--global-color-alpha-light);
+}
+
+.c-button:focus {
+  box-shadow: 0 0 0 3px var(--global-color-alpha-x-transparent);
+}
+
+.c-button:active {
+  background-color: var(--global-color-alpha-dark);
+  box-shadow: none;
+}
+
+.c-button-disabled {
+  background-color: var(--global-color-alpha-x-light);
+  border-color: var(--global-color-alpha-x-light);
+  color: var(--global-color-neutral-dark);
+  cursor: not-allowed;
+}
+
+.c-button-disabled:hover {
+  background-color: var(--global-color-alpha-x-light);
+}
+
+.c-button-disabled:focus {
+  box-shadow: none;
+}
+
+.c-button-disabled:active {
+  background-color: var(--global-color-alpha-x-light);
+  box-shadow: none;
 }
 
 /*------------------------------------*\

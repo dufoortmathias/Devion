@@ -13,6 +13,9 @@
     <link rel="icon" href="favicon.svg" />
     <link rel="apple-touch-icon" href="logo.png" />
     <link rel="manifest" href="manifest.json" />
+
+    <!-- Script -->
+    <script src="Script/app.js"></script>
   </head>
   <body>
     <svg
@@ -45,27 +48,71 @@
         <use xlink:href="#c-icon--devion"></use>
       </svg>
       <div class="c-app_body">
-        <label class="c-label" for="selectBestelbon"
-          >Selecteer een bestelbon</label
-        >
-        <span class="c-custom-select">
-          <select
-            class="c-input c-custom-select_input"
-            name="selectBestelbon"
-            id="selectBestelbon"
+        <p class="c-form-field">
+          <div class="c-item">
+          <label class="c-label" for="bedrijf"> Selecteer een bedrijf </label>
+          <span class="c-custom-select">
+            <select
+              class="c-input c-custom-select__input js-bedrijf-select"
+              class=""
+              name="bedrijf"
+              id="bedrijf"
+            >
+              <option value="" disabled selected hidden>bedrijf</option>
+              <option value="devion">
+                Devion
+              </option>
+              <option value="metabil">Metabil</option>
+              <option value="deviontest">Devion Test</option>
+            </select>
+            <svg
+              class="c-custom-select__symbol"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path d="M7,10l5,5,5-5Z" />
+            </svg>
+          </span>
+          </div>
+          <div class="c-item">
+          <label class="c-label" for="bestelbon"> Selecteer een bestelbon </label>
+          <span class="c-custom-select">
+            <select
+              class="c-input c-custom-select__input js-bestelbon-select"
+              class=""
+              name="bestelbon"
+              id="bestelbon"
+            >
+              <option value="" disabled selected hidden>bestelbon</option>
+              <option value="002244" onselect="ChangeButtonToActive()">
+                002244
+              </option>
+              <option value="123456">123456</option>
+            </select>
+            <svg
+              class="c-custom-select__symbol"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path d="M7,10l5,5,5-5Z" />
+            </svg>
+          </span>
+          </div>
+        </p>
+
+        <p class="u-mb-md">
+          <!-- Input type button
+            input type="submit" class="o-button-reset c-button" value="Sign in"/>
+            -->
+          <!-- Button -->
+          <button
+            type="submit"
+            class="o-button-reset c-button c-button-disabled js-button"
+            disabled
           >
-            <option value="" disabled selected hidden>Bestelbon</option>
-            <option value="020202">020202</option>
-            <option value="132456">123456</option>
-          </select>
-          <svg
-            class="c-custom-select_icon"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-          >
-            <path d=" M7, 1015, 5, 5-5Z" />
-          </svg>
-        </span>
+            download bestelbon
+          </button>
+        </p>
       </div>
     </div>
   </body>
