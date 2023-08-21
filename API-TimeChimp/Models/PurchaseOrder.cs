@@ -302,12 +302,12 @@ public class PurchaseOrderDetailETS
     public char? FD_CODE { get; set; }
     public char? FD_OLDCODE { get; set; }
     public string FD_BONNR { get; set; }
-    public object? FD_FAKNR { get; set; }
+    public string? FD_FAKNR { get; set; }
     public object? FD_KLNR { get; set; }
     public object? FD_LYNNR { get; set; }
-    public object? FD_ARTNR { get; set; }
+    public string? FD_ARTNR { get; set; }
     public object? FD_ARTLEV { get; set; }
-    public object? FD_OMS { get; set; }
+    public string? FD_OMS { get; set; }
     public object? FD_EENH { get; set; }
     public object? FD_VERP { get; set; }
     public object? FD_HOEV { get; set; }
@@ -327,7 +327,7 @@ public class PurchaseOrderDetailETS
     public object? FD_MAT { get; set; }
     public object? FD_FASE1 { get; set; }
     public object? FD_FASE2 { get; set; }
-    public object? FD_PROJ { get; set; }
+    public string? FD_PROJ { get; set; }
     public object? FD_VORD { get; set; }
     public object? FD_PROC { get; set; }
     public object? FD_OFFBEDR { get; set; }
@@ -391,13 +391,13 @@ public class PurchaseOrderDetailETS
     public object? FD_EHP_TOT_MANUREN_OPV { get; set; }
     public object? FD_DEFAULT_UURPRIJS { get; set; }
     public object? FD_DEFAULT_PERCENT { get; set; }
-    public object? FD_AANTAL { get; set; }
+    public double? FD_AANTAL { get; set; }
     public object? FD_HOOG { get; set; }
     public object? FD_LEN { get; set; }
     public object? FD_DIK { get; set; }
     public object? FD_SGEW { get; set; }
     public object? FD_EHP_MATERIAAL { get; set; }
-    public object? FD_SUBPROJ { get; set; }
+    public string? FD_SUBPROJ { get; set; }
     public object? FD_CATPRIJS { get; set; }
     public object? FD_ARTKORT { get; set; }
     public object? FD_NETPRIJS { get; set; }
@@ -483,7 +483,7 @@ public class PurchaseOrderDetailETS
     public object? FD_VERVALDATUM { get; set; }
     public object? FD_DOORSTUREN_ORDERLIJN_KLAAR { get; set; }
     public object? FD_OPMAAK { get; set; }
-    public object? KLANTNAAM { get; set; }
+    public string? KLANTNAAM { get; set; }
     public object? REF2 { get; set; }
     public object? FD_BLO_SELECT { get; set; }
     public object? FD_BLO_BESTEL { get; set; }
@@ -523,4 +523,5 @@ public class PurchaseOrderDetailETS
     public object? FD_POSITIE { get; set; }
     public object? FD_VRIJ_VELD1_NUMERIEK { get; set; }
     public object? FD_VRIJ_VELD2_NUMERIEK { get; set; }
+    public string? LV_NAM { get; set; }
 }

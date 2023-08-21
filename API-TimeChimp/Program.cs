@@ -399,5 +399,18 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}GetOpenPurchaseOrderIds");
+
+    app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
+    {
+        try
+        {
+            Dictionary<string, object> purchaseOrder = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrder(id);
+            return Results.Ok(purchaseOrder);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}GetPurchaseOrder");
 }
 app.Run();
