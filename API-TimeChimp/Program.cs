@@ -253,15 +253,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // Change to TimeChimp class
             ProjectTimeChimp TCProject = new(ETSProject);
 
+            CustomerTimeChimp customer;
             // Find customer id TimeChimpETSContact.CO_KLCOD
             if (ETSProject.PR_KLNR == null)
             {
-                CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
-                TCProject.customerId = customer.id.Value;
+                customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
             } else
             {
-                TCProject.customerId = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)).id.Value;
+                customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
             }
+            TCProject.customerId = customer.id.Value;
 
             ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId);
 
