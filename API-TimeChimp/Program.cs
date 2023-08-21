@@ -387,5 +387,17 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}GetMileagesFromETS");
+
+    app.MapGet($"/api/{company.ToLower()}/ets/openpurchaseorderids", () =>
+    {
+        try
+        {
+            List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
+            return Results.Ok(purchaseOrders.Select(p => p.FH_BONNR));
+        } catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}GetOpenPurchaseOrderIds");
 }
 app.Run();
