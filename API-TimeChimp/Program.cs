@@ -7,6 +7,11 @@ ConfigurationManager config = builder.Configuration;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -15,7 +20,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
@@ -258,7 +265,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             if (ETSProject.PR_KLNR == null)
             {
                 customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
-            } else
+            }
+            else
             {
                 customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
             }
@@ -393,8 +401,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
-            return Results.Ok(purchaseOrders.Select(p => p.FH_BONNR));
-        } catch (Exception e)
+            var purchaseOrderIds = purchaseOrders.Select(p => p.FH_BONNR);
+            return Results.Ok(purchaseOrderIds);
+        }
+        catch (Exception e)
         {
             return Results.Problem(e.Message);
         }
@@ -413,4 +423,4 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetPurchaseOrder");
 }
-app.Run();
+app.Run("https://192.168.100.237:5001");

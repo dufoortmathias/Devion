@@ -296,6 +296,18 @@ input::placeholder {
   color: var(--input-placeholder-color, var(--global-placeholder-color));
 }
 
+table,
+th,
+td {
+  border: var(--global-borderWidth) solid var(--global-color-neutral-xxx-light);
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
 /*------------------------------------*\
 #OBJECTS
 \*------------------------------------*/
@@ -394,11 +406,20 @@ input::placeholder {
   min-height: 100vh;
   display: grid;
   grid-template-areas: "logo topbar" "body body";
+  align-items: center;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
 }
 
 .c-form-field {
   display: flex;
   align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
+  width: 100vw;
 }
 
 .c-app_logo {
@@ -408,6 +429,10 @@ input::placeholder {
   align-items: center;
   grid-area: logo;
   height: var(--c-app__topbar-height);
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
 }
 
 .c-app_topbar {
@@ -426,6 +451,10 @@ input::placeholder {
   z-index: 10;
   height: calc(100vh - var(--c-app__topbar-height));
   width: 50vw;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
 }
 
 .c-label {
@@ -520,6 +549,23 @@ input::placeholder {
 .c-button-disabled:active {
   background-color: var(--global-color-alpha-x-light);
   box-shadow: none;
+}
+
+.c-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-color: var(--global-color-neutral-xxx-light);
+  border-width: var(--global-borderWidth);
+}
+
+@media (max-width: 768px) {
+  .c-app {
+    grid-template-areas: "logo" "topbar" "body";
+  }
+  .c-app_body {
+    width: 100vw;
+  }
 }
 
 /*------------------------------------*\

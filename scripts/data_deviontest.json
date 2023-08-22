@@ -1,0 +1,24 @@
+{
+  "last_sync": "21/08/2023 14:29:43",
+  "failed_employees": [],
+  "failed_uurcodes": [],
+  "failed_customers": [],
+  "failed_contacts": [
+    198,
+    71,
+    326,
+    234,
+    300,
+    335,
+    177,
+    372,
+    245,
+    375,
+    249,
+    284,
+    351
+  ],
+  "failed_projects": [],
+  "failed_times": [],
+  "failed_mileages": []
+}
