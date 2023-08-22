@@ -455,6 +455,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 List<PurchaseOrderDetailETS> purchaseOrdersLeverancier = purchaseOrders.Where(p => p.LV_COD != null && p.LV_COD.Equals(leverancier)).ToList();
                 FileContentResult fileContent = leverancier switch
                 {
+                    "000174" => helper.CreateFileCebeo(purchaseOrdersLeverancier, config),
                     _ => helper.CreateCSVFile(purchaseOrdersLeverancier)
                 };
                 fileContents.Add(fileContent);

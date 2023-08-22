@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+
 namespace Api.Devion.Helpers.ETS;
 
 public class ETSPurchaseOrderHelper : ETSHelper
@@ -63,6 +69,29 @@ public class ETSPurchaseOrderHelper : ETSHelper
         return new FileContentResult(byteData, "text/csv")
         {
             FileDownloadName = $"{purchaseOrders.FirstOrDefault()?.FD_BONNR}_{purchaseOrders.FirstOrDefault()?.LV_NAM}.csv"
+        };
+    }
+
+    public FileContentResult CreateFileCebeo(List<PurchaseOrderDetailETS> purchaseOrders, ConfigurationManager config)
+    {
+        CebeoXML cebeoXML = new(purchaseOrders, config);
+
+        XmlSerializer xsSubmit = new(typeof(CebeoXML));
+        var xml = "";
+
+        using (var sww = new StringWriter())
+        {
+            using (XmlWriter writer = XmlWriter.Create(sww))
+            {
+                xsSubmit.Serialize(writer, cebeoXML);
+                xml = sww.ToString(); // Your XML
+            }
+        }
+
+        byte[] byteData = Encoding.ASCII.GetBytes(xml);
+        return new FileContentResult(byteData, "text/xml")
+        {
+            FileDownloadName = $"{purchaseOrders.FirstOrDefault()?.FD_BONNR}_{purchaseOrders.FirstOrDefault()?.LV_NAM}.xml"
         };
     }
 }
