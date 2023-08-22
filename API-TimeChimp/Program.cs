@@ -7,6 +7,11 @@ ConfigurationManager config = builder.Configuration;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigin", builder => builder.AllowAnyOrigin());
+});
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -15,7 +20,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+app.UseCors("AllowAllOrigin");
 
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
