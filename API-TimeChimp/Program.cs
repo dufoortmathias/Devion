@@ -410,13 +410,61 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            Dictionary<string, object> purchaseOrder = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrder(id);
-            return Results.Ok(purchaseOrder);
+            List<PurchaseOrderDetailETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrderDetails(id);
+
+            //convert to a dictionary for the web
+            Dictionary<string, object> result = new()
+        {
+            {"bonNummer", purchaseOrders.FirstOrDefault()?.FD_BONNR},
+            {"artikels", new List<Dictionary<string, object>>()},
+            {"klant", purchaseOrders.FirstOrDefault()?.KLANTNAAM},
+            {"project", purchaseOrders.FirstOrDefault()?.FD_PROJ},
+            {"subproject", purchaseOrders.FirstOrDefault()?.FD_SUBPROJ}
+        };
+            foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders.Where(p => p.FD_ARTNR != null))
+            {
+                ((List<Dictionary<string, object>>)result["artikels"]).Add(new()
+            {
+                {"artikelNummer", purchaseOrder.FD_ARTNR},
+                {"omschrijving", purchaseOrder.FD_OMS},
+                {"aantal", purchaseOrder.FD_AANTAL.Value},
+                {"leverancier", purchaseOrder.LV_NAM}
+            });
+            }
+
+            return Results.Ok(result);
         }
         catch (Exception e)
         {
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}GetPurchaseOrder");
+
+    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id) =>
+    {
+        try
+        {
+            ETSPurchaseOrderHelper helper = new ETSPurchaseOrderHelper(ETSClient);
+
+            List<PurchaseOrderDetailETS> purchaseOrders = helper.GetPurchaseOrderDetails(id);
+            List<string> leveranciers = purchaseOrders.Select(p => p.LV_COD).Distinct().ToList();
+
+            List<FileContentResult> fileContents = new();
+            foreach (string leverancier in leveranciers)
+            {
+                List<PurchaseOrderDetailETS> purchaseOrdersLeverancier = purchaseOrders.Where(p => p.LV_COD != null && p.LV_COD.Equals(leverancier)).ToList();
+                FileContentResult fileContent = leverancier switch
+                {
+                    _ => helper.CreateCSVFile(purchaseOrdersLeverancier)
+                };
+                fileContents.Add(fileContent);
+            }
+            return Results.Ok(fileContents);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+}).WithName($"{company}CreatePurchaseFile");
 }
 app.Run();
