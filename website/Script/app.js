@@ -1,6 +1,10 @@
 //#region *** DOM references ***********
-const baseUrl = "https://192.168.100.237:7223/api";
+const baseUrl = "https://192.168.100.237:5001/api";
 let htmlButton, htmlBestelbonSelect, htmlBedrijfSelect;
+
+const config = {
+    credentials: "include"
+};
 //#endregion
 
 //#region *** Callback-Visualisation - show___ ***********
@@ -25,14 +29,31 @@ const showBestelbonnen = function (jsonObject) {
 
 //#region *** Data Access - get___ ***********
 const getData = async function (endpoint) {
-    console.log(endpoint)
-    const data = await fetch(endpoint).then(r => r.json()).catch(err => console.error(err));
-    return data;
+    console.log(endpoint);
+
+    try {
+        const response = await fetch(endpoint, config);
+
+        if (!response.ok) {
+            throw new Error(`API request failed with status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(JSON.stringify(data)); // Log the fetched data
+        return data;
+    } catch (error) {
+        console.error('An error occurred during the fetch:', error);
+        throw error; // Re-throw the error to handle it in the calling code if needed
+    }
 };
 
 const getBestelbonnen = async function (bedrijfId) {
-    const data = await getData(`${baseUrl}/${bedrijfId}/ets/openpurchaseorderids`);
-    showBestelbonnen(data);
+    const data = await getData(`${baseUrl}/${bedrijfId}/ets/customerids?datestring=1/01/2022`);
+    if (data != null) {
+        showBestelbonnen(data);
+    } else {
+        console.error("no data from api call with endpoint: " + `${baseUrl}/${bedrijfId}/ets/openpurchaseorderids`);
+    }
 };
 //#endregion
 
