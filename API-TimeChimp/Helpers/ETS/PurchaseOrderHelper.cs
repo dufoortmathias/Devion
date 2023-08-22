@@ -30,8 +30,8 @@ public class ETSPurchaseOrderHelper : ETSHelper
     {
         //create query
         string query = $"SELECT LVPX.LV_NAM, CSFDPX.* FROM CSFDPX " +
-            $"INNER JOIN CSARTPX on CSFDPX.FD_ARTNR = CSARTPX.ART_NR " +
-            $"INNER JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 " +
+            $"LEFT JOIN CSARTPX ON CSFDPX.FD_ARTNR = CSARTPX.ART_NR " +
+            $"LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 " +
             $"WHERE FD_BONNR = '{id}' AND FD_CODE = 'V'";
 
         //get data from ETS
