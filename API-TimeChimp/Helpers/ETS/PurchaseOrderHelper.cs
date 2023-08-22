@@ -55,7 +55,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
             // Add data to the CSV file
             var first = purchaseOrder.FD_ARTNR;
             var second = purchaseOrder.FD_AANTAL.Value;
-            var newLine = string.Format("{0},{1}", first, second);
+            var newLine = string.Format("{0}, {1}", first, second);
             csv.AppendLine(newLine);
         }
 
