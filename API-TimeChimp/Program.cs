@@ -143,7 +143,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-}).WithName($"{company}SyncContactTimechimp");
+    }).WithName($"{company}SyncContactTimechimp");
 
     //get uurcodes from ets
     app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) => { try { return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetUurcodesFromETS");
