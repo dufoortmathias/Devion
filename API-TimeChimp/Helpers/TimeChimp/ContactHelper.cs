@@ -11,7 +11,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
     //check if contact exists
     public bool ContactExists(ContactETS contactETS)
     {
-        return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_CONTACTPERSOON) && ((contact.email == null && contactETS.CO_EMAIL == null) || contact.email.Equals(contactETS.CO_EMAIL)));
+        return GetContacts().Any(contact => contact.name.Equals(contactETS.CO_CONTACTPERSOON) && ((contact.email == null && contactETS.CO_EMAIL == null) || (contact.email != null && contact.email.Equals(contactETS.CO_EMAIL))));
     }
 
     //get all contacts

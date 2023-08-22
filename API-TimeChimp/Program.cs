@@ -253,15 +253,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // Change to TimeChimp class
             ProjectTimeChimp TCProject = new(ETSProject);
 
+            CustomerTimeChimp customer;
             // Find customer id TimeChimpETSContact.CO_KLCOD
             if (ETSProject.PR_KLNR == null)
             {
-                CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
-                TCProject.customerId = customer.id.Value;
+                customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
             } else
             {
-                TCProject.customerId = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)).id.Value;
+                customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
             }
+            TCProject.customerId = customer.id.Value;
 
             ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId);
 
@@ -386,5 +387,30 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}GetMileagesFromETS");
+
+    app.MapGet($"/api/{company.ToLower()}/ets/openpurchaseorderids", () =>
+    {
+        try
+        {
+            List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
+            return Results.Ok(purchaseOrders.Select(p => p.FH_BONNR));
+        } catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}GetOpenPurchaseOrderIds");
+
+    app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
+    {
+        try
+        {
+            Dictionary<string, object> purchaseOrder = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrder(id);
+            return Results.Ok(purchaseOrder);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}GetPurchaseOrder");
 }
 app.Run();
