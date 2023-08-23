@@ -29,11 +29,33 @@ public class ETSMileageHelper : ETSHelper
     //add a mileage
     public MileageETS UpdateMileage(MileageETS mileage)
     {
+        string queryGet;
+        Dictionary<string, object> parametersGet;
         //create query to get mileages data from ETS that belong to current TimeChimp mileage
-        string queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = '{mileage.PLA_PROJECT}' AND PLA_SUBPROJECT {(mileage.PLA_SUBPROJECT.Length == 0 ? "IS NULL" : "= " + mileage.PLA_SUBPROJECT)} AND PLA_START LIKE '{mileage.PLA_START:yyyy-MM-dd}%' AND PLA_PERSOON = '{mileage.PLA_PERSOON}';";
+        if (mileage.PLA_SUBPROJECT.Length == 0)
+        {
+            queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = @project AND PLA_SUBPROJECT IS NULL AND PLA_START LIKE @start AND PLA_PERSOON = @persoon;";
+            parametersGet = new()
+            {
+                {"@project",  mileage.PLA_PROJECT},
+                {"@start", $"{mileage.PLA_START:yyyy-MM-dd}%" },
+                {"@persoon", mileage.PLA_PERSOON }
+            };
+        } else
+        {
+
+            queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = @project AND PLA_SUBPROJECT = @subproject AND PLA_START LIKE @start AND PLA_PERSOON = @persoon;";
+            parametersGet = new()
+            {
+                {"@project",  mileage.PLA_PROJECT},
+                {"@subproject", mileage.PLA_SUBPROJECT },
+                {"@start", $"{mileage.PLA_START:yyyy-MM-dd}%" },
+                {"@persoon", mileage.PLA_PERSOON }
+            };
+        }
 
         //get data from ETS
-        string responseGet = ETSClient.selectQuery(queryGet);
+        string responseGet = ETSClient.selectQuery(queryGet, parametersGet);
 
         //check if response is succesfull
         if (responseGet == null)
@@ -43,17 +65,24 @@ public class ETSMileageHelper : ETSHelper
 
         //convert first data  record to mileageETS object
         //the first mileage data object from ETS is always used to store new mileage registrations 
-        MileageETS mileageETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet).First();
+        MileageETS mileageETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet).First() ?? throw new Exception("No time record found in ETS");
 
         mileage.PLA_KM += mileageETS.PLA_KM;
         mileage.PLA_ID = mileageETS.PLA_ID;
 
 
         //update query
-        string query = $"UPDATE tbl_planning SET PLA_KM = {mileage.PLA_KM}, PLA_KM_DERDEN = '{mileage.PLA_KM_DERDEN}', PLA_KM_VERGOEDING = '{mileage.PLA_KM_VERGOEDING}' WHERE PLA_ID = {mileage.PLA_ID};";
+        string query = $"UPDATE tbl_planning SET PLA_KM = @km, PLA_KM_DERDEN = @derden, PLA_KM_VERGOEDING = @vergoeding WHERE PLA_ID = @id;";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@km",  mileage.PLA_KM},
+            {"@derden", mileage.PLA_KM_DERDEN },
+            {"@vergoeding", mileage.PLA_KM_VERGOEDING },
+            {"@id", mileage.PLA_ID}
+        };
 
         //send data to ETS
-        ETSClient.updateQuery(query);
+        ETSClient.updateQuery(query, parameters);
 
         return mileage;
     }

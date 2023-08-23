@@ -9,10 +9,14 @@ public class ETSUurcodeHelper : ETSHelper
     // get all uurcodes that are changed after the given date
     public List<string> GetUurcodes(DateTime date)
     {
-        string query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD LIKE '0%' AND DATE_CHANGED >= '{date:MM / dd / yyyy HH: mm}'";
+        string query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD LIKE '0%' AND DATE_CHANGED >= @date";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@date",  date}
+        };
 
         //get data from ETS
-        string response = ETSClient.selectQuery(query);
+        string response = ETSClient.selectQuery(query, parameters);
 
         //check if json is not empty
         if (response == null)
@@ -35,10 +39,14 @@ public class ETSUurcodeHelper : ETSHelper
     // get uurcode by uurcodeId
     public UurcodeETS GetUurcode(string uurcodeId)
     {
-        string query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD = '{uurcodeId}'";
+        string query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD = @uurcode";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@uurcode",  uurcodeId}
+        };
 
         //get data from ETS
-        string response = ETSClient.selectQuery(query);
+        string response = ETSClient.selectQuery(query, parameters);
 
         //check if json is not empty
         if (response == null)

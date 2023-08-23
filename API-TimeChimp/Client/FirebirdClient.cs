@@ -11,7 +11,7 @@ public class FirebirdClientETS
     }
 
     //select query
-    public string selectQuery(string query)
+    public string selectQuery(string query, Dictionary<string, object> parameters)
     {
         //create connection
         FbConnection connection = new(_connectionString);
@@ -19,6 +19,12 @@ public class FirebirdClientETS
         //create list for the values
         List<Dictionary<string, object>> values = new();
         using FbCommand command = new(query, connection);
+
+        foreach (KeyValuePair<string, object> record in parameters)
+        {
+            command.Parameters.AddWithValue(record.Key, record.Value);
+        }
+
         //open the connection
         connection.Open();
 
@@ -45,33 +51,51 @@ public class FirebirdClientETS
         return json;
     }
 
+    //select query without input files
+    public string selectQuery(string query)
+    {
+        return selectQuery(query, new());
+    }
+
     //insert query
-    public void insertQuery(string query)
+    public void insertQuery(string query, Dictionary<string, object> parameters)
     {
         //create connection
         FbConnection connection = new(_connectionString);
         using FbCommand command = new(query, connection);
+
+        foreach (KeyValuePair<string, object> record in parameters)
+        {
+            command.Parameters.AddWithValue(record.Key, record.Value);
+        }
+
         //open the connection
         connection.Open();
 
         //execute the insert query
-        //_ = command.ExecuteNonQuery();
+        _ = command.ExecuteNonQuery();
 
         //close the connection
         connection.Close();
     }
 
     //update query
-    public void updateQuery(string query)
+    public void updateQuery(string query, Dictionary<string, object> parameters)
     {
         //create connection
         FbConnection connection = new(_connectionString);
         using FbCommand command = new(query, connection);
+
+        foreach (KeyValuePair<string, object> record in parameters)
+        {
+            command.Parameters.AddWithValue(record.Key, record.Value);
+        }
+
         //open the connection
         connection.Open();
 
         //execute the insert query
-        //_ = command.ExecuteNonQuery();
+        _ = command.ExecuteNonQuery();
 
         //close the connection
         connection.Close();

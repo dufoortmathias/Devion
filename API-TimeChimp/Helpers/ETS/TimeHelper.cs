@@ -29,8 +29,14 @@ public class ETSTimeHelper : ETSHelper
         foreach (TimeETS time in times)
         {
             //get data from ETS for the employee
-            query = $"select PN_NAM from J2W_PNPX where PN_ID = {time.PLA_PERSOON}";
-            string json = ETSClient.selectQuery(query);
+            query = $"select PN_NAM from J2W_PNPX where PN_ID = @persoon";
+            Dictionary<string, object> parameters = new()
+            {
+                {"@persoon",  time.PLA_PERSOON},
+            };
+
+
+            string json = ETSClient.selectQuery(query, parameters);
 
             //check if json is not empty
             if (json == null)
@@ -84,13 +90,25 @@ public class ETSTimeHelper : ETSHelper
 
         //create the query
         string query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE, PLA_KM, PLA_KM_HEEN_TERUG, PLA_KM_VERGOEDING) " +
-                    $"VALUES ({timeETS.PLA_ID}, {timeETS.PLA_KLEUR}, '{timeETS.PLA_CAPTION}', '{timeETS.PLA_START.Value:yyyy-MM-dd HH:mm:ss}', " +
-                    $"'{timeETS.PLA_EINDE.Value:yyyy-MM-dd HH:mm:ss}', '{timeETS.PLA_KM_PAUZE}', '{timeETS.PLA_TEKST}', " +
-                    $"'{timeETS.PLA_PROJECT}', '{timeETS.PLA_SUBPROJECT}', '{timeETS.PLA_PERSOON}', '{timeETS.PLA_KLANT}', '{timeETS.PLA_UURCODE}', " +
-                    $"0, 0, 0)";
+                    $"VALUES (@id, @kleur, @caption, @start, @eind, @pauze, @tekst, @project, @subproject, @persoon, @klant, @uurcode, 0, 0, 0)";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@id", timeETS.PLA_ID},
+            {"@kleur", timeETS.PLA_KLEUR},
+            {"@caption", timeETS.PLA_CAPTION},
+            {"@start", timeETS.PLA_START},
+            {"@eind", timeETS.PLA_EINDE},
+            {"@pauze", timeETS.PLA_KM_PAUZE},
+            {"@tekst",  timeETS.PLA_TEKST},
+            {"@project", timeETS.PLA_PROJECT },
+            {"@subproject", timeETS.PLA_SUBPROJECT },
+            {"@persoon", timeETS.PLA_PERSOON },
+            {"@klant", timeETS.PLA_KLANT },
+            {"@uurcode", timeETS.PLA_UURCODE }
+        };
 
         //send data to ETS
-        ETSClient.insertQuery(query);
+        ETSClient.insertQuery(query, parameters);
 
         //check if response is succcesfull
         return response ?? throw new Exception("Error adding time to ETS with query: " + query);

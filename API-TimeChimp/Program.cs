@@ -430,4 +430,4 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
 
-app.Run("https://192.168.100.237:5001");
+app.Run();

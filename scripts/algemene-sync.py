@@ -54,7 +54,6 @@ global json_data
 
 current_dir = os.path.dirname(__file__)
 data_file = os.path.join(current_dir, data_filename)
-print(data_file)
 if os.path.exists(data_file):
     with open(data_file, "r") as json_file:
         try:

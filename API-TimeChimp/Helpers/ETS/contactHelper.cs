@@ -10,10 +10,15 @@ public class ETSContactHelper : ETSHelper
     public int[] GetContactIdsChangedAfter(DateTime date)
     {
         //create query
-        string query = $"SELECT C_CODE FROM contact WHERE DATE_CHANGED BETWEEN '{date:MM/dd/yyyy HH:mm}' AND '{DateTime.Now:MM/dd/yyyy HH:mm}'";
+        string query = $"SELECT C_CODE FROM contact WHERE DATE_CHANGED BETWEEN @date AND @dateNow";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@date",  date},
+            {"@dateNow", DateTime.Now }
+        };
 
         //get data from ETS
-        string json = ETSClient.selectQuery(query);
+        string json = ETSClient.selectQuery(query, parameters);
 
         //check if json is not empty
         if (json == null)
@@ -54,10 +59,14 @@ public class ETSContactHelper : ETSHelper
     public ContactETS GetContact(int contactId)
     {
         //create query
-        string query = $"select C.*, F.FUT_OMSCHRIJVING from contact as C left join tbl_functie_taal as F on C.CO_FUNCTIE = F.FUT_ID where c.C_CODE = {contactId}";
+        string query = $"select C.*, F.FUT_OMSCHRIJVING from contact as C left join tbl_functie_taal as F on C.CO_FUNCTIE = F.FUT_ID where c.C_CODE = @contact";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@contact", contactId}
+        };
 
         //data from ETS
-        string response = ETSClient.selectQuery(query);
+        string response = ETSClient.selectQuery(query, parameters);
 
         //check if response is succesfull
         if (response == null)

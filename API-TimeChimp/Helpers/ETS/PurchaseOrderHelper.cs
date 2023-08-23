@@ -1,5 +1,3 @@
-using Swashbuckle.AspNetCore.SwaggerGen;
-
 namespace Api.Devion.Helpers.ETS;
 
 public class ETSPurchaseOrderHelper : ETSHelper
@@ -32,10 +30,14 @@ public class ETSPurchaseOrderHelper : ETSHelper
         string query = $"SELECT LVPX.LV_NAM, CSFDPX.* FROM CSFDPX " +
             $"INNER JOIN CSARTPX on CSFDPX.FD_ARTNR = CSARTPX.ART_NR " +
             $"INNER JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 " +
-            $"WHERE FD_BONNR = '{id}' AND FD_CODE = 'V'";
+            $"WHERE FD_BONNR = @id AND FD_CODE = 'V'";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@id",  id}
+        };
 
         //get data from ETS
-        string json = ETSClient.selectQuery(query);
+        string json = ETSClient.selectQuery(query, parameters);
 
         //check if json is not empty
         if (json == null)

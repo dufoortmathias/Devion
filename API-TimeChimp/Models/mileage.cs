@@ -45,8 +45,7 @@ public class MileageETS
         PLA_PROJECT = project[..Math.Min(project.Length, 7)];
         PLA_SUBPROJECT = project[7..];
         PLA_START = mileage.date.Date;
-        string persoon = employeeNumber;
-        PLA_PERSOON = persoon[^4..];
+        PLA_PERSOON = employeeNumber[^4..];
         if (mileage.vehicleName == null)
         {
             throw new Exception($"In TimeChimp mileage with id \"{mileage.id}\" doesn't has a vehicle assigned");

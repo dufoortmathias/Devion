@@ -10,10 +10,14 @@
         public ProjectETS GetProject(string projectId)
         {
             //create query
-            string query = $"SELECT * FROM PROJPX WHERE PR_NR = {projectId}";
+            string query = $"SELECT * FROM PROJPX WHERE PR_NR = @id";
+            Dictionary<string, object> parameters = new()
+        {
+            {"@id",  projectId}
+        };
 
             //get data from ETS
-            string json = ETSClient.selectQuery(query);
+            string json = ETSClient.selectQuery(query, parameters);
 
             //check if json is not empty
             if (json == null)
@@ -30,10 +34,14 @@
         public List<SubprojectETS> GetSubprojects(string projectId)
         {
             //create query
-            string query = $"SELECT * FROM SUBPROJ WHERE VOLNR like '{projectId}%'";
+            string query = $"SELECT * FROM SUBPROJ WHERE VOLNR like @id";
+            Dictionary<string, object> parameters = new()
+        {
+            {"@id",  $"{projectId}%"}
+        };
 
             //get data from ETS
-            string json = ETSClient.selectQuery(query);
+            string json = ETSClient.selectQuery(query, parameters);
 
             //check if json is not empty
 
@@ -46,10 +54,15 @@
         public string[] GetProjectIdsChangedAfter(DateTime date)
         {
             //create query
-            string query = $"SELECT PROJPX.PR_NR FROM PROJPX WHERE DATE_CHANGED BETWEEN '{date:MM/dd/yyyy HH:mm}' AND '{DateTime.Now:MM/dd/yyyy HH:mm}'";
+            string query = $"SELECT PROJPX.PR_NR FROM PROJPX WHERE DATE_CHANGED BETWEEN @date AND @dateNow";
+            Dictionary<string, object> parameters = new()
+            {
+                {"@date",  date },
+                {"@dateNow", DateTime.Now }
+            };
 
             //get data from ETS
-            string json = ETSClient.selectQuery(query);
+            string json = ETSClient.selectQuery(query, parameters);
 
             //check if json is not empty
             if (json == null)

@@ -10,10 +10,15 @@ public class ETSCustomerHelper : ETSHelper
     public string[] GetCustomerIdsChangedAfter(DateTime date)
     {
         //create query
-        string query = $"SELECT KL_COD FROM KLPX WHERE DATE_CHANGED BETWEEN '{date:MM/dd/yyyy HH:mm}' AND '{DateTime.Now:MM/dd/yyyy HH:mm}'";
+        string query = $"SELECT KL_COD FROM KLPX WHERE DATE_CHANGED BETWEEN @date AND @dateNow";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@date",  date},
+            {"@dateNow", DateTime.Now }
+        };
 
         //get data from ETS
-        string json = ETSClient.selectQuery(query);
+        string json = ETSClient.selectQuery(query, parameters);
 
         //check if json is not empty
         if (json == null)
@@ -32,7 +37,7 @@ public class ETSCustomerHelper : ETSHelper
     public List<CustomerETS> GetCustomers()
     {
         //create query
-        string query = "select K.KL_COD, K.KL_NAM, K.KL_OPV, K.KL_STR, K.KL_PNR, K.KL_WPL, K.KL_LND, K.KL_TEL, K.KL_FAX, K.KL_TEX, K.KL_EMAIL, K.KL_WEBPAGE, K.KL_T, K.KL_BTW, K.KL_TYP, K.KL_BOE, K.KL_VRIJ1, K.KL_MNT, BM.BM_OMS, BV.BVW_CODE, BC.BEL_CODE, R.REK_CODE, KL_SLECHTBET from KLPX as K left join betaalmiddel as BM on K.KL_WIJZEBET = BM.BM_CODE left join tbl_betalingsvoorwaarde as BV on K.kl_betalingsvoorwaarde_id = BV.BVW_ID left join tbl_belasting_code as BC on K.kl_belasting_code_id = BC.BEL_ID left join tbl_rekening as R on K.kl_rekening_id = R.REK_ID; ";
+        string query = "select K.*, BM.BM_OMS, BV.BVW_CODE, BC.BEL_CODE, R.REK_CODE from KLPX as K left join betaalmiddel as BM on K.KL_WIJZEBET = BM.BM_CODE left join tbl_betalingsvoorwaarde as BV on K.kl_betalingsvoorwaarde_id = BV.BVW_ID left join tbl_belasting_code as BC on K.kl_belasting_code_id = BC.BEL_ID left join tbl_rekening as R on K.kl_rekening_id = R.REK_ID; ";
 
         //get data from ETS
         string json = ETSClient.selectQuery(query);
@@ -53,10 +58,14 @@ public class ETSCustomerHelper : ETSHelper
     public CustomerETS GetCustomer(string customerId)
     {
         //create query
-        string query = $"select K.KL_COD, K.KL_NAM, K.KL_OPV, K.KL_STR, K.KL_PNR, K.KL_WPL, K.KL_LND, K.KL_TEL, K.KL_FAX, K.KL_TEX, K.KL_EMAIL, K.KL_WEBPAGE, K.KL_T, K.KL_BTW, K.KL_TYP, K.KL_BOE, K.KL_VRIJ1, K.KL_MNT, BM.BM_OMS, BV.BVW_CODE, BC.BEL_CODE, R.REK_CODE, KL_SLECHTBET from KLPX as K left join betaalmiddel as BM on K.KL_WIJZEBET = BM.BM_CODE left join tbl_betalingsvoorwaarde as BV on K.kl_betalingsvoorwaarde_id = BV.BVW_ID left join tbl_belasting_code as BC on K.kl_belasting_code_id = BC.BEL_ID left join tbl_rekening as R on K.kl_rekening_id = R.REK_ID where K.KL_COD = {customerId}";
+        string query = $"select K.*, BM.BM_OMS, BV.BVW_CODE, BC.BEL_CODE, R.REK_CODE from KLPX as K left join betaalmiddel as BM on K.KL_WIJZEBET = BM.BM_CODE left join tbl_betalingsvoorwaarde as BV on K.kl_betalingsvoorwaarde_id = BV.BVW_ID left join tbl_belasting_code as BC on K.kl_belasting_code_id = BC.BEL_ID left join tbl_rekening as R on K.kl_rekening_id = R.REK_ID where K.KL_COD = @customer";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@customer",  customerId}
+        };
 
         //get data form ETS
-        string json = ETSClient.selectQuery(query);
+        string json = ETSClient.selectQuery(query, parameters);
 
         //check if json is not empty
         if (json == null)

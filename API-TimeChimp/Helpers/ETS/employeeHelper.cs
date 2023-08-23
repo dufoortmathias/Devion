@@ -34,10 +34,15 @@ public class ETSEmployeeHelper : ETSHelper
             $"SELECT J2W_PNPX.PN_ID " +
             $"FROM J2W_PNPX " +
             $"INNER JOIN TBL_PERSONEEL_PLOEG ON TBL_PERSONEEL_PLOEG.PPL_ID = J2W_PNPX.PN_PERSONEEL_PLOEG_ID " +
-            $"WHERE J2W_PNPX.DATE_CHANGED >= '{date:MM/dd/yyyy HH:mm}' AND TBL_PERSONEEL_PLOEG.PPL_OMSCHRIJVING = '{teamName}'";
+            $"WHERE J2W_PNPX.DATE_CHANGED >= @date AND TBL_PERSONEEL_PLOEG.PPL_OMSCHRIJVING = @teamName";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@date",  date},
+            {"@teamName", teamName }
+        };
 
         //get data from ETS
-        string json = ETSClient.selectQuery(query);
+        string json = ETSClient.selectQuery(query, parameters);
 
         //check if json is not empty
         if (json == null)
@@ -56,10 +61,14 @@ public class ETSEmployeeHelper : ETSHelper
     public EmployeeETS GetEmployee(string employeeId)
     {
         //create query
-        string query = $"select * from J2W_PNPX where PN_ID = {employeeId}";
+        string query = $"select * from J2W_PNPX where PN_ID = @employee";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@employee",  employeeId}
+        };
 
         //get data from ETS
-        string json = ETSClient.selectQuery(query);
+        string json = ETSClient.selectQuery(query, parameters);
 
         //check if json is not empty
         if (json == null)
