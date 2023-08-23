@@ -17,6 +17,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 
+List<string> companies = new();
+
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
@@ -24,6 +26,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
     string company = config[$"Companies:{companyIndex}:Name"];
+    companies.Add(company);
 
     //get customers from timechimp
     //app.MapGet($"/api/{company.ToLower()}/timechimp/customers", () => { try { return Results.Ok(new TimeChimpCustomerHelper(TCClient).GetCustomers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomers");
@@ -388,4 +391,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetMileagesFromETS");
 }
+
+app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
+
 app.Run();
