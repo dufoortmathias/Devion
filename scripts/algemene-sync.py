@@ -34,8 +34,8 @@ if __name__ == "__main__":
 ## Start time script
 start_time = datetime.datetime.now()
 ## Base URL API
-base_URL = f"https://192.168.100.237:5001/api/{company}/"
-## Name of data file that stores information about last time this script
+base_URL = f"http://localhost:5142/api/{company}/"
+## Name of data file that stores information about last time this script 
 data_filename = f"data_{company}.json"
 ## Defines format of how datetime objects should be tranlated to a String
 dateformat = "%d/%m/%Y %H:%M:%S"
