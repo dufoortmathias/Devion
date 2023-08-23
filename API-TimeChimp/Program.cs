@@ -7,15 +7,25 @@ ConfigurationManager config = builder.Configuration;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder => builder.AllowAnyOrigin());
+});
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors("AllowAllOrigins");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
+
+
+
+List<string> companies = new();
 
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
@@ -24,6 +34,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
     string company = config[$"Companies:{companyIndex}:Name"];
+    companies.Add(company);
 
     //get customers from timechimp
     //app.MapGet($"/api/{company.ToLower()}/timechimp/customers", () => { try { return Results.Ok(new TimeChimpCustomerHelper(TCClient).GetCustomers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomers");
@@ -143,7 +154,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-}).WithName($"{company}SyncContactTimechimp");
+    }).WithName($"{company}SyncContactTimechimp");
 
     //get uurcodes from ets
     app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) => { try { return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetUurcodesFromETS");
@@ -258,7 +269,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             if (ETSProject.PR_KLNR == null)
             {
                 customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
-            } else
+            }
+            else
             {
                 customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
             }
@@ -387,5 +399,35 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}GetMileagesFromETS");
+
+    app.MapGet($"/api/{company.ToLower()}/ets/openpurchaseorderids", () =>
+    {
+        try
+        {
+            List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
+            var purchaseOrderIds = purchaseOrders.Select(p => p.FH_BONNR);
+            return Results.Ok(purchaseOrderIds);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}GetOpenPurchaseOrderIds");
+
+    app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
+    {
+        try
+        {
+            Dictionary<string, object> purchaseOrder = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrder(id);
+            return Results.Ok(purchaseOrder);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}GetPurchaseOrder");
 }
-app.Run();
+
+app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
+
+app.Run("https://192.168.100.237:5001");

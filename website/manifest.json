@@ -1,0 +1,10 @@
+{
+    "name": "devion logo",
+    "short_name": "devion",
+    "icons":[{
+        "src": "logo.png",
+        "sizes": "192x192"
+    }],
+    "theme_color": "#ffffff",   
+    "background_color": "#ffffff"
+}
