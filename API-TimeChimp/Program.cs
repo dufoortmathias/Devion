@@ -394,18 +394,20 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetMileagesFromETS");
 
+    //get numbers for all the open purchase orders
     app.MapGet($"/api/{company.ToLower()}/ets/openpurchaseorderids", () =>
     {
         try
         {
             List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
-            return Results.Ok(purchaseOrders.Select(p => p.FH_BONNR));
+            return Results.Ok(purchaseOrders.Select(p => p.FH_BONNR).Distinct());
         } catch (Exception e)
         {
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}GetOpenPurchaseOrderIds");
 
+    //get details about specific purchase order
     app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
     {
         try
@@ -440,6 +442,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetPurchaseOrder");
 
+    //returns file information for each supplier about file needed for order 
     app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id) =>
     {
         try
@@ -455,7 +458,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 List<PurchaseOrderDetailETS> purchaseOrdersLeverancier = purchaseOrders.Where(p => p.LV_COD != null && p.LV_COD.Equals(leverancier)).ToList();
                 FileContentResult fileContent = leverancier switch
                 {
-                    "000174" => helper.CreateFileCebeo(purchaseOrdersLeverancier, config),
+                    "000174" => helper.CreateFileCebeo(purchaseOrdersLeverancier, config), //Cebeo
                     _ => helper.CreateCSVFile(purchaseOrdersLeverancier)
                 };
                 fileContents.Add(fileContent);

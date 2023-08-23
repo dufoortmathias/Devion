@@ -12,10 +12,11 @@ public class ETSPurchaseOrderHelper : ETSHelper
     {
     }
 
+    //get all purchase headers that aren't finished
     public List<PurchaseOrderHeaderETS> GetOpenPurchaseOrders()
     {
         //create query
-        string query = $"SELECT DISTINCT FH_BONNR FROM CSFHPX WHERE FH_GEMAILD = 0 AND FH_gemaild = 0 AND FH_AFGEWERKT = 'N' AND FH_CODE = 'V'";
+        string query = $"SELECT * FROM CSFHPX WHERE FH_GEMAILD = 0 AND FH_gemaild = 0 AND FH_AFGEWERKT = 'N' AND FH_CODE = 'V'";
 
         //get data from ETS
         string json = ETSClient.selectQuery(query);
@@ -30,6 +31,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
         return JsonTool.ConvertTo<List<PurchaseOrderHeaderETS>>(json);
     }
 
+    //get all purchase details for specific purchase order
     public List<PurchaseOrderDetailETS> GetPurchaseOrderDetails(string id)
     {
         //create query
@@ -53,6 +55,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
         return purchaseOrders;
     }
 
+    //creates CSV file with all order information for given purchaseOrders, and returns file information
     public FileContentResult CreateCSVFile(List<PurchaseOrderDetailETS> purchaseOrders)
     {
         var csv = new StringBuilder();
@@ -72,6 +75,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
         };
     }
 
+    //creates XML file with all order information for given purchaseOrders, and returns file information
     public FileContentResult CreateFileCebeo(List<PurchaseOrderDetailETS> purchaseOrders, ConfigurationManager config)
     {
         CebeoXML cebeoXML = new(purchaseOrders, config);
@@ -84,7 +88,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
             using (XmlWriter writer = XmlWriter.Create(sww))
             {
                 xsSubmit.Serialize(writer, cebeoXML);
-                xml = sww.ToString(); // Your XML
+                xml = sww.ToString();
             }
         }
 
