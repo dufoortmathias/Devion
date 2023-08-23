@@ -9,7 +9,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    options.AddPolicy("AllowAllOrigins", builder => builder.AllowAnyOrigin());
 });
 
 WebApplication app = builder.Build();
@@ -17,12 +17,15 @@ WebApplication app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors("AllowAllOrigins");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+
+
+List<string> companies = new();
 
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
@@ -31,6 +34,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
     string company = config[$"Companies:{companyIndex}:Name"];
+    companies.Add(company);
 
     //get customers from timechimp
     //app.MapGet($"/api/{company.ToLower()}/timechimp/customers", () => { try { return Results.Ok(new TimeChimpCustomerHelper(TCClient).GetCustomers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomers");
@@ -423,4 +427,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetPurchaseOrder");
 }
+
+app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
+
 app.Run("https://192.168.100.237:5001");
