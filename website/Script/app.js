@@ -1,5 +1,5 @@
 //#region *** DOM references ***********
-const baseUrl = "https://192.168.100.237:5001/api";
+const baseUrl = "http://192.168.100.237:5001/api";
 let htmlButton, htmlBestelbonSelect, htmlBedrijfSelect, htmltabel;
 
 //#endregion
@@ -47,6 +47,16 @@ const showTabel = function (jsonObject) {
     }
     htmltabel.innerHTML = innerhtml;
 };
+
+const showCompanies = function (jsonObject) {
+    console.log("showCompanies");
+    let innerhtml = "";
+    innerhtml += `<option value="0" disabled selected>Selecteer een bedrijf</option>`;
+    for (const company of jsonObject) {
+        innerhtml += `<option value="${company.toLowerCase()}">${company}</option>`;
+    }
+    htmlBedrijfSelect.innerHTML = innerhtml;
+};
 //#endregion
 
 //#region *** Callback-No Visualisation - callback___ ***********
@@ -66,7 +76,7 @@ const getData = async function (endpoint) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error('An error occurred during the fetch:', error);
+        alert("geen data van api call: " + endpoint + "\n" + error + "\n");
         throw error; // Re-throw the error to handle it in the calling code if needed
     }
 };
@@ -76,7 +86,7 @@ const getBestelbonnen = async function (bedrijfId) {
     if (data != null) {
         showBestelbonnen(data);
     } else {
-        console.error("no data from api call with endpoint: " + `${baseUrl}/${bedrijfId}/ets/openpurchaseorderids`);
+        alert("no data from api call with endpoint: " + `${baseUrl}/${bedrijfId}/ets/openpurchaseorderids`);
     }
 };
 
@@ -85,7 +95,7 @@ const getBestelbon = async function (bestelbonId) {
     if (data != null) {
        showTabel(data);
     } else {
-        console.error("no data from api call with endpoint: " + `${baseUrl}/${htmlBedrijfSelect.value}/ets/purchaseorder?id=${bestelbonId}`);
+        alert("no data from api call with endpoint: " + `${baseUrl}/${htmlBedrijfSelect.value}/ets/purchaseorder?id=${bestelbonId}`);
     }
 };
 
@@ -94,7 +104,16 @@ const getBestelbonFile = async function (bestelbonId) {
     if (data != null) {
         return data;
     } else {
-        console.error("no data from api call with endpoint: " + `${baseUrl}/${htmlBedrijfSelect.value}/ets/createpurchasefile?id=${bestelbonId}`);
+        alert("no data from api call with endpoint: " + `${baseUrl}/${htmlBedrijfSelect.value}/ets/createpurchasefile?id=${bestelbonId}`);
+    }
+};
+
+const getCompanies = async function () {
+    const data = await getData(`${baseUrl}/companies`);
+    if (data != null) {
+        showCompanies(data);
+    } else {
+        alert("no data from api call with endpoint: " + `${baseUrl}/ets/companies`);
     }
 };
 //#endregion
@@ -146,6 +165,7 @@ const init = function () {
 
     listenToList();
     listenToButtons();
+    getCompanies();
 };
 
 document.addEventListener("DOMContentLoaded", init);
