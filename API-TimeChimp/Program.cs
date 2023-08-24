@@ -400,101 +400,103 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetMileagesFromETS");
 
-    //get numbers for all the open purchase orders
-    app.MapGet($"/api/{company.ToLower()}/ets/openpurchaseorderids", () =>
+    if (company.ToLower().Equals("devion"))
     {
-        try
+        //get numbers for all the open purchase orders
+        app.MapGet($"/api/{company.ToLower()}/ets/openpurchaseorderids", () =>
         {
-            List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
-            var purchaseOrderIds = purchaseOrders.Select(p => p.FH_BONNR).Distinct();
-            return Results.Ok(purchaseOrderIds);
-        }
-        catch (Exception e)
-        {
-            return Results.Problem(e.Message);
-        }
-    }).WithName($"{company}GetOpenPurchaseOrderIds");
-
-    //get details about specific purchase order
-    app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
-    {
-        try
-        {
-            List<PurchaseOrderDetailETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrderDetails(id);
-
-            //convert to a dictionary for the web
-            Dictionary<string, object> result = new()
-        {
-            {"bonNummer", purchaseOrders.FirstOrDefault()?.FD_BONNR},
-            {"artikels", new List<Dictionary<string, object>>()},
-            {"klant", purchaseOrders.FirstOrDefault()?.KLANTNAAM},
-            {"project", purchaseOrders.FirstOrDefault()?.FD_PROJ},
-            {"subproject", purchaseOrders.FirstOrDefault()?.FD_SUBPROJ}
-        };
-            foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders.Where(p => p.FD_ARTNR != null))
+            try
             {
-                ((List<Dictionary<string, object>>)result["artikels"]).Add(new()
-            {
-                {"artikelNummer", purchaseOrder.FD_ARTNR},
-                {"omschrijving", purchaseOrder.FD_OMS},
-                {"aantal", purchaseOrder.FD_AANTAL.Value},
-                {"leverancier", purchaseOrder.LV_NAM}
-            });
+                List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
+                var purchaseOrderIds = purchaseOrders.Select(p => p.FH_BONNR).Distinct();
+                return Results.Ok(purchaseOrderIds);
             }
-
-            return Results.Ok(result);
-        }
-        catch (Exception e)
-        {
-            return Results.Problem(e.Message);
-        }
-    }).WithName($"{company}GetPurchaseOrder");
-
-    //returns file information for each supplier about file needed for order 
-    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id) =>
-    {
-        try
-        {
-            ETSPurchaseOrderHelper helper = new ETSPurchaseOrderHelper(ETSClient);
-
-            List<PurchaseOrderDetailETS> purchaseOrders = helper.GetPurchaseOrderDetails(id);
-            List<string> leveranciers = purchaseOrders.Select(p => p.LV_COD).Distinct().ToList();
-
-            List<FileContentResult> fileContents = new();
-            foreach (string leverancier in leveranciers)
+            catch (Exception e)
             {
-                List<PurchaseOrderDetailETS> purchaseOrdersLeverancier = purchaseOrders.Where(p => p.LV_COD != null && p.LV_COD.Equals(leverancier)).ToList();
-                FileContentResult fileContent = leverancier switch
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}GetOpenPurchaseOrderIds");
+
+        //get details about specific purchase order
+        app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
+        {
+            try
+            {
+                List<PurchaseOrderDetailETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrderDetails(id);
+
+                //convert to a dictionary for the web
+                Dictionary<string, object> result = new()
                 {
-                    "000174" => helper.CreateFileCebeo(purchaseOrdersLeverancier, config), //Cebeo
-                    _ => helper.CreateCSVFile(purchaseOrdersLeverancier)
+                    {"bonNummer", purchaseOrders.FirstOrDefault()?.FD_BONNR},
+                    {"artikels", new List<Dictionary<string, object>>()},
+                    {"klant", purchaseOrders.FirstOrDefault()?.KLANTNAAM},
+                    {"project", purchaseOrders.FirstOrDefault()?.FD_PROJ},
+                    {"subproject", purchaseOrders.FirstOrDefault()?.FD_SUBPROJ}
                 };
-                fileContents.Add(fileContent);
+                foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders.Where(p => p.FD_ARTNR != null))
+                {
+                    ((List<Dictionary<string, object>>)result["artikels"]).Add(new()
+                    {
+                        {"artikelNummer", purchaseOrder.FD_ARTNR},
+                        {"omschrijving", purchaseOrder.FD_OMS},
+                        {"aantal", purchaseOrder.FD_AANTAL.Value},
+                        {"leverancier", purchaseOrder.LV_NAM}
+                    });
+                }
+
+                return Results.Ok(result);
             }
-            return Results.Ok(fileContents);
-        }
-        catch (Exception e)
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}GetPurchaseOrder");
+
+        //returns file information for each supplier about file needed for order 
+        app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id) =>
         {
-            return Results.Problem(e.Message);
-        }
-    }).WithName($"{company}CreatePurchaseFile");
+            try
+            {
+                ETSPurchaseOrderHelper helper = new ETSPurchaseOrderHelper(ETSClient);
 
+                List<PurchaseOrderDetailETS> purchaseOrders = helper.GetPurchaseOrderDetails(id);
+                List<string> leveranciers = purchaseOrders.Select(p => p.LV_COD).Distinct().ToList();
 
-    app.MapGet($"/api/{company.ToLower()}/cebeo/artikels", () =>
-    {
-        try
+                List<FileContentResult> fileContents = new();
+                foreach (string leverancier in leveranciers)
+                {
+                    List<PurchaseOrderDetailETS> purchaseOrdersLeverancier = purchaseOrders.Where(p => p.LV_COD != null && p.LV_COD.Equals(leverancier)).ToList();
+                    FileContentResult fileContent = leverancier switch
+                    {
+                        "000174" => helper.CreateFileCebeo(purchaseOrdersLeverancier, config), //Cebeo //TODO find better way to check if order is for cebeo
+                        _ => helper.CreateCSVFile(purchaseOrdersLeverancier)
+                    };
+                    fileContents.Add(fileContent);
+                }
+                return Results.Ok(fileContents);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}CreatePurchaseFile");
+
+        app.MapGet($"/api/{company.ToLower()}/cebeo/artikels", () =>
         {
-            var json = ETSClient.selectQuery("select distinct art_nr from csartpx where art_lev1 = '000174'");
+            try
+            {
+                var json = ETSClient.selectQuery("select distinct art_nr from csartpx where art_lev1 = '000174'");
 
-            string[] artikels = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).Select(d => d["ART_NR"]).ToArray();
+                string[] artikels = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).Select(d => d["ART_NR"]).ToArray();
 
-            return Results.Ok(artikels);
-        }
-        catch (Exception e)
-        {
-            return Results.Problem(e.Message);
-        }
-    }).WithName($"{company}GetArtikels");
+                return Results.Ok(artikels);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}GetArtikels");
+    }
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
