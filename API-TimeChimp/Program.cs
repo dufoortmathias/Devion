@@ -426,6 +426,23 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}GetPurchaseOrder");
+
+
+    app.MapGet($"/api/{company.ToLower()}/cebeo/artikels", () =>
+    {
+        try
+        {
+            var json = ETSClient.selectQuery("select distinct art_nr from csartpx where art_lev1 = '000174'");
+
+            string[] artikels = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).Select(d => d["ART_NR"]).ToArray();
+
+            return Results.Ok(artikels);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}GetArtikels");
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
