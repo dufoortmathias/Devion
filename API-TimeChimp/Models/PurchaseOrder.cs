@@ -523,5 +523,6 @@ public class PurchaseOrderDetailETS
     public object? FD_POSITIE { get; set; }
     public object? FD_VRIJ_VELD1_NUMERIEK { get; set; }
     public object? FD_VRIJ_VELD2_NUMERIEK { get; set; }
+    public string? LV_COD { get; set; }
     public string? LV_NAM { get; set; }
 }
