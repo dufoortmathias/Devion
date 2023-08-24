@@ -16,6 +16,8 @@
 
     <!-- Script -->
     <script src="Script/app.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   </head>
   <body>
     <svg
@@ -84,10 +86,6 @@
               id="bestelbon"
             >
               <option value="" disabled selected hidden>bestelbon</option>
-              <option value="002244" onselect="ChangeButtonToActive()">
-                002244
-              </option>
-              <option value="123456">123456</option>
             </select>
             <svg
               class="c-custom-select__symbol"
@@ -109,6 +107,7 @@
           </button>
           <div class="c-app__tabel js-tabel o-hide-accessible">
             <h2 class="c-label--tabel"> Bestelbon </h2>
+            <h3 class="c-label--error o-hide o-hide-accessible"></h3>
             <h3 class="c-label--tabel"> Ancon </h3>
             <table class="c-tabel">
               <tr>
