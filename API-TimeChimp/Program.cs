@@ -88,7 +88,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     //app.MapGet($"/api/{company.ToLower()}/timechimp/projectusers", () => { try { return Results.Ok(new TimeChimpProjectUserHelper(TCClient).GetProjectUsers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetProjectUsers");
 
     //get customerids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (string dateString) => { try { return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomerIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (string dateString) => { 
+        try 
+        { 
+            return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); 
+        } 
+        catch (Exception e) 
+        { 
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetCustomerIds").WithTags(company);
 
     //sync customer from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/synccustomer", (string customerId) =>
@@ -118,10 +127,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncCustomerTimechimp");
+    }).WithName($"{company}SyncCustomerTimechimp").WithTags(company);
 
     //get contactids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/contactids", (string dateString) => { try { return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetContactIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/contactids", (string dateString) => { 
+        try 
+        { 
+            return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))); 
+        } 
+        catch (Exception e) 
+        { 
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetContactIds").WithTags(company);
 
     //sync contact from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/synccontact", (int contactId) =>
@@ -154,10 +172,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncContactTimechimp");
+    }).WithName($"{company}SyncContactTimechimp").WithTags(company); ;
 
     //get uurcodes from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) => { try { return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetUurcodesFromETS");
+    app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) => { 
+        try 
+        { 
+            return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString)));
+        } 
+        catch (Exception e) 
+        { 
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetUurcodesFromETS").WithTags(company);
 
     //sync uurcodes from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/syncuurcode", (string uurcodeId) =>
@@ -187,10 +214,18 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}UpdateUurcodes");
+    }).WithName($"{company}UpdateUurcodes").WithTags(company);
 
     //get employeeids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (string dateString, string teamName) => { try { return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetEmployeeIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (string dateString, string teamName) => { 
+        try { 
+            return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName)); 
+        } 
+        catch (Exception e) 
+        { 
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetEmployeeIds").WithTags(company);
 
     //sync employee from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/syncemployee", (string employeeId) =>
@@ -239,10 +274,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(exception.Message);
         }
 
-    }).WithName($"{company}SyncEmployeeTimechimp");
+    }).WithName($"{company}SyncEmployeeTimechimp").WithTags(company);
 
     //get projectids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/projectids", (string dateString) => { try { return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetProjectIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/projectids", (string dateString) => { 
+        try { 
+            return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))); 
+        } catch (Exception e) {
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetProjectIds").WithTags(company);
 
     //sync project from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/syncproject", (string projectId) =>
@@ -322,10 +363,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncProjectTimechimp");
+    }).WithName($"{company}SyncProjectTimechimp").WithTags(company); ;
 
     //get timesids from timechimp
-    app.MapGet($"/api/{company.ToLower()}/ets/timeids", (string dateString) => { try { return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetTimeIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/timeids", (string dateString) => { 
+        try { 
+            return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString))); 
+        } catch (Exception e) {
+            return Results.Problem(e.Message);
+        } 
+    }).WithName($"{company}GetTimeIds").WithTags(company); ;
 
     //sync time from timechimp to ets
     app.MapPost($"/api/{company.ToLower()}/ets/synctime", (int timeId) =>
@@ -356,7 +403,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncTimeETS");
+    }).WithName($"{company}SyncTimeETS").WithTags(company); ;
 
     //get mileageids from timechimp that were changed after specific time
     app.MapGet($"/api/{company.ToLower()}/ets/mileageids", (string dateString) =>
@@ -369,7 +416,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(exception.Message);
         }
-    }).WithName($"{company}GetMileageIds");
+    }).WithName($"{company}GetMileageIds").WithTags(company); ;
 
     //sync mileages from timechimp to ets
     app.MapPost($"/api/{company.ToLower()}/ets/syncmileage", (int mileageId) =>
@@ -398,7 +445,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}GetMileagesFromETS");
+    }).WithName($"{company}GetMileagesFromETS").WithTags(company); ;
 
     if (company.ToLower().Equals("devion"))
     {
@@ -415,7 +462,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             {
                 return Results.Problem(e.Message);
             }
-        }).WithName($"{company}GetOpenPurchaseOrderIds");
+        }).WithName($"{company}GetOpenPurchaseOrderIds").WithTags(company);
 
         //get details about specific purchase order
         app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
@@ -450,7 +497,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             {
                 return Results.Problem(e.Message);
             }
-        }).WithName($"{company}GetPurchaseOrder");
+        }).WithName($"{company}GetPurchaseOrder").WithTags(company); ;
 
         //returns file information for each supplier about file needed for order 
         app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id) =>
@@ -479,7 +526,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             {
                 return Results.Problem(e.Message);
             }
-        }).WithName($"{company}CreatePurchaseFile");
+        }).WithName($"{company}CreatePurchaseFile").WithTags(company); ;
 
         app.MapGet($"/api/{company.ToLower()}/cebeo/artikels", () =>
         {
@@ -495,7 +542,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             {
                 return Results.Problem(e.Message);
             }
-        }).WithName($"{company}GetArtikels");
+        }).WithName($"{company}GetArtikels").WithTags(company); ;
     }
 }
 
