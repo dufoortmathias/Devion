@@ -30,6 +30,7 @@ List<string> companies = new();
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
+    WebClient webClient = new();
     WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
@@ -538,8 +539,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             try
             {
-                ETSArticleHelper helper = new(ETSClient);
-                List<string> articles = new ETSArticleHelper(ETSClient).GetAriclesSupplier("000174");
+                List<string> articles = new ETSArticleHelper(ETSClient, webClient, config).GetAriclesSupplier("000174");
 
                 return Results.Ok(articles);
             }
@@ -549,13 +549,15 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
         }).WithName($"{company}GetArticles").WithTags(company);
 
-        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumber) =>
+        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleReference) =>
         {
             try
             {
-                float? price = new ETSArticleHelper(ETSClient).GetArticlePriceCebeo(articleNumber, config);
+                ETSArticleHelper helper = new ETSArticleHelper(ETSClient, webClient, config);
+                string articleNumber = helper.GetArticleNumberCebeo(articleReference);
+                float price = helper.GetArticlePriceCebeo(articleNumber) ?? throw new Exception($"Cebeo has no article with number = {articleNumber}");
 
-                return Results.Ok($"{articleNumber}: { price ?? -1}");
+                return Results.Ok(price);
             }
             catch (Exception e)
             {

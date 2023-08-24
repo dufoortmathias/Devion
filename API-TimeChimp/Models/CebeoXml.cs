@@ -41,11 +41,14 @@ public class Material
 
     public Material(string artikelNummer)
     {
-        SupplierItemID = artikelNummer;
+        Reference = artikelNummer;
     }
 
     [XmlElement(ElementName = "SupplierItemID")]
     public string SupplierItemID { get; set; }
+
+    [XmlElement(ElementName = "Reference")]
+    public string Reference { get; set; }
 }
 
 [XmlRoot(ElementName = "OrderLine")]
@@ -95,13 +98,6 @@ public class Order
 [XmlRoot(ElementName = "Get")]
 public class Get
 {
-    public Get() { }
-
-    public Get(string[] articleNumbers)
-    {
-        Material = articleNumbers.Select(a => new Material(a)).ToList();
-    }
-
     [XmlElement(ElementName = "Material")]
     public List<Material> Material { get; set; }
 }
@@ -129,6 +125,22 @@ public class Item
     public int SalesPackQuantity { get; set; }
 }
 
+[XmlRoot(ElementName = "SearchKeywords")]
+public class SearchKeywords
+{
+
+    [XmlElement(ElementName = "Keyword")]
+    public List<string> Keyword { get; set; }
+}
+
+[XmlRoot(ElementName = "BrandKeywords")]
+public class BrandKeywords
+{
+
+    [XmlElement(ElementName = "Keyword")]
+    public List<string> Keyword { get; set; }
+}
+
 [XmlRoot(ElementName = "List")]
 public class List
 {
@@ -140,21 +152,28 @@ public class List
     public List<Item> Item { get; set; }
 }
 
+[XmlRoot(ElementName = "Search")]
+public class Search
+{
+
+    [XmlElement(ElementName = "SearchKeywords")]
+    public SearchKeywords SearchKeywords { get; set; }
+
+    [XmlElement(ElementName = "BrandKeywords")]
+    public BrandKeywords BrandKeywords { get; set; }
+}
+
 [XmlRoot(ElementName = "Article")]
 public class Article
 {
-    public Article() { }
-
-    public Article(string[] articleNumbers)
-    {
-        Get = new(articleNumbers);
-    }
-
     [XmlElement(ElementName = "Get")]
     public Get Get { get; set; }
 
     [XmlElement(ElementName = "List")]
     public List List { get; set; }
+
+    [XmlElement(ElementName = "Search")]
+    public Search Search { get; set; }
 }
 
 
@@ -231,7 +250,38 @@ public class CebeoXML
             Request = new(config)
             {
                 ResponseType = "List",
-                Article = new(new string[] { articleNumber })
+                Article = new()
+                {
+                    Get = new()
+                    {
+                        Material = new Material[] {new() { SupplierItemID = articleNumber }}.ToList()
+                    } 
+                }
+            },
+            Version = config["Cebeo:Version"]
+        };
+
+        return cebeoXML;
+    }
+
+    public static CebeoXML CreateArticleSearchRequest(string articleReference, ConfigurationManager config)
+    {
+        CebeoXML cebeoXML = new()
+        {
+            Request = new(config)
+            {
+                ResponseType = "List",
+                Article = new()
+                {
+                    Search = new()
+                    {
+                        SearchKeywords = new()
+                        {
+                            Keyword = new string[] { articleReference }.ToList()
+                        },
+                        BrandKeywords = new()
+                    }
+                }
             },
             Version = config["Cebeo:Version"]
         };
