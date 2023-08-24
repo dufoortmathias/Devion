@@ -2,9 +2,9 @@
 {
     public abstract class TimeChimpHelper
     {
-        protected BearerTokenHttpClient TCClient;
+        protected WebClient TCClient;
 
-        protected TimeChimpHelper(BearerTokenHttpClient client)
+        protected TimeChimpHelper(WebClient client)
         {
             TCClient = client;
         }

@@ -76,21 +76,9 @@ public class ETSPurchaseOrderHelper : ETSHelper
     //creates XML file with all order information for given purchaseOrders, and returns file information
     public FileContentResult CreateFileCebeo(List<PurchaseOrderDetailETS> purchaseOrders, ConfigurationManager config)
     {
-        CebeoXML cebeoXML = new(purchaseOrders, config);
+        CebeoXML cebeoXML = CebeoXML.CreateOrderRequest(purchaseOrders, config);
 
-        XmlSerializer xsSubmit = new(typeof(CebeoXML));
-        var xml = "";
-
-        using (var sww = new StringWriter())
-        {
-            using (XmlWriter writer = XmlWriter.Create(sww))
-            {
-                xsSubmit.Serialize(writer, cebeoXML);
-                xml = sww.ToString();
-            }
-        }
-
-        byte[] byteData = Encoding.ASCII.GetBytes(xml);
+        byte[] byteData = Encoding.ASCII.GetBytes(cebeoXML.GetXML());
         return new FileContentResult(byteData, "text/xml")
         {
             FileDownloadName = $"{purchaseOrders.FirstOrDefault()?.FD_BONNR}_{purchaseOrders.FirstOrDefault()?.LV_NAM}.xml"

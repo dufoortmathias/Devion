@@ -30,7 +30,7 @@ List<string> companies = new();
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
-    BearerTokenHttpClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
+    WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
     string company = config[$"Companies:{companyIndex}:Name"];
@@ -480,7 +480,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 //convert to a dictionary for the web
                 Dictionary<string, object> result = new()
                 {
-                    {"bonNummer", purchaseOrders.FirstOrDefault()?.FD_BONNR},
+                    {"bonNummer", id},
                     {"artikels", new List<Dictionary<string, object>>()},
                     {"klant", purchaseOrders.FirstOrDefault()?.KLANTNAAM},
                     {"project", purchaseOrders.FirstOrDefault()?.FD_PROJ},
@@ -534,21 +534,34 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
         }).WithName($"{company}CreatePurchaseFile").WithTags(company);
 
-        app.MapGet($"/api/{company.ToLower()}/cebeo/artikels", () =>
+        app.MapGet($"/api/{company.ToLower()}/cebeo/articles", () =>
         {
             try
             {
-                var json = ETSClient.selectQuery("select distinct art_nr from csartpx where art_lev1 = '000174'");
+                ETSArticleHelper helper = new(ETSClient);
+                List<string> articles = new ETSArticleHelper(ETSClient).GetAriclesSupplier("000174");
 
-                string[] artikels = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).Select(d => d["ART_NR"]).ToArray();
-
-                return Results.Ok(artikels);
+                return Results.Ok(articles);
             }
             catch (Exception e)
             {
                 return Results.Problem(e.Message);
             }
-        }).WithName($"{company}GetArtikels").WithTags(company);
+        }).WithName($"{company}GetArticles").WithTags(company);
+
+        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumber) =>
+        {
+            try
+            {
+                float? price = new ETSArticleHelper(ETSClient).GetArticlePriceCebeo(articleNumber, config);
+
+                return Results.Ok($"{articleNumber}: { price ?? -1}");
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}UpdateArticlePrice").WithTags(company);
     }
 }
 

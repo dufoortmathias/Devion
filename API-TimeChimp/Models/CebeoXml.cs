@@ -1,3 +1,4 @@
+using System.Reflection.PortableExecutable;
 using System.Xml.Serialization;
 
 namespace Api.Devion.Models;
@@ -25,75 +26,12 @@ public class Customer
     public string Password { get; set; }
 }
 
-[XmlRoot(ElementName = "OrderDate")]
-public class OrderDate
+[XmlRoot(ElementName = "UnitPrice")]
+public class UnitPrice
 {
 
-    [XmlElement(ElementName = "Day")]
-    public int Day { get; set; }
-
-    [XmlElement(ElementName = "Month")]
-    public int Month { get; set; }
-
-    [XmlElement(ElementName = "Year")]
-    public int Year { get; set; }
-}
-
-[XmlRoot(ElementName = "DeliveryAddress")]
-public class DeliveryAddress
-{
-
-    [XmlElement(ElementName = "DeliverTo")]
-    public string DeliverTo { get; set; }
-
-    [XmlElement(ElementName = "Street")]
-    public string Street { get; set; }
-
-    [XmlElement(ElementName = "City")]
-    public string City { get; set; }
-
-    [XmlElement(ElementName = "PostalCode")]
-    public int PostalCode { get; set; }
-}
-
-[XmlRoot(ElementName = "DeliveryLocation")]
-public class DeliveryLocation
-{
-
-    [XmlElement(ElementName = "DeliveryAddress")]
-    public DeliveryAddress DeliveryAddress { get; set; }
-
-    [XmlElement(ElementName = "ContactPerson")]
-    public string ContactPerson { get; set; }
-
-    [XmlElement(ElementName = "ContactTelephone")]
-    public string ContactTelephone { get; set; }
-}
-
-[XmlRoot(ElementName = "OrderHeader")]
-public class OrderHeader
-{
-
-    [XmlElement(ElementName = "CustomerOrderID")]
-    public string CustomerOrderID { get; set; }
-
-    [XmlElement(ElementName = "CustomerOrderRef")]
-    public string CustomerOrderRef { get; set; }
-
-    [XmlElement(ElementName = "OrderDate")]
-    public OrderDate OrderDate { get; set; }
-
-    [XmlElement(ElementName = "DeliveryLocation")]
-    public DeliveryLocation DeliveryLocation { get; set; }
-
-    [XmlElement(ElementName = "PriceOnDeliveryNote")]
-    public bool PriceOnDeliveryNote { get; set; }
-
-    [XmlElement(ElementName = "DeliveryOption")]
-    public string DeliveryOption { get; set; }
-
-    [XmlElement(ElementName = "Comments")]
-    public List<string> Comments { get; set; }
+    [XmlElement(ElementName = "NetPrice")]
+    public string NetPrice { get; set; }
 }
 
 [XmlRoot(ElementName = "Material")]
@@ -108,35 +46,6 @@ public class Material
 
     [XmlElement(ElementName = "SupplierItemID")]
     public string SupplierItemID { get; set; }
-
-    [XmlElement(ElementName = "BrandCode")]
-    public object BrandCode { get; set; }
-
-    [XmlElement(ElementName = "Reference")]
-    public object Reference { get; set; }
-
-    [XmlElement(ElementName = "ReelCode")]
-    public object ReelCode { get; set; }
-
-    [XmlElement(ElementName = "ReelLength")]
-    public object ReelLength { get; set; }
-
-    [XmlElement(ElementName = "Description")]
-    public object Description { get; set; }
-}
-
-[XmlRoot(ElementName = "RequestedDeliveryDate")]
-public class RequestedDeliveryDate
-{
-
-    [XmlElement(ElementName = "Day")]
-    public int Day { get; set; }
-
-    [XmlElement(ElementName = "Month")]
-    public int Month { get; set; }
-
-    [XmlElement(ElementName = "Year")]
-    public int Year { get; set; }
 }
 
 [XmlRoot(ElementName = "OrderLine")]
@@ -150,31 +59,11 @@ public class OrderLine
         OrderedQuantity = (int) purchaseOrder.FD_AANTAL;
     }
 
-    [XmlElement(ElementName = "CustomerOrderLineID")]
-    public object CustomerOrderLineID { get; set; }
-
     [XmlElement(ElementName = "Material")]
     public Material Material { get; set; }
 
     [XmlElement(ElementName = "OrderedQuantity")]
     public int OrderedQuantity { get; set; }
-
-    [XmlElement(ElementName = "RequestedPrice")]
-    public object RequestedPrice { get; set; }
-
-    [XmlElement(ElementName = "RequestedDeliveryDate")]
-    public RequestedDeliveryDate RequestedDeliveryDate { get; set; }
-}
-
-[XmlRoot(ElementName = "OrderAttribute")]
-public class OrderAttribute
-{
-
-    [XmlAttribute(AttributeName = "name")]
-    public string Name { get; set; }
-
-    [XmlText]
-    public string Text { get; set; }
 }
 
 [XmlRoot(ElementName = "Create")]
@@ -186,14 +75,8 @@ public class Create
         OrderLine = purchaseOrders.Select(p => new OrderLine(p)).ToList();
     }
 
-    [XmlElement(ElementName = "OrderHeader")]
-    public OrderHeader OrderHeader { get; set; }
-
     [XmlElement(ElementName = "OrderLine")]
     public List<OrderLine> OrderLine { get; set; }
-
-    [XmlElement(ElementName = "OrderAttribute")]
-    public OrderAttribute OrderAttribute { get; set; }
 }
 
 [XmlRoot(ElementName = "Order")]
@@ -209,16 +92,80 @@ public class Order
     public Create Create { get; set; }
 }
 
+[XmlRoot(ElementName = "Get")]
+public class Get
+{
+    public Get() { }
+
+    public Get(string[] articleNumbers)
+    {
+        Material = articleNumbers.Select(a => new Material(a)).ToList();
+    }
+
+    [XmlElement(ElementName = "Material")]
+    public List<Material> Material { get; set; }
+}
+
+[XmlRoot(ElementName = "Item")]
+public class Item
+{
+
+    [XmlElement(ElementName = "Material")]
+    public Material Material { get; set; }
+
+    [XmlElement(ElementName = "StockCode")]
+    public string StockCode { get; set; }
+
+    [XmlElement(ElementName = "Stock")]
+    public int Stock { get; set; }
+
+    [XmlElement(ElementName = "UnitOfMeasure")]
+    public string UnitOfMeasure { get; set; }
+
+    [XmlElement(ElementName = "UnitPrice")]
+    public UnitPrice UnitPrice { get; set; }
+
+    [XmlElement(ElementName = "SalesPackQuantity")]
+    public int SalesPackQuantity { get; set; }
+}
+
+[XmlRoot(ElementName = "List")]
+public class List
+{
+
+    [XmlElement(ElementName = "NumberOfLines")]
+    public int NumberOfLines { get; set; }
+
+    [XmlElement(ElementName = "Item")]
+    public List<Item> Item { get; set; }
+}
+
+[XmlRoot(ElementName = "Article")]
+public class Article
+{
+    public Article() { }
+
+    public Article(string[] articleNumbers)
+    {
+        Get = new(articleNumbers);
+    }
+
+    [XmlElement(ElementName = "Get")]
+    public Get Get { get; set; }
+
+    [XmlElement(ElementName = "List")]
+    public List List { get; set; }
+}
+
+
 [XmlRoot(ElementName = "Request")]
 public class Request
 {
     public Request() { }
 
-    public Request(List<PurchaseOrderDetailETS> purchaseOrders, ConfigurationManager config)
+    public Request(ConfigurationManager config)
     {
         Customer = new(config);
-        ResponseType = "Message";
-        Order = new(purchaseOrders);
     }
 
     [XmlElement(ElementName = "Customer")]
@@ -229,25 +176,93 @@ public class Request
 
     [XmlElement(ElementName = "Order")]
     public Order Order { get; set; }
+
+    [XmlElement(ElementName = "Article")]
+    public Article Article { get; set; }
+}
+
+
+[XmlRoot(ElementName = "Response")]
+public class Response
+{
+
+    [XmlElement(ElementName = "Message")]
+    public Message Message { get; set; }
+
+    [XmlElement(ElementName = "Article")]
+    public Article Article { get; set; }
+}
+
+
+[XmlRoot(ElementName = "Message")]
+public class Message
+{
+
+    [XmlAttribute(AttributeName = "code")]
+    public int Code { get; set; }
+
+    [XmlText]
+    public string Text { get; set; }
 }
 
 [XmlRoot(ElementName = "cebeoXML")]
 public class CebeoXML
 {
-    public CebeoXML() { }
 
-    public CebeoXML(List<PurchaseOrderDetailETS> purchaseOrders, ConfigurationManager config)
+    public static CebeoXML CreateOrderRequest(List<PurchaseOrderDetailETS> purchaseOrders, ConfigurationManager config)
     {
-        Request = new(purchaseOrders, config);
-        Version = config["Cebeo:Version"];
+        CebeoXML cebeoXML = new()
+        {
+            Request = new(config)
+            {
+                ResponseType = "Message",
+                Order = new(purchaseOrders)
+            },
+            Version = config["Cebeo:Version"]
+        };
+
+        return cebeoXML;
+    }
+
+    public static CebeoXML CreateArticleRequest(string articleNumber, ConfigurationManager config)
+    {
+        CebeoXML cebeoXML = new()
+        {
+            Request = new(config)
+            {
+                ResponseType = "List",
+                Article = new(new string[] { articleNumber })
+            },
+            Version = config["Cebeo:Version"]
+        };
+
+        return cebeoXML;
     }
 
     [XmlElement(ElementName = "Request")]
     public Request Request { get; set; }
 
+    [XmlElement(ElementName = "Response")]
+    public Response Response { get; set; }
+
     [XmlAttribute(AttributeName = "version")]
     public string Version { get; set; }
 
-    [XmlText]
-    public string Text { get; set; }
+    //creates XML string format of current class object
+    public string GetXML()
+    {
+        XmlSerializer serializer = new(typeof(CebeoXML));
+
+        string xml = "";
+        using (var sww = new StringWriter())
+        {
+            using (XmlWriter writer = XmlWriter.Create(sww))
+            {
+                serializer.Serialize(writer, this);
+                xml = sww.ToString();
+            }
+        }
+
+        return xml;
+    }
 }
