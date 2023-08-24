@@ -21,7 +21,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 
 
@@ -30,7 +30,8 @@ List<string> companies = new();
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
-    BearerTokenHttpClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
+    WebClient webClient = new();
+    WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
     string company = config[$"Companies:{companyIndex}:Name"];
@@ -88,7 +89,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     //app.MapGet($"/api/{company.ToLower()}/timechimp/projectusers", () => { try { return Results.Ok(new TimeChimpProjectUserHelper(TCClient).GetProjectUsers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetProjectUsers");
 
     //get customerids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (string dateString) => { try { return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetCustomerIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (string dateString) => { 
+        try 
+        { 
+            return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); 
+        } 
+        catch (Exception e) 
+        { 
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetCustomerIds").WithTags(company);
 
     //sync customer from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/synccustomer", (string customerId) =>
@@ -118,10 +128,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncCustomerTimechimp");
+    }).WithName($"{company}SyncCustomerTimechimp").WithTags(company);
 
     //get contactids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/contactids", (string dateString) => { try { return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetContactIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/contactids", (string dateString) => { 
+        try 
+        { 
+            return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))); 
+        } 
+        catch (Exception e) 
+        { 
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetContactIds").WithTags(company);
 
     //sync contact from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/synccontact", (int contactId) =>
@@ -154,10 +173,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncContactTimechimp");
+    }).WithName($"{company}SyncContactTimechimp").WithTags(company); ;
 
     //get uurcodes from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) => { try { return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetUurcodesFromETS");
+    app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) => { 
+        try 
+        { 
+            return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString)));
+        } 
+        catch (Exception e) 
+        { 
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetUurcodesFromETS").WithTags(company);
 
     //sync uurcodes from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/syncuurcode", (string uurcodeId) =>
@@ -187,10 +215,18 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}UpdateUurcodes");
+    }).WithName($"{company}UpdateUurcodes").WithTags(company);
 
     //get employeeids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (string dateString, string teamName) => { try { return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName)); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetEmployeeIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (string dateString, string teamName) => { 
+        try { 
+            return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName)); 
+        } 
+        catch (Exception e) 
+        { 
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetEmployeeIds").WithTags(company);
 
     //sync employee from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/syncemployee", (string employeeId) =>
@@ -239,10 +275,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(exception.Message);
         }
 
-    }).WithName($"{company}SyncEmployeeTimechimp");
+    }).WithName($"{company}SyncEmployeeTimechimp").WithTags(company);
 
     //get projectids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/projectids", (string dateString) => { try { return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetProjectIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/projectids", (string dateString) => { 
+        try 
+        {
+            return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))); 
+        } 
+        catch (Exception e) 
+        {
+            return Results.Problem(e.Message); 
+        } 
+    }).WithName($"{company}GetProjectIds").WithTags(company);
 
     //sync project from ets to timechimp
     app.MapPost($"/api/{company.ToLower()}/ets/syncproject", (string projectId) =>
@@ -322,10 +367,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncProjectTimechimp");
+    }).WithName($"{company}SyncProjectTimechimp").WithTags(company);
 
     //get timesids from timechimp
-    app.MapGet($"/api/{company.ToLower()}/ets/timeids", (string dateString) => { try { return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString))); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetTimeIds");
+    app.MapGet($"/api/{company.ToLower()}/ets/timeids", (string dateString) => { 
+        try 
+        { 
+            return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString))); 
+        } 
+        catch (Exception e) 
+        {
+            return Results.Problem(e.Message);
+        } 
+    }).WithName($"{company}GetTimeIds").WithTags(company);
 
     //sync time from timechimp to ets
     app.MapPost($"/api/{company.ToLower()}/ets/synctime", (int timeId) =>
@@ -356,7 +410,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncTimeETS");
+    }).WithName($"{company}SyncTimeETS").WithTags(company);
 
     //get mileageids from timechimp that were changed after specific time
     app.MapGet($"/api/{company.ToLower()}/ets/mileageids", (string dateString) =>
@@ -369,7 +423,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(exception.Message);
         }
-    }).WithName($"{company}GetMileageIds");
+    }).WithName($"{company}GetMileageIds").WithTags(company);
 
     //sync mileages from timechimp to ets
     app.MapPost($"/api/{company.ToLower()}/ets/syncmileage", (int mileageId) =>
@@ -398,34 +452,119 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}GetMileagesFromETS");
+    }).WithName($"{company}GetMileagesFromETS").WithTags(company);
 
-    app.MapGet($"/api/{company.ToLower()}/ets/openpurchaseorderids", () =>
+    if (company.ToLower().Equals("devion"))
     {
-        try
+        //get numbers for all the open purchase orders
+        app.MapGet($"/api/{company.ToLower()}/ets/openpurchaseorderids", () =>
         {
-            List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
-            var purchaseOrderIds = purchaseOrders.Select(p => p.FH_BONNR);
-            return Results.Ok(purchaseOrderIds);
-        }
-        catch (Exception e)
-        {
-            return Results.Problem(e.Message);
-        }
-    }).WithName($"{company}GetOpenPurchaseOrderIds");
+            try
+            {
+                List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
+                var purchaseOrderIds = purchaseOrders.Select(p => p.FH_BONNR).Distinct();
+                return Results.Ok(purchaseOrderIds);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}GetOpenPurchaseOrderIds").WithTags(company);
 
-    app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
-    {
-        try
+        //get details about specific purchase order
+        app.MapGet($"/api/{company.ToLower()}/ets/purchaseorder", (string id) =>
         {
-            Dictionary<string, object> purchaseOrder = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrder(id);
-            return Results.Ok(purchaseOrder);
-        }
-        catch (Exception e)
+            try
+            {
+                List<PurchaseOrderDetailETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrderDetails(id);
+
+                //convert to a dictionary for the web
+                Dictionary<string, object> result = new()
+                {
+                    {"bonNummer", id},
+                    {"artikels", new List<Dictionary<string, object>>()},
+                    {"klant", purchaseOrders.FirstOrDefault()?.KLANTNAAM},
+                    {"project", purchaseOrders.FirstOrDefault()?.FD_PROJ},
+                    {"subproject", purchaseOrders.FirstOrDefault()?.FD_SUBPROJ}
+                };
+                foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders.Where(p => p.FD_ARTNR != null))
+                {
+                    ((List<Dictionary<string, object>>)result["artikels"]).Add(new()
+                    {
+                        {"artikelNummer", purchaseOrder.FD_ARTNR},
+                        {"omschrijving", purchaseOrder.FD_OMS},
+                        {"aantal", purchaseOrder.FD_AANTAL.Value},
+                        {"leverancier", purchaseOrder.LV_NAM}
+                    });
+                }
+
+                return Results.Ok(result);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}GetPurchaseOrder").WithTags(company);
+
+        //returns file information for each supplier about file needed for order 
+        app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id) =>
         {
-            return Results.Problem(e.Message);
-        }
-    }).WithName($"{company}GetPurchaseOrder");
+            try
+            {
+                ETSPurchaseOrderHelper helper = new ETSPurchaseOrderHelper(ETSClient);
+
+                List<PurchaseOrderDetailETS> purchaseOrders = helper.GetPurchaseOrderDetails(id);
+                List<string> leveranciers = purchaseOrders.Select(p => p.LV_COD).Distinct().ToList();
+
+                List<FileContentResult> fileContents = new();
+                foreach (string leverancier in leveranciers)
+                {
+                    List<PurchaseOrderDetailETS> purchaseOrdersLeverancier = purchaseOrders.Where(p => p.LV_COD != null && p.LV_COD.Equals(leverancier)).ToList();
+                    FileContentResult fileContent = leverancier switch
+                    {
+                        "000174" => helper.CreateFileCebeo(purchaseOrdersLeverancier, config), //Cebeo //TODO find better way to check if order is for cebeo
+                        _ => helper.CreateCSVFile(purchaseOrdersLeverancier)
+                    };
+                    fileContents.Add(fileContent);
+                }
+                return Results.Ok(fileContents);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}CreatePurchaseFile").WithTags(company);
+
+        app.MapGet($"/api/{company.ToLower()}/cebeo/articles", () =>
+        {
+            try
+            {
+                List<string> articles = new ETSArticleHelper(ETSClient, webClient, config).GetAriclesSupplier("000174");
+
+                return Results.Ok(articles);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}GetArticles").WithTags(company);
+
+        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleReference) =>
+        {
+            try
+            {
+                ETSArticleHelper helper = new ETSArticleHelper(ETSClient, webClient, config);
+                string articleNumber = helper.GetArticleNumberCebeo(articleReference);
+                float price = helper.GetArticlePriceCebeo(articleNumber) ?? throw new Exception($"Cebeo has no article with number = {articleNumber}");
+
+                return Results.Ok(price);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        }).WithName($"{company}UpdateArticlePrice").WithTags(company);
+    }
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");

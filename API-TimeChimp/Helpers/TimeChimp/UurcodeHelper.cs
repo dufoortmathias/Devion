@@ -4,7 +4,7 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
 {
     private readonly FirebirdClientETS ETSClient;
 
-    public TimeChimpUurcodeHelper(BearerTokenHttpClient clientTC, FirebirdClientETS clientETS) : base(clientTC)
+    public TimeChimpUurcodeHelper(WebClient clientTC, FirebirdClientETS clientETS) : base(clientTC)
     {
         ETSClient = clientETS;
     }

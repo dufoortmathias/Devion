@@ -1,18 +1,24 @@
 namespace Api.Devion.Client;
 
-public interface IBearerTokenHttpClient
+public interface IWebClient
 {
     string GetAsync(string endpoint);
     string PostAsync(string endpoint, string jsonPayload);
     string PutAsync(string endpoint, string jsonPayload);
 }
 
-public class BearerTokenHttpClient : IBearerTokenHttpClient
+public class WebClient : IWebClient
 {
     private readonly HttpClient _httpClient;
 
+    // Create a new instance of HttpClient
+    public WebClient()
+    {
+        _httpClient = new HttpClient();
+    }
+
     // Create a new instance of HttpClient that is configured with the base address of the API and the bearer token
-    public BearerTokenHttpClient(string url, string token)
+    public WebClient(string url, string token)
     {
         _httpClient = new HttpClient
         {
