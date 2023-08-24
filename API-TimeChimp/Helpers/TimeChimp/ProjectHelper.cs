@@ -2,7 +2,7 @@
 {
     public class TimeChimpProjectHelper : TimeChimpHelper
     {
-        public TimeChimpProjectHelper(BearerTokenHttpClient client) : base(client)
+        public TimeChimpProjectHelper(WebClient client) : base(client)
         {
         }
 

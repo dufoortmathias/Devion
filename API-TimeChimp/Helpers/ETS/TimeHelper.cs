@@ -2,8 +2,8 @@ namespace Api.Devion.Helpers.ETS;
 
 public class ETSTimeHelper : ETSHelper
 {
-    private readonly BearerTokenHttpClient TCClient;
-    public ETSTimeHelper(FirebirdClientETS FBClient, BearerTokenHttpClient clientTC) : base(FBClient)
+    private readonly WebClient TCClient;
+    public ETSTimeHelper(FirebirdClientETS FBClient, WebClient clientTC) : base(FBClient)
     {
         TCClient = clientTC;
         ETSClient = FBClient;

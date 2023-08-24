@@ -2,7 +2,7 @@ namespace Api.Devion.Helpers.TimeChimp;
 
 public class TimeChimpProjectUserHelper : TimeChimpHelper
 {
-    public TimeChimpProjectUserHelper(BearerTokenHttpClient client) : base(client)
+    public TimeChimpProjectUserHelper(WebClient client) : base(client)
     {
     }
 
