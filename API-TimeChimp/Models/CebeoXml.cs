@@ -1,6 +1,3 @@
-using System.Reflection.PortableExecutable;
-using System.Xml.Serialization;
-
 namespace Api.Devion.Models;
 
 [XmlRoot(ElementName = "Customer")]

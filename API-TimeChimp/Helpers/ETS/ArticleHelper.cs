@@ -11,9 +11,24 @@ public class ETSArticleHelper : ETSHelper
         this.config = config;
     }
 
+    public ArticleETS GetArticle(string articleReference)
+    {
+        string query = "SELECT * FROM CSARTPX WHERE ART_LEVREF = @reference";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@reference", articleReference},
+        };
+
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
+
+        ArticleETS article = JsonTool.ConvertTo<List<ArticleETS>>(json).First() ?? throw new Exception($"ETS han no article with reference = {articleReference}");
+
+        return article;
+    }
+
     public List<string> GetAriclesSupplier(string supplierId)
     {
-        string query = "SELECT DISTINCT ART_LEVREF from csartpx where art_lev1 = @supplier";
+        string query = "SELECT * FROM CSARTPX WHERE ART_LEV1 = @supplier";
         Dictionary<string, object> parameters = new()
         {
             {"@supplier", supplierId},
@@ -21,12 +36,13 @@ public class ETSArticleHelper : ETSHelper
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
-        List<string> artikels = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).Select(d => d["ART_LEVREF"]).ToList();
+        List<string?> articles = JsonTool.ConvertTo<List<ArticleETS>>(json).Select(a => a.ART_LEVREF).Distinct().ToList();
+        articles.RemoveAll(string.IsNullOrEmpty);
 
-        return artikels;
+        return articles;
     }
 
-    public string GetArticleNumberCebeo(string articleReference)
+    public string? GetArticleNumberCebeo(string articleReference)
     {
         CebeoXML cebeoXML = CebeoXML.CreateArticleSearchRequest(articleReference, config);
 
@@ -34,14 +50,14 @@ public class ETSArticleHelper : ETSHelper
 
         var responseXML = webClient.PostAsync("http://b2b.cebeo.be/webservices/xml", requestXML);
 
-        XmlSerializer serializer = new XmlSerializer(typeof(CebeoXML));
-        using (StringReader reader = new StringReader(responseXML))
+        XmlSerializer serializer = new(typeof(CebeoXML));
+        using (StringReader reader = new(responseXML))
         {
             CebeoXML response = (CebeoXML)serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}");
 
-            string artikelNumber = response.Response.Article.List.Item.FirstOrDefault()?.Material?.SupplierItemID;
+            string? articleNumber = response.Response.Article?.List?.Item?.Find(x => x.Material?.Reference != null && x.Material.Reference.Equals(articleReference))?.Material?.SupplierItemID;
 
-            return artikelNumber;
+            return articleNumber;
         }
     }
 
@@ -53,8 +69,8 @@ public class ETSArticleHelper : ETSHelper
 
         var responseXML = webClient.PostAsync("http://b2b.cebeo.be/webservices/xml", requestXML);
 
-        XmlSerializer serializer = new XmlSerializer(typeof(CebeoXML));
-        using (StringReader reader = new StringReader(responseXML))
+        XmlSerializer serializer = new(typeof(CebeoXML));
+        using (StringReader reader = new(responseXML))
         {
             CebeoXML response = (CebeoXML)serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}");
 
@@ -62,5 +78,25 @@ public class ETSArticleHelper : ETSHelper
 
             return netPrice != null ? float.Parse(netPrice) : null;
         }
+    }
+
+    public ArticleETS UpdateArticlePriceETS(string articleReference, float newPrice)
+    {
+        ArticleETS article = GetArticle(articleReference);
+        float price = article.ART_AANKP ?? throw new Exception($"Article with reference = {articleReference}, has no old price assigned");
+        float diff = 0.1f;
+
+        if (price - price * diff > newPrice || newPrice > price + price * diff) throw new Exception($"Article with reference = {articleReference}, has not been updated because price difference is to big");
+
+        string query = $"UPDATE CSARTPX SET PLA_ART_AANKP = @price WHERE ART_LEVREF = @reference";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@reference", articleReference},
+            {"@price", newPrice }
+        };
+
+        // ETSClient.updateQuery(query, parameters);
+
+        return article;
     }
 }

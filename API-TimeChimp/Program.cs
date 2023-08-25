@@ -553,11 +553,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             try
             {
-                ETSArticleHelper helper = new ETSArticleHelper(ETSClient, webClient, config);
-                string articleNumber = helper.GetArticleNumberCebeo(articleReference);
-                float price = helper.GetArticlePriceCebeo(articleNumber) ?? throw new Exception($"Cebeo has no article with number = {articleNumber}");
+                ETSArticleHelper helper = new(ETSClient, webClient, config);
 
-                return Results.Ok(price);
+                string articleNumber = helper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+
+                float newPrice = helper.GetArticlePriceCebeo(articleNumber) ?? throw new Exception($"Cebeo has no article with number = {articleNumber}");
+
+                return Results.Ok(newPrice);
             }
             catch (Exception e)
             {
