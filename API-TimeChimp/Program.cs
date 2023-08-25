@@ -30,7 +30,6 @@ List<string> companies = new();
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
-    WebClient webClient = new();
     WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
@@ -539,7 +538,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             try
             {
-                List<string> articles = new ETSArticleHelper(ETSClient, webClient, config).GetAriclesSupplier("000174");
+                List<string> articles = new ETSArticleHelper(ETSClient, config).GetAriclesSupplier("000174");
 
                 return Results.Ok(articles);
             }
@@ -553,7 +552,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             try
             {
-                ETSArticleHelper helper = new(ETSClient, webClient, config);
+                ETSArticleHelper helper = new(ETSClient, config);
 
                 string articleNumber = helper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 

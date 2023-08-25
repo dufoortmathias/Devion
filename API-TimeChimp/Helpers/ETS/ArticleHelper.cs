@@ -5,9 +5,9 @@ public class ETSArticleHelper : ETSHelper
     WebClient webClient;
     ConfigurationManager config;
 
-    public ETSArticleHelper(FirebirdClientETS clientETS, WebClient client, ConfigurationManager config) : base(clientETS)
+    public ETSArticleHelper(FirebirdClientETS clientETS, ConfigurationManager config) : base(clientETS)
     {
-        webClient = client;
+        webClient = new();
         this.config = config;
     }
 

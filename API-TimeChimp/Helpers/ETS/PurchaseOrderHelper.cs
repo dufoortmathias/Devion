@@ -29,7 +29,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
     public List<PurchaseOrderDetailETS> GetPurchaseOrderDetails(string id)
     {
         //create query
-        string query = $"SELECT LVPX.LV_NAM, LVPX.LV_COD, CSFDPX.* FROM CSFDPX " +
+        string query = $"SELECT LVPX.LV_NAM, LVPX.LV_COD, CSARTPX.ART_LEVREF, CSFDPX.* FROM CSFDPX " +
             $"LEFT JOIN CSARTPX ON CSFDPX.FD_ARTNR = CSARTPX.ART_NR " +
             $"LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 " +
             $"WHERE FD_BONNR = @id AND FD_CODE = 'V'";
@@ -60,7 +60,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
         foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders)
         {
             // Add data to the CSV file
-            var first = purchaseOrder.FD_ARTNR;
+            var first = purchaseOrder.ART_LEVREF;
             var second = purchaseOrder.FD_AANTAL.Value;
             var newLine = string.Format("{0}, {1}", first, second);
             csv.AppendLine(newLine);
