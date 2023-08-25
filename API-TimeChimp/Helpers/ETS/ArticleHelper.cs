@@ -97,6 +97,8 @@ public class ETSArticleHelper : ETSHelper
 
         // ETSClient.updateQuery(query, parameters);
 
+        article.ART_AANKP = newPrice;
+
         return article;
     }
 }
