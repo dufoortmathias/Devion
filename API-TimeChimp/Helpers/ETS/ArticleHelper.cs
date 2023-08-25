@@ -80,24 +80,24 @@ public class ETSArticleHelper : ETSHelper
         }
     }
 
-    public ArticleETS UpdateArticlePriceETS(string articleReference, float newPrice)
+    public ArticleETS UpdateArticlePriceETS(string articleReference, float newPrice, float maxPriceDiff)
     {
         ArticleETS article = GetArticle(articleReference);
         float price = article.ART_AANKP ?? throw new Exception($"Article with reference = {articleReference}, has no old price assigned");
-        float diff = 0.1f;
 
-        if (price - price * diff > newPrice || newPrice > price + price * diff) throw new Exception($"Article with reference = {articleReference}, has not been updated because price difference is to big");
-
-        string query = $"UPDATE CSARTPX SET PLA_ART_AANKP = @price WHERE ART_LEVREF = @reference";
-        Dictionary<string, object> parameters = new()
+        if (price - price * maxPriceDiff < newPrice || newPrice < price + price * maxPriceDiff)
         {
-            {"@reference", articleReference},
-            {"@price", newPrice }
-        };
+            string query = $"UPDATE CSARTPX SET PLA_ART_AANKP = @price WHERE ART_LEVREF = @reference";
+            Dictionary<string, object> parameters = new()
+            {
+                {"@reference", articleReference},
+                {"@price", newPrice }
+            };
 
-        // ETSClient.updateQuery(query, parameters);
+            // ETSClient.updateQuery(query, parameters);
 
-        article.ART_AANKP = newPrice;
+            article.ART_AANKP = newPrice;
+        }
 
         return article;
     }

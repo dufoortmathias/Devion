@@ -549,7 +549,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
         }).WithName($"{company}GetArticles").WithTags(company);
 
-        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleReference) =>
+        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleReference, float maxPriceDiff) =>
         {
             try
             {
@@ -559,9 +559,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                 float newPrice = helper.GetArticlePriceCebeo(articleNumber) ?? throw new Exception($"Cebeo has no article with number = {articleNumber}");
 
-                ArticleETS article = helper.UpdateArticlePriceETS(articleReference, newPrice);
+                ArticleETS article = helper.UpdateArticlePriceETS(articleReference, newPrice, maxPriceDiff);
 
-                return Results.Ok(article);
+                return Results.Ok(article.ART_AANKP == newPrice ? $"Price updated to {article.ART_AANKP}" : $"Price not updated, price diff is {Math.Abs(article.ART_AANKP.Value-newPrice)/article.ART_AANKP*100}%");
             }
             catch (Exception e)
             {
