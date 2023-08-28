@@ -548,17 +548,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
         }).WithName($"{company}GetArticles").WithTags(company);
 
-        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleReference, float maxPriceDiff) =>
+        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumberETS, float maxPriceDiff) =>
         {
             try
             {
                 ETSArticleHelper helper = new(ETSClient, config);
 
-                string articleNumber = helper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+                string articleReference = helper.GetArticle(articleNumberETS).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
 
-                float newPrice = helper.GetArticlePriceCebeo(articleNumber) ?? throw new Exception($"Cebeo has no article with number = {articleNumber}");
+                string articleNumberCebeo = helper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 
-                ArticleETS article = helper.UpdateArticlePriceETS(articleReference, newPrice, maxPriceDiff);
+                float newPrice = helper.GetArticlePriceCebeo(articleNumberCebeo) ?? throw new Exception($"Cebeo has no article with number = {articleNumberCebeo}");
+
+                ArticleETS article = helper.UpdateArticlePriceETS(articleNumberETS, newPrice, maxPriceDiff);
 
                 return Results.Ok(article.ART_AANKP == newPrice ? $"Price updated to {article.ART_AANKP}" : $"Price not updated, price diff is {Math.Abs(article.ART_AANKP.Value-newPrice)/article.ART_AANKP*100}%");
             }

@@ -11,17 +11,17 @@ public class ETSArticleHelper : ETSHelper
         this.config = config;
     }
 
-    public ArticleETS GetArticle(string articleReference)
+    public ArticleETS GetArticle(string articleNumber)
     {
-        string query = "SELECT * FROM CSARTPX WHERE ART_LEVREF = @reference";
+        string query = "SELECT * FROM CSARTPX WHERE ART_NR = @number";
         Dictionary<string, object> parameters = new()
         {
-            {"@reference", articleReference},
+            {"@number", articleNumber},
         };
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
-        ArticleETS article = JsonTool.ConvertTo<List<ArticleETS>>(json).First() ?? throw new Exception($"ETS han no article with reference = {articleReference}");
+        ArticleETS article = JsonTool.ConvertTo<List<ArticleETS>>(json).First() ?? throw new Exception($"ETS han no article with number = {articleNumber}");
 
         return article;
     }
@@ -36,7 +36,7 @@ public class ETSArticleHelper : ETSHelper
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
-        List<string?> articles = JsonTool.ConvertTo<List<ArticleETS>>(json).Select(a => a.ART_LEVREF).Distinct().ToList();
+        List<string?> articles = JsonTool.ConvertTo<List<ArticleETS>>(json).Select(a => a.ART_NR).Distinct().ToList();
         articles.RemoveAll(string.IsNullOrEmpty);
 
         return articles;
@@ -80,21 +80,21 @@ public class ETSArticleHelper : ETSHelper
         }
     }
 
-    public ArticleETS UpdateArticlePriceETS(string articleReference, float newPrice, float maxPriceDiff)
+    public ArticleETS UpdateArticlePriceETS(string articleNumber, float newPrice, float maxPriceDiff)
     {
-        ArticleETS article = GetArticle(articleReference);
-        float price = article.ART_AANKP ?? throw new Exception($"Article with reference = {articleReference}, has no old price assigned");
+        ArticleETS article = GetArticle(articleNumber);
+        float price = article.ART_AANKP ?? throw new Exception($"Article with number = {articleNumber}, has no old price assigned");
 
         if (price - price * maxPriceDiff < newPrice || newPrice < price + price * maxPriceDiff)
         {
-            string query = $"UPDATE CSARTPX SET PLA_ART_AANKP = @price WHERE ART_LEVREF = @reference";
+            string query = $"EXECUTE PROCEDURE UPDATE_ARTIKEL_PRIJS @number, @price";
             Dictionary<string, object> parameters = new()
             {
-                {"@reference", articleReference},
+                {"@number", articleNumber},
                 {"@price", newPrice }
             };
 
-            // ETSClient.updateQuery(query, parameters);
+            ETSClient.ExecuteQuery(query, parameters);
 
             article.ART_AANKP = newPrice;
         }

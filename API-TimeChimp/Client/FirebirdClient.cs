@@ -57,8 +57,8 @@ public class FirebirdClientETS
         return selectQuery(query, new());
     }
 
-    //insert query
-    public void insertQuery(string query, Dictionary<string, object> parameters)
+    //execute query
+    public void ExecuteQuery(string query, Dictionary<string, object> parameters)
     {
         //create connection
         FbConnection connection = new(_connectionString);
@@ -72,33 +72,10 @@ public class FirebirdClientETS
         //open the connection
         connection.Open();
 
-        //execute the insert query
+        //execute the query
         _ = command.ExecuteNonQuery();
 
         //close the connection
         connection.Close();
     }
-
-    //update query
-    public void updateQuery(string query, Dictionary<string, object> parameters)
-    {
-        //create connection
-        FbConnection connection = new(_connectionString);
-        using FbCommand command = new(query, connection);
-
-        foreach (KeyValuePair<string, object> record in parameters)
-        {
-            command.Parameters.AddWithValue(record.Key, record.Value);
-        }
-
-        //open the connection
-        connection.Open();
-
-        //execute the insert query
-        _ = command.ExecuteNonQuery();
-
-        //close the connection
-        connection.Close();
-    }
-
 }

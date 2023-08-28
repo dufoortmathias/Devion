@@ -108,7 +108,7 @@ public class ETSTimeHelper : ETSHelper
         };
 
         //send data to ETS
-        ETSClient.insertQuery(query, parameters);
+        ETSClient.ExecuteQuery(query, parameters);
 
         //check if response is succcesfull
         return response ?? throw new Exception("Error adding time to ETS with query: " + query);

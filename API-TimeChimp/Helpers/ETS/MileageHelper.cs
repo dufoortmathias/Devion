@@ -82,7 +82,7 @@ public class ETSMileageHelper : ETSHelper
         };
 
         //send data to ETS
-        ETSClient.updateQuery(query, parameters);
+        ETSClient.ExecuteQuery(query, parameters);
 
         return mileage;
     }
