@@ -514,6 +514,7 @@ table {
     var(--global-whitespace-md);
   line-height: calc(var(--global-baseline) * 3);
   width: 100%;
+  height: fit-content;
   outline: none;
   transition: all var(--global-transitionTiming-alpha);
 }
@@ -671,6 +672,13 @@ table {
 
 .u-text-sm {
   font-size: 14px;
+}
+
+.div-button-bon-leverancier {
+  margin: 4px;
+  align-items: center;
+  display: grid;
+  grid-template-columns: 3fr 1fr 0.2fr 1fr auto;
 }
 
 /*------------------------------------*\

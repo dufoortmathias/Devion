@@ -1,18 +1,13 @@
 //#region *** DOM references ***********
-const baseUrl = "http://192.168.100.237:5001/api";
+const baseUrl = "http://localhost:5142/api";
 let htmlButton, htmlBestelbonSelect, htmlBedrijfSelect, htmltabel;
 
 //#endregion
 
 //#region *** Callback-Visualisation - show___ ***********
-const showButtons = function () {
-    console.log("showButtons");
-    htmlButton.classList.remove("c-button-disabled");
-    htmlButton.disabled = false;
-};
 
 const showBestelbonnen = async function (jsonObject) {
-    console.log("showBestelbonnen");
+    htmlBestelbonSelect.disabled = false
     let innerhtml = "";
     jsonObject.sort();
     innerhtml += `<option value="0" disabled selected>Selecteer een bestelbon</option>`;
@@ -23,8 +18,6 @@ const showBestelbonnen = async function (jsonObject) {
 };
 
 const showTabel = function (jsonObject) {
-    console.log("showTabel");
-    console.log(jsonObject);
     htmltabel.classList.remove("o-hide-accessible");
     let innerhtml = "";
     let leveranciers = [];
@@ -33,7 +26,6 @@ const showTabel = function (jsonObject) {
             leveranciers.push(bestelbon.leverancier);
         }
     }
-    console.log(leveranciers);
     innerhtml += `<h1>Bestelbon ${jsonObject.bonNummer}</h1>`;
 
     if (jsonObject.artikels.length == 0) {
@@ -42,7 +34,15 @@ const showTabel = function (jsonObject) {
 
     for (const leverancier of leveranciers) {
         if (leverancier != null) {
-            innerhtml += `<h2>${leverancier}</h2>`;
+
+            innerhtml += `<div class="div-button-bon-leverancier">`
+            innerhtml += `<h2 class="header">${leverancier}</h2>`;
+            innerhtml += `<button disabled type="submit" class="download-button o-button-reset c-button .c-button-disabled js-button"> download bestelbon </button>`
+            innerhtml += `<div></div>`
+            innerhtml += `<button disabled type="submit" class="o-button-reset c-button .c-button-disabled js-button"> order geplaatst </button>`
+            innerhtml += `<a target="_blank" href="https://www.routeco.com/nl-be/tools/quick-basket/order-upload" style="text-decoration: none !important; font-size:24px" class="fa">&#xf059;</a>`
+            innerhtml += `</div>`
+
             innerhtml += `<table class='c-tabel'>`;
             innerhtml += `<tr><th>Artikel</th><th>Aantal</th></tr>`;
             for (const bestelbon of jsonObject.artikels) {
@@ -63,7 +63,6 @@ const showTabel = function (jsonObject) {
             //check if 'VERZENDING' is in the list and the only one
             for (const artikel of artikels) {
                 if (artikel.artikelNummer == 'VERZENDING') {
-                    console.log("verzending")
                     let index = artikels.indexOf(artikel);
                     artikels.pop(index);
                 }
@@ -82,10 +81,41 @@ const showTabel = function (jsonObject) {
             }
         }}
         htmltabel.innerHTML = innerhtml;
+
+        getBestelbonFile(htmlBestelbonSelect.value).then(data => {
+            let files = []
+
+            data.forEach(bon => {
+                var decodeString = atob(bon.fileContents);
+                var blob = new Blob([decodeString], { type: bon.contentType });
+                files.push({
+                    "blob": blob,
+                    "fileName": bon.fileDownloadName
+                })
+            });
+
+            let divs = document.getElementsByClassName("div-button-bon-leverancier")
+            for (let i = 0; i < divs.length; i++) {
+                let result = files.find(content => content["fileName"].includes(divs[i].getElementsByClassName("header")[0].textContent));
+
+                if (result) {
+                    let button = divs[i].getElementsByClassName("download-button")[0]
+                    button.addEventListener("click", () => {
+                        const a = document.createElement("a");
+                        a.href = URL.createObjectURL(result["blob"]);
+                        a.download = result["fileName"];
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    })
+                    button.classList.remove("c-button-disabled");
+                    button.disabled = false
+                }
+            }
+        })
     };
 
     const showCompanies = function (jsonObject) {
-        console.log("showCompanies");
         let innerhtml = "";
         innerhtml += `<option value="0" disabled selected>Selecteer een bedrijf</option>`;
         for (const company of jsonObject) {
@@ -100,8 +130,6 @@ const showTabel = function (jsonObject) {
 
     //#region *** Data Access - get___ ***********
     const getData = async function (endpoint) {
-        console.log(endpoint);
-
         try {
             const response = await fetch(endpoint);
 
@@ -157,36 +185,11 @@ const showTabel = function (jsonObject) {
     //#region *** Event Listeners - listenTo___ ***********
     const listenToList = function () {
         htmlBestelbonSelect.addEventListener("change", function () {
-            console.log("select");
-            showButtons();
             getBestelbon(htmlBestelbonSelect.value);
         });
 
         htmlBedrijfSelect.addEventListener("change", function () {
-            console.log("bedrijf select");
             getBestelbonnen(htmlBedrijfSelect.value)
-        });
-    };
-
-    const listenToButtons = function () {
-        htmlButton.addEventListener("click", function () {
-            console.log("button");
-            getBestelbonFile(htmlBestelbonSelect.value).then(data => {
-                console.log(data);
-                data.forEach(bon => {
-                    console.log(bon)
-                    var decodeString = atob(bon.fileContents);
-                    console.log(decodeString)
-                    var blob = new Blob([decodeString], { type: bon.contentType });
-                    const a = document.createElement("a");
-                    a.href = URL.createObjectURL(blob);
-                    a.download = bon.fileDownloadName;
-                    document.body.appendChild(a);
-                    a.click();
-                    console.log("downloaded")
-                    document.body.removeChild(a);
-                });
-            });
         });
     };
     //#endregion
@@ -194,13 +197,11 @@ const showTabel = function (jsonObject) {
     //#region *** Init / DOMContentLoaded ***********
     const init = function () {
         console.log("DOM Content Loaded");
-        htmlButton = document.querySelector(".js-button");
         htmlBestelbonSelect = document.querySelector(".js-bestelbon-select");
         htmlBedrijfSelect = document.querySelector(".js-bedrijf-select");
         htmltabel = document.querySelector(".js-tabel");
 
         listenToList();
-        listenToButtons();
         getCompanies();
     };
 

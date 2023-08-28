@@ -8,6 +8,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/screen.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!-- Favicon -->
     <link rel="icon" href="favicon.svg" />
@@ -60,12 +61,6 @@
               name="bedrijf"
               id="bedrijf"
             >
-              <option value="" disabled selected hidden>bedrijf</option>
-              <option value="devion">
-                Devion
-              </option>
-              <option value="metabil">Metabil</option>
-              <option value="deviontest">Devion Test</option>
             </select>
             <svg
               class="c-custom-select__symbol"
@@ -80,12 +75,12 @@
           <label class="c-label" for="bestelbon"> Selecteer een bestelbon </label>
           <span class="c-custom-select">
             <select
+              disabled
               class="c-input c-custom-select__input js-bestelbon-select"
               class=""
               name="bestelbon"
               id="bestelbon"
             >
-              <option value="" disabled selected hidden>bestelbon</option>
             </select>
             <svg
               class="c-custom-select__symbol"
@@ -98,28 +93,7 @@
           </div>
 
         <p class="u-mb-md">
-          <button
-            type="submit"
-            class="o-button-reset c-button c-button-disabled js-button"
-            disabled
-          >
-            download bestelbon
-          </button>
           <div class="c-app__tabel js-tabel o-hide-accessible">
-            <h2 class="c-label--tabel"> Bestelbon </h2>
-            <h3 class="c-label--error o-hide o-hide-accessible"></h3>
-            <h3 class="c-label--tabel"> Ancon </h3>
-            <table class="c-tabel">
-              <tr>
-                <th>artikelnummer</th>
-                <th>aantal</th>
-              </tr>
-              <tr>
-                <tr>
-                  <td>123456</td>
-                  <td>1</td>
-                </tr>
-            </table>
           </div>
         </p>
       </div>
