@@ -10,7 +10,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
     public List<PurchaseOrderHeaderETS> GetOpenPurchaseOrders()
     {
         //create query
-        string query = $"SELECT * FROM CSFHPX WHERE FH_GEMAILD = 0 AND FH_gemaild = 0 AND FH_AFGEWERKT = 'N' AND FH_CODE = 'V'";
+        string query = "SELECT * FROM CSFHPX WHERE FH_GEMAILD = 0 AND FH_WEBSHOP = 0 AND FH_AFGEDRUKT = 'F' AND FH_AFGEWERKT = 'N' AND FH_CODE = 'V'";
 
         //get data from ETS
         string json = ETSClient.selectQuery(query);
