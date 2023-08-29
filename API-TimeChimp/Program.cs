@@ -337,7 +337,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             // get subprojects from ETS
             List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
-            foreach (SubprojectETS ETSSubproject in ETSSubprojects)
+            foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
             {
                 // Change to TimeChimp class
                 ProjectTimeChimp TCSubproject = new(ETSSubproject, TCProject)
