@@ -203,7 +203,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             //change to timechimp class
             UurcodeTimeChimp TCUurcode = new(ETSUurcode);
 
-            TimeChimpUurcodeHelper uurcodeHelper = new(TCClient, ETSClient);
+            TimeChimpUurcodeHelper uurcodeHelper = new(TCClient);
 
             //check if uurcode exists in timechimp
             return uurcodeHelper.uurcodeExists(uurcodeId)
@@ -320,20 +320,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
             TCProject.customerId = customer.id.Value;
 
-            ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId);
+            ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
+            
+            TCProject.id = mainProject.id;
+            mainProject = projectHelperTC.UpdateProject(TCProject);
 
-            // Check if project exists in TimeChimp
-            if (mainProject != null)
-            {
-                TCProject.id = mainProject.id;
-                mainProject = projectHelperTC.UpdateProject(TCProject);
-            }
-            else
-            {
-                mainProject = projectHelperTC.CreateProject(TCProject);
-                TCProject.id = mainProject.id;
-                mainProject = projectHelperTC.UpdateProject(TCProject);
-            }
+            List<UurcodeTimeChimp> uurcodes = new TimeChimpUurcodeHelper(TCClient).GetUurcodes();
 
             // get subprojects from ETS
             List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
@@ -345,18 +337,22 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     mainProjectId = TCProject.id
                 };
 
-                ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.code);
+                ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.code) ?? projectHelperTC.CreateProject(TCSubproject);
 
-                if (subProject != null)
+                TCSubproject.id = subProject.id;
+                subProject = projectHelperTC.UpdateProject(TCSubproject);
+
+
+                //update budgethours for each projecttask in timeChimp
+                List<ProjectTaskETS> projectTasksETS = new ETSUurcodeHelper(ETSClient).GetUurcodesSubproject(ETSProject.PR_NR, ETSSubproject.SU_SUB);
+                foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
                 {
-                    TCSubproject.id = subProject.id;
-                    subProject = projectHelperTC.UpdateProject(TCSubproject);
-                }
-                else
-                {
-                    subProject = projectHelperTC.CreateProject(TCSubproject);
-                    TCSubproject.id = subProject.id;
-                    subProject = projectHelperTC.UpdateProject(TCSubproject);
+                    int taskId = uurcodes.Find(u => u.code.Equals(projectTaskETS.VO_UUR)).id;
+                    ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks.Find(p => p.taskId.Equals(taskId));
+
+                    projectTaskTimechimp.budgetHours = projectTaskETS.VO_AANT;
+                    
+                    TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTaskTimechimp));
                 }
             }
 

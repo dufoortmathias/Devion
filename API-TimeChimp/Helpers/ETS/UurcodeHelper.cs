@@ -59,4 +59,29 @@ public class ETSUurcodeHelper : ETSHelper
 
         return uurcode;
     }
+
+    // get uurcode by uurcodeId
+    public List<ProjectTaskETS> GetUurcodesSubproject(string projectId, string subprojectId)
+    {
+        string query = $"SELECT * FROM J2W_VOPX WHERE VO_PROJ = @project AND VO_SUBPROJ = @subproject AND VO_SOORT = 'U'";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@project",  projectId},
+            {"@subproject",  subprojectId}
+        };
+
+        //get data from ETS
+        string response = ETSClient.selectQuery(query, parameters);
+
+        //check if json is not empty
+        if (response == null)
+        {
+            throw new Exception("Error getting uurcodes from ETS with query: " + query);
+        }
+
+        //convert data to uurcodesETS object
+        List<ProjectTaskETS> projectTasks = JsonTool.ConvertTo<List<ProjectTaskETS>>(response);
+
+        return projectTasks;
+    }
 }

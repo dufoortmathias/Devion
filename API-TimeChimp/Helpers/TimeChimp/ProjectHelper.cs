@@ -9,7 +9,12 @@
         //check if project exists
         public ProjectTimeChimp? FindProject(string projectId)
         {
-            return GetProjects().Find(project => project.code != null && project.code.Equals(projectId));
+            ProjectTimeChimp project = GetProjects().Find(project => project.code != null && project.code.Equals(projectId));
+            if (project != null)
+            {
+                project = GetProject(project.id.Value);
+            }
+            return project;
         }
 
         //get project by id

@@ -2,11 +2,9 @@ namespace Api.Devion.Helpers.TimeChimp;
 
 public class TimeChimpUurcodeHelper : TimeChimpHelper
 {
-    private readonly FirebirdClientETS ETSClient;
 
-    public TimeChimpUurcodeHelper(WebClient clientTC, FirebirdClientETS clientETS) : base(clientTC)
+    public TimeChimpUurcodeHelper(WebClient clientTC) : base(clientTC)
     {
-        ETSClient = clientETS;
     }
 
     //check if uurcode exists
