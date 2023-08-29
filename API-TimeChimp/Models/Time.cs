@@ -29,12 +29,12 @@ public class TimeTimeChimp
     public int userId { get; set; }
     public string? userDisplayName { get; set; }
     public string[]? userTags { get; set; }
-    public DateTime date { get; set; }
+    public DateTime? date { get; set; }
     public double? hours { get; set; }
     public string? notes { get; set; }
     public string? startEnd { get; set; }
-    public DateTime start { get; set; }
-    public DateTime end { get; set; }
+    public DateTime? start { get; set; }
+    public DateTime? end { get; set; }
     public double? pause { get; set; }
     public string? externalName { get; set; }
     public string? externalUrl { get; set; }
@@ -73,8 +73,8 @@ public class TimeETS
     {
         timechimpStatus = time.status;
         timechimpId = time.id;
-        PLA_START = time.start.ToLocalTime();
-        PLA_EINDE = time.end.ToLocalTime();
+        PLA_START = time.start?.ToLocalTime();
+        PLA_EINDE = time.end?.ToLocalTime();
         DateTime baseDateTime = DateTime.Parse("1899-12-30T00:00:00");
         PLA_KM_PAUZE = time.pause == null ? baseDateTime.ToString("yyyy-MM-dd HH:mm:ss") : baseDateTime.AddHours(time.pause.Value).ToString("yyyy-MM-dd HH:mm:ss");
         PN_NAM = time.userDisplayName;
