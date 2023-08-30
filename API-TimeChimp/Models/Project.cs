@@ -54,7 +54,7 @@
             active = projectETS.PR_STAT.Equals('L');
             useSubprojects = true; //TODO: add value to seperate file
             invoiceMethod = 2; //TODO: add value to seperate file
-            budgetMethod = 1; //TODO: add value to seperate file
+            budgetMethod = 2; //TODO: add value to seperate file
         }
 
         //constructor to from timechimp class to ets class (subproject)
@@ -69,7 +69,7 @@
                 active = subprojectETS.SU_AFGEWERKT != 1;
                 useSubprojects = false; //TODO: add value to seperate file
                 invoiceMethod = 2; //TODO: add value to seperate file
-                budgetMethod = 1; //TODO: add value to seperate file
+                budgetMethod = 3; //TODO: add value to seperate file
             }
         }
     }
