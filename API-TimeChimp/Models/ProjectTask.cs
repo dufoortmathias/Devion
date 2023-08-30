@@ -15,6 +15,7 @@ public class ProjectTaskTimechimp
 
 public class ProjectTaskETS
 {
+    public int VO_ID { get; set; }
     public string? VO_PROJ { get; set; }
     public string? VO_SUBPROJ { get; set; }
     public string? VO_UUR { get; set; }

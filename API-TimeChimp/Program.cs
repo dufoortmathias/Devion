@@ -90,7 +90,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     //get customerids from ets
     app.MapGet($"/api/{company.ToLower()}/ets/customerids", (string dateString) => { 
         try 
-        { 
+        {
             return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); 
         } 
         catch (Exception e) 
@@ -321,20 +321,17 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             TCProject.customerId = customer.id.Value;
 
             ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
-            
-            TCProject.id = mainProject.id;
-            mainProject = projectHelperTC.UpdateProject(TCProject);
 
+            double totalBudgetHours = 0;
             List<UurcodeTimeChimp> uurcodes = new TimeChimpUurcodeHelper(TCClient).GetUurcodes();
-
             // get subprojects from ETS
             List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
             foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
             {
                 // Change to TimeChimp class
-                ProjectTimeChimp TCSubproject = new(ETSSubproject, TCProject)
+                ProjectTimeChimp TCSubproject = new(ETSSubproject, mainProject)
                 {
-                    mainProjectId = TCProject.id
+                    mainProjectId = mainProject.id
                 };
 
                 ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.code) ?? projectHelperTC.CreateProject(TCSubproject);
@@ -343,20 +340,52 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
 
 
+                List<string> errorMessages = new();
+
                 //update budgethours for each projecttask in timeChimp
                 List<ProjectTaskETS> projectTasksETS = new ETSUurcodeHelper(ETSClient).GetUurcodesSubproject(ETSProject.PR_NR, ETSSubproject.SU_SUB);
                 foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
                 {
-                    int taskId = uurcodes.Find(u => u.code.Equals(projectTaskETS.VO_UUR)).id;
-                    ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks.Find(p => p.taskId.Equals(taskId));
+                    if (string.IsNullOrEmpty(projectTaskETS.VO_PROJ?.Trim()))
+                    {
+                        errorMessages.Add($"Subproject {subProject.id} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                    }
+                    if (string.IsNullOrEmpty(projectTaskETS.VO_SUBPROJ?.Trim()))
+                    {
+                        errorMessages.Add($"Subproject {subProject.id} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                    }
+                    else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
+                    {
+                        errorMessages.Add($"Subproject {subProject.id} field VO_UUR is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                    }
+                    else if (projectTaskETS.VO_AANT == null)
+                    {
+                        errorMessages.Add($"Subproject {subProject.id} field VO_AANT is null for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                    }
+                    else
+                    {
+                        int taskId = uurcodes.Find(u => u.code.Equals(projectTaskETS.VO_UUR)).id;
+                        ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks.Find(p => p.taskId.Equals(taskId));
 
-                    projectTaskTimechimp.budgetHours = projectTaskETS.VO_AANT;
-                    
-                    TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTaskTimechimp));
+                        projectTaskTimechimp.budgetHours = projectTaskETS.VO_AANT;
+                        totalBudgetHours += projectTaskETS.VO_AANT.Value;
+
+                        TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTaskTimechimp));
+                    }
+                }
+
+                if (errorMessages.Count > 0)
+                {
+                    throw new Exception(string.Join(", ", errorMessages));
                 }
             }
 
-            return Results.Ok(projectHelperTC.GetProject(TCProject.id.Value));
+            // update mainproject
+            TCProject.id = mainProject.id;
+            TCProject.budgetHours = totalBudgetHours;
+            mainProject = projectHelperTC.UpdateProject(TCProject);
+
+            return Results.Ok(mainProject);
         }
         catch (Exception e)
         {
