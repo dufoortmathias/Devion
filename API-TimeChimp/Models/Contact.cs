@@ -17,7 +17,7 @@ public class ContactTimeChimp
     //constructor to from ets class to timechimp class
     public ContactTimeChimp(ContactETS contactETS, int customerId)
     {
-        if (contactETS.CO_TAV == null)
+        if (string.IsNullOrEmpty(contactETS.CO_CONTACTPERSOON?.Trim()))
         {
             throw new Exception("Contact has no name");
         }
