@@ -322,6 +322,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
 
+            List<string> errorMessages = new();
             double totalBudgetHours = 0;
             List<UurcodeTimeChimp> uurcodes = new TimeChimpUurcodeHelper(TCClient).GetUurcodes();
             // get subprojects from ETS
@@ -338,10 +339,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                 TCSubproject.id = subProject.id;
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
-
-
-                List<string> errorMessages = new();
-
+                
                 //update budgethours for each projecttask in timeChimp
                 List<ProjectTaskETS> projectTasksETS = new ETSUurcodeHelper(ETSClient).GetUurcodesSubproject(ETSProject.PR_NR, ETSSubproject.SU_SUB);
                 foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
@@ -350,7 +348,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     {
                         errorMessages.Add($"Subproject {subProject.id} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
                     }
-                    if (string.IsNullOrEmpty(projectTaskETS.VO_SUBPROJ?.Trim()))
+                    else if (string.IsNullOrEmpty(projectTaskETS.VO_SUBPROJ?.Trim()))
                     {
                         errorMessages.Add($"Subproject {subProject.id} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
                     }
@@ -373,17 +371,18 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                         TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTaskTimechimp));
                     }
                 }
-
-                if (errorMessages.Count > 0)
-                {
-                    throw new Exception(string.Join(", ", errorMessages));
-                }
             }
 
             // update mainproject
             TCProject.id = mainProject.id;
             TCProject.budgetHours = totalBudgetHours;
             mainProject = projectHelperTC.UpdateProject(TCProject);
+
+
+            if (errorMessages.Count > 0)
+            {
+                throw new Exception(string.Join(", ", errorMessages));
+            }
 
             return Results.Ok(mainProject);
         }
