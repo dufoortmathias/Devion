@@ -9,7 +9,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins", builder => builder.AllowAnyOrigin());
+    options.AddPolicy("AllowOrigins", builder => builder.WithOrigins(config["AllowedHosts"]));
 });
 
 WebApplication app = builder.Build();
@@ -17,10 +17,10 @@ WebApplication app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseCors("AllowAllOrigins");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowOrigins");
 //app.UseHttpsRedirection();
 
 
