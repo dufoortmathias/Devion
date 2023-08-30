@@ -8,6 +8,7 @@ import json
 import os
 import smtplib
 import ssl
+import sys
 
 from email import encoders
 from email.mime.multipart import MIMEMultipart
@@ -22,7 +23,13 @@ config = dotenv_values(dotenv_path=env_file)
 
 start_time = datetime.datetime.now()
 
-endpoint = f"{config.get('BASE_URL_API')}/devion/cebeo"
+if __name__ == "__main__":
+    try:
+        company = sys.argv[1].lower()
+    except:
+        company = ""
+
+endpoint = f"{config.get('BASE_URL_API')}/{company}/cebeo"
 ## Defines format of how datetime objects should be tranlated to a String
 dateformat = config.get('DATEFORMAT')
 ## Create a secure SSL context
@@ -45,19 +52,19 @@ def log(message):
     output = f"{output}{message}"
     print(message, end="", flush=True)
 
-def get_article_references():
+def get_article_ids():
     response = requests.get(f"{endpoint}/articles")
     if response.ok:
-        return response.json()
+        return ["1594000"]
     else:
         return None
     
 amount_failed = 0
 amount_succeeded = 0
 
-def update_price(reference, max_price_diff):
-    log(f"{reference} ")
-    response = requests.get(f"{endpoint}/updatearticleprice?articleReference={reference}&maxPriceDiff={max_price_diff}")
+def update_price(article_id, max_price_diff):
+    log(f"{article_id} ")
+    response = requests.get(f"{endpoint}/updatearticleprice?articleNumberETS={article_id}&maxPriceDiff={max_price_diff}")
     if response.status_code == 200:
         global amount_succeeded
         amount_succeeded += 1
@@ -69,11 +76,11 @@ def update_price(reference, max_price_diff):
 
 
 try:
-    references = get_article_references()
+    article_ids = get_article_ids()
 
-    for (index, reference) in enumerate(references):
-        log(f"{int(index / len(references) * 100)}% ")
-        update_price(reference, max_price_diff)
+    for (index, article_id) in enumerate(article_ids):
+        log(f"{int(index / len(article_ids) * 100)}% ")
+        update_price(article_id, max_price_diff)
 
 except Exception as e:
     send_mail = True
@@ -86,10 +93,10 @@ end_time = datetime.datetime.now()
 duration = end_time - start_time
 minutes = int(duration.total_seconds() / 60)
 seconds = duration.total_seconds() % 60
-log(f"Duration: {minutes} min {seconds} sec")
+log(f"\nDuration: {minutes} min {seconds} sec")
 
 # Create log file
-log_filename = f"{current_dir}/logs/cebeo/{start_time.year}/{start_time.month}/{start_time.day}/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
+log_filename = f"{current_dir}/logs/{company}-cebeo/{start_time.year}/{start_time.month}/{start_time.day}/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 with open(log_filename, "w+") as log_file:
     log_file.write(output)
@@ -99,7 +106,7 @@ if send_mail:
     message = MIMEMultipart()
 
     message["From"] = sender_email
-    message["Subject"] = "Script sync cebeo priced failed"
+    message["Subject"] = f"Script sync cebeo prices {company} failed"
 
     body = f"""
 Er ging iets mis met het script om de prijzen van alle cebeo artikelen te updaten!

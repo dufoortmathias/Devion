@@ -88,15 +88,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     //app.MapGet($"/api/{company.ToLower()}/timechimp/projectusers", () => { try { return Results.Ok(new TimeChimpProjectUserHelper(TCClient).GetProjectUsers()); } catch (Exception e) { return Results.Problem(e.Message); } }).WithName($"{company}GetProjectUsers");
 
     //get customerids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (string dateString) => { 
-        try 
+    app.MapGet($"/api/{company.ToLower()}/ets/customerids", (string dateString) =>
+    {
+        try
         {
-            return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString))); 
-        } 
-        catch (Exception e) 
-        { 
-            return Results.Problem(e.Message); 
-        } 
+            return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString)));
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
     }).WithName($"{company}GetCustomerIds").WithTags(company);
 
     //sync customer from ets to timechimp
@@ -130,15 +131,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}SyncCustomerTimechimp").WithTags(company);
 
     //get contactids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/contactids", (string dateString) => { 
-        try 
-        { 
-            return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString))); 
-        } 
-        catch (Exception e) 
-        { 
-            return Results.Problem(e.Message); 
-        } 
+    app.MapGet($"/api/{company.ToLower()}/ets/contactids", (string dateString) =>
+    {
+        try
+        {
+            return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString)));
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
     }).WithName($"{company}GetContactIds").WithTags(company);
 
     //sync contact from ets to timechimp
@@ -175,15 +177,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}SyncContactTimechimp").WithTags(company); ;
 
     //get uurcodes from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) => { 
-        try 
-        { 
+    app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) =>
+    {
+        try
+        {
             return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString)));
-        } 
-        catch (Exception e) 
-        { 
-            return Results.Problem(e.Message); 
-        } 
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
     }).WithName($"{company}GetUurcodesFromETS").WithTags(company);
 
     //sync uurcodes from ets to timechimp
@@ -217,14 +220,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}UpdateUurcodes").WithTags(company);
 
     //get employeeids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (string dateString, string teamName) => { 
-        try { 
-            return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName)); 
-        } 
-        catch (Exception e) 
-        { 
-            return Results.Problem(e.Message); 
-        } 
+    app.MapGet($"/api/{company.ToLower()}/ets/employeeids", (string dateString, string teamName) =>
+    {
+        try
+        {
+            return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName));
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
     }).WithName($"{company}GetEmployeeIds").WithTags(company);
 
     //sync employee from ets to timechimp
@@ -249,10 +254,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 .Where(e => e.roleId > 4 || e.roleId == 1)
                 .GroupBy(e => e.roleId.Value)
                 .Select(g => new
-                    {
-                        RoleId = g.Key,
-                        Count = g.Count()
-                    })
+                {
+                    RoleId = g.Key,
+                    Count = g.Count()
+                })
                 .MaxBy(o => o.Count)?.RoleId ?? 1;
 
             //change to timechimp class
@@ -289,15 +294,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}SyncEmployeeTimechimp").WithTags(company);
 
     //get projectids from ets
-    app.MapGet($"/api/{company.ToLower()}/ets/projectids", (string dateString) => { 
-        try 
+    app.MapGet($"/api/{company.ToLower()}/ets/projectids", (string dateString) =>
+    {
+        try
         {
-            return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString))); 
-        } 
-        catch (Exception e) 
+            return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString)));
+        }
+        catch (Exception e)
         {
-            return Results.Problem(e.Message); 
-        } 
+            return Results.Problem(e.Message);
+        }
     }).WithName($"{company}GetProjectIds").WithTags(company);
 
     //sync project from ets to timechimp
@@ -351,7 +357,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                 TCSubproject.id = subProject.id;
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
-                
+
                 //update budgethours for each projecttask in timeChimp
                 List<ProjectTaskETS> projectTasksETS = new ETSUurcodeHelper(ETSClient).GetUurcodesSubproject(ETSProject.PR_NR, ETSSubproject.SU_SUB);
                 foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
@@ -405,15 +411,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}SyncProjectTimechimp").WithTags(company);
 
     //get timesids from timechimp
-    app.MapGet($"/api/{company.ToLower()}/ets/timeids", (string dateString) => { 
-        try 
-        { 
-            return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString))); 
-        } 
-        catch (Exception e) 
+    app.MapGet($"/api/{company.ToLower()}/ets/timeids", (string dateString) =>
+    {
+        try
+        {
+            return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString)));
+        }
+        catch (Exception e)
         {
             return Results.Problem(e.Message);
-        } 
+        }
     }).WithName($"{company}GetTimeIds").WithTags(company);
 
     //sync time from timechimp to ets
@@ -572,44 +579,41 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}CreatePurchaseFile").WithTags(company);
 
-    if (company.ToLower().Equals("devion"))
+    app.MapGet($"/api/{company.ToLower()}/cebeo/articles", () =>
     {
-        app.MapGet($"/api/{company.ToLower()}/cebeo/articles", () =>
+        try
         {
-            try
-            {
-                List<string> articles = new ETSArticleHelper(ETSClient, config).GetAriclesSupplier("000174");
+            List<string> articles = new ETSArticleHelper(ETSClient, config).GetAriclesCebeo();
 
-                return Results.Ok(articles);
-            }
-            catch (Exception e)
-            {
-                return Results.Problem(e.Message);
-            }
-        }).WithName($"{company}GetArticles").WithTags(company);
-
-        app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumberETS, float maxPriceDiff) =>
+            return Results.Ok(articles);
+        }
+        catch (Exception e)
         {
-            try
-            {
-                ETSArticleHelper helper = new(ETSClient, config);
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}GetArticles").WithTags(company);
 
-                string articleReference = helper.GetArticle(articleNumberETS).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
+    app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumberETS, float maxPriceDiff) =>
+    {
+        try
+        {
+            ETSArticleHelper helper = new(ETSClient, config);
 
-                string articleNumberCebeo = helper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+            string articleReference = helper.GetArticle(articleNumberETS).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
 
-                float newPrice = helper.GetArticlePriceCebeo(articleNumberCebeo) ?? throw new Exception($"Cebeo has no article with number = {articleNumberCebeo}");
+            string articleNumberCebeo = helper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 
-                ArticleETS article = helper.UpdateArticlePriceETS(articleNumberETS, newPrice, maxPriceDiff);
+            float newPrice = helper.GetArticlePriceCebeo(articleNumberCebeo) ?? throw new Exception($"Cebeo has no article with number = {articleNumberCebeo}");
 
-                return Results.Ok(article.ART_AANKP == newPrice ? $"Price updated to {article.ART_AANKP}" : $"Price not updated, price diff is {Math.Abs(article.ART_AANKP.Value-newPrice)/article.ART_AANKP*100}%");
-            }
-            catch (Exception e)
-            {
-                return Results.Problem(e.Message);
-            }
-        }).WithName($"{company}UpdateArticlePrice").WithTags(company);
-    }
+            ArticleETS article = helper.UpdateArticlePriceETS(articleNumberETS, newPrice, maxPriceDiff);
+
+            return Results.Ok(article.ART_AANKP == newPrice ? $"Price updated to {article.ART_AANKP}" : $"Price not updated, price diff is {Math.Abs(article.ART_AANKP.Value - newPrice) / article.ART_AANKP * 100}%");
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}UpdateArticlePrice").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");

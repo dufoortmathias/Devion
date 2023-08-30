@@ -26,15 +26,11 @@ public class ETSArticleHelper : ETSHelper
         return article;
     }
 
-    public List<string> GetAriclesSupplier(string supplierId)
+    public List<string> GetAriclesCebeo()
     {
-        string query = "SELECT * FROM CSARTPX WHERE ART_LEV1 = @supplier";
-        Dictionary<string, object> parameters = new()
-        {
-            {"@supplier", supplierId},
-        };
+        string query = "SELECT CSARTPX.* FROM CSARTPX LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 WHERE LOWER(LVPX.LV_NAM) LIKE '%cebeo%'";
 
-        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
+        string json = ETSClient.selectQuery(query) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
         List<string?> articles = JsonTool.ConvertTo<List<ArticleETS>>(json).Select(a => a.ART_NR).Distinct().ToList();
         articles.RemoveAll(string.IsNullOrEmpty);

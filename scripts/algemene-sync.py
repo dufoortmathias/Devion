@@ -487,7 +487,7 @@ if send_mail:
     message = MIMEMultipart()
 
     message["From"] = sender_email
-    message["Subject"] = "Script sync TimeChimp failed"
+    message["Subject"] = f"Script sync TimeChimp {company} failed"
 
     body = f"""
 Er ging iets mis met het TimeChimp script!
