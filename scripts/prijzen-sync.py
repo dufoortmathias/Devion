@@ -130,6 +130,4 @@ Bekijk bijlage voor meer informatie.
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
         server.login(sender_email, password)
-        for email in notify_emails:
-            message["To"] = email
-            server.sendmail(sender_email, email, message.as_string())
+        server.sendmail(sender_email, notify_emails, message.as_string())

@@ -1,5 +1,5 @@
 //#region *** DOM references ***********
-const baseUrl = "http://192.168.100.237:5001/api";
+const baseUrl = "http://localhost:5142/api";
 let htmlButton, htmlBestelbonSelect, htmlBedrijfSelect, htmltabel;
 
 //#endregion

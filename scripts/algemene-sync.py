@@ -144,9 +144,8 @@ def get_projects_to_sync():
 
 # Receives ids from all times that have changed in ETS after last sync
 def get_times_to_sync():
-    response = requests.get(
-        f"{base_URL}ets/timeids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}"
-    )
+    url = f"{base_URL}ets/timeids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}"
+    response = requests.get(url)
     if response.ok:
         return response.json()
     else:
@@ -292,7 +291,6 @@ def sync_mileages(mileage_ids):
                 f"failed! ({response.status_code}{': ' + json.loads(response.text)['detail'] if response.text else ''})\n"
             )
     return synced
-
 
 try:
     if len(company) == 0: raise Exception("Script was run without an argument for the company name")
@@ -518,6 +516,4 @@ Bekijk bijlage voor meer informatie.
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
         server.login(sender_email, password)
-        for email in notify_emails:
-            message["To"] = email
-            server.sendmail(sender_email, email, message.as_string())
+        server.sendmail(sender_email, notify_emails, message.as_string())
