@@ -364,19 +364,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 {
                     if (string.IsNullOrEmpty(projectTaskETS.VO_PROJ?.Trim()))
                     {
-                        errorMessages.Add($"Subproject {subProject.id} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                        errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
                     }
                     else if (string.IsNullOrEmpty(projectTaskETS.VO_SUBPROJ?.Trim()))
                     {
-                        errorMessages.Add($"Subproject {subProject.id} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                        errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
                     }
                     else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
                     {
-                        errorMessages.Add($"Subproject {subProject.id} field VO_UUR is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                        errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
                     }
                     else if (projectTaskETS.VO_AANT == null)
                     {
-                        errorMessages.Add($"Subproject {subProject.id} field VO_AANT is null for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                        errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null for record {projectTaskETS.VO_ID} in table J2W_VOPX");
                     }
                     else
                     {
