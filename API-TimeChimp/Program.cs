@@ -544,22 +544,26 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            ETSPurchaseOrderHelper helper = new ETSPurchaseOrderHelper(ETSClient);
-
-            List<PurchaseOrderDetailETS> purchaseOrders = helper.GetPurchaseOrderDetails(id);
-            List<string> leveranciers = purchaseOrders.Select(p => p.LV_COD).Distinct().ToList();
+            ETSPurchaseOrderHelper helper = new(ETSClient);
 
             List<FileContentResult> fileContents = new();
-            foreach (string leverancier in leveranciers)
-            {
-                List<PurchaseOrderDetailETS> purchaseOrdersLeverancier = purchaseOrders.Where(p => p.LV_COD != null && p.LV_COD.Equals(leverancier)).ToList();
-                FileContentResult fileContent = leverancier switch
+            helper.GetPurchaseOrderDetails(id)
+                .Where(po => po.LV_COD != null)
+                .GroupBy(po => po.LV_COD)
+                .Select(g => g.ToList())
+                .ToList()
+                .ForEach(purchaseOrders =>
                 {
-                    "000174" => helper.CreateFileCebeo(purchaseOrdersLeverancier, config), //Cebeo //TODO find better way to check if order is for cebeo
-                    _ => helper.CreateCSVFile(purchaseOrdersLeverancier)
-                };
-                fileContents.Add(fileContent);
-            }
+                    if (purchaseOrders.First().LV_NAM.ToLower().Contains("cebeo"))
+                    {
+                        fileContents.Add(helper.CreateFileCebeo(purchaseOrders, config));
+                    }
+                    else
+                    {
+                        fileContents.Add(helper.CreateCSVFile(purchaseOrders));
+                    }
+                });
+
             return Results.Ok(fileContents);
         }
         catch (Exception e)
