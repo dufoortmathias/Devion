@@ -30,7 +30,7 @@
         public EmployeeTimeChimp() { }
 
         //constructor to from ets class to timechimp class
-        public EmployeeTimeChimp(EmployeeETS employeeETS)
+        public EmployeeTimeChimp(EmployeeETS employeeETS, int roleId)
         {
             employeeNumber = employeeETS.PN_ID;
             userName = employeeETS.PN_EMAIL;
@@ -44,7 +44,7 @@
                 _ => "nl"
             };
             badgeNumber = employeeETS.PN_BADGENR;
-            roleId = 1; //TODO: add value to seperate file
+            this.roleId = roleId; //TODO: add value to seperate file
             tagNames = new string?[] { };
         }
     }

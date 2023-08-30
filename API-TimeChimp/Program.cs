@@ -241,10 +241,22 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 return Results.Problem($"ETS doesn't contain an employee with id = {employeeId}");
             }
 
-            //change to timechimp class
-            EmployeeTimeChimp TCEmployee = new(ETSEmployee);
 
             TimeChimpEmployeeHelper employeeHelper = new(TCClient);
+
+            //determine role by most used role for all users except admins/managers
+            int roleId = employeeHelper.GetEmployees()
+                .Where(e => e.roleId > 4 || e.roleId == 1)
+                .GroupBy(e => e.roleId.Value)
+                .Select(g => new
+                    {
+                        RoleId = g.Key,
+                        Count = g.Count()
+                    })
+                .MaxBy(o => o.Count)?.RoleId ?? 1;
+
+            //change to timechimp class
+            EmployeeTimeChimp TCEmployee = new(ETSEmployee, roleId);
 
             //check if employee exists in timechimp
             if (employeeHelper.EmployeeExists(employeeId))
