@@ -1,3 +1,5 @@
+using System.Security;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
@@ -636,9 +638,50 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}SearchArticleCebeo").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/ets/articleforminfo", () =>
+    {
+        try
+        {
+            string query = "SELECT AR_COD AS CODE, AR_OMS1 AS DESCRIPTION FROM ARTFAM";
+            string responseFamilies = ETSClient.selectQuery(query);
+
+            query = "SELECT ASF_COD AS CODE, ASF_OMS1 AS DESCRIPTION FROM ARTSUBFAM";
+            string responseSubfamilies = ETSClient.selectQuery(query);
+
+
+            query = "SELECT EH_COD AS CODE, EH_OMS1 AS DESCRIPTION, EH_OMS2 AS SHORT_DESCRIPTION FROM EENHEID";
+            string responseMeasureTypes = ETSClient.selectQuery(query);
+
+            query = "SELECT TBL_REKENING.REK_CODE AS CODE, TBL_REKENING_TAAL.RET_OMSCHRIJVING AS DESCRIPTION FROM TBL_REKENING LEFT JOIN TBL_REKENING_TAAL ON TBL_REKENING.REK_ID = TBL_REKENING_TAAL.RET_MASTER_ID";
+            string responseBankAccounts = ETSClient.selectQuery(query);
+
+            query = "SELECT EURO_COD AS CODE, EURO_OMS AS DESCRIPTION FROM EURO";
+            string responseCoinTypes = ETSClient.selectQuery(query);
+
+            query = "SELECT CODE, OMSCHRIJF AS DESCRIPTION FROM BTW_CODE";
+            string responseBTWCodes = ETSClient.selectQuery(query);
+
+            Dictionary<string, object> result = new()
+            {
+                {"families", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseFamilies)},
+                {"subfamilies", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseSubfamilies)},
+                {"measureTypes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseMeasureTypes)},
+                {"bankAccounts", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseBankAccounts)},
+                {"coinTypes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseCoinTypes)},
+                {"BTWCodes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseBTWCodes)}
+            };
+
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}ArticleFormInfo").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
 
-//app.Run();
-app.Run("http://192.168.100.237:5200");
+app.Run();
+//app.Run("http://192.168.100.237:5200");

@@ -27,6 +27,9 @@ public class Customer
 public class UnitPrice
 {
 
+    [XmlElement(ElementName = "TarifPrice")]
+    public string TarifPrice { get; set; }
+
     [XmlElement(ElementName = "NetPrice")]
     public string NetPrice { get; set; }
 
@@ -129,6 +132,9 @@ public class Item
 
     [XmlElement(ElementName = "SalesPackQuantity")]
     public int SalesPackQuantity { get; set; }
+
+    [XmlElement(ElementName = "PromotionCode")]
+    public string? PromotionCode { get; set; }
 }
 
 [XmlRoot(ElementName = "SearchKeywords")]
