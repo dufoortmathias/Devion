@@ -25,6 +25,30 @@ public class ETSPurchaseOrderHelper : ETSHelper
         return JsonTool.ConvertTo<List<PurchaseOrderHeaderETS>>(json);
     }
 
+    public PurchaseOrderHeaderETS GetPurchaseOrderHeader(string id)
+    {
+        //create query
+        string query = $"SELECT * FROM CSFHPX WHERE FH_BONNR = @id AND FH_CODE = 'V'";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@id",  id}
+        };
+
+        //get data from ETS
+        string json = ETSClient.selectQuery(query, parameters);
+
+        //check if json is not empty
+        if (json == null)
+        {
+            throw new Exception("Error getting purchase order header from ETS with query: " + query);
+        }
+
+        //get all purchase orders from the json
+        PurchaseOrderHeaderETS purchaseOrder = JsonTool.ConvertTo<List<PurchaseOrderHeaderETS>>(json).First();
+
+        return purchaseOrder;
+    }
+
     //get all purchase details for specific purchase order
     public List<PurchaseOrderDetailETS> GetPurchaseOrderDetails(string id)
     {

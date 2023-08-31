@@ -583,7 +583,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            List<string> articles = new ETSArticleHelper(ETSClient, config).GetAriclesCebeo();
+            List<string> articles = new ETSArticleHelper(ETSClient).GetAriclesCebeo();
 
             return Results.Ok(articles);
         }
@@ -597,15 +597,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            ETSArticleHelper helper = new(ETSClient, config);
+            ETSArticleHelper ETShelper = new(ETSClient);
+            CebeoArticleHelper Cebeohelper = new(config);
 
-            string articleReference = helper.GetArticle(articleNumberETS).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
+            string articleReference = ETShelper.GetArticle(articleNumberETS).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
 
-            string articleNumberCebeo = helper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+            string articleNumberCebeo = Cebeohelper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 
-            float newPrice = helper.GetArticlePriceCebeo(articleNumberCebeo) ?? throw new Exception($"Cebeo has no article with number = {articleNumberCebeo}");
+            float newPrice = Cebeohelper.GetArticlePriceCebeo(articleNumberCebeo) ?? throw new Exception($"Cebeo has no article with number = {articleNumberCebeo}");
 
-            ArticleETS article = helper.UpdateArticlePriceETS(articleNumberETS, newPrice, maxPriceDiff);
+            ArticleETS article = ETShelper.UpdateArticlePriceETS(articleNumberETS, newPrice, maxPriceDiff);
 
             return Results.Ok(article.ART_AANKP == newPrice ? $"Price updated to {article.ART_AANKP}" : $"Price not updated, price diff is {Math.Abs(article.ART_AANKP.Value - newPrice) / article.ART_AANKP * 100}%");
         }
@@ -614,8 +615,30 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}UpdateArticlePrice").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/cebeo/searcharticle", (string articleReference) =>
+    {
+        try
+        {
+            if (new ETSArticleHelper(ETSClient).ArticleWithReferenceExists(articleReference))
+            {
+                throw new Exception($"ETS already has an article with reference = {articleReference}");
+            }
+
+            Item articleCebeo = new CebeoArticleHelper(config).SearchForArticleWithReference(articleReference);
+
+            ArticleWeb article = new(articleCebeo);
+
+            return Results.Ok(article);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}SearchArticleCebeo").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
 
-app.Run();
+//app.Run();
+app.Run("http://192.168.100.237:5200");

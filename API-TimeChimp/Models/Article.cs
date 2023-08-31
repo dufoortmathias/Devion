@@ -238,3 +238,29 @@ public class ArticleETS
     public object? ART_REMARK_PLAIN_TEXT { get; set; }
 
 }
+
+public class ArticleWeb
+{
+    public ArticleWeb() { }
+
+    public ArticleWeb(Item articleCebeo)
+    {
+        Reference = articleCebeo.Material.Reference;
+        Description = articleCebeo.Material.Description;
+        Brand = articleCebeo.Material.BrandName;
+        UnitOfMeasure = articleCebeo.UnitOfMeasure;
+        SalesPackQuantity = articleCebeo.SalesPackQuantity;
+        NettoPrice = float.Parse(articleCebeo.UnitPrice.NetPrice);
+        TAV = (int)float.Parse(articleCebeo.UnitPrice.TAV);
+        SUBURL = $"https://www.cebeo.be/catalog/nl-be/products/{Brand.ToLower()}-{string.Join('-', (Description.Replace('-', ' ').Split(' ').Where(x => x != "").Select(x => x.Trim())))}-{articleCebeo.Material.SupplierItemID}";
+    }
+
+    public string Reference { get; set; }
+    public string? Description { get; set; }
+    public string? Brand { get; set; }
+    public string? UnitOfMeasure { get; set; }
+    public int? SalesPackQuantity { get; set; }
+    public float? NettoPrice { get; set; }
+    public int? TAV { get; set; }
+    public string? SUBURL { get; }
+}

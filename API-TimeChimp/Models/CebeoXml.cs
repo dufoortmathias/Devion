@@ -29,6 +29,9 @@ public class UnitPrice
 
     [XmlElement(ElementName = "NetPrice")]
     public string NetPrice { get; set; }
+
+    [XmlElement(ElementName = "TAV")]
+    public string TAV { get; set; }
 }
 
 [XmlRoot(ElementName = "Material")]
@@ -46,6 +49,12 @@ public class Material
 
     [XmlElement(ElementName = "Reference")]
     public string Reference { get; set; }
+
+    [XmlElement(ElementName = "Description")]
+    public string Description { get; set; }
+
+    [XmlElement(ElementName = "BrandName")]
+    public string BrandName { get; set; }
 }
 
 [XmlRoot(ElementName = "OrderLine")]

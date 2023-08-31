@@ -2,13 +2,9 @@ namespace Api.Devion.Helpers.ETS;
 
 public class ETSArticleHelper : ETSHelper
 {
-    WebClient webClient;
-    ConfigurationManager config;
 
-    public ETSArticleHelper(FirebirdClientETS clientETS, ConfigurationManager config) : base(clientETS)
+    public ETSArticleHelper(FirebirdClientETS clientETS) : base(clientETS)
     {
-        webClient = new();
-        this.config = config;
     }
 
     public ArticleETS GetArticle(string articleNumber)
@@ -26,6 +22,19 @@ public class ETSArticleHelper : ETSHelper
         return article;
     }
 
+    public bool ArticleWithReferenceExists(string articleReference)
+    {
+        string query = "SELECT * FROM CSARTPX WHERE ART_LEVREF = @number";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@number", articleReference},
+        };
+
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article from ETS with query: " + query);
+
+        return JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0;
+    }
+
     public List<string> GetAriclesCebeo()
     {
         string query = "SELECT CSARTPX.* FROM CSARTPX LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 WHERE LOWER(LVPX.LV_NAM) LIKE '%cebeo%'";
@@ -36,44 +45,6 @@ public class ETSArticleHelper : ETSHelper
         articles.RemoveAll(string.IsNullOrEmpty);
 
         return articles;
-    }
-
-    public string? GetArticleNumberCebeo(string articleReference)
-    {
-        CebeoXML cebeoXML = CebeoXML.CreateArticleSearchRequest(articleReference, config);
-
-        string requestXML = cebeoXML.GetXML();
-
-        var responseXML = webClient.PostAsync("http://b2b.cebeo.be/webservices/xml", requestXML);
-
-        XmlSerializer serializer = new(typeof(CebeoXML));
-        using (StringReader reader = new(responseXML))
-        {
-            CebeoXML response = (CebeoXML)serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}");
-
-            string? articleNumber = response.Response.Article?.List?.Item?.Find(x => x.Material?.Reference != null && x.Material.Reference.Equals(articleReference))?.Material?.SupplierItemID;
-
-            return articleNumber;
-        }
-    }
-
-    public float? GetArticlePriceCebeo(string articleNumber)
-    {
-        CebeoXML cebeoXML = CebeoXML.CreateArticleRequest(articleNumber, config);
-
-        string requestXML = cebeoXML.GetXML();
-
-        var responseXML = webClient.PostAsync("http://b2b.cebeo.be/webservices/xml", requestXML);
-
-        XmlSerializer serializer = new(typeof(CebeoXML));
-        using (StringReader reader = new(responseXML))
-        {
-            CebeoXML response = (CebeoXML)serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}");
-
-            string? netPrice = response.Response.Article.List.Item.FirstOrDefault()?.UnitPrice?.NetPrice;
-
-            return netPrice != null ? float.Parse(netPrice) : null;
-        }
     }
 
     public ArticleETS UpdateArticlePriceETS(string articleNumber, float newPrice, float maxPriceDiff)
