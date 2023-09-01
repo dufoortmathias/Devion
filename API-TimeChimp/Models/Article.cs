@@ -252,7 +252,7 @@ public class ArticleWeb
         SalesPackQuantity = articleCebeo.SalesPackQuantity;
         NettoPrice = float.Parse(articleCebeo.UnitPrice.NetPrice);
         TarifPrice = float.Parse(articleCebeo.UnitPrice.TarifPrice);
-        SUBURL = $"https://www.cebeo.be/catalog/nl-be/products/{Brand.ToLower()}-{string.Join('-', (Description.Replace('-', ' ').Split(' ').Where(x => x != "").Select(x => x.Trim())))}-{articleCebeo.Material.SupplierItemID}";
+        URL = $"https://www.cebeo.be/catalog/nl-be/products/{Brand}-{string.Join('-', Regex.Replace(Description, "[^0-9A-Za-z _-]", "").Split(' ').Where(x => x != "").Select(x => x.Trim()))}-{articleCebeo.Material.SupplierItemID}".ToLower();
     }
 
     public string Reference { get; set; }
@@ -262,5 +262,5 @@ public class ArticleWeb
     public int? SalesPackQuantity { get; set; }
     public float? NettoPrice { get; set; }
     public float? TarifPrice { get; set; }
-    public string? SUBURL { get; }
+    public string? URL { get; }
 }
