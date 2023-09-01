@@ -30,7 +30,7 @@ public class ETSContactHelper : ETSHelper
         int[] ids = JsonTool.ConvertTo<ContactETS[]>(json)
             .Select(contact => contact.C_CODE)
             .Where(x => x != null)
-            .Select(x => x.Value)
+            .Cast<int>()
             .ToArray();
         return ids;
     }
@@ -56,7 +56,7 @@ public class ETSContactHelper : ETSHelper
     }
 
     //get contact by contactId
-    public ContactETS GetContact(int contactId)
+    public ContactETS? GetContact(int contactId)
     {
         //create query
         string query = $"select C.*, F.FUT_OMSCHRIJVING from contact as C left join tbl_functie_taal as F on C.CO_FUNCTIE = F.FUT_ID where c.C_CODE = @contact";
@@ -75,7 +75,7 @@ public class ETSContactHelper : ETSHelper
         }
 
         //convert data to contactETS object
-        ContactETS contact = JsonTool.ConvertTo<ContactETS[]>(response).FirstOrDefault();
+        ContactETS? contact = JsonTool.ConvertTo<ContactETS[]>(response).FirstOrDefault();
         return contact;
     }
 }

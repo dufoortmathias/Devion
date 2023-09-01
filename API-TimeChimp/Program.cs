@@ -108,7 +108,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get customer from ets
-            CustomerETS ETSCustomer = new ETSCustomerHelper(ETSClient).GetCustomer(customerId);
+            CustomerETS? ETSCustomer = new ETSCustomerHelper(ETSClient).GetCustomer(customerId);
 
             // Handle when customer doesn't exist in ETS
             if (ETSCustomer == null)
@@ -151,16 +151,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get contact from ets
-            ContactETS ETSContact = new ETSContactHelper(ETSClient).GetContact(contactId);
-
-            // Handle when contact doesn't exist in ETS
-            if (ETSContact == null)
-            {
-                throw new Exception($"ETS doesn't contain a contact with id = {contactId}");
-            }
+            ContactETS ETSContact = new ETSContactHelper(ETSClient).GetContact(contactId) ?? throw new Exception($"ETS doesn't contain a contact with id = {contactId}");
 
             CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSContact.CO_KLCOD)) ?? throw new Exception($"Customer with number = {ETSContact.CO_KLCOD} doesn't exist in TimeChimp");
-            int customerId = customer.id.Value;
+            int customerId = customer.id ?? throw new Exception("Customer received from timechimp has no id");
 
             //change to timechimp class
             ContactTimeChimp TCContact = new(ETSContact, customerId);
@@ -197,7 +191,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get uurcode from ets
-            UurcodeETS ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
+            UurcodeETS? ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
 
             // Handle when uurcode doesn't exist in ETS
             if (ETSUurcode == null)
@@ -240,7 +234,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get employee from ets
-            EmployeeETS ETSEmployee = new ETSEmployeeHelper(ETSClient).GetEmployee(employeeId);
+            EmployeeETS? ETSEmployee = new ETSEmployeeHelper(ETSClient).GetEmployee(employeeId);
 
             // Handle when contact doesn't exist in ETS
             if (ETSEmployee == null)
@@ -254,7 +248,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             //determine role by most used role for all users except admins/managers
             int roleId = employeeHelper.GetEmployees()
                 .Where(e => e.roleId > 4 || e.roleId == 1)
-                .GroupBy(e => e.roleId.Value)
+                .GroupBy(e => e.roleId ?? throw new Exception("Employee received from timechimp has no roleId"))
                 .Select(g => new
                 {
                     RoleId = g.Key,
@@ -283,7 +277,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 employee = employeeHelper.UpdateEmployee(TCEmployee);
 
                 //adds employee to all existing projects in TimeChimp
-                _ = new TimeChimpProjectUserHelper(TCClient).AddAllProjectUserForEmployee(employee.id.Value);
+                new TimeChimpProjectUserHelper(TCClient).AddAllProjectUserForEmployee(employee.id ?? throw new Exception("User received from timechimp has no id"));
 
                 return Results.Ok(employee);
             }
@@ -332,13 +326,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // Find customer id TimeChimpETSContact.CO_KLCOD
             if (ETSProject.PR_KLNR == null)
             {
-                customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
+                customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern != null && c.intern.Value) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
             }
             else
             {
                 customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
             }
-            TCProject.customerId = customer.id.Value;
+            TCProject.customerId = customer.id ?? throw new Exception("Customer received from timechimp has no id");
 
             ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
 
@@ -347,7 +341,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             List<UurcodeTimeChimp> uurcodes = new TimeChimpUurcodeHelper(TCClient).GetUurcodes();
             // get subprojects from ETS
             List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
-            foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
+            foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => subProject.SU_SUB != null && !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
             {
                 // Change to TimeChimp class
                 ProjectTimeChimp TCSubproject = new(ETSSubproject, mainProject)
@@ -355,13 +349,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     mainProjectId = mainProject.id
                 };
 
-                ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.code) ?? projectHelperTC.CreateProject(TCSubproject);
+                ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.code ?? throw new Exception("Subproject received from timechimp has no code")) ?? projectHelperTC.CreateProject(TCSubproject);
 
                 TCSubproject.id = subProject.id;
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
 
                 //update budgethours for each projecttask in timeChimp
-                List<ProjectTaskETS> projectTasksETS = new ETSUurcodeHelper(ETSClient).GetUurcodesSubproject(ETSProject.PR_NR, ETSSubproject.SU_SUB);
+                List<ProjectTaskETS> projectTasksETS = new ETSUurcodeHelper(ETSClient).GetUurcodesSubproject(ETSProject.PR_NR ?? throw new Exception("Project received from ETS has no NR"), ETSSubproject.SU_SUB ?? throw new Exception("Subproject received from ETS has no SUBNR"));
                 foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
                 {
                     if (string.IsNullOrEmpty(projectTaskETS.VO_PROJ?.Trim()))
@@ -382,8 +376,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     }
                     else
                     {
-                        int taskId = uurcodes.Find(u => u.code.Equals(projectTaskETS.VO_UUR)).id;
-                        ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks.Find(p => p.taskId.Equals(taskId));
+                        UurcodeTimeChimp uurcode = uurcodes.Find(u => u.code != null && u.code.Equals(projectTaskETS.VO_UUR)) ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
+                        int taskId = uurcode.id ?? throw new Exception("Uurcode in TimeChimp has no id");
+                        ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks?.Find(p => p.taskId.Equals(taskId)) ?? throw new Exception($"Subproject with code = {subProject.code} has no projecttask with id = {taskId}");
 
                         projectTaskTimechimp.budgetHours = projectTaskETS.VO_AANT;
                         totalBudgetHours += projectTaskETS.VO_AANT.Value;
@@ -481,8 +476,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 throw new Exception($"Mileage with id ({mileageId}) already invoiced");
             }
 
-            string projectNumber = new TimeChimpProjectHelper(TCClient).GetProject(mileage.projectId).code;
-            string employeeNumber = new TimeChimpEmployeeHelper(TCClient).GetEmployee(mileage.userId).employeeNumber;
+            string projectNumber = new TimeChimpProjectHelper(TCClient).GetProject(mileage.projectId).code ?? throw new Exception("Project received from timechimp has no code");
+            string employeeNumber = new TimeChimpEmployeeHelper(TCClient).GetEmployee(mileage.userId).employeeNumber ?? throw new Exception("Employee received from timechimp has no employeeNumber");
 
             MileageETS mileageETS = new(mileage, projectNumber, employeeNumber);
             MileageETS response = new ETSMileageHelper(ETSClient).UpdateMileage(mileageETS);
@@ -527,21 +522,21 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             List<PurchaseOrderDetailETS> purchaseOrders = PurchaseOrderhelper.GetPurchaseOrderDetails(id);
 
             //convert to a dictionary for the web
-            Dictionary<string, object> result = new()
+            Dictionary<string, object?> result = new()
                 {
                     {"bonNummer", id},
-                    {"artikels", new List<Dictionary<string, object>>()},
+                    {"artikels", new List<Dictionary<string, object?>>()},
                     {"klant", header.KL_NAM},
                     {"project", header.FH_PROJ},
                     {"subproject", header.FH_SUBPROJ}
                 };
             foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders.Where(p => p.FD_ARTNR != null))
             {
-                ((List<Dictionary<string, object>>)result["artikels"]).Add(new()
+                ((List<Dictionary<string, object?>>) (result["artikels"] ?? throw new Exception("Value at key artikels is null"))).Add(new()
                     {
-                        {"artikelNummer", Articlehelper.GetArticleReference(purchaseOrder.FD_ARTNR, header.FH_KLNR)},
+                        {"artikelNummer", Articlehelper.GetArticleReference(purchaseOrder.FD_ARTNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no ARTNR"), header.FH_KLNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no KLNR"))},
                         {"omschrijving", purchaseOrder.FD_OMS},
-                        {"aantal", purchaseOrder.FD_AANTAL.Value},
+                        {"aantal", purchaseOrder.FD_AANTAL},
                         {"leverancier", header.LV_NAM}
                     });
             }
@@ -564,11 +559,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             PurchaseOrderHeaderETS header = PurchaseOrderhelper.GetPurchaseOrderHeader(id);
 
-            string supplier = header.LV_NAM;
-            string supplierId = header.FH_KLNR;
+            string supplier = header.LV_NAM ?? throw new Exception($"PurchaseOrder header in ETS with number = {header.FH_BONNR} has no LV_NAM");
+            string supplierId = header.FH_KLNR ?? throw new Exception($"PurchaseOrder header in ETS with number = {header.FH_BONNR} has no FH_KLNR");
 
             List<PurchaseOrderDetailETS> purchaseOrders = PurchaseOrderhelper.GetPurchaseOrderDetails(id);
-            purchaseOrders.ForEach(po => po.FD_KLANTREFERENTIE = Articlehelper.GetArticleReference(po.FD_ARTNR, supplierId));
+            purchaseOrders.ForEach(po => po.FD_KLANTREFERENTIE = Articlehelper.GetArticleReference(po.FD_ARTNR ?? throw new Exception($"PurchaseOrder detail in ETS with number = {po.FD_BONNR} has no ART_NR"), supplierId));
 
             FileContentResult fileContent;
             if (supplier.ToLower().Contains("cebeo"))
@@ -617,7 +612,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             ArticleETS article = ETShelper.UpdateArticlePriceETS(articleNumberETS, newPrice, maxPriceDiff);
 
-            return Results.Ok(article.ART_AANKP == newPrice ? $"Price updated to {article.ART_AANKP}" : $"Price not updated, price diff is {Math.Abs(article.ART_AANKP.Value - newPrice) / article.ART_AANKP * 100}%");
+            float updatedPrice = article.ART_AANKP ?? throw new Exception($"Article from ETS with number = {articleNumberETS} has no AANKP");
+            return Results.Ok(updatedPrice == newPrice ? $"Price updated to {updatedPrice}" : $"Price not updated, price diff is {Math.Abs(updatedPrice - newPrice) / article.ART_AANKP * 100}%");
         }
         catch (Exception e)
         {
@@ -634,7 +630,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 throw new Exception($"ETS already has an article with reference = {articleReference}");
             }
 
-            Item articleCebeo = new CebeoArticleHelper(config).SearchForArticleWithReference(articleReference);
+            Item articleCebeo = new CebeoArticleHelper(config).SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 
             ArticleWeb article = new(articleCebeo);
 

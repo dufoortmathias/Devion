@@ -60,7 +60,7 @@ public class TimeChimpMileageHelper : TimeChimpHelper
         };
 
         //send data to timechimp
-        _ = TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
+        TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
 
         return new TimeChimpMileageHelper(TCClient).GetMileage(mileageId);
     }

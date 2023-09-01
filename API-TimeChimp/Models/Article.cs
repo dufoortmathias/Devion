@@ -245,17 +245,17 @@ public class ArticleWeb
 
     public ArticleWeb(Item articleCebeo)
     {
-        Reference = articleCebeo.Material.Reference;
-        Description = articleCebeo.Material.Description;
-        Brand = articleCebeo.Material.BrandName;
+        Reference = articleCebeo.Material?.Reference;
+        Description = articleCebeo.Material?.Description;
+        Brand = articleCebeo.Material?.BrandName;
         UnitOfMeasure = articleCebeo.UnitOfMeasure;
         SalesPackQuantity = articleCebeo.SalesPackQuantity;
-        NettoPrice = float.Parse(articleCebeo.UnitPrice.NetPrice);
-        TarifPrice = float.Parse(articleCebeo.UnitPrice.TarifPrice);
-        URL = $"https://www.cebeo.be/catalog/nl-be/products/{Brand}-{string.Join('-', Regex.Replace(Description, "[^0-9A-Za-z _-]", "").Split(' ').Where(x => x != "").Select(x => x.Trim()))}-{articleCebeo.Material.SupplierItemID}".ToLower();
+        NettoPrice = float.Parse(articleCebeo.UnitPrice?.NetPrice ?? "");
+        TarifPrice = float.Parse(articleCebeo.UnitPrice?.TarifPrice ?? "");
+        URL = $"https://www.cebeo.be/catalog/nl-be/products/{Brand}-{string.Join('-', Regex.Replace(Description ?? throw new Exception("Article form Cebeo has no description"), "[^0-9A-Za-z _-]", "").Split(' ').Where(x => x != "").Select(x => x.Trim()))}-{articleCebeo.Material?.SupplierItemID ?? throw new Exception("Article form Cebeo has no articleNumber")}".ToLower();
     }
 
-    public string Reference { get; set; }
+    public string? Reference { get; set; }
     public string? Description { get; set; }
     public string? Brand { get; set; }
     public string? UnitOfMeasure { get; set; }

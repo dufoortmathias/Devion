@@ -73,7 +73,10 @@
             //get all ids from the json
             string[] ids = JsonTool.ConvertTo<ProjectETS[]>(json)
                 .Select(project => project.PR_NR)
+                .Where(x => x != null)
+                .Cast<string>()
                 .ToArray();
+
             return ids;
         }
     }

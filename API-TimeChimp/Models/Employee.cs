@@ -4,12 +4,12 @@
     {
         public int? id { get; set; }
         public string? email { get; set; }
-        public string userName { get; set; }
-        public string displayName { get; set; }
+        public string? userName { get; set; }
+        public string? displayName { get; set; }
         public int? accountType { get; set; }
         public bool? isLocked { get; set; }
         public string? picture { get; set; }
-        public string?[] tagNames { get; set; }
+        public string[]? tagNames { get; set; }
         public string? language { get; set; }
         public double? contractHours { get; set; }
         public double? contractHourlyRate { get; set; }
@@ -45,7 +45,7 @@
             };
             badgeNumber = employeeETS.PN_BADGENR;
             this.roleId = roleId; //TODO: add value to seperate file
-            tagNames = new string?[] { };
+            tagNames = Array.Empty<string>();
         }
     }
 

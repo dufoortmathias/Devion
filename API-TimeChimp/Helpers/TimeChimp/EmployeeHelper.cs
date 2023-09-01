@@ -59,16 +59,11 @@ namespace Api.Devion.Helpers.TimeChimp
         public EmployeeTimeChimp UpdateEmployee(EmployeeTimeChimp employee)
         {
             //get employeeid
-            employee.id = GetEmployees().Find(e => e.userName != null && e.userName.Equals(employee.userName)).id;
+            EmployeeTimeChimp employeeFound = GetEmployees().Find(e => e.userName != null && e.userName.Equals(employee.userName)) ?? throw new Exception($"Timechimp has no employee with userName = {employee.userName} to update");
+            employee.id = employeeFound.id;
 
             //create json
-            string json = JsonTool.ConvertFrom(employee);
-
-            //check if json is not empty
-            if (json == null)
-            {
-                throw new Exception("Error converting employee to json");
-            }
+            string json = JsonTool.ConvertFrom(employee) ?? throw new Exception("Error converting employee to json");
 
             //send data to timechimp
             string response = TCClient.PutAsync("v1/users", json);

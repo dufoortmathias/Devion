@@ -28,16 +28,17 @@ public class ETSUurcodeHelper : ETSHelper
         List<UurcodeETS> uurcodes = JsonTool.ConvertTo<List<UurcodeETS>>(response);
 
         //create list with all uurcodeids
-        List<string> uurcodesIds = new();
-        foreach (UurcodeETS uurcode in uurcodes)
-        {
-            uurcodesIds.Add(uurcode.UR_COD);
-        }
+        List<string> uurcodesIds = uurcodes
+            .Select(uc => uc.UR_COD)
+            .Where(x => x != null)
+            .Cast<string>()
+            .ToList();
+
         return uurcodesIds;
     }
 
     // get uurcode by uurcodeId
-    public UurcodeETS GetUurcode(string uurcodeId)
+    public UurcodeETS? GetUurcode(string uurcodeId)
     {
         string query = $"SELECT UR_COD, UR_OMS FROM URPX WHERE UR_COD = @uurcode";
         Dictionary<string, object> parameters = new()
@@ -55,7 +56,7 @@ public class ETSUurcodeHelper : ETSHelper
         }
 
         //convert data to uurcodesETS object
-        UurcodeETS uurcode = JsonTool.ConvertTo<List<UurcodeETS>>(response).FirstOrDefault();
+        UurcodeETS? uurcode = JsonTool.ConvertTo<List<UurcodeETS>>(response).FirstOrDefault();
 
         return uurcode;
     }

@@ -85,7 +85,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
         {
             // Add data to the CSV file
             var first = purchaseOrder.ART_LEVREF;
-            var second = purchaseOrder.FD_AANTAL.Value;
+            var second = purchaseOrder.FD_AANTAL ?? throw new Exception($"PurchaseOrder {purchaseOrder.FD_BONNR} in ETS has no FD_AANTAL");
             var newLine = string.Format("{0}, {1}", first, second);
             csv.AppendLine(newLine);
         }

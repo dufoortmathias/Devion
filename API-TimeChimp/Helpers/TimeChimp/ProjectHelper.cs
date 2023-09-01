@@ -9,10 +9,10 @@
         //check if project exists
         public ProjectTimeChimp? FindProject(string projectId)
         {
-            ProjectTimeChimp project = GetProjects().Find(project => project.code != null && project.code.Equals(projectId));
+            ProjectTimeChimp? project = GetProjects().Find(project => project.code != null && project.code.Equals(projectId));
             if (project != null)
             {
-                project = GetProject(project.id.Value);
+                project = GetProject(project.id ?? throw new Exception("Project form TimeChimp has no id"));
             }
             return project;
         }
@@ -63,7 +63,7 @@
         public ProjectTimeChimp UpdateProject(ProjectTimeChimp projectUpdate)
         {
             //get project from timechimp
-            ProjectTimeChimp project = GetProject(projectUpdate.id.Value);
+            ProjectTimeChimp project = GetProject(projectUpdate.id ?? throw new Exception("Project TimeChimp has not id"));
 
             //check if project exists
             if (project == null)

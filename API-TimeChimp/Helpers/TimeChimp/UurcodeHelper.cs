@@ -17,7 +17,7 @@ public class TimeChimpUurcodeHelper : TimeChimpHelper
         List<UurcodeTimeChimp> uurcodes = JsonTool.ConvertTo<List<UurcodeTimeChimp>>(response);
 
         //search for uurcode
-        UurcodeTimeChimp uurcode = uurcodes.Find(uurcode => uurcode.code == code);
+        UurcodeTimeChimp? uurcode = uurcodes.Find(uurcode => uurcode.code == code);
 
         //check if uurcode exists
         return uurcode != null;

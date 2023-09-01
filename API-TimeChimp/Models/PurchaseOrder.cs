@@ -5,7 +5,7 @@ public class PurchaseOrderHeaderETS
     public char? FH_CODE { get; set; }
     public char? FH_OLDCODE { get; set; }
     public object? FH_AFD { get; set; }
-    public string FH_BONNR { get; set; }
+    public string? FH_BONNR { get; set; }
     public object? FH_FAKNR { get; set; }
     public object? FH_BHLINK { get; set; }
     public string? FH_KLNR { get; set; }
@@ -301,7 +301,7 @@ public class PurchaseOrderDetailETS
 {
     public char? FD_CODE { get; set; }
     public char? FD_OLDCODE { get; set; }
-    public string FD_BONNR { get; set; }
+    public string? FD_BONNR { get; set; }
     public string? FD_FAKNR { get; set; }
     public string? FD_KLNR { get; set; }
     public object? FD_LYNNR { get; set; }

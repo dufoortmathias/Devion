@@ -35,7 +35,7 @@ public class ETSArticleHelper : ETSHelper
         }
 
         string? articleReference;
-        if (article != null && article.ART_LEV1.Equals(supplierId) && article.ART_LEVREF != null)
+        if (article != null && article.ART_LEV1 != null && article.ART_LEV1.Equals(supplierId) && article.ART_LEVREF != null)
         {
             return article.ART_LEVREF;
         }
@@ -74,8 +74,11 @@ public class ETSArticleHelper : ETSHelper
 
         string json = ETSClient.selectQuery(query) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
-        List<string?> articles = JsonTool.ConvertTo<List<ArticleETS>>(json).Select(a => a.ART_NR).Distinct().ToList();
-        articles.RemoveAll(string.IsNullOrEmpty);
+        List<string> articles = JsonTool.ConvertTo<List<ArticleETS>>(json)
+            .Select(a => a.ART_NR).Distinct()
+            .Where(x => x != null)
+            .Cast<string>()
+            .ToList();
 
         return articles;
     }
