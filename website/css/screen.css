@@ -28,6 +28,9 @@
   --global-color-alpha-transparent: #3385ffbf;
   --global-color-alpha-x-transparent: #3385ff4d;
 
+  --global-color-hover: #adb004;
+  --global-color-active: #ffff00;
+
   --global-color-neutral-xxxx-light: #f5f6fa;
   --global-color-neutral-xxx-light: #e2e3e7;
   --global-color-neutral-xx-light: #caccd4;
@@ -91,7 +94,7 @@
 
   /* @media (prefers-color-scheme: dark) {
     :root {
-      --global-page-color: White;
+      --global-page-color: var(--global-color-neutral-xxxx-dark);
       --global-page-backgroundColor: var(--global-color-neutral-xxxx-dark);
 
       --global-label-color: var(--global-color-neutral-xx-light);
@@ -130,6 +133,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--global-page-backgroundColor);
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 *,
@@ -405,7 +410,7 @@ table {
   --c-app__topbar-height: calc(var(--global-baseline) * 14);
   min-height: 100vh;
   display: grid;
-  grid-template-areas: "logo topbar" "body body";
+  grid-template-areas: "header header" "body body";
   align-items: center;
   align-items: center;
   justify-content: center;
@@ -435,14 +440,67 @@ table {
   align-self: center;
 }
 
-.c-app_topbar {
-  background-color: #fff;
-  box-shadow: var(--global-boxShadow);
-  z-index: 20;
-  display: flex;
-  grid-area: topbar;
-  height: var(--c-app__topbar-height);
+.c-header {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
+  width: 100vw;
+  grid-area: header;
+  grid-template-areas: "logo nav";
+  grid-gap: 20vw;
 }
+/*
+    Component: Nav
+    ---
+    Main navigation of the site
+*/
+
+.c-nav {
+  grid-area: nav;
+  font-size: calc(var(--global-fontSize) * 1.5);
+  line-height: var(--global-whitespace);
+  width: auto;
+  display: flex;
+}
+
+.c-nav__link {
+  text-decoration: none;
+  font-weight: 400;
+  padding: var(--global-whitespace-xs) 0;
+}
+
+.c-nav__item {
+  display: inline-block;
+  margin-right: var(--global-whitespace-md);
+}
+
+.c-nav__link,
+.c-nav__link:visited,
+.c-nav__link:active {
+  color: var(--global-color-alpha-x-dark);
+  transition: color var(--global-transitionTiming-alpha);
+}
+
+.c-nav__link:active {
+  color: var(--global-color-active);
+}
+
+.c-nav__link:hover,
+.c-nav__link:focus {
+  color: var(--global-color-hover);
+}
+
+@media (min-width: 768px) {
+  .c-nav__list {
+    display: inline-block;
+  }
+
+  .c-nav__link {
+  }
+}
+
 .c-app_body {
   grid-area: body;
   padding: var(--global-whitespace-lg);
@@ -450,11 +508,12 @@ table {
   box-shadow: var(--global-boxShadow);
   z-index: 10;
   height: calc(100vh - var(--c-app__topbar-height));
-  width: 50vw;
+  width: 70vw;
   align-items: center;
   justify-content: center;
   justify-items: center;
   align-self: center;
+  min-height: 70vh;
 }
 
 .c-label {
@@ -572,6 +631,501 @@ table {
   color: var(--global-color-error);
 }
 
+.c-label--artikel {
+  padding-top: 11px;
+  grid-column: 1;
+}
+
+.c-input--artikel {
+  grid-column: 2;
+}
+
+.c-input--error {
+  border-color: var(--global-color-error);
+}
+
+.c-label--error-artikelnrsearch {
+  grid-column: 2;
+}
+
+.c-artikel_text {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  width: 100%;
+}
+
+.c-button-artikel-search {
+  margin-top: var(--global-whitespace-lg);
+  margin-bottom: var(--global-whitespace-lg);
+  cursor: pointer;
+}
+
+.c-artikel_form {
+  display: grid;
+  grid-template-areas: 
+          "artikelnr reflevnr hoofdleverancier" 
+          "omschrijving prijs muntcode" 
+          "akprijseh verbruikseh familie" 
+          "btwcode rekver subfamilie"
+          "tarief winst verkoop"
+          "stdkorting omrekfac typfac"
+          "lengte breedte hoogte"
+          "merk link none"
+          "button button button";
+  grid-template-columns: 30vw 30vw 30vw;
+  grid-gap: var(--global-whitespace-lg);
+  width: 100vw;
+  transform: translateX(-15vw);
+}
+
+.c-artikel-artikelnr {
+  grid-area: artikelnr;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-artikelnr {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-artikelnr {
+  grid-area: input;
+}
+
+.c-artikel-reflevnr {
+  grid-area: reflevnr;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-reflevnr {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-reflevnr {
+  grid-area: input;
+}
+
+.c-artikel-hoofdlev {
+  grid-area: hoofdleverancier;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-hoofdlev {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-hoofdlev {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--hoofdlev {
+  display: inline;
+  transform: translateX(-7vw);
+}
+
+.c-artikel-omschrijving {
+  grid-area: omschrijving;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-omschrijving {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-omschrijving {
+  grid-area: input;
+}
+
+.c-artikel-familie {
+  grid-area: familie;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-familie {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-familie {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--familie {
+  display: inline;
+  transform: translateX(-7vw) translateY(17vh);
+}
+
+.c-artikel-subfamilie {
+  grid-area: subfamilie;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-subfamilie {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-subfamilie {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--subfamilie {
+  display: inline;
+  transform: translateX(-7vw) translateY(25vh);
+}
+
+.c-artikel-prijs {
+  grid-area: prijs;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-prijs {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-prijs {
+  grid-area: input;
+}
+
+.c-artikel-akprijseh {
+  grid-area: akprijseh;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-akprijseh {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-akprijseh {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--akprijseh {
+  display: inline;
+  transform: translateX(-71vw) translateY(17vh);
+}
+
+.c-artikel-verbruikseh {
+  grid-area: verbruikseh;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-verbruikseh {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-verbruikseh {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--verbruikseh {
+  display: inline;
+  transform: translateX(-39vw) translateY(17vh);
+}
+
+.c-artikel-lengte {
+  grid-area: lengte;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-lengte {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-lengte {
+  grid-area: input;
+}
+
+.c-artikel-breedte {
+  grid-area: breedte;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-breedte {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-breedte {
+  grid-area: input;
+}
+
+.c-artikel-hoogte {
+  grid-area: hoogte;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-hoogte {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-hoogte {
+  grid-area: input;
+}
+
+.c-artikel-btwcode {
+  grid-area: btwcode;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-btwcode {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-btwcode {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--btwcode {
+  display: inline;
+  transform: translateX(-71vw) translateY(25vh);
+}
+
+.c-artikel-rekver {
+  grid-area: rekver;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-rekver {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-rekver {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--rekver {
+  display: inline;
+  transform: translateX(-39vw) translateY(25vh);
+}
+
+.c-artikel-muntcode {
+  grid-area: muntcode;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-muntcode {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-muntcode {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--muntcode {
+  display: inline;
+  transform: translateX(-7vw) translateY(8.5vh);
+}
+.c-artikel-typfac {
+  grid-area: typfac;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-typfac {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-typfac {
+  grid-area: input;
+}
+
+.c-custom-select__symbol--typfac {
+  display: inline;
+  transform: translateX(-7vw) translateY(41.5vh);
+}
+
+.c-artikel-omrekfac {
+  grid-area: omrekfac;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-omrekfac {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-omrekfac {
+  grid-area: input;
+}
+
+.c-artikel-merk {
+  grid-area: merk;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-merk {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-merk {
+  grid-area: input;
+}
+
+.c-artikel-tarief {
+  grid-area: tarief;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-tarief {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-tarief {
+  grid-area: input;
+}
+
+.c-artikel-verkoop {
+  grid-area: verkoop;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-verkoop {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-verkoop {
+  grid-area: input;
+}
+
+.c-artikel-winst {
+  grid-area: winst;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-winst {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-winst {
+  grid-area: input;
+}
+
+.c-artikel-link {
+  grid-area: link;
+  display: grid;
+  grid-template-areas: "label icon input";
+  grid-template-columns: 1fr 1fr 4fr;
+}
+
+.c-label-link {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-link {
+  grid-area: input;
+}
+
+.c-link-artikel {
+  grid-area: icon;
+  color:#fff;
+  justify-self: end;
+  align-self: center;
+  background-color:var(--global-color-alpha);
+  width:var(--global-whitespace-md);
+  height:var(--global-whitespace-md);
+  display:inline-block;
+  border-radius:100%;
+  font-size:10px;
+  text-align:center;
+  text-decoration:none;
+  -webkit-box-shadow: inset -1px -1px 1px 0px rgba(0,0,0,0.25);
+  -moz-box-shadow: inset -1px -1px 1px 0px rgba(0,0,0,0.25);
+  box-shadow: inset -1px -1px 1px 0px rgba(0,0,0,0.25);
+  margin-right: var(--global-whitespace-md);
+}
+
+.c-link-artikel:hover,
+.c-link-artikel:visited,
+.c-link-artikel:active {
+  color: var(--global-color-neutral-xxxx-light)
+}
+
+.c-artikel-stdkorting {
+  grid-area: stdkorting;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-stdkorting {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-stdkorting {
+  grid-area: input;
+}
+
+.c-artikel-button {
+  grid-area: button;
+  display: grid;
+  grid-template-areas: "button";
+  grid-template-columns: 1fr;
+  margin-bottom: 2vh;
+}
+
+.c-button-artikel {
+  grid-area: button;
+}
 /*------------------------------------*\
 #UTILITIES
 \*------------------------------------*/
