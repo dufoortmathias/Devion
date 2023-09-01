@@ -17,9 +17,42 @@ public class ETSArticleHelper : ETSHelper
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
-        ArticleETS article = JsonTool.ConvertTo<List<ArticleETS>>(json).First() ?? throw new Exception($"ETS han no article with number = {articleNumber}");
+        ArticleETS article = JsonTool.ConvertTo<List<ArticleETS>>(json).FirstOrDefault() ?? throw new Exception($"ETS han no article with number = {articleNumber}");
 
         return article;
+    }
+
+    public string GetArticleReference(string articleNumber, string supplierId)
+    {
+        ArticleETS? article = null;
+        try
+        {
+            GetArticle(articleNumber);
+        }
+        catch
+        {
+
+        }
+
+        string? articleReference;
+        if (article != null && article.ART_LEV1.Equals(supplierId) && article.ART_LEVREF != null)
+        {
+            return article.ART_LEVREF;
+        }
+        else
+        {
+            string query = "SELECT CO_REFLEV FROM CONTACT3 WHERE CO_ARTNR = @number AND CO_LEVNR = @supplier";
+            Dictionary<string, object> parameters = new()
+            {
+                {"@number", articleNumber},
+                {"@supplier", supplierId}
+            };
+
+            string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article reference from ETS with query: " + query);
+            articleReference = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).FirstOrDefault()?["CO_REFLEV"];
+        }
+
+        return articleReference ?? articleNumber;
     }
 
     public bool ArticleWithReferenceExists(string articleReference)

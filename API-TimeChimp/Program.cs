@@ -518,25 +518,31 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            List<PurchaseOrderDetailETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrderDetails(id);
+            ETSPurchaseOrderHelper PurchaseOrderhelper = new(ETSClient);
+            ETSArticleHelper Articlehelper = new(ETSClient);
+
+            PurchaseOrderHeaderETS header = PurchaseOrderhelper.GetPurchaseOrderHeader(id);
+            
+
+            List<PurchaseOrderDetailETS> purchaseOrders = PurchaseOrderhelper.GetPurchaseOrderDetails(id);
 
             //convert to a dictionary for the web
             Dictionary<string, object> result = new()
                 {
                     {"bonNummer", id},
                     {"artikels", new List<Dictionary<string, object>>()},
-                    {"klant", purchaseOrders.FirstOrDefault()?.KLANTNAAM},
-                    {"project", purchaseOrders.FirstOrDefault()?.FD_PROJ},
-                    {"subproject", purchaseOrders.FirstOrDefault()?.FD_SUBPROJ}
+                    {"klant", header.KL_NAM},
+                    {"project", header.FH_PROJ},
+                    {"subproject", header.FH_SUBPROJ}
                 };
             foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders.Where(p => p.FD_ARTNR != null))
             {
                 ((List<Dictionary<string, object>>)result["artikels"]).Add(new()
                     {
-                        {"artikelNummer", purchaseOrder.FD_ARTNR},
+                        {"artikelNummer", Articlehelper.GetArticleReference(purchaseOrder.FD_ARTNR, header.FH_KLNR)},
                         {"omschrijving", purchaseOrder.FD_OMS},
                         {"aantal", purchaseOrder.FD_AANTAL.Value},
-                        {"leverancier", purchaseOrder.LV_NAM}
+                        {"leverancier", header.LV_NAM}
                     });
             }
 
@@ -553,27 +559,28 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            ETSPurchaseOrderHelper helper = new(ETSClient);
+            ETSPurchaseOrderHelper PurchaseOrderhelper = new(ETSClient);
+            ETSArticleHelper Articlehelper = new(ETSClient);
 
-            List<FileContentResult> fileContents = new();
-            helper.GetPurchaseOrderDetails(id)
-                .Where(po => po.LV_COD != null)
-                .GroupBy(po => po.LV_COD)
-                .Select(g => g.ToList())
-                .ToList()
-                .ForEach(purchaseOrders =>
-                {
-                    if (purchaseOrders.First().LV_NAM.ToLower().Contains("cebeo"))
-                    {
-                        fileContents.Add(helper.CreateFileCebeo(purchaseOrders, config));
-                    }
-                    else
-                    {
-                        fileContents.Add(helper.CreateCSVFile(purchaseOrders));
-                    }
-                });
+            PurchaseOrderHeaderETS header = PurchaseOrderhelper.GetPurchaseOrderHeader(id);
 
-            return Results.Ok(fileContents);
+            string supplier = header.LV_NAM;
+            string supplierId = header.FH_KLNR;
+
+            List<PurchaseOrderDetailETS> purchaseOrders = PurchaseOrderhelper.GetPurchaseOrderDetails(id);
+            purchaseOrders.ForEach(po => po.FD_KLANTREFERENTIE = Articlehelper.GetArticleReference(po.FD_ARTNR, supplierId));
+
+            FileContentResult fileContent;
+            if (supplier.ToLower().Contains("cebeo"))
+            {
+                fileContent = PurchaseOrderhelper.CreateFileCebeo(purchaseOrders, supplier, config);
+            }
+            else
+            {
+                fileContent = PurchaseOrderhelper.CreateCSVFile(purchaseOrders, supplier);
+            }
+
+            return Results.Ok(fileContent);
         }
         catch (Exception e)
         {
@@ -684,4 +691,3 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
 
 app.Run();
-//app.Run("http://192.168.100.237:5200");

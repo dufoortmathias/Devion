@@ -8,7 +8,7 @@ public class PurchaseOrderHeaderETS
     public string FH_BONNR { get; set; }
     public object? FH_FAKNR { get; set; }
     public object? FH_BHLINK { get; set; }
-    public object? FH_KLNR { get; set; }
+    public string? FH_KLNR { get; set; }
     public object? FH_AUTO { get; set; }
     public object? FH_KILOM { get; set; }
     public object? FH_BVW { get; set; }
@@ -261,7 +261,7 @@ public class PurchaseOrderHeaderETS
     public object? FH_AFGEMELD { get; set; }
     public object? LV_TEL { get; set; }
     public object? LV_FAX { get; set; }
-    public object? LV_NAM { get; set; }
+    public string? LV_NAM { get; set; }
     public object? FH_OPVOLGING { get; set; }
     public object? FH_SETTLENUMBER { get; set; }
     public object? FH_SEL_TOURLIJST { get; set; }
@@ -303,7 +303,7 @@ public class PurchaseOrderDetailETS
     public char? FD_OLDCODE { get; set; }
     public string FD_BONNR { get; set; }
     public string? FD_FAKNR { get; set; }
-    public object? FD_KLNR { get; set; }
+    public string? FD_KLNR { get; set; }
     public object? FD_LYNNR { get; set; }
     public string? FD_ARTNR { get; set; }
     public object? FD_ARTLEV { get; set; }
@@ -501,7 +501,7 @@ public class PurchaseOrderDetailETS
     public object? FD_INSERT_VIA_OVERNAME_LEVBON { get; set; }
     public object? FD_INFO { get; set; }
     public object? FD_ARTIKEL_LOCATIE_ID { get; set; }
-    public object? FD_KLANTREFERENTIE { get; set; }
+    public string? FD_KLANTREFERENTIE { get; set; }
     public object? FD_VELD1 { get; set; }
     public object? FD_CAR_STOCK_ID { get; set; }
     public object? FD_WINSTPERCENTAGE { get; set; }

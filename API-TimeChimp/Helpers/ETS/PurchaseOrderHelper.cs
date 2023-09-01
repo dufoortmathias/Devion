@@ -78,7 +78,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
     }
 
     //creates CSV file with all order information for given purchaseOrders, and returns file information
-    public FileContentResult CreateCSVFile(List<PurchaseOrderDetailETS> purchaseOrders)
+    public FileContentResult CreateCSVFile(List<PurchaseOrderDetailETS> purchaseOrders, string supplier)
     {
         var csv = new StringBuilder();
         foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders)
@@ -93,19 +93,19 @@ public class ETSPurchaseOrderHelper : ETSHelper
         byte[] byteData = Encoding.ASCII.GetBytes(csv.ToString());
         return new FileContentResult(byteData, "text/csv")
         {
-            FileDownloadName = $"{purchaseOrders.FirstOrDefault()?.FD_BONNR}_{purchaseOrders.FirstOrDefault()?.LV_NAM}.csv"
+            FileDownloadName = $"{purchaseOrders.FirstOrDefault()?.FD_BONNR}_{supplier}.csv"
         };
     }
 
     //creates XML file with all order information for given purchaseOrders, and returns file information
-    public FileContentResult CreateFileCebeo(List<PurchaseOrderDetailETS> purchaseOrders, ConfigurationManager config)
+    public FileContentResult CreateFileCebeo(List<PurchaseOrderDetailETS> purchaseOrders, string supplier, ConfigurationManager config)
     {
         CebeoXML cebeoXML = CebeoXML.CreateOrderRequest(purchaseOrders, config);
 
         byte[] byteData = Encoding.ASCII.GetBytes(cebeoXML.GetXML());
         return new FileContentResult(byteData, "text/xml")
         {
-            FileDownloadName = $"{purchaseOrders.FirstOrDefault()?.FD_BONNR}_{purchaseOrders.FirstOrDefault()?.LV_NAM}.xml"
+            FileDownloadName = $"{purchaseOrders.FirstOrDefault()?.FD_BONNR}_{supplier}.xml"
         };
     }
 }

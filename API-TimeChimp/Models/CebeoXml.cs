@@ -67,7 +67,7 @@ public class OrderLine
 
     public OrderLine(PurchaseOrderDetailETS purchaseOrder)
     {
-        Material = new(purchaseOrder.ART_LEVREF);
+        Material = new(purchaseOrder.FD_KLANTREFERENTIE);
         OrderedQuantity = (int) purchaseOrder.FD_AANTAL;
     }
 
