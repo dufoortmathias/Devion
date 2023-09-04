@@ -50,6 +50,7 @@ password = config.get("SENDER_PASSWORD")
 notify_emails = config.get("LIST_RECEIVER_EMAILS").split(", ")
 send_mail = False
 first_sync_time = config.get("FIRST_SYNC_TIME")
+log_dir = config.get("PATH_LOG_DIRECTORY")
 
 # Reads data from the json file, if the file doesn't exist it will create one
 global json_data
@@ -476,7 +477,7 @@ minutes = int(duration.total_seconds() / 60)
 seconds = duration.total_seconds() % 60
 log(f"Duration: {minutes} min {seconds} sec")
 dir = os.path.dirname(__file__)
-log_filename = f"{dir}/logs/{company}/{start_time.year}/{start_time.month}/{start_time.day}/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
+log_filename = f"{log_dir}/logs/{company}/{start_time.year}/{start_time.month}/{start_time.day}/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
 # Create log file
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 with open(log_filename, "w+") as log_file:
