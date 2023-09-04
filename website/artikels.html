@@ -54,7 +54,7 @@
             <a href="index.html" class="c-nav__link">bestelbon</a>
           </li>
           <li class="c-nav__item" active>
-            <a href="artikels.html" class="c-nav__link" active>nieuw artikel</a>
+            <a href="artikels.html" class="c-nav__link c-nav__link--active">nieuw artikel</a>
           </li>
         </ul>
       </nav>
@@ -81,6 +81,14 @@
               for="artikelNr"
               >Dit artikel bestaat al</label
             >
+          </div>
+          <div class="c-file-input">
+            <input
+              type="file"
+              class="c-file-input__input js-file-input"
+              name="file"
+              id="file"
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
           </div>
           <button
             type="submit"
@@ -363,6 +371,7 @@
                 placeholder="catalogus prijs"
                 name="tarief"
                 id="tarief"
+                disabled
               />
             </div>
             <div class="c-artikel-verkoop">
@@ -416,10 +425,11 @@
             <div class="c-artikel-button">
               <button
                 type="submit"
-                class="o-button-reset c-button c-button-artikel js-button-artikel"
+                class="o-button-reset c-button c-button-artikel js-button-artikel-toevoegen"
               >
                 artikel toevoegen
               </button>
+            </div>
           </form>
         </div>
       </div>

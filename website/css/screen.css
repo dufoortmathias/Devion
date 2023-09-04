@@ -29,7 +29,7 @@
   --global-color-alpha-x-transparent: #3385ff4d;
 
   --global-color-hover: #adb004;
-  --global-color-active: #ffff00;
+  --global-color-active: #ebeb10;
 
   --global-color-neutral-xxxx-light: #f5f6fa;
   --global-color-neutral-xxx-light: #e2e3e7;
@@ -272,9 +272,9 @@ a {
   outline-offset: 2px;
 }
 
-a:visited {
+/* a:visited {
   color: var(--link-visited-color, var(--global-color-alpha));
-}
+} */
 
 a:hover {
   color: var(--link-hover-color, var(--global-color-alpha-light));
@@ -476,13 +476,6 @@ table {
   margin-right: var(--global-whitespace-md);
 }
 
-.c-nav__link,
-.c-nav__link:visited,
-.c-nav__link:active {
-  color: var(--global-color-alpha-x-dark);
-  transition: color var(--global-transitionTiming-alpha);
-}
-
 .c-nav__link:active {
   color: var(--global-color-active);
 }
@@ -490,6 +483,10 @@ table {
 .c-nav__link:hover,
 .c-nav__link:focus {
   color: var(--global-color-hover);
+}
+
+.c-nav__link--active {
+  color: var(--global-color-active);
 }
 
 @media (min-width: 768px) {
@@ -627,6 +624,13 @@ table {
   }
 }
 
+.c-file-input {
+  display: flex;
+  justify-content: end;
+  margin-top: 2vh;
+  width: 100%;
+}
+
 .c-label--error {
   color: var(--global-color-error);
 }
@@ -715,6 +719,7 @@ table {
   display: grid;
   grid-template-areas: "label input";
   grid-template-columns: 1fr 2fr;
+  cursor: pointer;
 }
 
 .c-label-hoofdlev {
@@ -761,6 +766,7 @@ table {
 
 .c-input-familie {
   grid-area: input;
+  cursor: pointer;
 }
 
 .c-custom-select__symbol--familie {
@@ -782,6 +788,7 @@ table {
 
 .c-input-subfamilie {
   grid-area: input;
+  cursor: pointer;
 }
 
 .c-custom-select__symbol--subfamilie {
@@ -819,6 +826,7 @@ table {
 
 .c-input-akprijseh {
   grid-area: input;
+  cursor: pointer;
 }
 
 .c-custom-select__symbol--akprijseh {
@@ -840,6 +848,7 @@ table {
 
 .c-input-verbruikseh {
   grid-area: input;
+  cursor: pointer;
 }
 
 .c-custom-select__symbol--verbruikseh {
@@ -909,6 +918,7 @@ table {
 
 .c-input-btwcode {
   grid-area: input;
+  cursor: pointer;
 }
 
 .c-custom-select__symbol--btwcode {
@@ -930,6 +940,7 @@ table {
 
 .c-input-rekver {
   grid-area: input;
+  cursor: pointer;
 }
 
 .c-custom-select__symbol--rekver {
@@ -951,6 +962,7 @@ table {
 
 .c-input-muntcode {
   grid-area: input;
+  cursor: pointer;
 }
 
 .c-custom-select__symbol--muntcode {
@@ -971,6 +983,7 @@ table {
 
 .c-input-typfac {
   grid-area: input;
+  cursor: pointer;
 }
 
 .c-custom-select__symbol--typfac {
@@ -1125,6 +1138,7 @@ table {
 
 .c-button-artikel {
   grid-area: button;
+  cursor: pointer;
 }
 /*------------------------------------*\
 #UTILITIES

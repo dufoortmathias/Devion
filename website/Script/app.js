@@ -31,7 +31,9 @@ let htmlButtonDownload,
   htmlWinstpercentage,
   htmlLink,
   htmlLinkIcon,
-  htmlStdKorting;
+  htmlStdKorting,
+  htmlArtikelToeveogen,
+  htmlFileInput;
 
 //#endregion
 
@@ -121,6 +123,7 @@ const showCompanies = function (jsonObject) {
 };
 
 const showArtikel = function (jsonObject) {
+  console.log(jsonObject);
   htmlArtikeNrSearchError.classList.add("o-hide-accessible");
   htmlArtikelNrSearch.classList.remove("c-input--error");
   htmlOmschrijving.value = jsonObject.description;
@@ -135,8 +138,8 @@ const showArtikel = function (jsonObject) {
   htmlArtikelNr.value = jsonObject.reference;
   htmlOmRekFac.value = jsonObject.salesPackQuantity;
   htmlMerk.value = jsonObject.brand;
-  htmlLink.value = jsonObject.suburl;
-  htmlLinkIcon.href = jsonObject.suburl;
+  htmlLink.value = jsonObject.url;
+  htmlLinkIcon.href = jsonObject.url;
   getFromInfo();
 };
 
@@ -301,7 +304,8 @@ const getArtikel = async function (artikelNr) {
         "no data from api call with endpoint: " +
           `${baseUrl}/devion/cebeo/searcharticle?articleReference=${artikelNr}`
       );
-    }}
+    }
+  }
   if (data != null) {
     showArtikel(data);
   }
@@ -358,23 +362,47 @@ const listenToList = function () {
 
 const listenToButtons = function () {
   htmlButtonDownload.addEventListener("click", function () {
-    getBestelbonFile(htmlBestelbonSelect.value).then((data) => {
-      data.forEach((bon) => {
-        var decodeString = atob(bon.fileContents);
-        var blob = new Blob([decodeString], { type: bon.contentType });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = bon.fileDownloadName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      });
+    getBestelbonFile(htmlBestelbonSelect.value).then((bon) => {
+      var decodeString = atob(bon.fileContents);
+      var blob = new Blob([decodeString], { type: bon.contentType });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = bon.fileDownloadName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     });
   });
 };
 
 const listenToButtonsArtikels = function () {
   htmlArtikelSearch.addEventListener("click", function () {
+    var reader = new FileReader();
+    reader.readAsText(htmlFileInput.files[0]);
+    reader.onload = function () {
+      var header = reader.result.split("\r\n")[0];
+      var artikels = [];
+      for (var i = 1; i < reader.result.split("\n").length; i++) {
+        var data = reader.result.split("\r\n")[i];
+        var obj = {};
+        for (var j = 0; j < header.split(", ").length; j++) {
+          obj[header.split(", ")[j]] = data.split(", ")[j];
+        }
+        if (obj["artikelNr."] != "") {
+          artikels.push(obj);
+        }
+      }
+      console.log(artikels);
+      var artikelNrs = [];
+      for (const artikel of artikels) {
+        artikelNrs.push(artikel["artikelNr."]);
+      }
+      console.log(artikelNrs);
+      sessionStorage.setItem("artikelNrs", JSON.stringify(artikelNrs));
+    };
+    //getArtikel(htmlArtikelNrSearch.value);
+  });
+  htmlArtikelToeveogen.addEventListener("click", function () {
     getArtikel(htmlArtikelNrSearch.value);
   });
 };
@@ -409,6 +437,7 @@ const listenToChangeStdKorting = function () {
     }
   });
 };
+
 //#endregion
 
 //#region *** Init / DOMContentLoaded ***********
@@ -465,6 +494,8 @@ const htmlselectors = function () {
   htmlLink = document.querySelector(".js-input-link");
   htmlLinkIcon = document.querySelector(".js-link-icon");
   htmlStdKorting = document.querySelector(".js-input-stdkorting");
+  htmlArtikelToeveogen = document.querySelector(".js-button-artikel-toevoegen");
+  htmlFileInput = document.querySelector(".js-file-input");
 };
 document.addEventListener("DOMContentLoaded", init);
 //#endregion
