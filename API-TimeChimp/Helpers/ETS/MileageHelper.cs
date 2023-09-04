@@ -59,7 +59,7 @@ public class ETSMileageHelper : ETSHelper
 
         //convert first data  record to mileageETS object
         //the first mileage data object from ETS is always used to store new mileage registrations 
-        MileageETS mileageETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet).First() ?? throw new Exception("No time record found in ETS");
+        MileageETS mileageETS = JsonTool.ConvertTo<List<MileageETS>>(responseGet).FirstOrDefault() ?? throw new Exception($"No time record found in ETS for mileage with project = {mileage.PLA_PROJECT}, subproject = {mileage.PLA_SUBPROJECT}, start = {mileage.PLA_START:dd/MM/yyyy}, persoon = {mileage.PLA_PERSOON}");
 
         mileage.PLA_KM += mileageETS.PLA_KM;
         mileage.PLA_ID = mileageETS.PLA_ID;
