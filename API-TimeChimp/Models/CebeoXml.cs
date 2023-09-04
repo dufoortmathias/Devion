@@ -67,10 +67,10 @@ public class OrderLine
 {
     public OrderLine() { }
 
-    public OrderLine(PurchaseOrderDetailETS purchaseOrder)
+    public OrderLine(Dictionary<string, object> orderLine)
     {
-        Material = new(purchaseOrder.FD_KLANTREFERENTIE ?? throw new Exception($"PurchaseOrder {purchaseOrder.FD_BONNR} ETS has no FD_KLANTREFERENTIE"));
-        OrderedQuantity = (int) (purchaseOrder.FD_AANTAL ?? throw new Exception($"PurchaseOrder {purchaseOrder.FD_BONNR} ETS has no FD_AANTAL"));
+        Material = new((string) orderLine["number"]);
+        OrderedQuantity = (int) orderLine["aantal"];
     }
 
     [XmlElement(ElementName = "Material")]
@@ -84,9 +84,9 @@ public class OrderLine
 public class Create
 {
     public Create() { }
-    public Create(List<PurchaseOrderDetailETS> purchaseOrders)
+    public Create(List<Dictionary<string, object>> orderLines)
     {
-        OrderLine = purchaseOrders.Select(p => new OrderLine(p)).ToList();
+        OrderLine = orderLines.Select(l => new OrderLine(l)).ToList();
     }
 
     [XmlElement(ElementName = "OrderLine")]
@@ -98,8 +98,8 @@ public class Order
 {
     public Order() { }
 
-    public Order(List<PurchaseOrderDetailETS> purchaseOrders) {
-        Create = new(purchaseOrders);
+    public Order(List<Dictionary<string, object>> orderLines) {
+        Create = new(orderLines);
     }
 
     [XmlElement(ElementName = "Create")]
@@ -242,14 +242,14 @@ public class Message
 public class CebeoXML
 {
 
-    public static CebeoXML CreateOrderRequest(List<PurchaseOrderDetailETS> purchaseOrders, ConfigurationManager config)
+    public static CebeoXML CreateOrderRequest(List<Dictionary<string, object>> orderLines, ConfigurationManager config)
     {
         CebeoXML cebeoXML = new()
         {
             Request = new(config)
             {
                 ResponseType = "Message",
-                Order = new(purchaseOrders)
+                Order = new(orderLines)
             },
             Version = config["Cebeo:Version"],
             NoNamespaceSchemaLocation = config["Cebeo:NoNamespaceSchemaLocation"]
