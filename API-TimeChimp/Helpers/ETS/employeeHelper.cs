@@ -46,7 +46,8 @@ public class ETSEmployeeHelper : ETSHelper
 
         //get all ids from json
         List<string> ids = JsonTool.ConvertTo<List<EmployeeETS>>(json)
-            .Where(employee => employee.PN_ID != null)
+            .Select(employee => employee.PN_ID)
+            .Where(x => x != null)
             .Cast<string>()
             .ToList();
         return ids;
