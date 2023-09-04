@@ -408,7 +408,7 @@ try:
     if "failed_times" not in json_data:
         json_data["failed_times"] = []
     # Retrieves times to sync and adds times where previous sync attempt failed
-    time_ids = list(set(get_times_to_sync() + json_data["failed_times"]))
+    time_ids = get_times_to_sync()
     # Syncs these times and receives times where sync was successful
     synced_time_ids = sync_times(time_ids)
     # Log total results sync times
@@ -425,7 +425,7 @@ try:
     if "failed_mileages" not in json_data:
         json_data["failed_mileages"] = []
     # Retrieves mileages to sync and adds mileages where previous sync attempt failed
-    mileage_ids = list(set(get_mileages_to_sync() + json_data["failed_mileages"]))
+    mileage_ids = get_mileages_to_sync()
     # Syncs these mileages and receives mileages where sync was successful
     synced_mileage_ids = sync_mileages(mileage_ids)
     # Log total results sync mileages
