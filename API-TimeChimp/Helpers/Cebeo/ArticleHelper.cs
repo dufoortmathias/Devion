@@ -1,3 +1,5 @@
+using Api.Devion.Models;
+
 namespace Api.Devion.Helpers.ETS;
 
 public class CebeoArticleHelper
@@ -28,31 +30,12 @@ public class CebeoArticleHelper
         }
     }
 
-    public string? GetArticleNumberCebeo(string articleReference)
+    public float GetArticlePriceCebeo(string articleReference)
     {
-        Item article = SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+        Item item = SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 
-        string? articleNumber = article?.Material?.SupplierItemID;
+        string netPrice = item.UnitPrice?.NetPrice ?? throw new Exception($"Cebeo article with reference = {articleReference} has no netto price");
 
-        return articleNumber;
-    }
-
-    public float? GetArticlePriceCebeo(string articleNumber)
-    {
-        CebeoXML cebeoXML = CebeoXML.CreateArticleRequest(articleNumber, config);
-
-        string requestXML = cebeoXML.GetXML();
-
-        var responseXML = webClient.PostAsync("http://b2b.cebeo.be/webservices/xml", requestXML);
-
-        XmlSerializer serializer = new(typeof(CebeoXML));
-        using (StringReader reader = new(responseXML))
-        {
-            CebeoXML response = (CebeoXML) (serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}"));
-
-            string? netPrice = response.Response?.Article?.List?.Item?.FirstOrDefault()?.UnitPrice?.NetPrice;
-
-            return netPrice != null ? float.Parse(netPrice) : null;
-        }
+        return float.Parse(netPrice);
     }
 }

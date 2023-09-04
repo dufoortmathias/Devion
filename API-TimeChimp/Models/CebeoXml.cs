@@ -1,3 +1,5 @@
+using System.Xml.Schema;
+
 namespace Api.Devion.Models;
 
 [XmlRoot(ElementName = "Customer")]
@@ -249,7 +251,8 @@ public class CebeoXML
                 ResponseType = "Message",
                 Order = new(purchaseOrders)
             },
-            Version = config["Cebeo:Version"]
+            Version = config["Cebeo:Version"],
+            NoNamespaceSchemaLocation = config["Cebeo:NoNamespaceSchemaLocation"]
         };
 
         return cebeoXML;
@@ -270,7 +273,8 @@ public class CebeoXML
                     } 
                 }
             },
-            Version = config["Cebeo:Version"]
+            Version = config["Cebeo:Version"],
+            NoNamespaceSchemaLocation = config["Cebeo:NoNamespaceSchemaLocation"]
         };
 
         return cebeoXML;
@@ -295,7 +299,8 @@ public class CebeoXML
                     }
                 }
             },
-            Version = config["Cebeo:Version"]
+            Version = config["Cebeo:Version"],
+            NoNamespaceSchemaLocation = config["Cebeo:NoNamespaceSchemaLocation"]
         };
 
         return cebeoXML;
@@ -306,6 +311,9 @@ public class CebeoXML
 
     [XmlElement(ElementName = "Response")]
     public Response? Response { get; set; }
+
+    [XmlAttribute("noNamespaceWhatever", Namespace = XmlSchema.InstanceNamespace)]
+    public string? NoNamespaceSchemaLocation { get; set; }
 
     [XmlAttribute(AttributeName = "version")]
     public string? Version { get; set; }
