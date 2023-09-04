@@ -686,4 +686,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
 
-app.Run();
+if (app.Environment.IsProduction())
+{
+    app.Run("http://*:5000");
+} 
+else
+{
+    app.Run();
+}
