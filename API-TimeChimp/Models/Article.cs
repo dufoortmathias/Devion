@@ -255,6 +255,7 @@ public class ArticleWeb
         URL = $"https://www.cebeo.be/catalog/nl-be/products/{Brand}-{string.Join('-', Regex.Replace(Description ?? throw new Exception("Article form Cebeo has no description"), "[^0-9A-Za-z _-]", "").Split(' ').Where(x => x != "").Select(x => x.Trim()))}-{articleCebeo.Material?.SupplierItemID ?? throw new Exception("Article form Cebeo has no articleNumber")}".ToLower();
     }
 
+    public string? Number { get; set; }
     public string? Reference { get; set; }
     public string? Description { get; set; }
     public string? Brand { get; set; }

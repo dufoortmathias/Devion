@@ -55,15 +55,32 @@ public class ETSArticleHelper : ETSHelper
         return articleReference ?? articleNumber;
     }
 
-    public bool ArticleWithReferenceExists(string articleReference)
+    public bool ArticleWithReferenceExists(string articleReference, string supplierId)
     {
-        string query = "SELECT * FROM CSARTPX WHERE ART_LEVREF = @number";
+        // Search for article with reference in table CSARTPX
+        string query = "SELECT * FROM CSARTPX WHERE ART_LEVREF = @number AND ART_LEV1 = @supplier";
         Dictionary<string, object> parameters = new()
         {
             {"@number", articleReference},
+            {"@supplier", supplierId}
         };
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article from ETS with query: " + query);
+
+        if (JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0)
+        {
+            return true;
+        }
+
+        // Search for article with reference in table CONTACT3
+        query = "SELECT * FROM CONTACT3 WHERE CO_REFLEV = @number AND CO_LEVNR = @supplier";
+        parameters = new()
+        {
+            {"@number", articleReference},
+            {"@supplier", supplierId}
+        };
+
+        json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article from ETS with query: " + query);
 
         return JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0;
     }
@@ -81,9 +98,9 @@ public class ETSArticleHelper : ETSHelper
         return JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0;
     }
 
-    public List<string> GetAriclesCebeo()
+    public List<string> GetAricles(string supplierId)
     {
-        string query = "SELECT CSARTPX.* FROM CSARTPX LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 WHERE LOWER(LVPX.LV_NAM) LIKE '%cebeo%'";
+        string query = "SELECT CSARTPX.* FROM CSARTPX LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 WHERE ART_LEV1 = @supplierId";
 
         string json = ETSClient.selectQuery(query) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 

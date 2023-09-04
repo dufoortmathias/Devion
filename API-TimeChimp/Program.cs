@@ -587,7 +587,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            List<string> articles = new ETSArticleHelper(ETSClient).GetAriclesCebeo();
+            string supplierId = new ETSSupplierHelper(ETSClient).FindSupplierId("devion");
+            List<string> articles = new ETSArticleHelper(ETSClient).GetAricles(supplierId);
 
             return Results.Ok(articles);
         }
@@ -625,7 +626,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            if (new ETSArticleHelper(ETSClient).ArticleWithReferenceExists(articleReference))
+            string supplierId = new ETSSupplierHelper(ETSClient).FindSupplierId("devion");
+
+            if (new ETSArticleHelper(ETSClient).ArticleWithReferenceExists(articleReference, supplierId))
             {
                 throw new Exception($"ETS already has an article with reference = {articleReference}");
             }
@@ -687,6 +690,75 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ArticleFormInfo").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/ets/validatearticleform", (string articleJSON) =>
+    {
+        try
+        {
+            ArticleWeb article = JsonTool.ConvertTo<ArticleWeb>(articleJSON);
+
+            ETSArticleHelper articleHelper = new(ETSClient);
+
+            Dictionary<string, string[]> problems = new()
+            {
+                {"Number", Array.Empty<string>() },
+                {"Reference", Array.Empty<string>() },
+                {"Description", Array.Empty<string>() },
+                {"Brand", Array.Empty<string>() },
+                {"UnitOfMeasure", Array.Empty<string>() },
+                {"SalesPackQuantity", Array.Empty<string>() },
+                {"NettoPrice", Array.Empty<string>() },
+                {"TarifPrice", Array.Empty<string>() },
+                {"URL", Array.Empty<string>() }
+            };
+
+            if (string.IsNullOrEmpty(article.Number))
+            {
+                problems["Number"].Append("Can't be empty");
+            }
+            else if (articleHelper.ArticleWithNumberExists(article.Number))
+            {
+                problems["Number"].Append("Articlenumber already exists in ETS");
+            }
+
+            if (string.IsNullOrEmpty(article.Reference))
+            {
+                problems["Reference"].Append("Can't be empty");
+            }
+
+            if (string.IsNullOrEmpty(article.Description))
+            {
+                problems["Description"].Append("Can't be empty");
+            }
+
+            if (string.IsNullOrEmpty(article.Brand))
+            {
+                problems["Brand"].Append("Can't be empty");
+            }
+
+            if (string.IsNullOrEmpty(article.UnitOfMeasure))
+            {
+                problems["UnitOfMeasure"].Append("Can't be empty");
+            }
+
+            if (string.IsNullOrEmpty(article.URL))
+            {
+                problems["URL"].Append("Can't be empty");
+            }
+
+
+            if (problems.Count > 0)
+            {
+                return Results.ValidationProblem(problems);
+            }
+
+            return Results.Ok(article);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}ValidateArticleForm").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
