@@ -230,7 +230,7 @@ public class Message
 {
 
     [XmlAttribute(AttributeName = "code")]
-    public int? Code { get; set; }
+    public int Code { get; set; }
 
     [XmlText]
     public string? Text { get; set; }
