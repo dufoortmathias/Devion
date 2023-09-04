@@ -54,7 +54,9 @@
             <a href="index.html" class="c-nav__link">bestelbon</a>
           </li>
           <li class="c-nav__item" active>
-            <a href="artikels.html" class="c-nav__link c-nav__link--active">nieuw artikel</a>
+            <a href="artikels.html" class="c-nav__link c-nav__link--active"
+              >nieuw artikel</a
+            >
           </li>
         </ul>
       </nav>
@@ -88,17 +90,18 @@
               class="c-file-input__input js-file-input"
               name="file"
               id="file"
-              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            />
           </div>
           <button
             type="submit"
             class="o-button-reset c-button c-button-artikel-search js-button-artikel-search"
           >
-            artikel opzoeken
+            artikel(en) opzoeken
           </button>
           <form class="c-artikel_form o-hide-accessible js-artikel-form">
             <div class="c-artikel-artikelnr">
-              <label for="" class="c-label c-label-artikelnr">ArtikelNr.</label>
+              <label for="" class="c-label c-label-artikelnr">Artikel nummer</label>
               <input
                 type="text"
                 class="c-input c-input-artikelnr js-input-artikelnr"
@@ -108,7 +111,7 @@
               />
             </div>
             <div class="c-artikel-reflevnr">
-              <label for="" class="c-label c-label-reflevnr">ReflevNr.</label>
+              <label for="" class="c-label c-label-reflevnr">Referentie leverancier</label>
               <input
                 type="text"
                 class="c-input c-input-reflevnr js-input-reflevnr"
@@ -119,7 +122,8 @@
               />
             </div>
             <div class="c-artikel-hoofdlev">
-              <label for="" class="c-label c-label-hoofdlev">Hoofdlev.</label>
+              <label for="" class="c-label c-label-hoofdlev">Hoofdleverancier</label>
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-hoofdlev js-input-hoofdlev"
                 placeholder="hoofdlev"
@@ -135,6 +139,8 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+              </span>
+            </span>
             </div>
             <div class="c-artikel-omschrijving">
               <label for="" class="c-label c-label-omschrijving"
@@ -149,7 +155,7 @@
               />
             </div>
             <div class="c-artikel-prijs">
-              <label for="" class="c-label c-label-prijs">Prijs</label>
+              <label for="" class="c-label c-label-prijs">Aankoopprijs</label>
               <input
                 type="text"
                 class="c-input c-input-prijs js-input-prijs"
@@ -160,6 +166,7 @@
             </div>
             <div class="c-artikel-familie">
               <label for="" class="c-label c-label-familie">Familie</label>
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-familie js-input-familie"
                 placeholder="familie"
@@ -175,9 +182,11 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+            </span>
             </div>
             <div class="c-artikel-akprijseh">
-              <label for="" class="c-label c-label-akprijseh">akprijseh</label>
+              <label for="" class="c-label c-label-akprijseh">Akp verbr. eh.</label>
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-akprijseh js-input-akprijseh"
                 placeholder="akprijseh"
@@ -193,11 +202,13 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+            </span>
             </div>
             <div class="c-artikel-verbruikseh">
               <label for="" class="c-label c-label-verbruikseh"
-                >verbruikseh</label
+                >Vkp verbr. eh.</label
               >
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-verbruikseh js-input-verbruikseh"
                 placeholder="verbruikseh"
@@ -213,11 +224,13 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+            </span>
             </div>
             <div class="c-artikel-subfamilie">
               <label for="" class="c-label c-label-subfamilie"
                 >subfamilie</label
               >
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-subfamilie js-input-subfamilie"
                 placeholder="subfamilie"
@@ -233,6 +246,7 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+            </span>
             </div>
             <div class="c-artikel-lengte">
               <label for="" class="c-label c-label-lengte">lengte</label>
@@ -265,7 +279,8 @@
               />
             </div>
             <div class="c-artikel-btwcode">
-              <label for="" class="c-label c-label-btwcode">btwcode.</label>
+              <label for="" class="c-label c-label-btwcode">BTW code</label>
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-btwcode js-input-btwcode"
                 placeholder="btwcode"
@@ -281,11 +296,13 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+            </span>
             </div>
             <div class="c-artikel-rekver">
               <label for="" class="c-label c-label-rekver"
-                >rekening verkoop</label
+                >Rekening verkoop</label
               >
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-rekver js-input-rekver"
                 placeholder="rekver"
@@ -301,9 +318,11 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+            </span>
             </div>
             <div class="c-artikel-muntcode">
               <label for="" class="c-label c-label-muntcode">Muntcode</label>
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-muntcode js-input-muntcode"
                 placeholder="muntcode"
@@ -319,6 +338,7 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+            </span>
             </div>
             <div class="c-artikel-omrekfac">
               <label for="" class="c-label c-label-omrekfac"
@@ -334,6 +354,7 @@
             </div>
             <div class="c-artikel-typfac">
               <label for="" class="c-label c-label-typfac">type factor</label>
+              <span class="c-custom-select">
               <select
                 class="c-input c-custom-select__input c-input-typfac js-input-typfac"
                 placeholder="typfac"
@@ -350,6 +371,7 @@
               >
                 <path d="M7,10l5,5,5-5Z" />
               </svg>
+              </span>
             </div>
             <div class="c-artikel-merk">
               <label for="" class="c-label c-label-merk">merk</label>
@@ -388,7 +410,7 @@
             </div>
             <div class="c-artikel-winst">
               <label for="" class="c-label c-label-winst"
-                >winstpercentage</label
+                >winstpercentage (%)</label
               >
               <input
                 type="text"
@@ -400,7 +422,12 @@
             </div>
             <div class="c-artikel-link">
               <label for="" class="c-label c-label-link">link</label>
-              <a href="#" class="c-link c-link-artikel js-link-icon" target="_blank">?</a>
+              <a
+                href="#"
+                class="c-link c-link-artikel js-link-icon"
+                target="_blank"
+                >?</a
+              >
               <input
                 type="url"
                 class="c-input c-input-link js-input-link"
@@ -412,7 +439,7 @@
             </div>
             <div class="c-artikel-stdkorting">
               <label for="" class="c-label c-label-stdkorting"
-                >std. korting</label
+                >std. korting (%)</label
               >
               <input
                 type="text"
@@ -422,13 +449,34 @@
                 id="stdkorting"
               />
             </div>
-            <div class="c-artikel-button">
+            <div class="c-artikel-button--save">
               <button
-                type="submit"
-                class="o-button-reset c-button c-button-artikel js-button-artikel-toevoegen"
+                type="button"
+                class="o-button-reset c-button c-button-artikel c-button-artikel--save js-button-artikel-toevoegen"
               >
-                artikel toevoegen
+                artikel(en) toevoegen
               </button>
+            </div>
+            <div class="c-artikel-button--next">
+              <button
+                type="button"
+                class="o-button-reset c-button c-button-artikel c-button-artikel--next js-button-artikel-next o-hide-accessible"
+              >
+                next
+              </button>
+            </div>
+            <div class="c-artikel-button--prev">
+              <button
+                type="button"
+                class="o-button-reset c-button c-button-artikel c-button-artikel--prev js-button-artikel-prev o-hide-accessible"
+              >
+                prev
+              </button>
+            </div>
+            <div class="c-artikel-progress">
+              <div class="c-artikel-progress__text js-artikel-progress">
+                0/0
+              </div>
             </div>
           </form>
         </div>

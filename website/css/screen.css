@@ -522,7 +522,6 @@ table {
 .c-custom-select {
   display: block;
   position: relative;
-  margin-left: var(--global-whitespace-md);
   width: 100%;
 }
 
@@ -667,19 +666,27 @@ table {
 .c-artikel_form {
   display: grid;
   grid-template-areas: 
-          "artikelnr reflevnr hoofdleverancier" 
-          "omschrijving prijs muntcode" 
-          "akprijseh verbruikseh familie" 
-          "btwcode rekver subfamilie"
-          "tarief winst verkoop"
-          "stdkorting omrekfac typfac"
+          "artikelnr reflevnr omschrijving" 
+          "tarief prijs stdkorting" 
+          "muntcode verkoop winst" 
+          "rekver akprijseh verbruikseh"
+          "btwcode omrekfac typfac" 
+          "merk familie subfamilie"
           "lengte breedte hoogte"
-          "merk link none"
-          "button button button";
+          "hoofdleverancier link none"
+          "prev progress next";
   grid-template-columns: 30vw 30vw 30vw;
   grid-gap: var(--global-whitespace-lg);
   width: 100vw;
   transform: translateX(-15vw);
+}
+
+@media (max-width: 768px) {
+  .c-artikel_form {
+    display: block;
+    width: 80vw;
+    transform: translateX(0);
+  }
 }
 
 .c-artikel-artikelnr {
@@ -731,11 +738,6 @@ table {
   grid-area: input;
 }
 
-.c-custom-select__symbol--hoofdlev {
-  display: inline;
-  transform: translateX(-7vw);
-}
-
 .c-artikel-omschrijving {
   grid-area: omschrijving;
   display: grid;
@@ -769,11 +771,6 @@ table {
   cursor: pointer;
 }
 
-.c-custom-select__symbol--familie {
-  display: inline;
-  transform: translateX(-7vw) translateY(17vh);
-}
-
 .c-artikel-subfamilie {
   grid-area: subfamilie;
   display: grid;
@@ -789,11 +786,6 @@ table {
 .c-input-subfamilie {
   grid-area: input;
   cursor: pointer;
-}
-
-.c-custom-select__symbol--subfamilie {
-  display: inline;
-  transform: translateX(-7vw) translateY(25vh);
 }
 
 .c-artikel-prijs {
@@ -828,12 +820,6 @@ table {
   grid-area: input;
   cursor: pointer;
 }
-
-.c-custom-select__symbol--akprijseh {
-  display: inline;
-  transform: translateX(-71vw) translateY(17vh);
-}
-
 .c-artikel-verbruikseh {
   grid-area: verbruikseh;
   display: grid;
@@ -849,11 +835,6 @@ table {
 .c-input-verbruikseh {
   grid-area: input;
   cursor: pointer;
-}
-
-.c-custom-select__symbol--verbruikseh {
-  display: inline;
-  transform: translateX(-39vw) translateY(17vh);
 }
 
 .c-artikel-lengte {
@@ -921,11 +902,6 @@ table {
   cursor: pointer;
 }
 
-.c-custom-select__symbol--btwcode {
-  display: inline;
-  transform: translateX(-71vw) translateY(25vh);
-}
-
 .c-artikel-rekver {
   grid-area: rekver;
   display: grid;
@@ -941,11 +917,6 @@ table {
 .c-input-rekver {
   grid-area: input;
   cursor: pointer;
-}
-
-.c-custom-select__symbol--rekver {
-  display: inline;
-  transform: translateX(-39vw) translateY(25vh);
 }
 
 .c-artikel-muntcode {
@@ -965,10 +936,6 @@ table {
   cursor: pointer;
 }
 
-.c-custom-select__symbol--muntcode {
-  display: inline;
-  transform: translateX(-7vw) translateY(8.5vh);
-}
 .c-artikel-typfac {
   grid-area: typfac;
   display: grid;
@@ -984,11 +951,6 @@ table {
 .c-input-typfac {
   grid-area: input;
   cursor: pointer;
-}
-
-.c-custom-select__symbol--typfac {
-  display: inline;
-  transform: translateX(-7vw) translateY(41.5vh);
 }
 
 .c-artikel-omrekfac {
@@ -1128,17 +1090,49 @@ table {
   grid-area: input;
 }
 
-.c-artikel-button {
-  grid-area: button;
-  display: grid;
-  grid-template-areas: "button";
-  grid-template-columns: 1fr;
-  margin-bottom: 2vh;
+.c-button-artikel {
+  cursor: pointer;
 }
 
-.c-button-artikel {
-  grid-area: button;
-  cursor: pointer;
+.c-artikel-button--save {
+  grid-area: next;
+  display: flex;
+  margin-bottom: var(--global-whitespace-lg);
+  justify-content: flex-end;
+}
+
+.c-artikel-button--prev {
+  grid-area: prev;
+  display: flex;
+  margin-bottom: var(--global-whitespace-lg);
+  justify-content: flex-start;
+}
+
+.c-artikel-button--next {
+  grid-area: next;
+  margin-bottom: var(--global-whitespace-lg);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.c-button-artikel--prev,
+.c-button-artikel--next,
+.c-button-artikel--save {
+  width: 50%;
+}
+
+.c-artikel-progress {
+  grid-area: progress;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: var(--global-whitespace-lg);
+}
+
+.c-artikel-progress__text {
+  text-align: center;
+  width: 100%;
+  font-weight: bolder;
 }
 /*------------------------------------*\
 #UTILITIES

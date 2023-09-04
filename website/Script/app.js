@@ -6,7 +6,7 @@ let htmlButtonDownload,
   htmltabel,
   htmlArtikelNrSearch,
   htmlArtikelSearch,
-  htmlArtikeNrSearchError,
+  htmlArtikelNrSearchError,
   htmlArtikelNr,
   htmlReflevNr,
   htmlHoofdlev,
@@ -32,8 +32,11 @@ let htmlButtonDownload,
   htmlLink,
   htmlLinkIcon,
   htmlStdKorting,
-  htmlArtikelToeveogen,
-  htmlFileInput;
+  htmlArtikelToevoegen,
+  htmlFileInput,
+  htmlArtikelNext,
+  htmlArtikelPrevious,
+  htmlArtikelProgress;
 
 //#endregion
 
@@ -124,7 +127,28 @@ const showCompanies = function (jsonObject) {
 
 const showArtikel = function (jsonObject) {
   console.log(jsonObject);
-  htmlArtikeNrSearchError.classList.add("o-hide-accessible");
+  let artikelNrs = JSON.parse(sessionStorage.getItem("artikelNrs"));
+  if (artikelNrs.length > 1) {
+    htmlArtikelToevoegen.classList.add("o-hide-accessible");
+    let index = parseInt(sessionStorage.getItem("index"));
+    if (index == 0) {
+      htmlArtikelPrevious.classList.add("o-hide-accessible");
+      htmlArtikelNext.classList.remove("o-hide-accessible");
+    } else if (index == artikelNrs.length - 1) {
+      htmlArtikelNext.classList.add("o-hide-accessible");
+      htmlArtikelToevoegen.classList.remove("o-hide-accessible");
+    } else {
+      htmlArtikelNext.classList.remove("o-hide-accessible");
+      htmlArtikelPrevious.classList.remove("o-hide-accessible");
+    }
+    htmlArtikelProgress.innerHTML = `${index + 1}/${artikelNrs.length}`;
+  } else if (artikelNrs.length == 1) {
+    htmlArtikelNext.classList.add("o-hide-accessible");
+    htmlArtikelPrevious.classList.add("o-hide-accessible");
+    htmlArtikelToevoegen.classList.remove("o-hide-accessible");
+  }
+  htmlArtikelForm.classList.remove("o-hide-accessible");
+  htmlArtikelNrSearchError.classList.add("o-hide-accessible");
   htmlArtikelNrSearch.classList.remove("c-input--error");
   htmlOmschrijving.value = jsonObject.description;
   htmlStdKorting.value = parseFloat("0").toFixed(2);
@@ -140,10 +164,11 @@ const showArtikel = function (jsonObject) {
   htmlMerk.value = jsonObject.brand;
   htmlLink.value = jsonObject.url;
   htmlLinkIcon.href = jsonObject.url;
-  getFromInfo();
+  htmlStdKorting.value = parseFloat((1-(jsonObject.nettoPrice/jsonObject.tarifPrice))*100).toFixed(4);
+  getFormInfo();
 };
 
-const showFromInfo = function (jsonObject) {
+const showFormInfo = function (jsonObject) {
   let innerhtml = "";
   innerhtml += `<option value="0" disabled selected>Selecteer een familie</option>`;
   for (familie of jsonObject.families) {
@@ -223,18 +248,10 @@ const showFromInfo = function (jsonObject) {
 
 //#region *** Data Access - get___ ***********
 const getData = async function (endpoint) {
-  try {
-    const response = await fetch(endpoint);
-
-    if (!response.ok) {
-      throw new Error(`API request failed with status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw error; // Re-throw the error to handle it in the calling code if needed
-  }
+  const data = await fetch(endpoint)
+    .then((r) => r.json())
+    .catch((err) => alert("an error, " + err + ". On endpoint: " + endpoint));
+  return data;
 };
 
 const getBestelbonnen = async function (bedrijfId) {
@@ -291,19 +308,21 @@ const getCompanies = async function () {
 const getArtikel = async function (artikelNr) {
   let data = null;
   try {
+    console.log(artikelNr)
     data = await getData(
       `${baseUrl}/devion/cebeo/searcharticle?articleReference=${artikelNr}`
     );
   } catch (error) {
+    console.log(error);
     if (error.message == "API request failed with status: 500") {
       htmlArtikelNrSearch.classList.add("c-input--error");
-      htmlArtikeNrSearchError.classList.remove("o-hide-accessible");
+      htmlArtikelNrSearchError.classList.remove("o-hide-accessible");
       htmlArtikelForm.classList.add("o-hide-accessible");
     } else {
-      alert(
-        "no data from api call with endpoint: " +
-          `${baseUrl}/devion/cebeo/searcharticle?articleReference=${artikelNr}`
-      );
+      // alert(
+      //   "no data from api call with endpoint: " +
+      //     `${baseUrl}/devion/cebeo/searcharticle?articleReference=${artikelNr}`
+      // );
     }
   }
   if (data != null) {
@@ -311,7 +330,7 @@ const getArtikel = async function (artikelNr) {
   }
 };
 
-const getFromInfo = async function () {
+const getFormInfo = async function () {
   try {
     const data = await getData(`${baseUrl}/devion/ets/articleforminfo`).catch(
       (error) => {
@@ -326,7 +345,7 @@ const getFromInfo = async function () {
       }
     );
     if (data != null) {
-      showFromInfo(data);
+      showFormInfo(data);
     } else {
       alert(
         "no data from api call with endpoint: " +
@@ -377,33 +396,64 @@ const listenToButtons = function () {
 
 const listenToButtonsArtikels = function () {
   htmlArtikelSearch.addEventListener("click", function () {
-    var reader = new FileReader();
-    reader.readAsText(htmlFileInput.files[0]);
-    reader.onload = function () {
-      var header = reader.result.split("\r\n")[0];
-      var artikels = [];
-      for (var i = 1; i < reader.result.split("\n").length; i++) {
-        var data = reader.result.split("\r\n")[i];
-        var obj = {};
-        for (var j = 0; j < header.split(", ").length; j++) {
-          obj[header.split(", ")[j]] = data.split(", ")[j];
-        }
-        if (obj["artikelNr."] != "") {
-          artikels.push(obj);
-        }
+    htmlArtikelNrSearch.classList.remove("c-input--error");
+    htmlArtikelNrSearchError.classList.add("o-hide-accessible");
+    let artikelString = htmlArtikelNrSearch.value;
+    console.log(artikelString)
+    let files = htmlFileInput.files;
+    if (files.length == 0) {
+      if (artikelString != "") {
+        artikelNrs = artikelString.split(", ");
+      } else {
+        htmlArtikelNrSearch.classList.add("c-input--error");
+        htmlArtikelNrSearchError.classList.remove("o-hide-accessible");
       }
-      console.log(artikels);
-      var artikelNrs = [];
-      for (const artikel of artikels) {
-        artikelNrs.push(artikel["artikelNr."]);
-      }
-      console.log(artikelNrs);
-      sessionStorage.setItem("artikelNrs", JSON.stringify(artikelNrs));
-    };
-    //getArtikel(htmlArtikelNrSearch.value);
+    } else {
+      var reader = new FileReader();
+      reader.readAsText(htmlFileInput.files[0]);
+      reader.onload = function () {
+        var header = reader.result.split("\r\n")[0];
+        var artikels = [];
+        for (var i = 1; i < reader.result.split("\n").length; i++) {
+          var data = reader.result.split("\r\n")[i];
+          var obj = {};
+          for (var j = 0; j < header.split(", ").length; j++) {
+            obj[header.split(", ")[j]] = data.split(", ")[j];
+          }
+          if (obj["artikelNr."] != "") {
+            artikels.push(obj);
+          }
+        }
+        console.log(artikels);
+        var artikelNrs = [];
+        for (const artikel of artikels) {
+          artikelNrs.push(artikel["artikelNr."]);
+        }
+      };
+    }
+    if (artikelNrs != null) {
+        console.log(artikelNrs);
+        sessionStorage.clear();
+        sessionStorage.setItem("artikelNrs", JSON.stringify(artikelNrs));
+        sessionStorage.setItem("index", 0);
+        let index = parseInt(sessionStorage.getItem("index"));
+        getArtikel(artikelNrs[index]);
+    }
   });
-  htmlArtikelToeveogen.addEventListener("click", function () {
-    getArtikel(htmlArtikelNrSearch.value);
+  htmlArtikelNext.addEventListener("click", async function () {
+    let artikelNrs = JSON.parse(sessionStorage.getItem("artikelNrs"));
+    console.log(artikelNrs)
+    let index = parseInt(sessionStorage.getItem("index"));
+    index++;
+    sessionStorage.setItem("index", index);
+    getArtikel(artikelNrs[index]);
+  });
+  htmlArtikelPrevious.addEventListener("click", function () {
+    let artikelNrs = JSON.parse(sessionStorage.getItem("artikelNrs"));
+    let index = parseInt(sessionStorage.getItem("index"));
+    index--;
+    sessionStorage.setItem("index", index);
+    getArtikel(artikelNrs[index]);
   });
 };
 
@@ -465,7 +515,7 @@ const htmlselectors = function () {
   htmlBedrijfSelect = document.querySelector(".js-bedrijf-select");
   htmltabel = document.querySelector(".js-tabel");
   htmlArtikelNrSearch = document.querySelector(".js-artikel-nr");
-  htmlArtikeNrSearchError = document.querySelector(
+  htmlArtikelNrSearchError = document.querySelector(
     ".js-artikelnr-search-error"
   );
   htmlArtikelSearch = document.querySelector(".js-button-artikel-search");
@@ -494,8 +544,11 @@ const htmlselectors = function () {
   htmlLink = document.querySelector(".js-input-link");
   htmlLinkIcon = document.querySelector(".js-link-icon");
   htmlStdKorting = document.querySelector(".js-input-stdkorting");
-  htmlArtikelToeveogen = document.querySelector(".js-button-artikel-toevoegen");
+  htmlArtikelToevoegen = document.querySelector(".js-button-artikel-toevoegen");
   htmlFileInput = document.querySelector(".js-file-input");
+  htmlArtikelNext = document.querySelector(".js-button-artikel-next");
+  htmlArtikelPrevious = document.querySelector(".js-button-artikel-prev");
+  htmlArtikelProgress = document.querySelector(".js-artikel-progress");
 };
 document.addEventListener("DOMContentLoaded", init);
 //#endregion
