@@ -564,12 +564,26 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             string supplierId = header.FH_KLNR ?? throw new Exception($"PurchaseOrder header in ETS with number = {header.FH_BONNR} has no FH_KLNR");
 
             List<PurchaseOrderDetailETS> purchaseOrders = purchaseOrderHelperETS.GetPurchaseOrderDetails(id);
-            purchaseOrders.ForEach(po => po.FD_KLANTREFERENTIE = articleHelperETS.GetArticleReference(po.FD_ARTNR ?? throw new Exception($"PurchaseOrder detail in ETS with number = {po.FD_BONNR} has no ART_NR"), supplierId));
+            purchaseOrders.ForEach(po => po.FD_KLANTREFERENTIE = articleHelperETS.GetArticleReference(po.FD_ARTNR ?? throw new Exception($"PurchaseOrder detail in ETS with number = {po.FD_BONNR} has no ART_NR"), supplierId) ?? throw new Exception($"Article with number = {po.FD_ARTNR} has no article reference"));
 
             FileContentResult fileContent;
             if (supplier.ToLower().Contains("cebeo"))
             {
-                fileContent = purchaseOrderHelperETS.CreateFileCebeo(purchaseOrders, supplier, config);
+                List<Dictionary<string, object>> orderLines = new();
+                purchaseOrders.ForEach(purchaseOrder =>
+                {
+                    if (purchaseOrder.FD_KLANTREFERENTIE != null)
+                    {
+                        string cebeoArticleNumber = articleHelperCebeo.SearchForArticleWithReference(purchaseOrder.FD_KLANTREFERENTIE)?.Material?.SupplierItemID ?? throw new Exception($"Cebeo has no article with reference = {purchaseOrder.FD_KLANTREFERENTIE}");
+                        orderLines.Add(new Dictionary<string, object>()
+                        {
+                            { "number", cebeoArticleNumber },
+                            { "aantal", purchaseOrder.FD_AANTAL ?? 0 }
+                        });
+                    }
+                });
+
+                fileContent = purchaseOrderHelperETS.CreateFileCebeo(orderLines, id, supplier, config);
             }
             else
             {

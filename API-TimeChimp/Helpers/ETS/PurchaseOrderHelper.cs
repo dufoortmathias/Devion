@@ -98,14 +98,14 @@ public class ETSPurchaseOrderHelper : ETSHelper
     }
 
     //creates XML file with all order information for given purchaseOrders, and returns file information
-    public FileContentResult CreateFileCebeo(List<PurchaseOrderDetailETS> purchaseOrders, string supplier, ConfigurationManager config)
+    public FileContentResult CreateFileCebeo(List<Dictionary<string, object>> orderLines, string bestelbon, string supplier, ConfigurationManager config)
     {
-        CebeoXML cebeoXML = CebeoXML.CreateOrderRequest(purchaseOrders, config);
+        CebeoXML cebeoXML = CebeoXML.CreateOrderRequest(orderLines, config);
 
         byte[] byteData = Encoding.ASCII.GetBytes(cebeoXML.GetXML());
         return new FileContentResult(byteData, "text/xml")
         {
-            FileDownloadName = $"{purchaseOrders.FirstOrDefault()?.FD_BONNR}_{supplier}.xml"
+            FileDownloadName = $"{bestelbon}_{supplier}.xml"
         };
     }
 }
