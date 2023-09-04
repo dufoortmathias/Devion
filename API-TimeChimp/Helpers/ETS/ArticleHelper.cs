@@ -68,6 +68,19 @@ public class ETSArticleHelper : ETSHelper
         return JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0;
     }
 
+    public bool ArticleWithNumberExists(string articleNumber)
+    {
+        string query = "SELECT * FROM CSARTPX WHERE ART_NR = @number";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@number", articleNumber},
+        };
+
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article from ETS with query: " + query);
+
+        return JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0;
+    }
+
     public List<string> GetAriclesCebeo()
     {
         string query = "SELECT CSARTPX.* FROM CSARTPX LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 WHERE LOWER(LVPX.LV_NAM) LIKE '%cebeo%'";

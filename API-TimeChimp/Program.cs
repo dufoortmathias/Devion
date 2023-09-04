@@ -630,6 +630,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 throw new Exception($"ETS already has an article with reference = {articleReference}");
             }
 
+            if (new ETSArticleHelper(ETSClient).ArticleWithNumberExists(articleReference))
+            {
+                throw new Exception($"ETS already has an article with number = {articleReference}");
+            }
+
             Item articleCebeo = new CebeoArticleHelper(config).SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 
             ArticleWeb article = new(articleCebeo);
