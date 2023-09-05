@@ -670,7 +670,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             query = "SELECT ASF_COD AS CODE, ASF_OMS1 AS DESCRIPTION FROM ARTSUBFAM";
             string responseSubfamilies = ETSClient.selectQuery(query);
 
-
             query = "SELECT EH_COD AS CODE, EH_OMS1 AS DESCRIPTION, EH_OMS2 AS SHORT_DESCRIPTION FROM EENHEID";
             string responseMeasureTypes = ETSClient.selectQuery(query);
 
@@ -744,9 +743,34 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 problems["brand"].Append("Can't be empty");
             }
 
+            string query = "SELECT EH_COD AS CODE, EH_OMS1 AS DESCRIPTION, EH_OMS2 AS SHORT_DESCRIPTION FROM EENHEID";
+            string[] MeasureTypes = JsonTool.ConvertTo<List<Dictionary<string, string>>>(ETSClient.selectQuery(query)).Select(x => x["EH_COD"]).ToArray();
             if (string.IsNullOrEmpty(article.UnitOfMeasure))
             {
                 problems["unitOfMeasure"].Append("Can't be empty");
+            }
+            else if (!MeasureTypes.Contains(article.UnitOfMeasure))
+            {
+                problems["unitOfMeasure"].Append("Chosen value not valid");
+            }
+
+            if (article.SalesPackQuantity < 0)
+            {
+                problems["salesPackQuantity"].Append("Can't be below zero");
+            }
+
+            if (article.NettoPrice < 0)
+            {
+                problems["nettoPrice"].Append("Price can't be below zero");
+            }
+            else if (article.TarifPrice < 0)
+            {
+                problems["tarifPrice"].Append("Price can't be below zero");
+            }
+            else if (article.TarifPrice < article.NettoPrice)
+            {
+                problems["nettoPrice"].Append("Price can't be higher then tarif price");
+                problems["tarifPrice"].Append("Price can't be lower then netto price");
             }
 
             if (string.IsNullOrEmpty(article.URL))
