@@ -709,49 +709,49 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             Dictionary<string, string[]> problems = new()
             {
-                {"Number", Array.Empty<string>() },
-                {"Reference", Array.Empty<string>() },
-                {"Description", Array.Empty<string>() },
-                {"Brand", Array.Empty<string>() },
-                {"UnitOfMeasure", Array.Empty<string>() },
-                {"SalesPackQuantity", Array.Empty<string>() },
-                {"NettoPrice", Array.Empty<string>() },
-                {"TarifPrice", Array.Empty<string>() },
-                {"URL", Array.Empty<string>() }
+                {"number", Array.Empty<string>() },
+                {"reference", Array.Empty<string>() },
+                {"description", Array.Empty<string>() },
+                {"brand", Array.Empty<string>() },
+                {"unitOfMeasure", Array.Empty<string>() },
+                {"salesPackQuantity", Array.Empty<string>() },
+                {"nettoPrice", Array.Empty<string>() },
+                {"tarifPrice", Array.Empty<string>() },
+                {"url", Array.Empty<string>() }
             };
 
             if (string.IsNullOrEmpty(article.Number))
             {
-                problems["Number"].Append("Can't be empty");
+                problems["number"].Append("Can't be empty");
             }
             else if (articleHelperETS.ArticleWithNumberExists(article.Number))
             {
-                problems["Number"].Append("Articlenumber already exists in ETS");
+                problems["number"].Append("Articlenumber already exists in ETS");
             }
 
             if (string.IsNullOrEmpty(article.Reference))
             {
-                problems["Reference"].Append("Can't be empty");
+                problems["reference"].Append("Can't be empty");
             }
 
             if (string.IsNullOrEmpty(article.Description))
             {
-                problems["Description"].Append("Can't be empty");
+                problems["description"].Append("Can't be empty");
             }
 
             if (string.IsNullOrEmpty(article.Brand))
             {
-                problems["Brand"].Append("Can't be empty");
+                problems["brand"].Append("Can't be empty");
             }
 
             if (string.IsNullOrEmpty(article.UnitOfMeasure))
             {
-                problems["UnitOfMeasure"].Append("Can't be empty");
+                problems["unitOfMeasure"].Append("Can't be empty");
             }
 
             if (string.IsNullOrEmpty(article.URL))
             {
-                problems["URL"].Append("Can't be empty");
+                problems["url"].Append("Can't be empty");
             }
 
 

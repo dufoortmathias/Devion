@@ -223,6 +223,25 @@ public class OrderLine
     public DeliveryDate? DeliveryDate { get; set; }
 }
 
+[XmlRoot(ElementName = "Mime")]
+public class Mime
+{
+
+    [XmlElement(ElementName = "MimeType")]
+    public string? MimeType { get; set; }
+
+    [XmlElement(ElementName = "MimeSource")]
+    public string? MimeSource { get; set; }
+}
+
+[XmlRoot(ElementName = "MimeInfo")]
+public class MimeInfo
+{
+
+    [XmlElement(ElementName = "Mime")]
+    public List<Mime>? Mime { get; set; }
+}
+
 [XmlRoot(ElementName = "Create")]
 public class Create
 {
@@ -294,6 +313,9 @@ public class Item
 
     [XmlElement(ElementName = "PromotionCode")]
     public string? PromotionCode { get; set; }
+
+    [XmlElement(ElementName = "MimeInfo")]
+    public MimeInfo? MimeInfo { get; set; }
 }
 
 [XmlRoot(ElementName = "SearchKeywords")]

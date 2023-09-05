@@ -252,7 +252,8 @@ public class ArticleWeb
         SalesPackQuantity = articleCebeo.SalesPackQuantity;
         NettoPrice = float.Parse(articleCebeo.UnitPrice?.NetPrice ?? "");
         TarifPrice = float.Parse(articleCebeo.UnitPrice?.TarifPrice ?? "");
-        URL = $"https://www.cebeo.be/catalog/nl-be/products/{Brand}-{string.Join('-', Regex.Replace(Description ?? throw new Exception("Article form Cebeo has no description"), "[^0-9A-Za-z _-]", "").Split(' ').Where(x => x != "").Select(x => x.Trim()))}-{articleCebeo.Material?.SupplierItemID ?? throw new Exception("Article form Cebeo has no articleNumber")}".ToLower();
+        URL = articleCebeo.MimeInfo?.Mime?.Find(m => m.MimeType != null && m.MimeType.Equals("url"))?.MimeSource;
+        URLImage = articleCebeo.MimeInfo?.Mime?.Find(m => m.MimeType != null && m.MimeType.Equals("image"))?.MimeSource;
     }
 
     public string? Number { get; set; }
@@ -263,5 +264,6 @@ public class ArticleWeb
     public int? SalesPackQuantity { get; set; }
     public float? NettoPrice { get; set; }
     public float? TarifPrice { get; set; }
-    public string? URL { get; }
+    public string? URL { get; set; }
+    public string? URLImage { get; set; }
 }
