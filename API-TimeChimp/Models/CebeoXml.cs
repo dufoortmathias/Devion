@@ -62,6 +62,119 @@ public class Material
     public string? BrandName { get; set; }
 }
 
+[XmlRoot(ElementName = "OrderDate")]
+public class OrderDate
+{
+
+    [XmlElement(ElementName = "Day")]
+    public int? Day { get; set; }
+
+    [XmlElement(ElementName = "Month")]
+    public int? Month { get; set; }
+
+    [XmlElement(ElementName = "Year")]
+    public int? Year { get; set; }
+}
+
+[XmlRoot(ElementName = "RequestedDeliveryDate")]
+public class RequestedDeliveryDate
+{
+
+    [XmlElement(ElementName = "Day")]
+    public int? Day { get; set; }
+
+    [XmlElement(ElementName = "Month")]
+    public int? Month { get; set; }
+
+    [XmlElement(ElementName = "Year")]
+    public int? Year { get; set; }
+}
+
+[XmlRoot(ElementName = "BOEstimatedDeliveryDate")]
+public class BOEstimatedDeliveryDate
+{
+
+    [XmlElement(ElementName = "Day")]
+    public int? Day { get; set; }
+
+    [XmlElement(ElementName = "Month")]
+    public int? Month { get; set; }
+
+    [XmlElement(ElementName = "Year")]
+    public int? Year { get; set; }
+}
+
+[XmlRoot(ElementName = "DeliveryDate")]
+public class DeliveryDate
+{
+
+    [XmlElement(ElementName = "Day")]
+    public int? Day { get; set; }
+
+    [XmlElement(ElementName = "Month")]
+    public int? Month { get; set; }
+
+    [XmlElement(ElementName = "Year")]
+    public int? Year { get; set; }
+}
+
+[XmlRoot(ElementName = "DeliveryAddress")]
+public class DeliveryAddress
+{
+
+    [XmlElement(ElementName = "DeliverTo")]
+    public string? DeliverTo { get; set; }
+
+    [XmlElement(ElementName = "Street")]
+    public string? Street { get; set; }
+
+    [XmlElement(ElementName = "City")]
+    public string? City { get; set; }
+
+    [XmlElement(ElementName = "PostalCode")]
+    public int? PostalCode { get; set; }
+}
+
+[XmlRoot(ElementName = "DeliveryLocation")]
+public class DeliveryLocation
+{
+
+    [XmlElement(ElementName = "DeliveryAddress")]
+    public DeliveryAddress? DeliveryAddress { get; set; }
+
+    [XmlElement(ElementName = "ContactPerson")]
+    public string? ContactPerson { get; set; }
+
+    [XmlElement(ElementName = "ContactTelephone")]
+    public string? ContactTelephone { get; set; }
+}
+
+[XmlRoot(ElementName = "OrderHeader")]
+public class OrderHeader
+{
+
+    [XmlElement(ElementName = "SupplierOrderID")]
+    public int? SupplierOrderID { get; set; }
+
+    [XmlElement(ElementName = "CustomerOrderID")]
+    public string? CustomerOrderID { get; set; }
+
+    [XmlElement(ElementName = "CustomerOrderRef")]
+    public string? CustomerOrderRef { get; set; }
+
+    [XmlElement(ElementName = "OrderDate")]
+    public OrderDate? OrderDate { get; set; }
+
+    [XmlElement(ElementName = "OrderedBy")]
+    public string? OrderedBy { get; set; }
+
+    [XmlElement(ElementName = "DeliveryLocation")]
+    public DeliveryLocation? DeliveryLocation { get; set; }
+
+    [XmlElement(ElementName = "Comments")]
+    public List<string>? Comments { get; set; }
+}
+
 [XmlRoot(ElementName = "OrderLine")]
 public class OrderLine
 {
@@ -78,6 +191,30 @@ public class OrderLine
 
     [XmlElement(ElementName = "OrderedQuantity")]
     public int? OrderedQuantity { get; set; }
+
+    [XmlElement(ElementName = "SupplierOrderLineID")]
+    public int? SupplierOrderLineID { get; set; }
+
+    [XmlElement(ElementName = "CustomerOrderLineID")]
+    public int? CustomerOrderLineID { get; set; }
+
+    [XmlElement(ElementName = "UnitPrice")]
+    public UnitPrice? UnitPrice { get; set; }
+
+    [XmlElement(ElementName = "RequestedDeliveryDate")]
+    public RequestedDeliveryDate? RequestedDeliveryDate { get; set; }
+
+    [XmlElement(ElementName = "BOQuantity")]
+    public int? BOQuantity { get; set; }
+
+    [XmlElement(ElementName = "BOEstimatedDeliveryDate")]
+    public BOEstimatedDeliveryDate? BOEstimatedDeliveryDate { get; set; }
+
+    [XmlElement(ElementName = "DeliveryQuantity")]
+    public int? DeliveryQuantity { get; set; }
+
+    [XmlElement(ElementName = "DeliveryDate")]
+    public DeliveryDate? DeliveryDate { get; set; }
 }
 
 [XmlRoot(ElementName = "Create")]
@@ -88,6 +225,17 @@ public class Create
     {
         OrderLine = orderLines.Select(l => new OrderLine(l)).ToList();
     }
+
+    [XmlElement(ElementName = "OrderLine")]
+    public List<OrderLine>? OrderLine { get; set; }
+}
+
+[XmlRoot(ElementName = "Detail")]
+public class Detail
+{
+
+    [XmlElement(ElementName = "OrderHeader")]
+    public OrderHeader? OrderHeader { get; set; }
 
     [XmlElement(ElementName = "OrderLine")]
     public List<OrderLine>? OrderLine { get; set; }
@@ -104,6 +252,9 @@ public class Order
 
     [XmlElement(ElementName = "Create")]
     public Create? Create { get; set; }
+
+    [XmlElement(ElementName = "Detail")]
+    public Detail? Detail { get; set; }
 }
 
 [XmlRoot(ElementName = "Get")]
@@ -224,6 +375,9 @@ public class Response
 
     [XmlElement(ElementName = "Article")]
     public Article? Article { get; set; }
+
+    [XmlElement(ElementName = "Order")]
+    public Order? Order { get; set; }
 }
 
 
