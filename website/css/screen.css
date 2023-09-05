@@ -440,6 +440,27 @@ table {
   align-self: center;
 }
 
+.c-app_logo--small{
+  display: none;
+  color: var(--global-color-alpha);
+  grid-area:logo;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
+  height: var(--c-app__topbar-height);
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  .c-app_logo {
+    display: none;
+  }
+  .c-app_logo--small{
+    display: flex;
+  }
+}
+
 .c-header {
   display: grid;
   align-items: center;
@@ -673,7 +694,7 @@ table {
           "btwcode omrekfac typfac" 
           "merk familie subfamilie"
           "lengte breedte hoogte"
-          "hoofdleverancier link none"
+          "hoofdleverancier link minaan"
           "prev progress next";
   grid-template-columns: 30vw 30vw 30vw;
   grid-gap: var(--global-whitespace-lg);
@@ -1087,6 +1108,22 @@ table {
 }
 
 .c-input-stdkorting {
+  grid-area: input;
+}
+
+.c-artikel-minaan {
+  grid-area: minaan;
+  display: grid;
+  grid-template-areas: "label input";
+  grid-template-columns: 1fr 2fr;
+}
+
+.c-label-minaan {
+  padding-top: 11px;
+  grid-area: label;
+}
+
+.c-input-minaan {
   grid-area: input;
 }
 

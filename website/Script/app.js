@@ -36,7 +36,8 @@ let htmlButtonDownload,
   htmlFileInput,
   htmlArtikelNext,
   htmlArtikelPrevious,
-  htmlArtikelProgress;
+  htmlArtikelProgress,
+  htmlMinAantal;
 
 //#endregion
 
@@ -160,11 +161,12 @@ const showArtikel = function (jsonObject) {
   htmlVerkoopPrijs.value = parseFloat(htmlPrijs.value * (1 + 1 / 3)).toFixed(4);
   htmlReflevNr.value = jsonObject.reference;
   htmlArtikelNr.value = jsonObject.reference;
-  htmlOmRekFac.value = jsonObject.salesPackQuantity;
+  htmlMinAantal.value = jsonObject.salesPackQuantity;
   htmlMerk.value = jsonObject.brand;
   htmlLink.value = jsonObject.url;
   htmlLinkIcon.href = jsonObject.url;
   htmlStdKorting.value = parseFloat((1-(jsonObject.nettoPrice/jsonObject.tarifPrice))*100).toFixed(4);
+  htmlOmRekFac.value = '1';
   getFormInfo();
 };
 
@@ -549,6 +551,7 @@ const htmlselectors = function () {
   htmlArtikelNext = document.querySelector(".js-button-artikel-next");
   htmlArtikelPrevious = document.querySelector(".js-button-artikel-prev");
   htmlArtikelProgress = document.querySelector(".js-artikel-progress");
+  htmlMinAantal = document.querySelector(".js-input-minaan");
 };
 document.addEventListener("DOMContentLoaded", init);
 //#endregion
