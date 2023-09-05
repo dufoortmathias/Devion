@@ -15,7 +15,17 @@ public class CebeoArticleHelper
 
     public Item? SearchForArticleWithReference(string articleReference)
     {
-        CebeoXML cebeoXML = CebeoXML.CreateArticleSearchRequest(articleReference, config);
+        string[] articleReferenceParts = articleReference.Split(' ');
+        string reference = articleReferenceParts[0];
+        string? reelCode = null;
+        string? reelLength = null;
+        if (articleReferenceParts.Length > 1)
+        {
+            reelCode = articleReferenceParts[1];
+            reelLength = articleReferenceParts[2];
+        }
+
+        CebeoXML cebeoXML = CebeoXML.CreateArticleSearchRequest(reference, config);
 
         string requestXML = cebeoXML.GetXML();
 
@@ -26,7 +36,11 @@ public class CebeoArticleHelper
         {
             CebeoXML result = (CebeoXML) (serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}"));
 
-            return result.Response?.Article?.List?.Item?.Find(x => x.Material?.Reference != null && x.Material.Reference.Equals(articleReference));
+            return result.Response?.Article?.List?.Item?.Find(x => 
+                x.Material != null && 
+                x.Material.Reference != null && x.Material.Reference.Equals(reference) && 
+                (reelCode == null || (x.Material.ReelCode != null && x.Material.ReelCode.Equals(reelCode))) && 
+                (reelLength == null || (x.Material.ReelLength != null && x.Material.ReelLength.Equals(reelLength))));
         }
     }
 

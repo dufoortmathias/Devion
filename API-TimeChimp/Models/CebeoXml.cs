@@ -60,6 +60,12 @@ public class Material
 
     [XmlElement(ElementName = "BrandName")]
     public string? BrandName { get; set; }
+
+    [XmlElement(ElementName = "ReelCode")]
+    public string? ReelCode { get; set; }
+
+    [XmlElement(ElementName = "ReelLength")]
+    public string? ReelLength { get; set; }
 }
 
 [XmlRoot(ElementName = "OrderDate")]
