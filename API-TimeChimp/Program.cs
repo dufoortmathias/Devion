@@ -602,7 +602,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            string supplierId = supplierHelperETS.FindSupplierId("devion");
+            string supplierId = supplierHelperETS.FindSupplierId("cebeo");
             List<string> articles = articleHelperETS.GetAricles(supplierId);
 
             return Results.Ok(articles);
@@ -636,7 +636,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            string supplierId = supplierHelperETS.FindSupplierId("devion");
+            string supplierId = supplierHelperETS.FindSupplierId("cebeo");
 
             if (articleHelperETS.ArticleWithReferenceExists(articleReference, supplierId))
             {
