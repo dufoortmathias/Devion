@@ -13,5 +13,6 @@
         public string Description { get; set; }
         public int Quantity { get; set; }
         public List<Item?> Parts { get; set; } = new();
+        public Boolean ExistsETS { get; set; } = false;
     }
 }

@@ -792,47 +792,63 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
     app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile) =>
     {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        using (var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content")))
+        try
         {
-            using (var reader = ExcelReaderFactory.CreateReader(stream))
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            using (var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content")))
             {
-                DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {
-                    ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+                    DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
                     {
-                        UseHeaderRow = true
-                    }
-                });
+                        ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+                        {
+                            UseHeaderRow = true
+                        }
+                    });
 
-                DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
+                    DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
 
-                List<Item?> assemblies = new();
-                foreach (DataRow row in table.Rows)
-                {
-                    List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x)-1)?.ToList() ?? new();
-                    List<Item?> parentList = assemblies;
-                    foreach (int level in hierarchy)
+                    List<Item?> assemblies = new();
+                    foreach (DataRow row in table.Rows)
                     {
-                        while (level >= parentList.Count)
+                        List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
+                        List<Item?> parentList = assemblies;
+                        foreach (int level in hierarchy)
                         {
-                            parentList.Add(null);
-                        }
+                            while (level >= parentList.Count)
+                            {
+                                parentList.Add(null);
+                            }
 
-                        if (parentList[level] != null)
-                        {
-                            #pragma warning disable CS8602 // Dereference of a possibly null reference.
-                            parentList = parentList[level].Parts;
-                            #pragma warning restore CS8602 // Dereference of a possibly null reference.
-                        }
-                        else
-                        {
-                            parentList[level] = new Item((string)row["Part Number"], (string)row["Description"], Convert.ToInt32((double)row["QTY"]));
+                            if (parentList[level] != null)
+                            {
+                                #pragma warning disable CS8602 // Dereference of a possibly null reference.
+                                parentList = parentList[level].Parts;
+                                #pragma warning restore CS8602 // Dereference of a possibly null reference.
+                            }
+                            else
+                            {
+                                Item part = new((string)row["Part Number"], (string)row["Description"], Convert.ToInt32((double)row["QTY"]));
+
+                                if (part.Number.Length > 25)
+                                {
+                                    throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
+                                }
+
+                                part.ExistsETS = articleHelperETS.ArticleWithNumberExists(part.Number);
+
+                                parentList[level] = part;
+                            }
                         }
                     }
+                    return Results.Ok(assemblies);
                 }
-                return assemblies;
             }
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
         }
     });
 }

@@ -84,7 +84,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
         foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders)
         {
             // Add data to the CSV file
-            var first = purchaseOrder.ART_LEVREF;
+            var first = purchaseOrder.FD_KLANTREFERENTIE;
             var second = purchaseOrder.FD_AANTAL ?? throw new Exception($"PurchaseOrder {purchaseOrder.FD_BONNR} in ETS has no FD_AANTAL");
             var newLine = string.Format("{0}, {1}", first, second);
             csv.AppendLine(newLine);
