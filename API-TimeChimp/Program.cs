@@ -791,6 +791,18 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}ValidateArticleForm").WithTags(company);
 
+    app.MapPost($"/api/{company.ToLower()}/ets/createarticle", ([FromBody] ArticleWeb article) =>
+    {
+        try
+        {
+            Results.Ok(articleHelperETS.CreateArticle(article));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
+
     app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile) =>
     {
         try
@@ -855,17 +867,24 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
     app.MapPut($"/api/{company.ToLower()}/ets/updatelinkedarticles", ([FromBody] List<Item> articles) =>
     {
-        void LinkArticles(Item main)
+        try
         {
-            foreach (Item part in main.Parts.Where(i => i != null).Cast<Item>().ToList())
+            void LinkArticles(Item main)
             {
-                articleHelperETS.LinkArticle(main.Number, part.Number);
-                LinkArticles(part);
-            }
-        };
+                foreach (Item part in main.Parts.Where(i => i != null).Cast<Item>().ToList())
+                {
+                    articleHelperETS.LinkArticle(main.Number, part.Number);
+                    LinkArticles(part);
+                }
+            };
 
-        articles.ForEach(a => LinkArticles(a));
-    });
+            articles.ForEach(a => LinkArticles(a));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");

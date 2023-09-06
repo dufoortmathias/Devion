@@ -109,6 +109,12 @@ public class ETSArticleHelper : ETSHelper
         return articles;
     }
 
+    public ArticleWeb CreateArticle(ArticleWeb article)
+    {
+        // TODO create article ETS
+        return article;
+    }
+
     public ArticleETS UpdateArticlePriceETS(string articleNumber, float newPrice, float maxPriceDiff)
     {
         ArticleETS article = GetArticle(articleNumber) ?? throw new Exception($"ETS han no article with number = {articleNumber}");
