@@ -93,8 +93,12 @@ public class ETSArticleHelper : ETSHelper
     public List<string> GetAricles(string supplierId)
     {
         string query = "SELECT CSARTPX.* FROM CSARTPX LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 WHERE ART_LEV1 = @supplierId";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@supplierId", supplierId},
+        };
 
-        string json = ETSClient.selectQuery(query) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
         List<string> articles = JsonTool.ConvertTo<List<ArticleETS>>(json)
             .Select(a => a.ART_NR).Distinct()
@@ -127,8 +131,21 @@ public class ETSArticleHelper : ETSHelper
         return article;
     }
 
-    public void LinkArticle(string articleNumberMain, string articleNumberToLink)
+    public void LinkArticle(string articleNumberMaster, string articleNumberToLink)
     {
-        Console.WriteLine($"{articleNumberToLink} => {articleNumberMain}");
+        string query = $"SELECT COUNT(*) FROM TBL_ARTIKEL_GEKOPPELD AS L LEFT JOIN CSARTPX AS A1 ON A1.ART_ID = L.ARG_ART_ID LEFT JOIN CSARTPX AS A2 ON A2.ART_ID = L.ARG_MASTER_ID WHERE A1.ART_NR = @artikel AND A2.ART_NR = @master";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@artikel", articleNumberToLink},
+            {"@master", articleNumberMaster }
+        };
+
+        string response = ETSClient.selectQuery(query, parameters);
+        int count = JsonTool.ConvertTo<List<Dictionary<string, int>>>(response).First()["COUNT"];
+
+        if (count == 0)
+        {
+            // TODO create link ETS
+        }
     }
 }
