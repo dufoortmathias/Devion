@@ -1,11 +1,18 @@
+@import 'main.css';
 /*------------------------------------*\
 #FONTS
 \*------------------------------------*/
 
 @font-face {
-  font-family: "Sofia Pro";
+  font-family: "Inter Web";
   font-weight: 400;
-  src: url("./fonts/Sofia Pro Regular.ttf");
+  src: url("../fonts/Inter-Regular.ttf") format("ttf");
+}
+
+@font-face {
+  font-family: "Inter Web";
+  font-weight: 700;
+  src: url("../fonts/Inter-Bold.ttf") format("ttf");
 }
 
 /*------------------------------------*\
@@ -52,7 +59,7 @@
   --global-borderWidth: 1px;
 
   /* font settings */
-  --global-font-family: "Sofia Pro", Helvetica, arial, sans-serif;
+  --global-font-family: "Inter Web", Helvetica, arial, sans-serif;
   --global-fontSize: 16px;
 
   /* transition settings */
@@ -122,7 +129,7 @@
 html {
   font-size: 16px;
   line-height: 1.5;
-  font-family: var(--global-font-family);
+  font-family: "Inter Web", Helvetica, arial, sans-serif;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -412,10 +419,6 @@ table {
   align-self: center;
 }
 
-.c-header {
-  height: var(--c-app__topbar-height);
-}
-
 .c-form-field {
   display: flex;
   align-items: center;
@@ -423,6 +426,98 @@ table {
   justify-items: center;
   align-self: center;
   width: 100vw;
+}
+
+.c-app_logo {
+  padding: 0 var(--global-whitespace-lg);
+  height: var(--c-app__topbar-height);
+  display: flex;
+  align-items: center;
+  grid-area: logo;
+  height: var(--c-app__topbar-height);
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
+}
+
+.c-app_logo--small{
+  display: none;
+  color: var(--global-color-alpha);
+  grid-area:logo;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
+  height: var(--c-app__topbar-height);
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  .c-app_logo {
+    display: none;
+  }
+  .c-app_logo--small{
+    display: flex;
+  }
+}
+
+.c-header {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  align-self: center;
+  width: 100vw;
+  grid-area: header;
+  grid-template-areas: "logo nav";
+  grid-gap: 20vw;
+}
+/*
+    Component: Nav
+    ---
+    Main navigation of the site
+*/
+
+.c-nav {
+  grid-area: nav;
+  font-size: calc(var(--global-fontSize) * 1.5);
+  line-height: var(--global-whitespace);
+  width: auto;
+  display: flex;
+}
+
+.c-nav__link {
+  text-decoration: none;
+  font-weight: 400;
+  padding: var(--global-whitespace-xs) 0;
+}
+
+.c-nav__item {
+  display: inline-block;
+  margin-right: var(--global-whitespace-md);
+}
+
+.c-nav__link:active {
+  color: var(--global-color-active);
+}
+
+.c-nav__link:hover,
+.c-nav__link:focus {
+  color: var(--global-color-hover);
+}
+
+.c-nav__link--active {
+  color: var(--global-color-active);
+}
+
+@media (min-width: 768px) {
+  .c-nav__list {
+    display: inline-block;
+  }
+
+  .c-nav__link {
+  }
 }
 
 .c-app_body {
@@ -446,6 +541,22 @@ table {
   width: 100%;
 }
 
+.c-custom-select {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+.c-custom-select__symbol {
+  width: calc(var(--global-baseline) * 3);
+  height: calc(var(--global-baseline) * 3);
+  fill: var(--global-color-neutral-x-light);
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  pointer-events: none;
+}
+
 .c-input {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -467,6 +578,54 @@ table {
   align-items: center;
   justify-content: space-between;
   padding: var(--global-whitespace-md) 0;
+}
+
+.c-button {
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: var(--global-borderRadius);
+  border: var(--global-borderWidth) solid var(--global-color-alpha-dark);
+  background-color: var(--global-color-alpha);
+  color: #fff;
+  padding: calc(var(--global-baseline) * 1.5 - var(--global-borderWidth))
+    var(--global-whitespace-md);
+  line-height: calc(var(--global-baseline) * 3);
+  width: 100%;
+  outline: none;
+  transition: all var(--global-transitionTiming-alpha);
+}
+
+.c-button:hover {
+  background-color: var(--global-color-alpha-light);
+}
+
+.c-button:focus {
+  box-shadow: 0 0 0 3px var(--global-color-alpha-x-transparent);
+}
+
+.c-button:active {
+  background-color: var(--global-color-alpha-dark);
+  box-shadow: none;
+}
+
+.c-button-disabled {
+  background-color: var(--global-color-alpha-x-light);
+  border-color: var(--global-color-alpha-x-light);
+  color: var(--global-color-neutral-dark);
+  cursor: not-allowed;
+}
+
+.c-button-disabled:hover {
+  background-color: var(--global-color-alpha-x-light);
+}
+
+.c-button-disabled:focus {
+  box-shadow: none;
+}
+
+.c-button-disabled:active {
+  background-color: var(--global-color-alpha-x-light);
+  box-shadow: none;
 }
 
 .c-tabel {
@@ -520,6 +679,11 @@ table {
   width: 100%;
 }
 
+.c-button-artikel-search {
+  margin-top: var(--global-whitespace-lg);
+  margin-bottom: var(--global-whitespace-lg);
+  cursor: pointer;
+}
 
 .c-artikel_form {
   display: grid;
@@ -1207,4 +1371,3 @@ No media query since this is the default in mobile first design
     page-break-after: avoid;
   }
 }
-

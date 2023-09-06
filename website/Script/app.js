@@ -367,6 +367,30 @@ const getFormInfo = async function () {
     }
   }
 };
+
+const sendDataBOM = async function (data) {
+  try {
+    const response = await fetch(
+      `${baseUrl}/devion/cebeo/transmitbom`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bom: data,
+        }),
+      }
+    );
+    if (response.status == 200) {
+      alert("BOM sent successfully");
+    } else {
+      alert("something went wrong");
+    }
+  } catch (error) {
+    alert(error);
+  }
+}
 //#endregion
 
 //#region *** Event Listeners - listenTo___ ***********
@@ -412,25 +436,9 @@ const listenToButtonsArtikels = function () {
       }
     } else {
       var reader = new FileReader();
-      reader.readAsText(htmlFileInput.files[0]);
+      reader.readAsText(htmlFileInput.files[0], "base64");
       reader.onload = function () {
-        var header = reader.result.split("\r\n")[0];
-        var artikels = [];
-        for (var i = 1; i < reader.result.split("\n").length; i++) {
-          var data = reader.result.split("\r\n")[i];
-          var obj = {};
-          for (var j = 0; j < header.split(", ").length; j++) {
-            obj[header.split(", ")[j]] = data.split(", ")[j];
-          }
-          if (obj["artikelNr."] != "") {
-            artikels.push(obj);
-          }
-        }
-        console.log(artikels);
-        var artikelNrs = [];
-        for (const artikel of artikels) {
-          artikelNrs.push(artikel["artikelNr."]);
-        }
+        sendDataBOM(reader.result);
       };
     }
     if (artikelNrs != null) {
