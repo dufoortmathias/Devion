@@ -126,4 +126,9 @@ public class ETSArticleHelper : ETSHelper
 
         return article;
     }
+
+    public void LinkArticle(string articleNumberMain, string articleNumberToLink)
+    {
+        Console.WriteLine($"{articleNumberToLink} => {articleNumberMain}");
+    }
 }

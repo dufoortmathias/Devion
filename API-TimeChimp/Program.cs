@@ -851,6 +851,20 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
+    }).WithName($"{company}TransformBomExcel").WithTags(company);
+
+    app.MapPut($"/api/{company.ToLower()}/ets/updatelinkedarticles", ([FromBody] List<Item> articles) =>
+    {
+        void LinkArticles(Item main)
+        {
+            foreach (Item part in main.Parts.Where(i => i != null).Cast<Item>().ToList())
+            {
+                articleHelperETS.LinkArticle(main.Number, part.Number);
+                LinkArticles(part);
+            }
+        };
+
+        articles.ForEach(a => LinkArticles(a));
     });
 }
 
