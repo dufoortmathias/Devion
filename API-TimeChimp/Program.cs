@@ -1,5 +1,3 @@
-using System.Security;
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
@@ -648,7 +646,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 throw new Exception($"ETS already has an article with number = {articleReference}");
             }
 
-            Item articleCebeo = articleHelperCebeo.SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+            CebeoItem articleCebeo = articleHelperCebeo.SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 
             ArticleWeb article = new(articleCebeo);
 
@@ -791,6 +789,52 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ValidateArticleForm").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile) =>
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        using (var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content")))
+        {
+            using (var reader = ExcelReaderFactory.CreateReader(stream))
+            {
+                DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
+                {
+                    ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+                    {
+                        UseHeaderRow = true
+                    }
+                });
+
+                DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
+
+                List<Item?> assemblies = new();
+                foreach (DataRow row in table.Rows)
+                {
+                    List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x)-1)?.ToList() ?? new();
+                    List<Item?> parentList = assemblies;
+                    foreach (int level in hierarchy)
+                    {
+                        while (level >= parentList.Count)
+                        {
+                            parentList.Add(null);
+                        }
+
+                        if (parentList[level] != null)
+                        {
+                            #pragma warning disable CS8602 // Dereference of a possibly null reference.
+                            parentList = parentList[level].Parts;
+                            #pragma warning restore CS8602 // Dereference of a possibly null reference.
+                        }
+                        else
+                        {
+                            parentList[level] = new Item((string)row["Part Number"], (string)row["Description"], Convert.ToInt32((double)row["QTY"]));
+                        }
+                    }
+                }
+                return assemblies;
+            }
+        }
+    });
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");

@@ -243,7 +243,7 @@ public class ArticleWeb
 {
     public ArticleWeb() { }
 
-    public ArticleWeb(Item articleCebeo)
+    public ArticleWeb(CebeoItem articleCebeo)
     {
         Reference = articleCebeo.Material?.Reference;
         Description = articleCebeo.Material?.Description;

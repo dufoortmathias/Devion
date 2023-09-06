@@ -13,7 +13,7 @@ public class CebeoArticleHelper
         webClient = new();
     }
 
-    public Item? SearchForArticleWithReference(string articleReference)
+    public CebeoItem? SearchForArticleWithReference(string articleReference)
     {
         string[] articleReferenceParts = articleReference.Split(' ');
         string reference = articleReferenceParts[0];
@@ -46,7 +46,7 @@ public class CebeoArticleHelper
 
     public float GetArticlePriceCebeo(string articleReference)
     {
-        Item item = SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+        CebeoItem item = SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
 
         string netPrice = item.UnitPrice?.NetPrice ?? throw new Exception($"Cebeo article with reference = {articleReference} has no netto price");
 

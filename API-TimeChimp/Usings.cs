@@ -6,6 +6,7 @@ global using Api.Devion.Models;
 global using Api.Devion.Tools;
 //nuget namespaces
 global using FirebirdSql.Data.FirebirdClient;
+global using ExcelDataReader;
 //dotnet namespaces
 global using System;
 global using System.Collections.Generic;
@@ -16,4 +17,3 @@ global using System.Text;
 global using Microsoft.AspNetCore.Mvc;
 global using System.Xml;
 global using System.Xml.Serialization;
-global using System.Text.RegularExpressions;

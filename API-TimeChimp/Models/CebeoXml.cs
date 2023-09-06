@@ -290,7 +290,7 @@ public class Get
 }
 
 [XmlRoot(ElementName = "Item")]
-public class Item
+public class CebeoItem
 {
 
     [XmlElement(ElementName = "Material")]
@@ -342,7 +342,7 @@ public class List
     public int? NumberOfLines { get; set; }
 
     [XmlElement(ElementName = "Item")]
-    public List<Item>? Item { get; set; }
+    public List<CebeoItem>? Item { get; set; }
 }
 
 [XmlRoot(ElementName = "Search")]
