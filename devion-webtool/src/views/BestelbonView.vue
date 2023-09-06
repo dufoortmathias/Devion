@@ -4,9 +4,10 @@
       @option-selected="handledropdownCompaniesSelected" class="c-dropdown" />
     <Dropdown :id="dropdownBestelbon.id" :label="dropdownBestelbon.label" :options="dropdownBestelbon.options"
       @option-selected="handledropdownBestelbonSelected" class="c-dropdown" />
-    <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonOpzoeken"
+    <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonDownload"
       class="c-button-artikel-search" />
-    <TabelBestelbon :showTabel="tabelBestelbon.showTabel" :bestelbonNr="tabelBestelbon.bestelbonNr" :showError="tabelBestelbon.showError" :showInfo="tabelBestelbon.showInfo" :artikels="tabelBestelbon.artikels"/>
+    <TabelBestelbon :showTabel="tabelBestelbon.showTabel" :bestelbonNr="tabelBestelbon.bestelbonNr"
+      :showError="tabelBestelbon.showError" :showInfo="tabelBestelbon.showInfo" :artikels="tabelBestelbon.artikels" />
   </div>
 </template>
 
@@ -19,6 +20,7 @@ import { GetData } from '../global/global.js'
 let options = [];
 let endpoint = 'companies'
 let company = "";
+let bestelbonNr = "";
 const data = await GetData(endpoint)
 
 for (var element of data) {
@@ -90,6 +92,7 @@ export default {
       }
     },
     async handledropdownBestelbonSelected(selectedOption) {
+      bestelbonNr = selectedOption
       this.buttonDevion.isButtonDisabled = false
       endpoint = `${company}/ets/purchaseorder?id=${selectedOption}`
       const data = await GetData(endpoint)
@@ -116,9 +119,13 @@ export default {
             let artikelsLeverancier = []
             for (const bestelbon of data.artikels) {
               if (bestelbon.leverancier == leverancier) {
-                artikelsLeverancier.push({ artikelNummer: bestelbon.artikelNummer, aantal: bestelbon.aantal, omschrijving: bestelbon.omschrijving })
+                if (bestelbon.artikelNummer != 'VERZENDING') {
+                  artikelsLeverancier.push({ artikelNummer: bestelbon.artikelNummer, aantal: bestelbon.aantal, omschrijving: bestelbon.omschrijving })
+                }
               }
             }
+
+
             artikels.push({ leverancier: { name: leverancier, artikels: artikelsLeverancier } })
           }
           this.tabelBestelbon.artikels = artikels
@@ -127,6 +134,19 @@ export default {
         this.tabelBestelbon.showTabel = false
       }
     },
+    async BestelbonDownload() {
+      endpoint = `${company}/ets/createpurchasefile?id=${bestelbonNr}`
+      await GetData(endpoint).then((bon) =>{
+        var decodeString = atob(bon.fileContents);
+        var blob = new Blob([decodeString], { type: bon.contentType });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = bon.fileDownloadName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      })
+    }
   },
 };
 </script>
