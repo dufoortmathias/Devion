@@ -50,17 +50,4 @@ export default {
   color: var(--global-color-neutral-dark);
   cursor: not-allowed;
 }
-/* 
-.c-button:disabled:hover {
-  background-color: var(--global-color-alpha-x-light);
-}
-
-.c-button:disabled:focus {
-  box-shadow: none;
-}
-
-.c-button:disabled:active {
-  background-color: var(--global-color-alpha-x-light);
-  box-shadow: none;
-} */
 </style>
