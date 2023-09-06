@@ -22,7 +22,7 @@ public class ETSArticleHelper : ETSHelper
         return article;
     }
 
-    public string GetArticleReference(string articleNumber, string supplierId)
+    public string? GetArticleReference(string articleNumber, string supplierId)
     {
         ArticleETS? article = GetArticle(articleNumber);
 
@@ -44,7 +44,7 @@ public class ETSArticleHelper : ETSHelper
             articleReference = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).FirstOrDefault()?["CO_REFLEV"];
         }
 
-        return string.IsNullOrEmpty(articleReference) ? articleNumber : articleReference;
+        return string.IsNullOrEmpty(articleReference) ? null : articleReference;
     }
 
     public bool ArticleWithReferenceExists(string articleReference, string supplierId)

@@ -562,7 +562,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             string supplierId = header.FH_KLNR ?? throw new Exception($"PurchaseOrder header in ETS with number = {header.FH_BONNR} has no FH_KLNR");
 
             List<PurchaseOrderDetailETS> purchaseOrders = purchaseOrderHelperETS.GetPurchaseOrderDetails(id);
-            purchaseOrders.ForEach(po => po.FD_KLANTREFERENTIE = articleHelperETS.GetArticleReference(po.FD_ARTNR ?? throw new Exception($"PurchaseOrder detail in ETS with number = {po.FD_BONNR} has no ART_NR"), supplierId) ?? throw new Exception($"Article with number = {po.FD_ARTNR} has no article reference"));
+            purchaseOrders.ForEach(po => po.FD_KLANTREFERENTIE = articleHelperETS.GetArticleReference(po.FD_ARTNR ?? throw new Exception($"PurchaseOrder detail in ETS with number = {po.FD_BONNR} has no ART_NR"), supplierId));
+            purchaseOrders = purchaseOrders.Where(po => po.FD_KLANTREFERENTIE != null).ToList();
 
             FileContentResult fileContent;
             if (supplier.ToLower().Contains("cebeo"))
