@@ -2,7 +2,7 @@ import requests
 import json
 import base64
 
-with open("220050-005-0072M-REV1_BOM2.xlsx", "rb") as f:
+with open("220050-005-0072M-REV1_BOM2_new.xlsx", "rb") as f:
     bytes = f.read()
 
 headers = {
@@ -15,4 +15,4 @@ jsonData = json.dumps({
 
 response = requests.post("http://localhost:5142/api/devion/ets/transformbomexcel", headers=headers, data=jsonData)
 
-print(response.json())
+response = requests.put("http://localhost:5142/api/devion/ets/updatelinkedarticles", headers=headers, data=response.text)
