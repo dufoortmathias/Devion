@@ -82,9 +82,11 @@ export default {
       return data
     }).then((data) => {
       console.log(data)
+      const options = []
       for (var element of data) {
-        this.dropdownCompanies.options.push({ value: element, label: element })
+        options.push({ value: element, label: element })
       }
+      this.dropdownCompanies.options = options
     })
   },
   methods: {
