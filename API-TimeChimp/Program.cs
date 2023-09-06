@@ -615,7 +615,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {            
-            string articleReference = articleHelperETS.GetArticle(articleNumberETS).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
+            string articleReference = (articleHelperETS.GetArticle(articleNumberETS) ?? throw new Exception($"ETS han no article with number = {articleNumberETS}")).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
 
             float newPrice = articleHelperCebeo.GetArticlePriceCebeo(articleReference);
 

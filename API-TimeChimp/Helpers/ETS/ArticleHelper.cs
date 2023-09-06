@@ -7,7 +7,7 @@ public class ETSArticleHelper : ETSHelper
     {
     }
 
-    public ArticleETS GetArticle(string articleNumber)
+    public ArticleETS? GetArticle(string articleNumber)
     {
         string query = "SELECT * FROM CSARTPX WHERE ART_NR = @number";
         Dictionary<string, object> parameters = new()
@@ -17,22 +17,14 @@ public class ETSArticleHelper : ETSHelper
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
-        ArticleETS article = JsonTool.ConvertTo<List<ArticleETS>>(json).FirstOrDefault() ?? throw new Exception($"ETS han no article with number = {articleNumber}");
+        ArticleETS? article = JsonTool.ConvertTo<List<ArticleETS>>(json).FirstOrDefault();
 
         return article;
     }
 
     public string GetArticleReference(string articleNumber, string supplierId)
     {
-        ArticleETS? article = null;
-        try
-        {
-            GetArticle(articleNumber);
-        }
-        catch
-        {
-
-        }
+        ArticleETS? article = GetArticle(articleNumber);
 
         string? articleReference;
         if (article != null && article.ART_LEV1 != null && article.ART_LEV1.Equals(supplierId) && article.ART_LEVREF != null)
@@ -52,7 +44,7 @@ public class ETSArticleHelper : ETSHelper
             articleReference = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).FirstOrDefault()?["CO_REFLEV"];
         }
 
-        return articleReference ?? articleNumber;
+        return string.IsNullOrEmpty(articleReference) ? articleNumber : articleReference;
     }
 
     public bool ArticleWithReferenceExists(string articleReference, string supplierId)
@@ -115,7 +107,7 @@ public class ETSArticleHelper : ETSHelper
 
     public ArticleETS UpdateArticlePriceETS(string articleNumber, float newPrice, float maxPriceDiff)
     {
-        ArticleETS article = GetArticle(articleNumber);
+        ArticleETS article = GetArticle(articleNumber) ?? throw new Exception($"ETS han no article with number = {articleNumber}");
         float price = article.ART_AANKP ?? throw new Exception($"Article with number = {articleNumber}, has no old price assigned");
 
         if (price - price * maxPriceDiff < newPrice || newPrice < price + price * maxPriceDiff)
