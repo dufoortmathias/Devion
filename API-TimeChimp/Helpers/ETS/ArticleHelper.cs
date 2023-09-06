@@ -24,27 +24,27 @@ public class ETSArticleHelper : ETSHelper
 
     public string? GetArticleReference(string articleNumber, string supplierId)
     {
-        ArticleETS? article = GetArticle(articleNumber);
-
-        string? articleReference;
-        if (article != null && article.ART_LEV1 != null && article.ART_LEV1.Equals(supplierId) && article.ART_LEVREF != null)
-        {
-            return article.ART_LEVREF;
-        }
-        else
-        {
-            string query = "SELECT CO_REFLEV FROM CONTACT3 WHERE CO_ARTNR = @number AND CO_LEVNR = @supplier";
-            Dictionary<string, object> parameters = new()
+        string query = "SELECT CO_REFLEV FROM CONTACT3 WHERE CO_ARTNR = @number AND CO_LEVNR = @supplier";
+        Dictionary<string, object> parameters = new()
             {
                 {"@number", articleNumber},
                 {"@supplier", supplierId}
             };
 
-            string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article reference from ETS with query: " + query);
-            articleReference = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).FirstOrDefault()?["CO_REFLEV"];
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article reference from ETS with query: " + query);
+        string? articleReference = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).FirstOrDefault()?["CO_REFLEV"];
+        articleReference = string.IsNullOrEmpty(articleReference) ? null : articleReference;
+
+        if (articleReference == null)
+        {
+            ArticleETS? article = GetArticle(articleNumber);
+            if (article != null && article.ART_LEV1 != null && article.ART_LEV1.Equals(supplierId) && article.ART_LEVREF != null)
+            {
+                return article.ART_LEVREF;
+            }
         }
 
-        return string.IsNullOrEmpty(articleReference) ? null : articleReference;
+        return articleReference;
     }
 
     public bool ArticleWithReferenceExists(string articleReference, string supplierId)
