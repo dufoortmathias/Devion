@@ -1,9 +1,9 @@
 <template>
   <div>
     <Dropdown :id="dropdownCompanies.id" :label="dropdownCompanies.label" :options="dropdownCompanies.options"
-      @option-selected="handledropdownCompaniesSelected" class="c-dropdown" />
+      :error="dropdownCompanies.error" @option-selected="handledropdownCompaniesSelected" class="c-dropdown" />
     <Dropdown :id="dropdownBestelbon.id" :label="dropdownBestelbon.label" :options="dropdownBestelbon.options"
-      @option-selected="handledropdownBestelbonSelected" class="c-dropdown" />
+      :error="dropdownBestelbon.error" @option-selected="handledropdownBestelbonSelected" class="c-dropdown" />
     <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonDownload"
       class="c-button-artikel-search" />
     <TabelBestelbon :showTabel="tabelBestelbon.showTabel" :bestelbonNr="tabelBestelbon.bestelbonNr"
@@ -42,6 +42,7 @@ export default {
         id: 'dropdownCompanies',
         label: 'Bedrijf',
         options: options,
+        error: false,
       },
       dropdownBestelbon: {
         components: {
@@ -50,6 +51,7 @@ export default {
         id: 'dropdownBestelbon',
         label: 'Bestelbon',
         options: [],
+        error: false,
       },
       buttonDevion: {
         components: {
@@ -136,7 +138,7 @@ export default {
     },
     async BestelbonDownload() {
       endpoint = `${company}/ets/createpurchasefile?id=${bestelbonNr}`
-      await GetData(endpoint).then((bon) =>{
+      await GetData(endpoint).then((bon) => {
         var decodeString = atob(bon.fileContents);
         var blob = new Blob([decodeString], { type: bon.contentType });
         const a = document.createElement("a");

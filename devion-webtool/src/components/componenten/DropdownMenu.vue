@@ -1,23 +1,36 @@
 <template>
-    <div>
+    <div class="c-input-placement">
         <label :for="id" class="c-label">{{ label }}:</label>
-        <select :id="id" v-model="selectedOption" @change="emitSelectedOption" class="c-input c-custom-select">
-            <option value="null" disabled selected>Selecteer een {{ label }}</option>
-            <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.label }}</option>
-        </select>
-        <svg class="c-custom-select__symbol" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24">
-            <path d="M7,10l5,5,5-5Z" />
-        </svg>
+        <div v-if="error">
+            <select :id="id" v-model="selectedOption" @change="emitSelectedOption"
+                class="c-input c-custom-select c-input--error">
+                <option value="null" disabled selected>Selecteer een {{ label }}</option>
+                <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.label }}</option>
+            </select>
+            <svg class="c-custom-select__symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M7,10l5,5,5-5Z" />
+            </svg>
+            <label class="c-label--error"> {{ label }} is verplicht!</label>
+        </div>
+        <div v-else>
+            <select :id="id" v-model="selectedOption" @change="emitSelectedOption" class="c-input c-custom-select">
+                <option value="null" disabled selected>Selecteer een {{ label }}</option>
+                <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.label }}</option>
+            </select>
+            <svg class="c-custom-select__symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M7,10l5,5,5-5Z" />
+            </svg>
+        </div>
     </div>
 </template>
-  
+
 <script>
 export default {
     props: {
         id: String,
         label: String,
         options: Array,
+        error: Boolean,
     },
     data() {
         return {
@@ -32,15 +45,15 @@ export default {
     }
 };
 </script>
-  
+
 <style scoped>
 /* Add your custom styles for the dropdown here */
 .c-custom-select {
     grid-area: select;
-  display: block;
-  position: relative;
-  width: 100%;
-  cursor: pointer;
+    display: block;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
 }
 
 .c-label {
@@ -53,20 +66,28 @@ export default {
 }
 
 .c-custom-select__symbol {
-  width: calc(var(--global-baseline) * 3);
-  height: calc(var(--global-baseline) * 3);
-  fill: var(--global-color-neutral-x-light);
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  pointer-events: none;
+    width: calc(var(--global-baseline) * 3);
+    height: calc(var(--global-baseline) * 3);
+    fill: var(--global-color-neutral-x-light);
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    pointer-events: none;
 }
 
-div {
+.c-label--error {
+    grid-area: error;
+    color: var(--global-color-error);
+}
+
+.c-input--error {
+    border-color: var(--global-color-error);
+}
+
+.c-input-placement {
     position: relative;
     display: grid;
-    grid-template-areas: "label select";
+    grid-template-areas: "label select" "none error";
     grid-template-columns: 1fr 2fr;
 }
-
 </style>
