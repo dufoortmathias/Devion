@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
@@ -552,7 +554,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}GetPurchaseOrder").WithTags(company);
 
     //returns file information for each supplier about file needed for order 
-    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id) =>
+    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id, string seperator) =>
     {
         try
         {
@@ -586,7 +588,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
             else
             {
-                fileContent = purchaseOrderHelperETS.CreateCSVFile(purchaseOrders, supplier);
+                fileContent = purchaseOrderHelperETS.CreateCSVFile(purchaseOrders, supplier, seperator);
             }
 
             return Results.Ok(fileContent);
@@ -801,7 +803,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             Console.WriteLine(e.Message);
         }
-    }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
+    }).WithName($"{company}CreateArticle").WithTags(company);
 
     app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile) =>
     {

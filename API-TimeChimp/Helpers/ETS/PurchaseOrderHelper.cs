@@ -78,7 +78,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
     }
 
     //creates CSV file with all order information for given purchaseOrders, and returns file information
-    public FileContentResult CreateCSVFile(List<PurchaseOrderDetailETS> purchaseOrders, string supplier)
+    public FileContentResult CreateCSVFile(List<PurchaseOrderDetailETS> purchaseOrders, string supplier, string seperator)
     {
         var csv = new StringBuilder();
         foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders)
@@ -86,7 +86,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
             // Add data to the CSV file
             var first = purchaseOrder.FD_KLANTREFERENTIE;
             var second = purchaseOrder.FD_AANTAL ?? throw new Exception($"PurchaseOrder {purchaseOrder.FD_BONNR} in ETS has no FD_AANTAL");
-            var newLine = string.Format("{0}, {1}", first, second);
+            var newLine = $"{first}{seperator}{second}";
             csv.AppendLine(newLine);
         }
 
