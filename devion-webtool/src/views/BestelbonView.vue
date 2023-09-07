@@ -134,7 +134,7 @@ export default {
               let artikelsLeverancier = []
               for (const bestelbon of data.artikels) {
                 if (bestelbon.leverancier == leverancier) {
-                  if (bestelbon.artikelNummer.toLowerCase() != 'VERZENDING'.toLocaleLowerCase()) {
+                  if (bestelbon.artikelNummer != 'VERZENDING'.toLocaleLowerCase()) {
                     artikelsLeverancier.push({ artikelNummer: bestelbon.artikelNummer, aantal: bestelbon.aantal, omschrijving: bestelbon.omschrijving })
                   }
                 }
