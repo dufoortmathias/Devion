@@ -58,9 +58,9 @@ public class ETSTimeHelper : ETSHelper
         //get the max id from the table
         string response = ETSClient.selectQuery("select max(PLA_ID) from tbl_planning");
 
-        int max = JsonTool.ConvertTo<List<Dictionary<string, int>>>(response).First()["MAX"];
+        int maxId = JsonTool.ConvertTo<List<Dictionary<string, int>>>(response).First()["MAX"];
         //set the id of the new time
-        timeETS.PLA_ID = max + 1;
+        timeETS.PLA_ID = maxId + 1;
 
         //get data from ETS for the customer
         CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(timeTC.customerId) ?? throw new Exception("Error getting customer from TimeChimp with id: " + timeTC.customerId);
@@ -93,7 +93,7 @@ public class ETSTimeHelper : ETSHelper
                     $"VALUES (@id, @kleur, @caption, @start, @eind, @pauze, @tekst, @project, @subproject, @persoon, @klant, @uurcode, 0, 0, 0)";
         Dictionary<string, object> parameters = new()
         {
-            {"@id", timeETS.PLA_ID ?? throw new Exception("Time from ETS has no id")},
+            {"@id", timeETS.PLA_ID ?? throw new Exception("No id generated for time record ETS")},
             {"@kleur", timeETS.PLA_KLEUR ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_KLEUR")},
             {"@caption", timeETS.PLA_CAPTION ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_CAPTION")},
             {"@start", timeETS.PLA_START ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_START")},

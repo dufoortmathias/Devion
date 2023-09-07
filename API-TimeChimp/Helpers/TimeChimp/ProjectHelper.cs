@@ -78,6 +78,7 @@
             project.active = projectUpdate.active;
             project.budgetMethod = projectUpdate.budgetMethod;
             project.budgetHours = projectUpdate.budgetHours;
+            project.customerId = projectUpdate.customerId;
 
             //send data to timechimp
             string response = TCClient.PutAsync("v1/projects", JsonTool.ConvertFrom(project));
