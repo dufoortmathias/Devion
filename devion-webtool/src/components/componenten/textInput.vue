@@ -68,4 +68,8 @@ export default {
     grid-template-areas: "label text" "none error";
     grid-template-columns: 1fr 2fr;
 }
+
+.c-input {
+    white-space: pre;
+}
 </style>
