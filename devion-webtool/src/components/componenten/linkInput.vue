@@ -1,12 +1,49 @@
 <template>
     <div class="c-artikel-link">
-        <label for="" class="c-label c-label-link">link</label>
-        <a href="#" class="c-link c-link-artikel js-link-icon" target="_blank">?</a>
-        <input type="url" class="c-input c-input-link js-input-link" placeholder="link" name="link" id="link" disabled />
+        <label :for="id" class="c-label c-label-link">{{ label }}</label>
+        <a :href="link" class="c-link c-link-artikel js-link-icon" target="_blank">?</a>
+        <div v-if="error">
+            <input type="url" class="c-input c-input-link c-input--error" :placeholder="link" v-model="selectedOption"
+                @change="emitSelectedOption" />
+            <label class="c-label--error">link is verplicht!</label>
+        </div>
+        <div v-else>
+            <input type="url" :id="id" class="c-input c-input-link" :placeholder="link" v-model="selectedOption"
+                @change="emitSelectedOption" />
+        </div>
     </div>
 </template>
 
+<script>
+export default {
+    props: {
+        id: String,
+        label: String,
+        error: Boolean,
+        link: String,
+    },
+    data() {
+        return {
+            selectedOption: null,
+        };
+    },
+    methods: {
+        emitSelectedOption() {
+            // Emit the selected option when the value changes
+            this.$emit('option-selected', this.selectedOption);
+        },
+    }
+};
+</script>
+
 <style scoped>
+.c-artikel-link {
+    display: grid;
+    grid-template-areas: "label icon input"
+        "none none error";
+    grid-template-columns: 1fr 1fr 4fr;
+}
+
 .c-label-link {
     padding-top: 11px;
     grid-area: label;

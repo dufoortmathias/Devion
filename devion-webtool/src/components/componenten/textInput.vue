@@ -36,14 +36,6 @@ export default {
 
 <style scoped>
 /* Add your custom styles for the dropdown here */
-.c-custom-select {
-    grid-area: text;
-    display: block;
-    position: relative;
-    width: 100%;
-    cursor: pointer;
-}
-
 .c-label {
     grid-area: label;
     display: block;
@@ -67,9 +59,5 @@ export default {
     display: grid;
     grid-template-areas: "label text" "none error";
     grid-template-columns: 1fr 2fr;
-}
-
-.c-input {
-    white-space: pre;
 }
 </style>

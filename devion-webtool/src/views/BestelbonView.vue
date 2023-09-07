@@ -1,7 +1,8 @@
 <template>
   <div>
     <Dropdown :id="dropdownCompanies.id" :label="dropdownCompanies.label" :options="dropdownCompanies.options"
-      :error="dropdownCompanies.error" @option-selected="handledropdownCompaniesSelected" class="c-dropdown" />
+      :error="dropdownCompanies.error" @option-selected="handledropdownCompaniesSelected" class="c-dropdown"
+      :selected="dropdownCompanies.selected" />
     <Dropdown :id="dropdownBestelbon.id" :label="dropdownBestelbon.label" :options="dropdownBestelbon.options"
       :error="dropdownBestelbon.error" @option-selected="handledropdownBestelbonSelected" class="c-dropdown" />
     <textInput :id="seperator.id" :label="seperator.label" :error="seperator.error" :placeholder="seperator.label"
@@ -101,6 +102,18 @@ export default {
         options.push({ value: element, label: element })
       }
       this.dropdownCompanies.options = options
+      this.dropdownCompanies.selected = this.dropdownCompanies.options.find((x) => x.label.toLowerCase() == "devion").value
+      company = this.dropdownCompanies.selected
+      endpoint = `${company}/ets/openpurchaseorderids`
+      GetData(endpoint).then((data) => {
+        return data
+      }).then((data) => {
+        data.sort()
+        data.reverse()
+        for (var element of data) {
+          this.dropdownBestelbon.options.push({ value: element, label: element })
+        }
+      })
     })
   },
   methods: {

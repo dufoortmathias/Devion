@@ -14,7 +14,7 @@
         </div>
         <div v-else>
             <select :id="id" v-model="selectedOption" @change="emitSelectedOption" class="c-input c-custom-select">
-                <option value="null" disabled selected>Selecteer een {{ label }}</option>
+                <option value="null" disabled >Selecteer een {{ label }}</option>
                 <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.label }}</option>
             </select>
             <svg class="c-custom-select__symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -31,11 +31,19 @@ export default {
         label: String,
         options: Array,
         error: Boolean,
+        selected: String
     },
     data() {
         return {
-            selectedOption: null,
+            selectedOption: this.selected==undefined? null: this.selected
         };
+    },
+    watch: {
+        selected(value) {
+            this.selectedOption = value
+            console.log(value)
+            console.log(this.selected)
+        }
     },
     methods: {
         emitSelectedOption() {

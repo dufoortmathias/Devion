@@ -11,14 +11,14 @@ export function PostDataWithBody(endpoint, body) {
     redirect: 'follow'
   }
 
-  fetch('http://192.168.100.237:5142/api/devion/ets/createpurchasefile?id=230879', requestOptions)
+  fetch('http://192.168.100.237:5000/api/devion/ets/createpurchasefile?id=230879', requestOptions)
     .then((response) => response.text())
     .then((result) => result)
     .catch((error) => console.log('error', error))
 }
 
 export async function GetData(endpoint) {
-  return fetch('http://192.168.100.237:5142/api/' + endpoint)
+  return fetch('http://192.168.100.237:5000/api/' + endpoint)
     .then((response) => response.json())
     .then((data) => data)
     .catch((error) => console.log(error))

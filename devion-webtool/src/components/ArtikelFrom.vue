@@ -9,35 +9,50 @@
         <textInput :id="tarif.id" :label="tarif.label" :error="tarif.error" :placeholder="tarif.label" class="c-tarif" />
         <textInput :id="aankoop.id" :label="aankoop.label" :error="aankoop.error" :placeholder="aankoop.label"
             class="c-aankoop" />
-        <textInput :id="stdKorting.id" :label="stdKorting.label" :error="stdKorting.error"
-            :placeholder="stdKorting.label" class="c-stdKorting" />
+        <textInput :id="stdKorting.id" :label="stdKorting.label" :error="stdKorting.error" :placeholder="stdKorting.label"
+            class="c-stdKorting" />
         <dropdownMenu :id="muntcode.id" :label="muntcode.label" :options="muntcode.options" :error="muntcode.error"
-            class="c-muntcode" />
+            class="c-muntcode" :selected="muntcode.selected" />
         <textInput :id="verkoop.id" :label="verkoop.label" :error="verkoop.error" :placeholder="verkoop.label"
             class="c-verkoop" />
-        <textInput :id="winstpercentage.id" :label="winstpercentage.label" :error="winstpercentage.error" :placeholder="winstpercentage.label"
-            class="c-winstpercentage" />
-        <dropdownMenu :id="rekver.id" :label="rekver.label" :options="rekver.options" :error="rekver.error" class="c-rekver" />
+        <textInput :id="winstpercentage.id" :label="winstpercentage.label" :error="winstpercentage.error"
+            :placeholder="winstpercentage.label" class="c-winstpercentage" />
+        <dropdownMenu :id="rekver.id" :label="rekver.label" :options="rekver.options" :error="rekver.error" class="c-rekver"
+            :selected="rekver.selected" />
         <dropdownMenu :id="aaneh.id" :label="aaneh.label" :options="aaneh.options" :error="aaneh.error" class="c-aaneh" />
         <dropdownMenu :id="vereh.id" :label="vereh.label" :options="vereh.options" :error="vereh.error" class="c-vereh" />
-        <dropdownMenu :id="btwcode.id" :label="btwcode.label" :options="btwcode.options" :error="btwcode.error" class="c-btwcode" />
+        <dropdownMenu :id="btwcode.id" :label="btwcode.label" :options="btwcode.options" :error="btwcode.error"
+            class="c-btwcode" :selected="btwcode.selected" />
         <textInput :id="omrekfac.id" :label="omrekfac.label" :error="omrekfac.error" :placeholder="omrekfac.label"
             class="c-omrekfac" />
-        <dropdownMenu :id="typfac.id" :label="typfac.label" :options="typfac.options" :error="typfac.error" class="c-typfac" />
+        <dropdownMenu :id="typfac.id" :label="typfac.label" :options="typfac.options" :error="typfac.error" class="c-typfac"
+            :selected="typfac.selected" />
         <textInput :id="merk.id" :label="merk.label" :error="merk.error" :placeholder="merk.label" class="c-merk" />
-        <dropdownMenu :id="familie.id" :label="familie.label" :options="familie.options" :error="familie.error" class="c-familie" />
-        <dropdownMenu :id="subfamilie.id" :label="subfamilie.label" :options="subfamilie.options" :error="subfamilie.error" class="c-subfamilie" />
-        <textInput :id="lengte.id" :label="lengte.label" :error="lengte.error" :placeholder="lengte.label" class="c-lengte" />
-        <textInput :id="breedte.id" :label="breedte.label" :error="breedte.error" :placeholder="breedte.label" class="c-breedte" />
-        <textInput :id="hoogte.id" :label="hoogte.label" :error="hoogte.error" :placeholder="hoogte.label" class="c-hoogte" />
-        <dropdownMenu :id="hoofdleverancier.id" :label="hoofdleverancier.label" :options="hoofdleverancier.options" :error="hoofdleverancier.error" class="c-hoofdleverancier" />
-        <textInput :id="minaan.id" :label="minaan.label" :error="minaan.error" :placeholder="minaan.label" class="c-minaan" />
+        <dropdownMenu :id="familie.id" :label="familie.label" :options="familie.options" :error="familie.error"
+            class="c-familie" :selected="familie.selected" />
+        <dropdownMenu :id="subfamilie.id" :label="subfamilie.label" :options="subfamilie.options" :error="subfamilie.error"
+            class="c-subfamilie" :selected="subfamilie.selected" />
+        <textInput :id="lengte.id" :label="lengte.label" :error="lengte.error" :placeholder="lengte.label"
+            class="c-lengte" />
+        <textInput :id="breedte.id" :label="breedte.label" :error="breedte.error" :placeholder="breedte.label"
+            class="c-breedte" />
+        <textInput :id="hoogte.id" :label="hoogte.label" :error="hoogte.error" :placeholder="hoogte.label"
+            class="c-hoogte" />
+        <dropdownMenu :id="hoofdleverancier.id" :label="hoofdleverancier.label" :options="hoofdleverancier.options"
+            :error="hoofdleverancier.error" class="c-hoofdleverancier" :selected="hoofdleverancier.selected" />
+        <linkInput :id="link.id" :label="link.label" :error="link.error" :link="link.link" class="c-link" />
+        <textInput :id="minaan.id" :label="minaan.label" :error="minaan.error" :placeholder="minaan.label"
+            class="c-minaan" />
     </div>
 </template>
 
 <script>
 import textInput from '../components/componenten/textInput.vue';
 import dropdownMenu from '../components/componenten/DropdownMenu.vue';
+import linkInput from '../components/componenten/linkInput.vue';
+import { GetData } from '../global/global';
+
+const companie = 'devion';
 
 export default {
     props: {
@@ -45,7 +60,8 @@ export default {
     },
     components: {
         textInput,
-        dropdownMenu
+        dropdownMenu,
+        linkInput,
     },
     data() {
         return {
@@ -172,8 +188,9 @@ export default {
                 },
                 id: 'typfac',
                 label: 'Type factor',
-                options: [],
+                options: [{ label: 'Deelfactor', value: '0' }, { label: 'Vermenigvuldigingsfactor', value: '1' }],
                 error: false,
+                selected: '1',
             },
             merk: {
                 components: {
@@ -234,6 +251,15 @@ export default {
                 options: [],
                 error: false,
             },
+            link: {
+                components: {
+                    linkInput,
+                },
+                id: 'link',
+                label: 'Link',
+                error: false,
+                link: 'https://www.cebeo.be',
+            },
             minaan: {
                 components: {
                     textInput,
@@ -242,6 +268,77 @@ export default {
                 label: 'Minimum aantal',
                 error: false,
             },
+        }
+    },
+    created() {
+        this.getOptions();
+    },
+    methods: {
+        async getOptions() {
+            let endpoint = `${companie}/ets/articleforminfo`;
+            GetData(endpoint).then((data) => {
+                return data;
+            }).then((data) => {
+                let options = [];
+                for (var element of data.coinTypes) {
+                    options.push({ value: element.CODE, label: element.DESCRIPTION });
+                }
+                this.muntcode.options = options
+                this.muntcode.selected = this.muntcode.options.find((x) => x.label.toLowerCase() == "euro").value
+
+                options = [];
+                for (element of data.bankAccounts) {
+                    options.push({ value: element.CODE, label: `${element.CODE} - ${element.DESCRIPTION}` });
+                }
+                this.rekver.options = options;
+                this.rekver.selected = this.rekver.options.find((x) => x.value == "700000").value
+
+                options = [];
+                for (element of data.measureTypes) {
+                    options.push({ value: element.CODE, label: element.DESCRIPTION });
+                }
+                console.log(options);
+                this.aaneh.options = options;
+
+                options = []
+                for (element of data.measureTypes) {
+                    options.push({ value: element.CODE, label: element.DESCRIPTION });
+                }
+                this.vereh.options = options;
+
+                options = []
+                for (element of data.BTWCodes) {
+                    if (element.DESCRIPTION == null) {
+                        continue;
+                    } else if (
+                        element.DESCRIPTION.includes("EXTRA CODE") ||
+                        element.DESCRIPTION.includes("TEKSTLIJN")
+                    ) {
+                        continue;
+                    } else {
+                        options.push({ value: element.CODE, label: element.DESCRIPTION });
+                    }
+                }
+                this.btwcode.options = options;
+                this.btwcode.selected = this.btwcode.options.find((x) => x.label.toLowerCase() == 'btw 21 %').value
+
+                options = []
+                for (element of data.families) {
+                    options.push({ value: element.CODE, label: element.DESCRIPTION });
+                }
+                this.familie.options = options;
+                this.familie.selected = this.familie.options.find((x) => x.label.toLowerCase() == 'niet courant materiaal').value
+
+                options = []
+                console.log(data.subfamilies)
+                for (element of data.subfamilies) {
+                    if (element.CODE.includes('2')) {
+                        options.push({ value: element.CODE, label: element.DESCRIPTION });
+                    }
+                }
+                this.subfamilie.options = options;
+                this.subfamilie.selected = this.subfamilie.options.find((x) => x.label.toLowerCase() == "non stock").value
+            });
         }
     }
 }
@@ -258,8 +355,7 @@ export default {
         "btwcode omrekfac typfac"
         "merk familie subfamilie"
         "lengte breedte hoogte"
-        "hoofdleverancier link minaan"
-        "prev progress next";
+        "hoofdleverancier link minaan";
     grid-template-columns: 30vw 30vw 30vw;
     grid-gap: var(--global-whitespace-lg);
     width: 100vw;
@@ -352,6 +448,10 @@ export default {
 
 .c-hoofdleverancier {
     grid-area: hoofdleverancier;
+}
+
+.c-link {
+    grid-area: link;
 }
 
 .c-minaan {
