@@ -4,6 +4,8 @@
       :error="dropdownCompanies.error" @option-selected="handledropdownCompaniesSelected" class="c-dropdown" />
     <Dropdown :id="dropdownBestelbon.id" :label="dropdownBestelbon.label" :options="dropdownBestelbon.options"
       :error="dropdownBestelbon.error" @option-selected="handledropdownBestelbonSelected" class="c-dropdown" />
+    <textInput :id="seperator.id" :label="seperator.label" :error="seperator.error" :placeholder="seperator.label"
+      @option-selected="handletextInputSelected" class="c-text-input" />
     <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonDownload"
       class="c-button-artikel-search" />
     <TabelBestelbon :showTabel="tabelBestelbon.showTabel" :bestelbonNr="tabelBestelbon.bestelbonNr"
@@ -16,17 +18,20 @@ import Dropdown from '../components/componenten/DropdownMenu.vue';
 import ButtonDevion from '../components/componenten/ButtonDevion.vue';
 import TabelBestelbon from '../components/componenten/TabelBestelbonDevion.vue';
 import { GetData } from '../global/global.js'
+import textInput from '../components/componenten/textInput.vue'
 
 let options = [];
 let endpoint = 'companies'
 let company = "";
 let bestelbonNr = "";
+let seperator = "";
 
 export default {
   components: {
     Dropdown,
     ButtonDevion,
-    TabelBestelbon
+    TabelBestelbon,
+    textInput
   },
   data() {
     return {
@@ -74,6 +79,15 @@ export default {
         showInfo: true,
         artikels: [],
       },
+      seperator: {
+        components: {
+          textInput,
+        },
+        id: 'seperator',
+        label: 'Seperator',
+        options: [],
+        error: false,
+      },
     };
   },
   created() {
@@ -107,7 +121,10 @@ export default {
     async handledropdownBestelbonSelected(selectedOption) {
       bestelbonNr = selectedOption
       this.buttonDevion.isButtonDisabled = false
-      endpoint = `${company}/ets/purchaseorder?id=${selectedOption}`
+      const params = {
+        id: selectedOption
+      }
+      endpoint = `${company}/ets/purchaseorder?${new URLSearchParams(params)}`
       GetData(endpoint).then((data) => {
         return data
       }).then((data) => {
@@ -134,7 +151,7 @@ export default {
               let artikelsLeverancier = []
               for (const bestelbon of data.artikels) {
                 if (bestelbon.leverancier == leverancier) {
-                  if (bestelbon.artikelNummer != 'VERZENDING'.toLocaleLowerCase()) {
+                  if (bestelbon.artikelNummer != 'VERZENDING' || bestelbon.omschrijving != 'VERZENDING') {
                     artikelsLeverancier.push({ artikelNummer: bestelbon.artikelNummer, aantal: bestelbon.aantal, omschrijving: bestelbon.omschrijving })
                   }
                 }
@@ -149,9 +166,25 @@ export default {
       })
 
     },
+    handletextInputSelected(selectedOption) {
+      console.log(selectedOption)
+      if (selectedOption == null) {
+        seperator = ' '
+      } else if (selectedOption.includes('\\t')) {
+        seperator = selectedOption.replace('\\t', '\t')
+      } else {
+        seperator = selectedOption
+      }
+    },
     async BestelbonDownload() {
-      endpoint = `${company}/ets/createpurchasefile?id=${bestelbonNr}`
+      const params = {
+        id: bestelbonNr,
+        seperator: seperator
+      }
+      endpoint = `${company.toLocaleLowerCase()}/ets/createpurchasefile?${new URLSearchParams(params)}`
+      console.log(endpoint)
       GetData(endpoint).then((bon) => {
+        console.log(bon)
         var decodeString = atob(bon.fileContents);
         var blob = new Blob([decodeString], { type: bon.contentType });
         const a = document.createElement("a");
