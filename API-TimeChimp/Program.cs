@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
@@ -345,6 +343,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             TCProject.customerId = customer.id ?? throw new Exception("Customer received from timechimp has no id");
 
             ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
+
+            // update mainproject
+            TCProject.id = mainProject.id;
+            mainProject = projectHelperTC.UpdateProject(TCProject);
 
             List<string> errorMessages = new();
             double totalBudgetHours = 0;
@@ -701,86 +703,14 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}ArticleFormInfo").WithTags(company);
 
-    app.MapGet($"/api/{company.ToLower()}/ets/validatearticleform", (string articleJSON) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/validatearticleform", ([FromBody] ArticleWeb article) =>
     {
         try
         {
-            ArticleWeb article = JsonTool.ConvertTo<ArticleWeb>(articleJSON);
+            Dictionary<string, string[]> problems = new();
+            articleHelperETS.ValidateArticle(article).ToList().ForEach(x => problems.Add(x.Key, x.Value.ToArray()));
 
-            Dictionary<string, string[]> problems = new()
-            {
-                {"number", Array.Empty<string>() },
-                {"reference", Array.Empty<string>() },
-                {"description", Array.Empty<string>() },
-                {"brand", Array.Empty<string>() },
-                {"unitOfMeasure", Array.Empty<string>() },
-                {"salesPackQuantity", Array.Empty<string>() },
-                {"nettoPrice", Array.Empty<string>() },
-                {"tarifPrice", Array.Empty<string>() },
-                {"url", Array.Empty<string>() }
-            };
-
-            if (string.IsNullOrEmpty(article.Number))
-            {
-                problems["number"].Append("Can't be empty");
-            }
-            else if (articleHelperETS.ArticleWithNumberExists(article.Number))
-            {
-                problems["number"].Append("Articlenumber already exists in ETS");
-            }
-
-            if (string.IsNullOrEmpty(article.Reference))
-            {
-                problems["reference"].Append("Can't be empty");
-            }
-
-            if (string.IsNullOrEmpty(article.Description))
-            {
-                problems["description"].Append("Can't be empty");
-            }
-
-            if (string.IsNullOrEmpty(article.Brand))
-            {
-                problems["brand"].Append("Can't be empty");
-            }
-
-            string query = "SELECT EH_COD AS CODE, EH_OMS1 AS DESCRIPTION, EH_OMS2 AS SHORT_DESCRIPTION FROM EENHEID";
-            string[] MeasureTypes = JsonTool.ConvertTo<List<Dictionary<string, string>>>(ETSClient.selectQuery(query)).Select(x => x["EH_COD"]).ToArray();
-            if (string.IsNullOrEmpty(article.UnitOfMeasure))
-            {
-                problems["unitOfMeasure"].Append("Can't be empty");
-            }
-            else if (!MeasureTypes.Contains(article.UnitOfMeasure))
-            {
-                problems["unitOfMeasure"].Append("Chosen value not valid");
-            }
-
-            if (article.SalesPackQuantity < 0)
-            {
-                problems["salesPackQuantity"].Append("Can't be below zero");
-            }
-
-            if (article.NettoPrice < 0)
-            {
-                problems["nettoPrice"].Append("Price can't be below zero");
-            }
-            else if (article.TarifPrice < 0)
-            {
-                problems["tarifPrice"].Append("Price can't be below zero");
-            }
-            else if (article.TarifPrice < article.NettoPrice)
-            {
-                problems["nettoPrice"].Append("Price can't be higher then tarif price");
-                problems["tarifPrice"].Append("Price can't be lower then netto price");
-            }
-
-            if (string.IsNullOrEmpty(article.URL))
-            {
-                problems["url"].Append("Can't be empty");
-            }
-
-
-            if (problems.Count > 0)
+            if (problems.Any(x => x.Value.Length > 0))
             {
                 return Results.ValidationProblem(problems);
             }
@@ -797,11 +727,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            Results.Ok(articleHelperETS.CreateArticle(article));
+            return Results.Ok(articleHelperETS.CreateArticle(article));
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            return Results.Problem(e.Message);
         }
     }).WithName($"{company}CreateArticle").WithTags(company);
 
@@ -881,10 +811,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             };
 
             articles.ForEach(a => LinkArticles(a));
+
+            return Results.Ok();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            return Results.Problem(e.Message);
         }
     }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
 }

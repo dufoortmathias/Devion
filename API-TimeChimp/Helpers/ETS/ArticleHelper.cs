@@ -109,9 +109,122 @@ public class ETSArticleHelper : ETSHelper
         return articles;
     }
 
+    public Dictionary<string, List<string>> ValidateArticle(ArticleWeb article)
+    {
+        Dictionary<string, List<string>> problems = new()
+            {
+                {"number", new() },
+                {"reference", new() },
+                {"description", new() },
+                {"brand", new() },
+                {"unitOfMeasure", new() },
+                {"salesPackQuantity", new() },
+                {"nettoPrice", new() },
+                {"tarifPrice", new() },
+                {"url", new() }
+        };
+
+        if (string.IsNullOrEmpty(article.Number))
+        {
+            problems["number"].Add("Can't be empty");
+        }
+        else if (!article.Number.Equals(article.Number.ToUpper()))
+        {
+            problems["number"].Add("Articlenumber contains lower case characters");
+        }
+        else if (ArticleWithNumberExists(article.Number))
+        {
+            problems["number"].Add("Articlenumber already exists in ETS");
+        }
+
+        if (string.IsNullOrEmpty(article.Reference))
+        {
+            problems["reference"].Add("Can't be empty");
+        }
+
+        if (string.IsNullOrEmpty(article.Description))
+        {
+            problems["description"].Add("Can't be empty");
+        }
+
+        if (string.IsNullOrEmpty(article.Brand))
+        {
+            problems["brand"].Add("Can't be empty");
+        }
+
+        string query = "SELECT EH_COD AS CODE, EH_OMS1 AS DESCRIPTION, EH_OMS2 AS SHORT_DESCRIPTION FROM EENHEID";
+        string[] MeasureTypes = JsonTool.ConvertTo<List<Dictionary<string, string>>>(ETSClient.selectQuery(query)).Select(x => x["CODE"]).ToArray();
+        if (string.IsNullOrEmpty(article.UnitOfMeasure))
+        {
+            problems["unitOfMeasure"].Add("Can't be empty");
+        }
+        else if (!MeasureTypes.Contains(article.UnitOfMeasure))
+        {
+            problems["unitOfMeasure"].Add("Chosen value not valid");
+        }
+
+        if (article.SalesPackQuantity < 0)
+        {
+            problems["salesPackQuantity"].Add("Can't be below zero");
+        }
+
+        if (article.NettoPrice < 0)
+        {
+            problems["nettoPrice"].Add("Price can't be below zero");
+        }
+        else if (article.TarifPrice < 0)
+        {
+            problems["tarifPrice"].Add("Price can't be below zero");
+        }
+        else if (article.TarifPrice < article.NettoPrice)
+        {
+            problems["nettoPrice"].Add("Price can't be higher then tarif price");
+            problems["tarifPrice"].Add("Price can't be lower then netto price");
+        }
+
+        if (string.IsNullOrEmpty(article.URL))
+        {
+            problems["url"].Add("Can't be empty");
+        }
+
+        return problems;
+    }
+
     public ArticleWeb CreateArticle(ArticleWeb article)
     {
-        // TODO create article ETS
+        if (ValidateArticle(article).Any(x => x.Value.Count > 0))
+        {
+            throw new Exception("Some fields from article given are not valid");
+        }
+
+        string createQuery = "EXECUTE PROCEDURE INSERT_ARTIKEL_WS @number, @description, null, @reference, @familie, @subfamilie, null, null, null, null, @lengte, @breedte, @hoogte, null, null, null, null, @aankoop, @verkoop, null, null, 1, 1, @supplier, null, null";
+        Dictionary<string, object> createParameters = new()
+        {
+            { "@number", article.Number },
+            { "@description", article.Description },
+            { "@reference", article.Reference },
+            { "@familie", null },
+            { "@subfamilie", null },
+            { "@lengte", 0 },
+            { "@breedte", 0 },
+            { "@hoogte", 0 },
+            { "@aankoop", article.NettoPrice },
+            { "@verkoop", article.NettoPrice },
+            { "@supplier", ""}
+        };
+
+        ETSClient.ExecuteQuery(createQuery, createParameters);
+
+        //update query
+        string updateQuery = $"UPDATE CSARTPX SET ART_HYPERLINK = @url WHERE ART_NR = @id;";
+        Dictionary<string, object> updateParameters = new()
+        {
+            { "@id", article.Number },
+            { "@url", article.URL }
+        };
+
+        ETSClient.ExecuteQuery(updateQuery, updateParameters);
+
         return article;
     }
 
