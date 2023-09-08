@@ -524,46 +524,7 @@ table {
   }
 }
 
-.c-artikel-button--save {
-  grid-area: next;
-  display: flex;
-  margin-bottom: var(--global-whitespace-lg);
-  justify-content: flex-end;
-}
 
-.c-artikel-button--prev {
-  grid-area: prev;
-  display: flex;
-  margin-bottom: var(--global-whitespace-lg);
-  justify-content: flex-start;
-}
-
-.c-artikel-button--next {
-  grid-area: next;
-  margin-bottom: var(--global-whitespace-lg);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.c-button-artikel--prev,
-.c-button-artikel--next,
-.c-button-artikel--save {
-  width: 50%;
-}
-
-.c-artikel-progress {
-  grid-area: progress;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: var(--global-whitespace-lg);
-}
-
-.c-artikel-progress__text {
-  text-align: center;
-  width: 100%;
-  font-weight: bolder;
-}
 /*------------------------------------*\
 #UTILITIES
 \*------------------------------------*/

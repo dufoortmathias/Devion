@@ -8,7 +8,7 @@
     <textInput :id="seperator.id" :label="seperator.label" :error="seperator.error" :placeholder="seperator.label"
       @option-selected="handletextInputSelected" class="c-text-input" />
     <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonDownload"
-      class="c-button-artikel-search" />
+      class="c-button-artikel-search" :showButton="buttonDevion.showButton" />
     <TabelBestelbon :showTabel="tabelBestelbon.showTabel" :bestelbonNr="tabelBestelbon.bestelbonNr"
       :showError="tabelBestelbon.showError" :showInfo="tabelBestelbon.showInfo" :artikels="tabelBestelbon.artikels" />
   </div>
@@ -60,6 +60,7 @@ export default {
         },
         label: 'Download bestelbon',
         isButtonDisabled: true,
+        showButton: true,
         methods: {
           handleButtonClick() {
             // Handle button click event here

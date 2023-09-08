@@ -1,6 +1,6 @@
 
 <template>
-    <button type="button" :disabled="isDisabled" class="o-button-reset c-button">
+    <button type="button" :disabled="isDisabled" v-show="showButton" class="o-button-reset c-button">
         {{label}}
     </button>
 </template>
@@ -10,6 +10,7 @@ export default {
     props: {
         label: String,
         isDisabled: Boolean,
+        showButton: Boolean,
     }
 }
 

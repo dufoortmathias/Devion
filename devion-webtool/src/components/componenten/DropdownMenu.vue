@@ -41,8 +41,6 @@ export default {
     watch: {
         selected(value) {
             this.selectedOption = value
-            console.log(value)
-            console.log(this.selected)
         }
     },
     methods: {

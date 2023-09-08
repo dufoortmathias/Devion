@@ -3,8 +3,8 @@
         <label :for="id" class="c-label">{{ label }}:</label>
         <div v-if="error">
             <input type="text" :id="id" :label="label" v-model="selectedOption" @change="emitSelectedOption" :placeholder="placeholder"
-                class="c-input c-input--error" />
-            <label class="c-label--error"> {{ label }} is verplicht!</label>
+                class="c-input c-input--error">
+            <label class="c-label--error"> {{ errorText }}</label>
         </div>
         <div v-else>
             <input type="text" :id="id" v-model="selectedOption" @change="emitSelectedOption" class="c-input" :placeholder="placeholder"/>
@@ -19,11 +19,17 @@ export default {
         label: String,
         error: Boolean,
         placeholder: String,
+        errorText: String,
     },
     data() {
         return {
             selectedOption: null,
         };
+    },
+    watch: {
+        placeholder(value) {
+            this.selectedOption = value;
+        },
     },
     methods: {
         emitSelectedOption() {

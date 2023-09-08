@@ -1,14 +1,14 @@
 <template>
     <div class="c-artikel-link">
         <label :for="id" class="c-label c-label-link">{{ label }}</label>
-        <a :href="link" class="c-link c-link-artikel js-link-icon" target="_blank">?</a>
+        <a :href="computedLink" class="c-link c-link-artikel js-link-icon" target="_blank" >?</a>
         <div v-if="error">
-            <input type="url" class="c-input c-input-link c-input--error" :placeholder="link" v-model="selectedOption"
+            <input type="url" class="c-input c-input-link c-input--error" :placeholder="computedLink" v-model="selectedOption"
                 @change="emitSelectedOption" />
             <label class="c-label--error">link is verplicht!</label>
         </div>
         <div v-else>
-            <input type="url" :id="id" class="c-input c-input-link" :placeholder="link" v-model="selectedOption"
+            <input type="url" :id="id" class="c-input c-input-link" :placeholder="computedLink" v-model="selectedOption"
                 @change="emitSelectedOption" />
         </div>
     </div>
@@ -26,6 +26,17 @@ export default {
         return {
             selectedOption: null,
         };
+    },
+    computed: {
+        computedLink() {
+            return this.link;
+        }
+    },
+    watch: {
+        computedLink(value) {
+            console.log(value);
+            this.computedLink = value;
+        },
     },
     methods: {
         emitSelectedOption() {
