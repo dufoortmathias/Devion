@@ -40,7 +40,6 @@ export default {
     },
     watch: {
         selected(value) {
-            console.log(`selected ${this.label} changed to: ` + value)
             this.selectedOption = value==undefined? '-1': value;
         }
     },

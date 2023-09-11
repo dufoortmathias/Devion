@@ -7,10 +7,13 @@ import { RouterLink } from 'vue-router';
     <nav class="c-nav">
             <ul class="o-list c-nav__list">
                 <li class="c-nav__item">
-                    <RouterLink to="/Bestelbon" class="c-nav__link">bestelbonnen</RouterLink>
+                    <RouterLink to="/Bestelbon" class="c-nav__link">Bestelbonnen</RouterLink>
                 </li>
-                <li class="c-nav__item" active>
-                    <RouterLink to="/artikel" class="c-nav__link">nieuw artikel</RouterLink>
+                <li class="c-nav__item">
+                    <RouterLink to="/artikel" class="c-nav__link">Nieuw artikel</RouterLink>
+                </li>
+                <li class="c-nav__item">
+                    <RouterLink to="/assembly" class="c-nav__link">Assembly</RouterLink>
                 </li>
             </ul>
         </nav>

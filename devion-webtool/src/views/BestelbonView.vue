@@ -64,7 +64,6 @@ export default {
         methods: {
           handleButtonClick() {
             // Handle button click event here
-            console.log('Button clicked');
           },
           toggleButtonState() {
             this.isButtonDisabled = !this.isButtonDisabled;
@@ -98,7 +97,6 @@ export default {
     GetData(endpoint).then((data) => {
       return data
     }).then((data) => {
-      console.log(data)
       const options = []
       for (var element of data) {
         options.push({ value: element, label: element })
@@ -151,7 +149,6 @@ export default {
       GetData(endpoint).then((data) => {
         return data
       }).then((data) => {
-        console.log(data)
         if (data != null) {
           this.tabelBestelbon.showTabel = true
           this.tabelBestelbon.bestelbonNr = data.bonNummer
@@ -159,7 +156,6 @@ export default {
             this.tabelBestelbon.showError = true
             this.tabelBestelbon.showInfo = false
           } else {
-            console.log(data)
             this.tabelBestelbon.showError = false
             this.tabelBestelbon.showInfo = true
             let artikels = []
@@ -190,7 +186,6 @@ export default {
 
     },
     handletextInputSelected(selectedOption) {
-      console.log(selectedOption)
       if (selectedOption == null) {
         seperator = ' '
       } else if (selectedOption.includes('\\t')) {
@@ -210,9 +205,7 @@ export default {
           seperator: seperator
         }
         endpoint = `${company.toLocaleLowerCase()}/ets/createpurchasefile?${new URLSearchParams(params)}`
-        console.log(endpoint)
         GetData(endpoint).then((bon) => {
-          console.log(bon)
           var decodeString = atob(bon.fileContents);
           var blob = new Blob([decodeString], { type: bon.contentType });
           const a = document.createElement("a");

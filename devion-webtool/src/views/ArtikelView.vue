@@ -68,7 +68,6 @@ export default {
         methods: {
           handleButtonClick() {
             // Handle button click event here
-            console.log('Button clicked');
           },
           toggleButtonState() {
             this.isButtonDisabled = !this.isButtonDisabled;
