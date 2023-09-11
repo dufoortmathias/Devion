@@ -5,7 +5,7 @@
       :selected="dropdownCompanies.selected" />
     <Dropdown :id="dropdownBestelbon.id" :label="dropdownBestelbon.label" :options="dropdownBestelbon.options"
       :error="dropdownBestelbon.error" @option-selected="handledropdownBestelbonSelected" class="c-dropdown" />
-    <textInput :id="seperator.id" :label="seperator.label" :error="seperator.error" :placeholder="seperator.label"
+    <textInput :id="seperator.id" :label="seperator.label" :error="seperator.error" :placeholder="seperator.label" :errorText="seperator.errorText"
       @option-selected="handletextInputSelected" class="c-text-input" />
     <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonDownload"
       class="c-button-artikel-search" :showButton="buttonDevion.showButton" />
@@ -89,6 +89,7 @@ export default {
         label: 'Seperator',
         options: [],
         error: false,
+        errorText: 'Seperator is verplicht',
       },
     };
   },
@@ -191,23 +192,29 @@ export default {
       }
     },
     async BestelbonDownload() {
-      const params = {
-        id: bestelbonNr,
-        seperator: seperator
+      if (seperator == "") {
+        this.seperator.error = true
+        this.seperator.errorText = "Seperator is verplicht"
+      } else {
+        this.seperator.error = false
+        const params = {
+          id: bestelbonNr,
+          seperator: seperator
+        }
+        endpoint = `${company.toLocaleLowerCase()}/ets/createpurchasefile?${new URLSearchParams(params)}`
+        console.log(endpoint)
+        GetData(endpoint).then((bon) => {
+          console.log(bon)
+          var decodeString = atob(bon.fileContents);
+          var blob = new Blob([decodeString], { type: bon.contentType });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = bon.fileDownloadName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        })
       }
-      endpoint = `${company.toLocaleLowerCase()}/ets/createpurchasefile?${new URLSearchParams(params)}`
-      console.log(endpoint)
-      GetData(endpoint).then((bon) => {
-        console.log(bon)
-        var decodeString = atob(bon.fileContents);
-        var blob = new Blob([decodeString], { type: bon.contentType });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = bon.fileDownloadName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      })
     }
   },
 };
