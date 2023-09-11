@@ -688,6 +688,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             query = "SELECT CODE, OMSCHRIJF AS DESCRIPTION FROM BTW_CODE";
             string responseBTWCodes = ETSClient.selectQuery(query);
 
+            query = "SELECT LV_COD AS CODE, LV_NAM AS NAME FROM LVPX WHERE (UPPER(LV_NAM) LIKE '%CEBEO%' OR UPPER(LV_NAM) LIKE '%ANCON%' OR UPPER(LV_NAM) LIKE '%VNC%' OR UPPER(LV_NAM) LIKE '%METABIL%') AND NOT UPPER(LV_NAM) LIKE '%BV%'";
+            string responseSuppliers = ETSClient.selectQuery(query);
+
+
             Dictionary<string, object> result = new()
             {
                 {"families", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseFamilies)},
@@ -695,7 +699,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 {"measureTypes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseMeasureTypes)},
                 {"bankAccounts", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseBankAccounts)},
                 {"coinTypes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseCoinTypes)},
-                {"BTWCodes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseBTWCodes)}
+                {"BTWCodes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseBTWCodes)},
+                {"suppliers", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseSuppliers)}
             };
 
             return Results.Ok(result);
