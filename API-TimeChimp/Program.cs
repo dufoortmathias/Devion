@@ -819,6 +819,66 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/ets/projectprogress", (DateTime day) =>
+    {
+        string query = @"
+select *
+from (
+    select
+        projpx.pr_nr as project,
+        subproj.su_sub as subproject,
+        j2w_vopx.vo_uur as uurcode,
+        j2w_vopx.vo_aant as vcc_uren,
+        ncc.totaal_uren as ncc_uren,
+        projpx.pr_stdat,   
+        projpx.pr_beloofd,
+        projpx.pr_plandatum,
+        projpx.pr_laatst_gepland,
+        subproj.su_start_productie,
+        subproj.su_levdatum,
+        subproj.su_vandat,
+        case
+            when (subproj.su_start_productie is null and projpx.pr_stdat is null) or (subproj.su_start_productie is not null and subproj.su_start_productie < current_timestamp) or (subproj.su_start_productie is null and projpx.pr_stdat is not null and projpx.pr_stdat < current_timestamp)
+                then current_timestamp
+            when subproj.su_start_productie is not null
+                then subproj.su_start_productie
+                else projpx.pr_stdat end as start_date,
+        case
+            when (subproj.su_levdatum is null and projpx.pr_beloofd is null) or (subproj.su_levdatum is not null and subproj.su_levdatum < current_timestamp) or (subproj.su_levdatum is null and projpx.pr_beloofd is not null and projpx.pr_beloofd < current_timestamp)
+                then dateadd(7 day to current_timestamp)
+            when subproj.su_levdatum is not null
+                then subproj.su_levdatum
+                else projpx.pr_beloofd end as end_date
+    from projpx
+    right join subproj on projpx.pr_nr = subproj.su_nr
+    left outer join j2w_vopx on projpx.pr_nr = j2w_vopx.vo_proj and subproj.su_sub = j2w_vopx.vo_subproj
+    left outer join (
+        select rudpx.rud_proj, rudpx.rud_subpr, rudpx.rud_uur, SUM(rudpx.rud_totaal_produktief_dec) as totaal_uren
+        from rudpx
+        where rudpx.rud_soort = 'U'
+        group by rudpx.rud_proj, rudpx.rud_subpr, rudpx.rud_uur
+    ) ncc on projpx.pr_nr = ncc.rud_proj and subproj.su_sub = ncc.rud_subpr and j2w_vopx.vo_uur = ncc.rud_uur
+    where subproj.su_afgewerkt = 0 and j2w_vopx.vo_soort = 'U'
+)
+where start_date <= @date and @date <= end_date
+";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@date", day }
+        };
+
+        string response = ETSClient.selectQuery(query, parameters);
+
+        List<ProjectProgress> projectProgresses = JsonTool.ConvertTo<List<ProjectProgress>>(response);
+
+        List<object[]> result = projectProgresses
+            .Select(x => new object[] { x.PROJECT, x.SUBPROJECT, x.UURCODE, x.PlannedHoursLeft() / x.DaysLeft() })
+            .ToList();
+
+        return Results.Ok(result);
+
+    }).WithName($"{company}GetProjectProgress");
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
