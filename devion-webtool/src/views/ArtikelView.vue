@@ -4,8 +4,8 @@
   <buttonDevion :label="searchButton.label" :isDisabled="searchButton.isButtonDisabled" @click="ArtikelZoeken"
     :showButton="searchButton.showButton" class="c-button-search" />
   <div class="c-artikel-form">
-    <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel"
-      class="c-form" :check="artikelForm.check" ref="articleCheck"/>
+    <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel" class="c-form"
+      :check="artikelForm.check" ref="article" />
     <div class="c-artikel-button--save">
       <buttonDevion :label="save.label" :isDisabled="save.isButtonDisabled" :showButton="save.showButton"
         @click="handleSaveButtonClick" class="c-button-artikel--save " />
@@ -19,7 +19,8 @@
         @click="handlePrevButtonClick" class="c-button-artikel--prev" />
     </div>
     <div class="c-artikel-progress">
-      <labelDevion :label="artikelProgress.label" :showLabel="artikelProgress.showLabel" class="c-artikel-progress__text" />
+      <labelDevion :label="artikelProgress.label" :showLabel="artikelProgress.showLabel"
+        class="c-artikel-progress__text" />
     </div>
   </div>
 </template>
@@ -29,7 +30,7 @@ import textInput from '../components/componenten/textInput.vue';
 import buttonDevion from '../components/componenten/ButtonDevion.vue';
 import artikelForm from '../components/ArtikelForm.vue';
 import labelDevion from '../components/componenten/LabelDevion.vue';
-import { GetData } from '../global/global.js';
+import { GetData, PostDataWithBody } from '../global/global.js';
 
 let artikelSearch = ""
 let endpoint = ""
@@ -37,6 +38,8 @@ let artikelNrs = []
 let index = 0
 let artikel = null
 let index2 = 0
+let artikels = []
+let save = false
 
 export default {
   components: {
@@ -112,6 +115,15 @@ export default {
       },
     };
   },
+  beforeUnmount() {
+    artikelSearch = ""
+    endpoint = ""
+    artikelNrs = []
+    index = 0
+    artikel = null
+    index2 = 0
+    artikels = []
+  },
   methods: {
     ArtikelZoeken() {
       if (artikelSearch == null) {
@@ -123,22 +135,54 @@ export default {
           artikelNrs = artikelString.split(', ')
         }
         if (artikelNrs != null) {
-          endpoint = `devion/cebeo/searcharticle?articleReference=${artikelNrs[index]}`
-          GetData(endpoint).then((data) => {
-            this.artikelForm.data = data
+          if (artikels[index] == undefined) {
+            endpoint = `devion/cebeo/searcharticle?articleReference=${artikelNrs[index]}`
+            GetData(endpoint).then((data) => {
+              this.artikelForm.data = data
+              this.artikelForm.showform = true;
+              if (artikelNrs.length > 1) {
+                if (index == artikelNrs.length - 1) {
+                  this.next.showButton = false;
+                  this.save.showButton = true;
+                  this.artikelProgress.showLabel = true;
+                  this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+                } else {
+                  this.next.showButton = true;
+                  this.save.showButton = false;
+                  this.prev.showButton = true;
+                  this.artikelProgress.showLabel = true;
+                  this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+                }
+              } else {
+                this.artikelProgress.showLabel = false;
+                this.save.showButton = true;
+                this.next.showButton = false;
+                this.prev.showButton = false;
+              }
+            })
+          } else {
+            this.artikelForm.data = artikels[index]
             this.artikelForm.showform = true;
             if (artikelNrs.length > 1) {
-              this.next.showButton = true;
-              this.artikelProgress.showLabel = true;
-              this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+              if (index == artikelNrs.length - 1) {
+                this.next.showButton = false;
+                this.save.showButton = true;
+                this.artikelProgress.showLabel = true;
+                this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+              } else {
+                this.next.showButton = true;
+                this.save.showButton = false;
+                this.prev.showButton = true;
+                this.artikelProgress.showLabel = true;
+                this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+              }
             } else {
               this.artikelProgress.showLabel = false;
               this.save.showButton = true;
               this.next.showButton = false;
               this.prev.showButton = false;
             }
-            console.log(this.artikelProgress.label, this.artikelProgress.showLabel)
-          })
+          }
         }
       }
     },
@@ -147,34 +191,46 @@ export default {
     },
     handleArtikel(object) {
       artikel = object
-      console.log(artikel)
-      index = index2
-      if (index == artikelNrs.length - 1) {
-        this.next.showButton = false;
-        this.save.showButton = true;
-        this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
-      } else  if (index > 0) {
-        this.next.showButton = true;
-        this.save.showButton = false;
-        this.prev.showButton = false;
-        this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+      artikels[index] = artikel
+      if (save == true) {
+        endpoint = `metabil/cebeo/createarticle`
+        artikels.forEach(artikel => {
+          PostDataWithBody(endpoint, artikel).then((data) => {
+            console.log(data)
+          }) 
+        });
       } else {
-        this.next.showButton = true;
-        this.save.showButton = false;
-        this.prev.showButton = true;
-        this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+        save = false
+        index = index2
+        if (index == artikelNrs.length - 1) {
+          this.next.showButton = false;
+          this.save.showButton = true;
+          this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+        } else if (index == 0) {
+          this.next.showButton = true;
+          this.save.showButton = false;
+          this.prev.showButton = false;
+          this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+        } else {
+          this.next.showButton = true;
+          this.save.showButton = false;
+          this.prev.showButton = true;
+          this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+        }
+        this.ArtikelZoeken()
       }
     },
-    handleNextButtonClick(){
-      this.$refs.articleCheck.createInfoObject()
+    handleNextButtonClick() {
       index2 = index + 1
+      this.$refs.article.createInfoObject()
     },
-    handlePrevButtonClick(){
-      this.$refs.articleCheck.createInfoObject()
+    handlePrevButtonClick() {
       index2 = index - 1
+      this.$refs.article.createInfoObject()
     },
-    handleSaveButtonClick(){
-
+    handleSaveButtonClick() {
+      save = true
+      this.$refs.article.createInfoObject()
     },
   },
 };

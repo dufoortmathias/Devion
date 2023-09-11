@@ -4,7 +4,7 @@
         <div v-if="error">
             <select :id="id" v-model="selectedOption" @change="emitSelectedOption"
                 class="c-input c-custom-select c-input--error">
-                <option value="null" disabled selected>Selecteer een {{ label }}</option>
+                <option value="-1" disabled selected>Selecteer een {{ label }}</option>
                 <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.label }}</option>
             </select>
             <svg class="c-custom-select__symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -14,7 +14,7 @@
         </div>
         <div v-else>
             <select :id="id" v-model="selectedOption" @change="emitSelectedOption" class="c-input c-custom-select">
-                <option value="null" disabled >Selecteer een {{ label }}</option>
+                <option value="-1" disabled >Selecteer een {{ label }}</option>
                 <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.label }}</option>
             </select>
             <svg class="c-custom-select__symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -35,12 +35,13 @@ export default {
     },
     data() {
         return {
-            selectedOption: this.selected==undefined? null: this.selected
+            selectedOption: this.selected==undefined? '-1': this.selected
         };
     },
     watch: {
         selected(value) {
-            this.selectedOption = value
+            console.log(`selected ${this.label} changed to: ` + value)
+            this.selectedOption = value==undefined? '-1': value;
         }
     },
     methods: {
@@ -48,6 +49,9 @@ export default {
             // Emit the selected option when the value changes
             this.$emit('option-selected', this.selectedOption);
         },
+        reset() {
+            this.selectedOption = '-1';
+        }
     }
 };
 </script>

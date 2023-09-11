@@ -20,10 +20,10 @@
             :placeholder="winstpercentage.placeholder" class="c-winstpercentage" @option-selected="handleWinst" />
         <dropdownMenu :id="rekver.id" :label="rekver.label" :options="rekver.options" :error="rekver.error" class="c-rekver"
             :selected="rekver.selected" @option-selected="handleRekver" />
-        <dropdownMenu :id="aaneh.id" :label="aaneh.label" :options="aaneh.options" :error="aaneh.error" class="c-aaneh"
-            @option-selected="handleAaneh" />
-        <dropdownMenu :id="vereh.id" :label="vereh.label" :options="vereh.options" :error="vereh.error" class="c-vereh"
-            @option-selected="handleVereh" />
+        <dropdownMenu :id="aaneh.id" :label="aaneh.label" :options="aaneh.options" :error="aaneh.error"
+            :selected="aaneh.selected" class="c-aaneh" @option-selected="handleAaneh" ref="aaneh"/>
+        <dropdownMenu :id="vereh.id" :label="vereh.label" :options="vereh.options" :error="vereh.error"
+            :selected="vereh.selected" class="c-vereh" @option-selected="handleVereh" ref="vereh"/>
         <dropdownMenu :id="btwcode.id" :label="btwcode.label" :options="btwcode.options" :error="btwcode.error"
             class="c-btwcode" :selected="btwcode.selected" @option-selected="handleBtwcode" />
         <textInput :id="omrekfac.id" :label="omrekfac.label" :error="omrekfac.error" :placeholder="omrekfac.placeholder"
@@ -39,7 +39,7 @@
         <textInput :id="lengte.id" :label="lengte.label" :error="lengte.error" :placeholder="lengte.placeholder"
             class="c-lengte" @option-selected="handleLengte" />
         <textInput :id="breedte.id" :label="breedte.label" :error="breedte.error" :placeholder="breedte.placeholder"
-            class="c-breedte" @cahnge="handleBreedte" />
+            class="c-breedte" @option-selected="handleBreedte" />
         <textInput :id="hoogte.id" :label="hoogte.label" :error="hoogte.error" :placeholder="hoogte.placeholder"
             class="c-hoogte" @option-selected="handleHoogte" />
         <dropdownMenu :id="hoofdleverancier.id" :label="hoofdleverancier.label" :options="hoofdleverancier.options"
@@ -300,31 +300,113 @@ export default {
     },
     watch: {
         data(object) {
-            this.artikelNr.placeholder = object.reference
-            artikelNr = object.reference
-            this.reflev.placeholder = object.reference
-            reflev = object.reference
-            this.omschrijving.placeholder = object.description
-            omschrijving = object.description
-            this.tarief.placeholder = object.tarifPrice.toString()
-            tarief = object.tarifPrice.toString()
-            this.aankoop.placeholder = object.nettoPrice.toString()
-            aankoop = object.nettoPrice.toString()
-            this.stdKorting.placeholder = (parseFloat((1 - (object.nettoPrice / object.tarifPrice)) * 100).toFixed(4)).toString()
-            stdKorting = (parseFloat((1 - (object.nettoPrice / object.tarifPrice)) * 100).toFixed(4)).toString()
-            this.verkoop.placeholder = (parseFloat((object.nettoPrice * (1 + (1 / 3)))).toFixed(4)).toString()
-            verkoop = (parseFloat((object.nettoPrice * (1 + (1 / 3)))).toFixed(4)).toString()
-            this.winstpercentage.placeholder = (parseFloat((1 / 3) * 100).toFixed(4)).toString()
-            winstpercentage = (parseFloat((1 / 3) * 100).toFixed(4)).toString()
-            this.merk.placeholder = object.brand
-            merk = object.brand
-            this.minaan.placeholder = object.salesPackQuantity.toString()
-            minaan = object.salesPackQuantity.toString()
-            this.link.link = object.url
-            link = object.url
+            if (object.reference == undefined) {
+                this.artikelNr.placeholder = object.artikelNr
+                artikelNr = object.artikelNr
+                this.reflev.placeholder = object.reflev
+                reflev = object.reflev
+                this.omschrijving.placeholder = object.omschrijving
+                omschrijving = object.omschrijving
+                this.tarief.placeholder = object.tarief
+                tarief = object.tarief
+                this.aankoop.placeholder = object.aankoop
+                aankoop = object.aankoop
+                this.stdKorting.placeholder = object.stdKorting
+                stdKorting = object.stdKorting
+                this.verkoop.placeholder = object.verkoop
+                verkoop = object.verkoop
+                this.winstpercentage.placeholder = object.winstpercentage
+                winstpercentage = object.winstpercentage
+                this.muntcode.selected = object.muntcode
+                muntcode = object.muntcode
+                this.rekver.selected = object.rekver
+                rekver = object.rekver
+                this.aaneh.selected = object.aaneh
+                aaneh = object.aaneh
+                this.vereh.selected = object.vereh
+                vereh = object.vereh
+                this.btwcode.selected = object.btwcode
+                btwcode = object.btwcode
+                this.omrekfac.placeholder = object.omrekfac
+                omrekfac = object.omrekfac
+                this.typfac.selected = object.typfac
+                typfac = object.typfac
+                this.merk.placeholder = object.merk
+                merk = object.merk
+                this.familie.selected = object.familie
+                familie = object.familie
+                this.subfamilie.selected = object.subfamilie
+                subfamilie = object.subfamilie
+                this.lengte.placeholder = object.lengte
+                lengte = object.lengte
+                this.breedte.placeholder = object.breedte
+                breedte = object.breedte
+                this.hoogte.placeholder = object.hoogte
+                hoogte = object.hoogte
+                this.hoofdleverancier.selected = object.hoofdleverancier
+                hoofdleverancier = object.hoofdleverancier
+                this.link.link = object.link
+                link = object.link
+                this.minaan.placeholder = object.minaan
+                minaan = object.minaan
+            } else {
+                this.returnToDefault()
 
-            this.returnToDefault()
+                this.artikelNr.placeholder = object.reference
+                artikelNr = object.reference
+                this.reflev.placeholder = object.reference
+                reflev = object.reference
+                this.omschrijving.placeholder = object.description
+                omschrijving = object.description
+                this.tarief.placeholder = object.tarifPrice.toString()
+                tarief = object.tarifPrice.toString()
+                this.aankoop.placeholder = object.nettoPrice.toString()
+                aankoop = object.nettoPrice.toString()
+                this.stdKorting.placeholder = (parseFloat((1 - (object.nettoPrice / object.tarifPrice)) * 100).toFixed(4)).toString()
+                stdKorting = (parseFloat((1 - (object.nettoPrice / object.tarifPrice)) * 100).toFixed(4)).toString()
+                this.verkoop.placeholder = (parseFloat((object.nettoPrice * (1 + (1 / 3)))).toFixed(4)).toString()
+                verkoop = (parseFloat((object.nettoPrice * (1 + (1 / 3)))).toFixed(4)).toString()
+                this.winstpercentage.placeholder = (parseFloat((1 / 3) * 100).toFixed(4)).toString()
+                winstpercentage = (parseFloat((1 / 3) * 100).toFixed(4)).toString()
+                this.merk.placeholder = object.brand
+                merk = object.brand
+                this.minaan.placeholder = object.salesPackQuantity.toString()
+                minaan = object.salesPackQuantity.toString()
+                this.link.link = object.url
+                link = object.url
+            }
         },
+    },
+    beforeUnmount() {
+        this.returnToDefault()
+        // set all variables to null
+        artikelNr = null
+        reflev = null
+        omschrijving = null
+        tarief = null
+        aankoop = null
+        stdKorting = null
+        muntcode = null
+        verkoop = null
+        winstpercentage = null
+        rekver = null
+        aaneh = null
+        vereh = null
+        btwcode = null
+        omrekfac = null
+        typfac = null
+        merk = null
+        familie = null
+        subfamilie = null
+        lengte = null
+        breedte = null
+        hoogte = null
+        hoofdleverancier = null
+        link = null
+        minaan = null
+
+        object = {}
+
     },
     methods: {
         emitObjectArtikel() {
@@ -358,19 +440,35 @@ export default {
             this.minaan.error = false
 
             this.muntcode.selected = this.muntcode.options.find((x) => x.label.toLowerCase() == "euro").value
+            muntcode = this.muntcode.options.find((x) => x.label.toLowerCase() == "euro").value
             this.rekver.selected = this.rekver.options.find((x) => x.value == "700000").value
+            rekver = this.rekver.options.find((x) => x.value == "700000").value
             this.btwcode.selected = this.btwcode.options.find((x) => x.label.toLowerCase() == 'btw 21 %').value
+            btwcode = this.btwcode.options.find((x) => x.label.toLowerCase() == 'btw 21 %').value
             this.familie.selected = this.familie.options.find((x) => x.label.toLowerCase() == 'niet courant materiaal').value
+            familie = this.familie.options.find((x) => x.label.toLowerCase() == 'niet courant materiaal').value
             this.subfamilie.selected = this.subfamilie.options.find((x) => x.label.toLowerCase() == "non stock").value
+            subfamilie = this.subfamilie.options.find((x) => x.label.toLowerCase() == "non stock").value
             this.typfac.selected = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
+            typfac = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
             this.hoofdleverancier.selected = this.hoofdleverancier.options.find((x) => x.label.toLowerCase() == "cebeo").value
+            hoofdleverancier = this.hoofdleverancier.options.find((x) => x.label.toLowerCase() == "cebeo").value
             this.lengte.placeholder = "0"
+            lengte = "0"
             this.breedte.placeholder = "0"
+            breedte = "0"
             this.hoogte.placeholder = "0"
+            hoogte = "0"
             this.hoofdleverancier.selected = this.hoofdleverancier.options.find((x) => x.label.toLowerCase() == "cebeo").value
+            hoofdleverancier = this.hoofdleverancier.options.find((x) => x.label.toLowerCase() == "cebeo").value
             this.omrekfac.placeholder = "1"
+            omrekfac = "1"
             this.typfac.selected = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
-
+            typfac = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
+            this.$refs.aaneh.reset();
+            aaneh = undefined
+            this.$refs.vereh.reset();
+            vereh = undefined
         },
         async getOptions() {
             let endpoint = `${companie}/ets/articleforminfo`
@@ -536,7 +634,6 @@ export default {
         },
         handleAaneh(value) {
             aaneh = value
-
         },
         handleVereh(value) {
             vereh = value
@@ -564,7 +661,6 @@ export default {
         },
         handleSubfamilie(value) {
             subfamilie = value
-
         },
         handleLengte(value) {
             lengte = value.toString()
@@ -713,7 +809,7 @@ export default {
 
 <style scoped>
 .c-artikel_form {
-    display: grid ;
+    display: grid;
     grid-template-areas: "artikelnr reflevnr omschrijving"
         "tarief prijs stdkorting"
         "muntcode verkoop winst"
@@ -722,9 +818,9 @@ export default {
         "merk familie subfamilie"
         "lengte breedte hoogte"
         "hoofdleverancier link minaan";
-        grid-template-columns: 30vw 30vw 30vw ;
-        grid-gap: var(--global-whitespace-lg) ;
-        width: 100vw;
+    grid-template-columns: 30vw 30vw 30vw;
+    grid-gap: var(--global-whitespace-lg);
+    width: 100vw;
 }
 
 .c-artikelNr {

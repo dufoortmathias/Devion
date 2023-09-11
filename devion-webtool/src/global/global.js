@@ -11,7 +11,7 @@ export function PostDataWithBody(endpoint, body) {
     redirect: 'follow'
   }
 
-  fetch('http://192.168.100.237:5000/api/devion/ets/createpurchasefile?id=230879', requestOptions)
+  fetch('http://192.168.100.237:5000/api/'+endpoint, requestOptions)
     .then((response) => response.text())
     .then((result) => result)
     .catch((error) => console.log('error', error))

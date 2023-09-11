@@ -5,8 +5,8 @@
       :selected="dropdownCompanies.selected" />
     <Dropdown :id="dropdownBestelbon.id" :label="dropdownBestelbon.label" :options="dropdownBestelbon.options"
       :error="dropdownBestelbon.error" @option-selected="handledropdownBestelbonSelected" class="c-dropdown" />
-    <textInput :id="seperator.id" :label="seperator.label" :error="seperator.error" :placeholder="seperator.label" :errorText="seperator.errorText"
-      @option-selected="handletextInputSelected" class="c-text-input" />
+    <textInput :id="seperator.id" :label="seperator.label" :error="seperator.error" :placeholder="seperator.label"
+      :errorText="seperator.errorText" @option-selected="handletextInputSelected" class="c-text-input" />
     <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonDownload"
       class="c-button-artikel-search" :showButton="buttonDevion.showButton" />
     <TabelBestelbon :showTabel="tabelBestelbon.showTabel" :bestelbonNr="tabelBestelbon.bestelbonNr"
@@ -117,6 +117,14 @@ export default {
         }
       })
     })
+  },
+  beforeUnmount() {
+    // Clean up before component is destroyed
+    options = [];
+    endpoint = 'companies'
+    company = "";
+    bestelbonNr = "";
+    seperator = "";
   },
   methods: {
     async handledropdownCompaniesSelected(selectedOption) {
