@@ -9,7 +9,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowOrigins", builder => builder.WithOrigins(config["AllowedHosts"]));
+    options.AddPolicy("AllowOrigins", builder => {
+        builder.WithOrigins(config["AllowedHosts"]);
+        builder.WithHeaders("*");
+        });
 });
 
 WebApplication app = builder.Build();
