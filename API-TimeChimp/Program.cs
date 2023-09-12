@@ -788,6 +788,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                                 {
                                     throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
                                 }
+                                string operation = ((string)row[""]).ToUpper().Trim();
+                                string supplier = config[$"Operations:{operation}"] ?? config[$"Operations:"];
+
+                                part.MainSupplier = supplierHelperETS.FindSupplierId(supplier);
 
                                 part.ExistsETS = articleHelperETS.ArticleWithNumberExists(part.Number);
 

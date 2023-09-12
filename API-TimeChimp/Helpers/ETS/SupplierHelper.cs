@@ -8,10 +8,10 @@ public class ETSSupplierHelper : ETSHelper
 
     public string FindSupplierId(string name)
     {
-        string query = "SELECT LV_COD FROM LVPX WHERE LOWER(LV_NAM) LIKE @name";
+        string query = "SELECT LV_COD FROM LVPX WHERE UPPER(LV_NAM) LIKE @name";
         Dictionary<string, object> parameters = new()
         {
-            {"@name", $"%{name}%" },
+            {"@name", $"%{name.ToUpper()}%" },
         };
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
