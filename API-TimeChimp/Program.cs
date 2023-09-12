@@ -688,9 +688,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             query = "SELECT CODE, OMSCHRIJF AS DESCRIPTION FROM BTW_CODE";
             string responseBTWCodes = ETSClient.selectQuery(query);
 
-            query = "SELECT LV_COD AS CODE, LV_NAM AS NAME FROM LVPX WHERE (UPPER(LV_NAM) LIKE '%CEBEO%' OR UPPER(LV_NAM) LIKE '%ANCON%' OR UPPER(LV_NAM) LIKE '%VNC%' OR UPPER(LV_NAM) LIKE '%METABIL%') AND NOT UPPER(LV_NAM) LIKE '%BV%'";
-            string responseSuppliers = ETSClient.selectQuery(query);
+            List<string> suppliers = config.GetSection("Operations").GetChildren().Select(x => x.Value.ToUpper()).Distinct().ToList();
+            suppliers.Add("CEBEO".ToUpper());
+            string queryPart = string.Join("' OR UPPER(LV_NAM) LIKE '", suppliers.Select(s => $"%{s}%").ToList());
 
+            query = "SELECT LV_COD AS CODE, LV_NAM AS NAME FROM LVPX WHERE (UPPER(LV_NAM) LIKE '" + queryPart + "') AND NOT UPPER(LV_NAM) LIKE '%BV%'";
+            string responseSuppliers = ETSClient.selectQuery(query);
 
             Dictionary<string, object> result = new()
             {
@@ -788,7 +791,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                                 {
                                     throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
                                 }
-                                string operation = ((string)row[""]).ToUpper().Trim();
+                                string operation = ((string)row["Bewerking 1"]).ToUpper().Trim();
                                 string supplier = config[$"Operations:{operation}"] ?? config[$"Operations:"];
 
                                 part.MainSupplier = supplierHelperETS.FindSupplierId(supplier);
