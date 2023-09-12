@@ -75,22 +75,27 @@ public class ETSTimeHelper : ETSHelper
         timeETS.PLA_PROJECT = subProject.code?[..7];
         timeETS.PLA_SUBPROJECT = subProject.code?[7..];
 
+
+        //get data from ETS for the project
+        ProjectETS mainProject = new ETSProjectHelper(ETSClient).GetProject(timeETS.PLA_PROJECT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_PROJECT")) ?? throw new Exception("Error getting project from ETS with id: " + timeETS.PLA_PROJECT);
+
         //get data from ETS for the employee
         EmployeeTimeChimp employee = new TimeChimpEmployeeHelper(TCClient).GetEmployee(timeTC.userId) ?? throw new Exception("Error getting employee from TimeChimp with id: " + timeTC.userId);
         timeETS.PLA_PERSOON = employee.employeeNumber;
 
         //create the caption
-        timeETS.PLA_CAPTION = subProject.code;
+        timeETS.PLA_CAPTION = $"{subProject.code}: {mainProject.PR_KROM}";
 
         //create the text
         timeETS.PLA_TEKST =
-            $"{timeTC.projectName}: {uurCode.name} ({timeETS.PLA_UURCODE})\n" +
+            $"{timeETS.PLA_SUBPROJECT}: {timeTC.projectName}" +
+            $"{uurCode.name} ({timeETS.PLA_UURCODE})\n" +
             $"TimeChimp: {timeTC.id}\n" +
             timeTC.notes;
 
         //create the query
-        string query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE, PLA_KM, PLA_KM_HEEN_TERUG, PLA_KM_VERGOEDING) " +
-                    $"VALUES (@id, @kleur, @caption, @start, @eind, @pauze, @tekst, @project, @subproject, @persoon, @klant, @uurcode, 0, 0, 0)";
+        string query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE, PLA_KM, PLA_KM_HEEN_TERUG, PLA_KM_VERGOEDING, PLA_INTERN) " +
+                    $"VALUES (@id, @kleur, @caption, @start, @eind, @pauze, @tekst, @project, @subproject, @persoon, @klant, @uurcode, 0, 0, 0, @timechimp)";
         Dictionary<string, object> parameters = new()
         {
             {"@id", timeETS.PLA_ID ?? throw new Exception("No id generated for time record ETS")},
@@ -104,7 +109,8 @@ public class ETSTimeHelper : ETSHelper
             {"@subproject", timeETS.PLA_SUBPROJECT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_SUBPROJECT")},
             {"@persoon", timeETS.PLA_PERSOON ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_PERSOON")},
             {"@klant", timeETS.PLA_KLANT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_KLANT")},
-            {"@uurcode", timeETS.PLA_UURCODE ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_UURCODE")}
+            {"@uurcode", timeETS.PLA_UURCODE ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_UURCODE")},
+            {"@timechimp", timeTC.id}
         };
 
         //send data to ETS
