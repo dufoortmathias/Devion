@@ -6,15 +6,15 @@
   <div class="c-artikel-form">
     <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel" class="c-form"
       :check="artikelForm.check" ref="article" />
-    <div class="c-artikel-button--save">
+    <div class="c-artikel-button--save" :class="{'o-hide-accessible': !save.showButton}">
       <buttonDevion :label="save.label" :isDisabled="save.isButtonDisabled" :showButton="save.showButton"
-        @click="handleSaveButtonClick" class="c-button-artikel--save " />
+        @click="handleSaveButtonClick" class="c-button-artikel--next" />
     </div>
-    <div class="c-artikel-button--next">
+    <div class="c-artikel-button--next" :class="{'o-hide-accessible': !next.showButton}">
       <buttonDevion :label="next.label" :isDisabled="next.isButtonDisabled" :showButton="next.showButton"
         @click="handleNextButtonClick" class="c-button-artikel--next" />
     </div>
-    <div class="c-artikel-button--prev">
+    <div class="c-artikel-button--prev" :class="{'o-hide-accessible': !prev.showButton}">
       <buttonDevion :label="prev.label" :isDisabled="prev.isButtonDisabled" :showButton="prev.showButton"
         @click="handlePrevButtonClick" class="c-button-artikel--prev" />
     </div>
@@ -228,6 +228,7 @@ export default {
       this.$refs.article.createInfoObject()
     },
     handleSaveButtonClick() {
+      console.log("opslaan")
       save = true
       this.$refs.article.createInfoObject()
     },
@@ -240,63 +241,5 @@ export default {
   margin-top: var(--global-whitespace-lg);
   margin-bottom: var(--global-whitespace-lg);
   cursor: pointer;
-}
-
-.c-artikel-form {
-  display: grid;
-  width: 100vw;
-  transform: translateX(-15vw);
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas: "form form form" "prev progress next";
-  grid-gap: var(--global-whitespace-lg);
-  margin-top: var(--global-whitespace-lg);
-  margin-bottom: var(--global-whitespace-lg);
-}
-
-.c-form {
-  grid-area: form;
-}
-
-.c-artikel-button--save {
-  grid-area: next;
-  display: flex;
-  margin-bottom: var(--global-whitespace-lg);
-  justify-content: flex-end;
-  margin-right: calc(var(--global-whitespace-lg) * 2.8)
-}
-
-.c-artikel-button--prev {
-  grid-area: prev;
-  display: flex;
-  margin-bottom: var(--global-whitespace-lg);
-  justify-content: flex-start;
-}
-
-.c-artikel-button--next {
-  grid-area: next;
-  margin-bottom: var(--global-whitespace-lg);
-  display: flex;
-  justify-content: flex-end;
-  margin-right: calc(var(--global-whitespace-lg) * 2.8);
-}
-
-.c-button-artikel--prev,
-.c-button-artikel--next,
-.c-button-artikel--save {
-  width: 50%;
-}
-
-.c-artikel-progress {
-  grid-area: progress;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: var(--global-whitespace-lg);
-}
-
-.c-artikel-progress__text {
-  text-align: center;
-  width: 100%;
-  font-weight: bolder;
 }
 </style>

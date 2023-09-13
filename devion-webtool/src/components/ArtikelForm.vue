@@ -5,7 +5,7 @@
         <textInput :id="reflev.id" :label="reflev.label" :error="reflev.error" :placeholder="reflev.placeholder"
             class="c-reflev" @option-selected="handleReflev" />
         <textInput :id="omschrijving.id" :label="omschrijving.label" :error="omschrijving.error"
-            :placeholder="omschrijving.placeholder" class="c-omschrijving" @option-selected="handleOmschrijving" />
+            :placeholder="omschrijving.placeholder" :error-text="omschrijving.errorText" class="c-omschrijving" @option-selected="handleOmschrijving" />
         <textInput :id="tarief.id" :label="tarief.label" :error="tarief.error" :placeholder="tarief.placeholder"
             class="c-tarief" @option-selected="handletarief" />
         <textInput :id="aankoop.id" :label="aankoop.label" :error="aankoop.error" :placeholder="aankoop.placeholder"
@@ -21,9 +21,9 @@
         <dropdownMenu :id="rekver.id" :label="rekver.label" :options="rekver.options" :error="rekver.error" class="c-rekver"
             :selected="rekver.selected" @option-selected="handleRekver" />
         <dropdownMenu :id="aaneh.id" :label="aaneh.label" :options="aaneh.options" :error="aaneh.error"
-            :selected="aaneh.selected" class="c-aaneh" @option-selected="handleAaneh" ref="aaneh"/>
+            :selected="aaneh.selected" class="c-aaneh" @option-selected="handleAaneh" ref="aaneh" />
         <dropdownMenu :id="vereh.id" :label="vereh.label" :options="vereh.options" :error="vereh.error"
-            :selected="vereh.selected" class="c-vereh" @option-selected="handleVereh" ref="vereh"/>
+            :selected="vereh.selected" class="c-vereh" @option-selected="handleVereh" ref="vereh" />
         <dropdownMenu :id="btwcode.id" :label="btwcode.label" :options="btwcode.options" :error="btwcode.error"
             class="c-btwcode" :selected="btwcode.selected" @option-selected="handleBtwcode" />
         <textInput :id="omrekfac.id" :label="omrekfac.label" :error="omrekfac.error" :placeholder="omrekfac.placeholder"
@@ -100,7 +100,8 @@ export default {
                 id: 'omschrijving',
                 label: 'Omschrijving',
                 error: false,
-                placeholder: 'omschrijving'
+                placeholder: 'omschrijving',
+                errorText: 'Omschrijving is verplicht'
             },
             tarief: {
                 components: {
@@ -300,7 +301,7 @@ export default {
     },
     watch: {
         data(object) {
-            if (object.reference == undefined) {
+            if (object.reference == undefined && object.number == undefined) {
                 this.artikelNr.placeholder = object.artikelNr
                 artikelNr = object.artikelNr
                 this.reflev.placeholder = object.reflev
@@ -349,6 +350,52 @@ export default {
                 link = object.link
                 this.minaan.placeholder = object.minaan
                 minaan = object.minaan
+            } else if (object.number != undefined) {
+                this.returnToDefault()
+
+                this.artikelNr.placeholder = object.number
+                artikelNr = object.number
+                this.reflev.placeholder = object.number
+                reflev = object.number
+                this.omschrijving.placeholder = object.description
+                omschrijving = object.description
+                this.hoofdleverancier.selected = object.mainSupplier
+                hoofdleverancier = object.mainSupplier
+                this.merk.placeholder = "devion"
+                merk = "devion"
+                this.familie.selected = this.familie.options.find((x) => x.label.toLowerCase() == 'niet courant materiaal').value
+                familie = this.familie.options.find((x) => x.label.toLowerCase() == 'niet courant materiaal').value
+                this.subfamilie.selected = this.subfamilie.options.find((x) => x.label.toLowerCase() == "non stock").value
+                subfamilie = this.subfamilie.options.find((x) => x.label.toLowerCase() == "non stock").value
+                this.lengte.placeholder = "0"
+                lengte = "0"
+                this.breedte.placeholder = "0"
+                breedte = "0"
+                this.hoogte.placeholder = "0"
+                hoogte = "0"
+                this.omrekfac.placeholder = "1"
+                omrekfac = "1"
+                this.typfac.selected = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
+                typfac = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
+                this.muntcode.selected = this.muntcode.options.find((x) => x.label.toLowerCase() == "euro").value
+                muntcode = this.muntcode.options.find((x) => x.label.toLowerCase() == "euro").value
+                this.rekver.selected = this.rekver.options.find((x) => x.value == "700000").value
+                rekver = this.rekver.options.find((x) => x.value == "700000").value
+                this.tarief.placeholder = "0"
+                tarief = "0"
+                this.aankoop.placeholder = "0"
+                aankoop = "0"
+                this.stdKorting.placeholder = "0"
+                stdKorting = "0"
+                this.verkoop.placeholder = "0"
+                verkoop = "0"
+                this.winstpercentage.placeholder = "0"
+                winstpercentage = "0"
+                this.minaan.placeholder = "1"
+                minaan = "1"
+                this.link.link = ""
+                link = ""
+
             } else {
                 this.returnToDefault()
 
@@ -469,6 +516,8 @@ export default {
             aaneh = undefined
             this.$refs.vereh.reset();
             vereh = undefined
+            this.omschrijving.placeholder = "omschrijving"
+            omschrijving = undefined
         },
         async getOptions() {
             let endpoint = `${companie}/ets/articleforminfo`
@@ -538,10 +587,17 @@ export default {
                 this.subfamilie.selected = this.subfamilie.options.find((x) => x.label.toLowerCase() == "non stock").value
                 subfamilie = this.subfamilie.options.find((x) => x.label.toLowerCase() == "non stock").value
 
+                options = []
+                for (element of data.suppliers) {
+                    options.push({ value: element.CODE, label: element.NAME })
+                }
+                this.hoofdleverancier.options = options
+                this.hoofdleverancier.selected = this.hoofdleverancier.options.find((x) => x.label.toLowerCase() == "cebeo").value
+                hoofdleverancier = this.hoofdleverancier.options.find((x) => x.label.toLowerCase() == "cebeo").value
+
                 lengte = "0"
                 breedte = "0"
                 hoogte = "0"
-                hoofdleverancier = this.hoofdleverancier.options.find((x) => x.label.toLowerCase() == "cebeo").value
                 omrekfac = "1"
                 typfac = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
             })
@@ -716,7 +772,7 @@ export default {
             const keys = Object.keys(object)
             let errors = 0
             for (const key of keys) {
-                if (object[key] == undefined || object[key] == '') {
+                if ((object[key] == undefined || object[key] == '') && key != 'link') {
                     this.changeErrorState(key, true)
                     errors++
                 } else {

@@ -1,10 +1,15 @@
 <template>
     <ul class="treeview" v-show="showTree">
-        <li v-for="(part, index) in jsonData" :key="index">
-            <span @click="toggleNode(part)"
-                :class="{ 'caret': hasChildParts(part), 'no-caret': !hasChildParts(part), 'caret-down': part.expanded, 'exists': part.existsETS, 'not-exists': !part.existsETS }">
-                {{ part.number }} ({{ part.description }})
-            </span>
+        <li v-for="(part, index) in jsonData" :key="index" class="c-placement">
+            <div>
+                <span @click="toggleNode(part)"
+                    :class="{ 'caret': hasChildParts(part), 'no-caret': !hasChildParts(part), 'caret-down': part.expanded, 'exists': part.existsETS, 'not-exists': !part.existsETS }"
+                    class="c-text">
+                    {{ part.number }} ({{ part.description }})
+                </span>
+                <ButtonDevion v-if="!part.existsETS" :label="button.label" :isDisabled="button.isDisabled"
+                    :showButton="button.showButton" @click="handleButton" class="c-button" />
+            </div>
             <ul v-if="part.parts && part.expanded">
                 <TreeView :jsonData="part.parts" :showTree="true" />
             </ul>
@@ -13,15 +18,27 @@
 </template>
 
 <script>
+import ButtonDevion from './ButtonDevion.vue';
 export default {
     name: 'TreeView',
     props: {
         jsonData: Array,
         showTree: Boolean,
     },
+    components: {
+        ButtonDevion
+    },
     data() {
         return {
             expanded: false,
+            button: {
+                components: {
+                    ButtonDevion
+                },
+                label: 'Toevoegen',
+                isDisabled: false,
+                showButton: true
+            },
         };
     },
     methods: {
@@ -83,5 +100,24 @@ export default {
 
 .not-exists {
     color: red;
+}
+
+.c-placement {
+    margin-top: 3vh;
+}
+
+.c-text {
+    font-size: var(--global-font-size);
+    font-weight: var(--global-font-weight-bold);
+    padding-top: 11px;
+    grid-area: label;
+}
+
+.c-button {
+    margin: 0;
+    cursor: pointer;
+    grid-area: button;
+    float: right;
+    width: 20%;
 }
 </style>

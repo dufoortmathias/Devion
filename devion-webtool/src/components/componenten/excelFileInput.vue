@@ -1,5 +1,5 @@
 <template>
-    <div class="c-input-placement">
+    <div class="c-input-placement" v-show="showFile">
         <label class="c-label c-label-file">{{ label }}: </label>
         <div v-if="error" class="c-input-file">
             <input id="file-input" class="o-hide-accessible" type="file" accept=".xlsx, .xls, .csv"
@@ -22,6 +22,7 @@ export default {
         error: Boolean,
         label: String,
         filename: String,
+        showFile: Boolean,
     },
     components: {
     },
