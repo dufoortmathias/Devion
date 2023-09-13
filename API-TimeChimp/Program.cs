@@ -9,10 +9,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowOrigins", builder => {
+    options.AddPolicy("AllowOrigins", builder =>
+    {
         builder.WithOrigins(config["AllowedHosts"]);
         builder.WithHeaders("*");
-        });
+    });
 });
 
 WebApplication app = builder.Build();
@@ -526,7 +527,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             PurchaseOrderHeaderETS header = purchaseOrderHelperETS.GetPurchaseOrderHeader(id);
-            
+
 
             List<PurchaseOrderDetailETS> purchaseOrders = purchaseOrderHelperETS.GetPurchaseOrderDetails(id);
 
@@ -541,7 +542,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 };
             foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders.Where(p => p.FD_ARTNR != null))
             {
-                ((List<Dictionary<string, object?>>) (result["artikels"] ?? throw new Exception("Value at key artikels is null"))).Add(new()
+                ((List<Dictionary<string, object?>>)(result["artikels"] ?? throw new Exception("Value at key artikels is null"))).Add(new()
                     {
                         {"artikelNummer", articleHelperETS.GetArticleReference(purchaseOrder.FD_ARTNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no ARTNR"), header.FH_KLNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no KLNR"))},
                         {"omschrijving", purchaseOrder.FD_OMS},
@@ -622,7 +623,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumberETS, float maxPriceDiff) =>
     {
         try
-        {            
+        {
             string articleReference = (articleHelperETS.GetArticle(articleNumberETS) ?? throw new Exception($"ETS han no article with number = {articleNumberETS}")).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
 
             float newPrice = articleHelperCebeo.GetArticlePriceCebeo(articleReference);
@@ -779,13 +780,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                             if (parentList[level] != null)
                             {
-                                #pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                                 parentList = parentList[level].Parts;
-                                #pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
                             }
                             else
                             {
-                                Item part = new((string)row["Part Number"], (string)row["Description"], Convert.ToInt32((double)row["QTY"]));
+                                Item part = new((string)row["Part Number"], row["Description"] is System.DBNull ? String.Empty : (string)row["Description"], Convert.ToInt32((double)row["QTY"]));
 
                                 if (part.Number.Length > 25)
                                 {
@@ -841,7 +842,7 @@ app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyN
 if (app.Environment.IsProduction())
 {
     app.Run("http://*:5000");
-} 
+}
 else
 {
     app.Run();

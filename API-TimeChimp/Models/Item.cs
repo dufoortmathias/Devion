@@ -10,7 +10,7 @@
         }
 
         public string Number { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public int Quantity { get; set; }
         public string? MainSupplier { get; set; }
         public List<Item?> Parts { get; set; } = new();
