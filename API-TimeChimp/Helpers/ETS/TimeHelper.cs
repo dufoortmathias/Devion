@@ -95,10 +95,9 @@ public class ETSTimeHelper : ETSHelper
 
         //create the query
         string query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE, PLA_KM, PLA_KM_HEEN_TERUG, PLA_KM_VERGOEDING, PLA_INTERN) " +
-                    $"VALUES (@id, @kleur, @caption, @start, @eind, @pauze, @tekst, @project, @subproject, @persoon, @klant, @uurcode, 0, 0, 0, @timechimp)";
+                    $"VALUES (GEN_ID(PLANNINGSITEM_GEN,1), @kleur, @caption, @start, @eind, @pauze, @tekst, @project, @subproject, @persoon, @klant, @uurcode, 0, 0, 0, @timechimp)";
         Dictionary<string, object> parameters = new()
         {
-            {"@id", timeETS.PLA_ID ?? throw new Exception("No id generated for time record ETS")},
             {"@kleur", timeETS.PLA_KLEUR ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_KLEUR")},
             {"@caption", timeETS.PLA_CAPTION ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_CAPTION")},
             {"@start", timeETS.PLA_START ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_START")},
