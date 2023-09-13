@@ -369,37 +369,40 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                 TCSubproject.id = subProject.id;
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
-
-                //update budgethours for each projecttask in timeChimp
-                List<ProjectTaskETS> projectTasksETS = uurcodeHelperETS.GetUurcodesSubproject(ETSProject.PR_NR ?? throw new Exception("Project received from ETS has no NR"), ETSSubproject.SU_SUB ?? throw new Exception("Subproject received from ETS has no SUBNR"));
-                foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
+                
+                if (TCSubproject.active ?? false)
                 {
-                    if (string.IsNullOrEmpty(projectTaskETS.VO_PROJ?.Trim()))
+                    //update budgethours for each projecttask in timeChimp
+                    List<ProjectTaskETS> projectTasksETS = uurcodeHelperETS.GetUurcodesSubproject(ETSProject.PR_NR ?? throw new Exception("Project received from ETS has no NR"), ETSSubproject.SU_SUB ?? throw new Exception("Subproject received from ETS has no SUBNR"));
+                    foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
                     {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (string.IsNullOrEmpty(projectTaskETS.VO_SUBPROJ?.Trim()))
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (projectTaskETS.VO_AANT == null)
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else
-                    {
-                        UurcodeTimeChimp uurcode = uurcodes.Find(u => u.code != null && u.code.Equals(projectTaskETS.VO_UUR)) ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
-                        int taskId = uurcode.id ?? throw new Exception("Uurcode in TimeChimp has no id");
-                        ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks?.Find(p => p.taskId.Equals(taskId)) ?? throw new Exception($"Subproject with code = {subProject.code} has no projecttask with id = {taskId}");
+                        if (string.IsNullOrEmpty(projectTaskETS.VO_PROJ?.Trim()))
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                        }
+                        else if (string.IsNullOrEmpty(projectTaskETS.VO_SUBPROJ?.Trim()))
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                        }
+                        else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                        }
+                        else if (projectTaskETS.VO_AANT == null)
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                        }
+                        else
+                        {
+                            UurcodeTimeChimp uurcode = uurcodes.Find(u => u.code != null && u.code.Equals(projectTaskETS.VO_UUR)) ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
+                            int taskId = uurcode.id ?? throw new Exception("Uurcode in TimeChimp has no id");
+                            ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks?.Find(p => p.taskId.Equals(taskId)) ?? throw new Exception($"Subproject with code = {subProject.code} has no projecttask with id = {taskId}");
 
-                        projectTaskTimechimp.budgetHours = projectTaskETS.VO_AANT;
-                        totalBudgetHours += projectTaskETS.VO_AANT.Value;
+                            projectTaskTimechimp.budgetHours = projectTaskETS.VO_AANT;
+                            totalBudgetHours += projectTaskETS.VO_AANT.Value;
 
-                        TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTaskTimechimp));
+                            TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTaskTimechimp));
+                        }
                     }
                 }
             }
