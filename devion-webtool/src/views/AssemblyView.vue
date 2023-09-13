@@ -3,6 +3,9 @@
         @file-updated="handleFileUpdate" />
     <ButtonDevion :label="button.label" :isDisabled="button.isDisabled" :showButton="button.showButton"
         @click="handleButton" class="c-button" />
+    <div v-if="loading.showLoad" class="c-load">
+        <LoadingAnimation :showLoad="loading.showLoad"/>
+    </div>
     <TreeView :jsonData="treeView.jsonData" :showTree="treeView.showTree" />
     <div v-if="treeView.showTree" class="c-buttons">
         <ButtonDevion :label="buttonSave.label" :isDisabled="buttonSave.isDisabled" :showButton="buttonSave.showButton"
@@ -39,8 +42,9 @@ import ButtonDevion from '../components/componenten/ButtonDevion.vue';
 import TreeView from '../components/componenten/TreeView.vue';
 import ArtikelForm from '../components/ArtikelForm.vue';
 import LabelDevion from '../components/componenten/LabelDevion.vue';
+import LoadingAnimation from '../components/componenten/LoadingAnimation.vue';
 
-import { PostDataWithBody } from '../global/global';
+import { PostDataWithBody, PutDataWithBody } from '../global/global';
 
 let FileContents = null
 let partsNotFound = []
@@ -55,7 +59,8 @@ export default {
         ButtonDevion,
         TreeView,
         ArtikelForm,
-        LabelDevion
+        LabelDevion,
+        LoadingAnimation
     },
     data() {
         return {
@@ -146,6 +151,12 @@ export default {
                 },
                 label: 'Artikel niet gevonden 0/0',
                 showlabel: false
+            },
+            loading: {
+                components: {
+                    LoadingAnimation
+                },
+                showLoad: false
             }
         }
     },
@@ -159,10 +170,12 @@ export default {
 
         },
         async handleButton() {
+            this.loading.showLoad = true
             let endpoint = 'devion/ets/transformbomexcel'
             FileContents = this.file.file.previewBase64.replace('data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,', '')
             PostDataWithBody(endpoint, FileContents).then((response) => {
                 let artikels = JSON.parse(response)
+                this.loading.showLoad = false
                 this.treeView.showTree = true
                 this.treeView.jsonData = artikels
                 for (let artikel of artikels) {
@@ -227,7 +240,11 @@ export default {
                 this.buttonInsert.showButton = false
                 this.missing.showlabel = false
             } else {
-                console.log('all parts found')
+                this.loading.showLoad = true
+                PutDataWithBody('devion/ets/updatalinkedarticles', artikels).then((response) => {
+                    console.log(response)
+                    this.loading.showLoad = false
+                })
             }
         },
         handleArtikel(object) {
@@ -321,5 +338,10 @@ export default {
     font-weight: var(--global-font-weight-bold);
     margin-bottom: var(--global-baseline);
     padding-top: 11px;
+}
+
+.c-load {
+    display: flex;
+    justify-content: center;
 }
 </style>
