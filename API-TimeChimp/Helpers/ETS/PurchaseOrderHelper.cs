@@ -53,10 +53,17 @@ public class ETSPurchaseOrderHelper : ETSHelper
     public List<PurchaseOrderDetailETS> GetPurchaseOrderDetails(string id)
     {
         //create query
-        string query = $"SELECT LVPX.LV_NAM, LVPX.LV_COD, CSARTPX.ART_LEVREF, CSFDPX.* FROM CSFDPX " +
-            $"LEFT JOIN CSARTPX ON CSFDPX.FD_ARTNR = CSARTPX.ART_NR " +
-            $"LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 " +
-            $"WHERE FD_BONNR = @id AND FD_CODE = 'V'";
+        string query = @"
+SELECT LVPX.LV_NAM, LVPX.LV_COD, CSARTPX.ART_LEVREF, CSARTPX.ART_OMS, VCC.*
+FROM (
+    SELECT CSFDPX.FD_ARTNR, CSFDPX.FD_BONNR,  SUM(CSFDPX.FD_AANTAL) AS TOTAAL_AANTAL
+    FROM CSFDPX 
+    WHERE FD_BONNR = @ID AND FD_CODE = 'V'
+    GROUP BY CSFDPX.FD_ARTNR, CSFDPX.FD_BONNR
+) VCC
+LEFT JOIN CSARTPX ON VCC.FD_ARTNR = CSARTPX.ART_NR
+LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1
+";
         Dictionary<string, object> parameters = new()
         {
             {"@id",  id}
@@ -85,7 +92,7 @@ public class ETSPurchaseOrderHelper : ETSHelper
         {
             // Add data to the CSV file
             var first = purchaseOrder.FD_KLANTREFERENTIE;
-            var second = purchaseOrder.FD_AANTAL ?? throw new Exception($"PurchaseOrder {purchaseOrder.FD_BONNR} in ETS has no FD_AANTAL");
+            var second = purchaseOrder.TOTAAL_AANTAL ?? throw new Exception($"PurchaseOrder {purchaseOrder.FD_BONNR} in ETS has no FD_AANTAL");
             var newLine = $"{first}{seperator}{second}";
             csv.AppendLine(newLine);
         }

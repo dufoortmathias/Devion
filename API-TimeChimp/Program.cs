@@ -393,6 +393,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                         {
                             int taskId = uurcodes.Find(u => u.code != null && u.code.Equals(projectTaskETS.VO_UUR))?.id ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
                             projectTaskHelperTC.CreateOrUpdateProjectTask(taskId, subProject.id.Value, projectTaskETS.VO_AANT.Value);
+                            totalBudgetHours += projectTaskETS.VO_AANT.Value;
                         }
                     }
                 }
@@ -539,8 +540,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 ((List<Dictionary<string, object?>>)(result["artikels"] ?? throw new Exception("Value at key artikels is null"))).Add(new()
                     {
                         {"artikelNummer", articleHelperETS.GetArticleReference(purchaseOrder.FD_ARTNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no ARTNR"), header.FH_KLNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no KLNR"))},
-                        {"omschrijving", purchaseOrder.FD_OMS},
-                        {"aantal", purchaseOrder.FD_AANTAL},
+                        {"omschrijving", purchaseOrder.ART_OMS},
+                        {"aantal", purchaseOrder.TOTAAL_AANTAL},
                         {"leverancier", header.LV_NAM}
                     });
             }
@@ -579,7 +580,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                         orderLines.Add(new Dictionary<string, object>()
                         {
                             { "number", cebeoArticleNumber },
-                            { "aantal", purchaseOrder.FD_AANTAL ?? 0 }
+                            { "aantal", purchaseOrder.TOTAAL_AANTAL ?? 0 }
                         });
                     }
                 });
