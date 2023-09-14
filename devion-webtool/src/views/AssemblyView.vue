@@ -161,7 +161,10 @@ export default {
         async handleButton() {
             let endpoint = 'devion/ets/transformbomexcel'
             FileContents = this.file.file.previewBase64.replace('data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,', '')
-            PostDataWithBody(endpoint, FileContents).then((response) => {
+            var data = {
+                "FileContents": FileContents
+            }
+            PostDataWithBody(endpoint, data).then((response) => {
                 let artikels = JSON.parse(response)
                 this.treeView.showTree = true
                 this.treeView.jsonData = artikels

@@ -192,10 +192,10 @@ export default {
       artikel = object
       artikels[index] = artikel
       if (save == true) {
-        endpoint = `metabil/cebeo/createarticle`
+        endpoint = `devion/ets/createarticle`
         artikels.forEach(artikel => {
           PostDataWithBody(endpoint, artikel).then((data) => {
-            console.log(data)
+            console.log("Created article:", JSON.parse(data)["artikelNr"])
           }) 
         });
       } else {

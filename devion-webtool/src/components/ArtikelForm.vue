@@ -301,7 +301,7 @@ export default {
     },
     watch: {
         data(object) {
-            if (object.reference == undefined && object.number == undefined) {
+            if (object.reflev == undefined && object.artikelNr == undefined) {
                 this.artikelNr.placeholder = object.artikelNr
                 artikelNr = object.artikelNr
                 this.reflev.placeholder = object.reflev
@@ -350,17 +350,17 @@ export default {
                 link = object.link
                 this.minaan.placeholder = object.minaan
                 minaan = object.minaan
-            } else if (object.number != undefined) {
+            } else if (object.artikelNr != undefined) {
                 this.returnToDefault()
 
-                this.artikelNr.placeholder = object.number
-                artikelNr = object.number
-                this.reflev.placeholder = object.number
-                reflev = object.number
-                this.omschrijving.placeholder = object.description
-                omschrijving = object.description
-                this.hoofdleverancier.selected = object.mainSupplier
-                hoofdleverancier = object.mainSupplier
+                this.artikelNr.placeholder = object.artikelNr
+                artikelNr = object.artikelNr
+                this.reflev.placeholder = object.artikelNr
+                reflev = object.artikelNr
+                this.omschrijving.placeholder = object.omschrijving
+                omschrijving = object.omschrijving
+                this.hoofdleverancier.selected = object.hoofdleverancier
+                hoofdleverancier = object.hoofdleverancier
                 this.merk.placeholder = "devion"
                 merk = "devion"
                 this.familie.selected = this.familie.options.find((x) => x.label.toLowerCase() == 'niet courant materiaal').value
@@ -399,28 +399,28 @@ export default {
             } else {
                 this.returnToDefault()
 
-                this.artikelNr.placeholder = object.reference
-                artikelNr = object.reference
-                this.reflev.placeholder = object.reference
-                reflev = object.reference
-                this.omschrijving.placeholder = object.description
-                omschrijving = object.description
-                this.tarief.placeholder = object.tarifPrice.toString()
-                tarief = object.tarifPrice.toString()
-                this.aankoop.placeholder = object.nettoPrice.toString()
-                aankoop = object.nettoPrice.toString()
-                this.stdKorting.placeholder = (parseFloat((1 - (object.nettoPrice / object.tarifPrice)) * 100).toFixed(4)).toString()
-                stdKorting = (parseFloat((1 - (object.nettoPrice / object.tarifPrice)) * 100).toFixed(4)).toString()
-                this.verkoop.placeholder = (parseFloat((object.nettoPrice * (1 + (1 / 3)))).toFixed(4)).toString()
-                verkoop = (parseFloat((object.nettoPrice * (1 + (1 / 3)))).toFixed(4)).toString()
+                this.artikelNr.placeholder = object.reflev
+                artikelNr = object.reflev
+                this.reflev.placeholder = object.reflev
+                reflev = object.reflev
+                this.omschrijving.placeholder = object.omschrijving
+                omschrijving = object.omschrijving
+                this.tarief.placeholder = object.tarief.toString()
+                tarief = object.tarief.toString()
+                this.aankoop.placeholder = object.aankoop.toString()
+                aankoop = object.aankoop.toString()
+                this.stdKorting.placeholder = (parseFloat((1 - (object.aankoop / object.tarief)) * 100).toFixed(4)).toString()
+                stdKorting = (parseFloat((1 - (object.aankoop / object.tarief)) * 100).toFixed(4)).toString()
+                this.verkoop.placeholder = (parseFloat((object.aankoop * (1 + (1 / 3)))).toFixed(4)).toString()
+                verkoop = (parseFloat((object.aankoop * (1 + (1 / 3)))).toFixed(4)).toString()
                 this.winstpercentage.placeholder = (parseFloat((1 / 3) * 100).toFixed(4)).toString()
                 winstpercentage = (parseFloat((1 / 3) * 100).toFixed(4)).toString()
-                this.merk.placeholder = object.brand
-                merk = object.brand
-                this.minaan.placeholder = object.salesPackQuantity.toString()
-                minaan = object.salesPackQuantity.toString()
-                this.link.link = object.url
-                link = object.url
+                this.merk.placeholder = object.merk
+                merk = object.merk
+                this.minaan.placeholder = object.minaan.toString()
+                minaan = object.minaan.toString()
+                this.link.link = object.link
+                link = object.link
             }
         },
     },
