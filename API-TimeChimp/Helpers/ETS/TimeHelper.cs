@@ -88,7 +88,7 @@ public class ETSTimeHelper : ETSHelper
 
         //create the text
         timeETS.PLA_TEKST =
-            $"{timeETS.PLA_SUBPROJECT}: {timeTC.projectName}" +
+            $"{timeETS.PLA_SUBPROJECT}: {timeTC.projectName}\n" +
             $"{uurCode.name} ({timeETS.PLA_UURCODE})\n" +
             $"TimeChimp: {timeTC.id}\n" +
             timeTC.notes;

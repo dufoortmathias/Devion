@@ -113,78 +113,78 @@ public class ETSArticleHelper : ETSHelper
     {
         Dictionary<string, List<string>> problems = new()
             {
-                {"number", new() },
-                {"reference", new() },
-                {"description", new() },
-                {"brand", new() },
-                {"unitOfMeasure", new() },
-                {"salesPackQuantity", new() },
-                {"nettoPrice", new() },
-                {"tarifPrice", new() },
-                {"url", new() }
+                {"artikelNr", new() },
+                {"reflev", new() },
+                {"omschrijving", new() },
+                {"merk", new() },
+                {"aaneh", new() },
+                {"minaan", new() },
+                {"aankoop", new() },
+                {"tarief", new() },
+                {"link", new() }
         };
 
-        if (string.IsNullOrEmpty(article.Number))
+        if (string.IsNullOrEmpty(article.artikelNr))
         {
-            problems["number"].Add("Can't be empty");
+            problems["artikelNr"].Add("Can't be empty");
         }
-        else if (!article.Number.Equals(article.Number.ToUpper()))
+        else if (!article.artikelNr.Equals(article.artikelNr.ToUpper()))
         {
-            problems["number"].Add("Articlenumber contains lower case characters");
+            problems["artikelNr"].Add("Articlenumber contains lower case characters");
         }
-        else if (ArticleWithNumberExists(article.Number))
+        else if (ArticleWithNumberExists(article.artikelNr))
         {
-            problems["number"].Add("Articlenumber already exists in ETS");
-        }
-
-        if (string.IsNullOrEmpty(article.Reference))
-        {
-            problems["reference"].Add("Can't be empty");
+            problems["artikelNr"].Add("Articlenumber already exists in ETS");
         }
 
-        if (string.IsNullOrEmpty(article.Description))
+        if (string.IsNullOrEmpty(article.reflev))
         {
-            problems["description"].Add("Can't be empty");
+            problems["reflev"].Add("Can't be empty");
         }
 
-        if (string.IsNullOrEmpty(article.Brand))
+        if (string.IsNullOrEmpty(article.omschrijving))
         {
-            problems["brand"].Add("Can't be empty");
+            problems["omschrijving"].Add("Can't be empty");
+        }
+
+        if (string.IsNullOrEmpty(article.merk))
+        {
+            problems["merk"].Add("Can't be empty");
         }
 
         string query = "SELECT EH_COD AS CODE, EH_OMS1 AS DESCRIPTION, EH_OMS2 AS SHORT_DESCRIPTION FROM EENHEID";
         string[] MeasureTypes = JsonTool.ConvertTo<List<Dictionary<string, string>>>(ETSClient.selectQuery(query)).Select(x => x["CODE"]).ToArray();
-        if (string.IsNullOrEmpty(article.UnitOfMeasure))
+        if (string.IsNullOrEmpty(article.aaneh))
         {
-            problems["unitOfMeasure"].Add("Can't be empty");
+            problems["aaneh"].Add("Can't be empty");
         }
-        else if (!MeasureTypes.Contains(article.UnitOfMeasure))
+        else if (!MeasureTypes.Contains(article.aaneh))
         {
-            problems["unitOfMeasure"].Add("Chosen value not valid");
-        }
-
-        if (article.SalesPackQuantity < 0)
-        {
-            problems["salesPackQuantity"].Add("Can't be below zero");
+            problems["aaneh"].Add("Chosen value not valid");
         }
 
-        if (article.NettoPrice < 0)
+        if (article.minaan < 0)
         {
-            problems["nettoPrice"].Add("Price can't be below zero");
-        }
-        else if (article.TarifPrice < 0)
-        {
-            problems["tarifPrice"].Add("Price can't be below zero");
-        }
-        else if (article.TarifPrice < article.NettoPrice)
-        {
-            problems["nettoPrice"].Add("Price can't be higher then tarif price");
-            problems["tarifPrice"].Add("Price can't be lower then netto price");
+            problems["minaan"].Add("Can't be below zero");
         }
 
-        if (string.IsNullOrEmpty(article.URL))
+        if (article.aankoop < 0)
         {
-            problems["url"].Add("Can't be empty");
+            problems["aankoop"].Add("Price can't be below zero");
+        }
+        else if (article.tarief < 0)
+        {
+            problems["tarief"].Add("Price can't be below zero");
+        }
+        else if (article.tarief < article.aankoop)
+        {
+            problems["aankoop"].Add("Price can't be higher then tarif price");
+            problems["tarief"].Add("Price can't be lower then netto price");
+        }
+
+        if (string.IsNullOrEmpty(article.link))
+        {
+            problems["link"].Add("Can't be empty");
         }
 
         return problems;
@@ -197,30 +197,37 @@ public class ETSArticleHelper : ETSHelper
             throw new Exception("Some fields from article given are not valid");
         }
 
-        string createQuery = "EXECUTE PROCEDURE INSERT_ARTIKEL_WS @number, @description, null, @reference, @familie, @subfamilie, null, null, null, null, @lengte, @breedte, @hoogte, null, null, null, null, @aankoop, @verkoop, null, null, 1, 1, @supplier, null, null";
-        Dictionary<string, object> createParameters = new()
+        string createQuery = "EXECUTE PROCEDURE INSERT_ARTIKEL_WS @number, @description, null, @reference, @familie, @subfamilie, null, null, null, null, @lengte, @breedte, @hoogte, @omrekfac, @typfac, @aaneh, null, @aankoop, @verkoop, @aankoopEenh, @verkoopEenh, 1, 1, @supplier, null, null";
+        Dictionary<string, object?> createParameters = new()
         {
-            { "@number", article.Number },
-            { "@description", article.Description },
-            { "@reference", article.Reference },
-            { "@familie", null },
-            { "@subfamilie", null },
-            { "@lengte", 0 },
-            { "@breedte", 0 },
-            { "@hoogte", 0 },
-            { "@aankoop", article.NettoPrice },
-            { "@verkoop", article.NettoPrice },
-            { "@supplier", ""}
+            { "@number", article.artikelNr },
+            { "@description", article.omschrijving },
+            { "@reference", article.reflev },
+            { "@familie", article.familie },
+            { "@subfamilie", article.subfamilie },
+            { "@lengte", article.lengte },
+            { "@breedte", article.breedte },
+            { "@hoogte", article.hoogte },
+            { "@omrekfac", article.omrekfac },
+            { "@typfac", article.typfac },
+            { "@aaneh", article.aaneh },
+            { "@aankoop", article.aankoop },
+            { "@verkoop", article.verkoop },
+            { "@aankoopEenh", article.aankoop },
+            { "@verkoopEenh", article.verkoop },
+            { "@supplier", article.hoofdleverancier}
         };
 
         ETSClient.ExecuteQuery(createQuery, createParameters);
 
         //update query
-        string updateQuery = $"UPDATE CSARTPX SET ART_HYPERLINK = @url WHERE ART_NR = @id;";
-        Dictionary<string, object> updateParameters = new()
+        string updateQuery = $"UPDATE CSARTPX SET ART_MERK = @merk, ART_KORT = @korting, ART_HYPERLINK = @url WHERE ART_NR = @id;";
+        Dictionary<string, object?> updateParameters = new()
         {
-            { "@id", article.Number },
-            { "@url", article.URL }
+            { "@id", article.artikelNr },
+            { "@url", article.link },
+            { "@merk", article.merk },
+            { "@korting", article.stdKorting }
         };
 
         ETSClient.ExecuteQuery(updateQuery, updateParameters);

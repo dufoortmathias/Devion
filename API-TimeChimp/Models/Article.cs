@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Api.Devion.Models;
 
 public class ArticleETS
@@ -245,25 +247,37 @@ public class ArticleWeb
 
     public ArticleWeb(CebeoItem articleCebeo)
     {
-        Reference = articleCebeo.Material?.Reference;
-        Description = articleCebeo.Material?.Description;
-        Brand = articleCebeo.Material?.BrandName;
-        UnitOfMeasure = articleCebeo.UnitOfMeasure;
-        SalesPackQuantity = articleCebeo.SalesPackQuantity;
-        NettoPrice = float.Parse(articleCebeo.UnitPrice?.NetPrice ?? "");
-        TarifPrice = float.Parse(articleCebeo.UnitPrice?.TarifPrice ?? "");
-        URL = articleCebeo.MimeInfo?.Mime?.Find(m => m.MimeType != null && m.MimeType.Equals("url"))?.MimeSource;
-        URLImage = articleCebeo.MimeInfo?.Mime?.Find(m => m.MimeType != null && m.MimeType.Equals("image"))?.MimeSource;
+        reflev = articleCebeo.Material?.Reference;
+        omschrijving = articleCebeo.Material?.Description;
+        merk = articleCebeo.Material?.BrandName;
+        aaneh = articleCebeo.UnitOfMeasure;
+        minaan = articleCebeo.SalesPackQuantity;
+        aankoop = float.Parse(articleCebeo.UnitPrice?.NetPrice ?? "");
+        tarief = float.Parse(articleCebeo.UnitPrice?.TarifPrice ?? "");
+        link = $"https://www.cebeo.be/catalog/nl-be/products/{merk}-{string.Join('-', Regex.Replace(omschrijving ?? throw new Exception("Article form Cebeo has no description"), "[^0-9A-Za-z _-]", "").Split(' ').Where(x => x != "").Select(x => x.Trim()))}-{articleCebeo.Material?.SupplierItemID ?? throw new Exception("Article form Cebeo has no articleNumber")}".ToLower();
+        linkMime = articleCebeo.MimeInfo?.Mime?.Find(m => m.MimeType != null && m.MimeType.Equals("url"))?.MimeSource;
+        linkImage = articleCebeo.MimeInfo?.Mime?.Find(m => m.MimeType != null && m.MimeType.Equals("image"))?.MimeSource;
     }
 
-    public string? Number { get; set; }
-    public string? Reference { get; set; }
-    public string? Description { get; set; }
-    public string? Brand { get; set; }
-    public string? UnitOfMeasure { get; set; }
-    public int? SalesPackQuantity { get; set; }
-    public float? NettoPrice { get; set; }
-    public float? TarifPrice { get; set; }
-    public string? URL { get; set; }
-    public string? URLImage { get; set; }
+    public string? artikelNr { get; set; }
+    public string? reflev { get; set; }
+    public string? omschrijving { get; set; }
+    public string? familie { get; set; }
+    public string? subfamilie { get; set; }
+    public float? lengte { get; set; }
+    public float? breedte { get; set; }
+    public float? hoogte { get; set; }
+    public string? omrekfac { get; set; }
+    public string? typfac { get; set; }
+    public string? merk { get; set; }
+    public string? aaneh { get; set; }
+    public int? minaan { get; set; }
+    public float? aankoop { get; set; }
+    public float? verkoop { get; set; }
+    public float? tarief { get; set; }
+    public float? stdKorting { get; set; }
+    public string? hoofdleverancier { get; set; }
+    public string? link { get; set; }
+    public string? linkMime { get; set; }
+    public string? linkImage { get; set; }
 }
