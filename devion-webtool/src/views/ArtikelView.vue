@@ -131,7 +131,7 @@ export default {
         this.textInputArtikelSearch.error = false;
         let artikelString = artikelSearch.toString()
         if (artikelSearch != '') {
-          artikelNrs = artikelString.split(', ')
+          artikelNrs = [...new Set(artikelString.split(', '))]
         }
         if (artikelNrs != null) {
           if (artikels[index] == undefined) {
