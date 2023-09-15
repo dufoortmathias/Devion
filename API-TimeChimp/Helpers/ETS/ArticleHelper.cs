@@ -271,7 +271,7 @@ public class ETSArticleHelper : ETSHelper
 
         if (count == 0)
         {
-            // TODO create link ETS
+            // TODO  (Create query) to link articles in ETS -> Table: TBL_ARTIKEL_GEKOPPELD
         }
     }
 }
