@@ -552,7 +552,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}GetPurchaseOrder").WithTags(company);
 
     //returns file information for each supplier about file needed for order 
-    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id, string seperator) =>
+    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id, string seperator, bool forceCSV) =>
     {
         try
         {
@@ -566,7 +566,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             purchaseOrders = purchaseOrders.Where(po => po.FD_KLANTREFERENTIE != null).ToList();
 
             FileContentResult fileContent;
-            if (supplier.ToLower().Contains("cebeo"))
+            if (!forceCSV && supplier.ToLower().Contains("cebeo"))
             {
                 List<Dictionary<string, object>> orderLines = new();
                 purchaseOrders.ForEach(purchaseOrder =>
