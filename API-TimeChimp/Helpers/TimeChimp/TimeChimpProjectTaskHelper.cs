@@ -1,7 +1,4 @@
-﻿using Api.Devion.Models;
-using System.Threading.Tasks;
-
-namespace Api.Devion.Helpers.TimeChimp
+﻿namespace Api.Devion.Helpers.TimeChimp
 {
     public class TimeChimpProjectTaskHelper : TimeChimpHelper
     {
@@ -9,16 +6,33 @@ namespace Api.Devion.Helpers.TimeChimp
         {
         }
 
+        public ProjectTaskTimechimp? FindProjectTask(int taskId, int subprojectId)
+        {
+            string response = TCClient.GetAsync($"v1/projecttasks/project/{subprojectId}");
+
+            List<ProjectTaskTimechimp> projectTasks = JsonTool.ConvertTo<List<ProjectTaskTimechimp>>(response);
+
+            return projectTasks.Find(pt => pt.taskId == taskId);
+        }
+
         public void CreateOrUpdateProjectTask(int taskId, int subprojectId, double aantal)
         {
-            ProjectTaskTimechimp projectTask = new()
+            ProjectTaskTimechimp projectTask = FindProjectTask(taskId, subprojectId) ?? new()
             {
                 taskId = taskId,
                 projectId = subprojectId,
                 budgetHours = aantal
             };
 
-            TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTask));
+            if (projectTask.id != null)
+            {
+                TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTask));
+            }
+            else
+            {
+                TCClient.PostAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTask));
+            }
+
         }
     }
 }

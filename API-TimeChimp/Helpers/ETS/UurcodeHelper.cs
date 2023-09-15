@@ -63,7 +63,7 @@ public class ETSUurcodeHelper : ETSHelper
 
     public List<ProjectTaskETS> GetUurcodesSubproject(string projectId, string subprojectId)
     {
-        string query = $"SELECT VO_PROJ, VO_SUBPROJ, VO_UUR, SUM(VO_AANT) FROM J2W_VOPX WHERE VO_PROJ = @project AND VO_SUBPROJ = @subproject AND VO_SOORT = 'U' GROUP BY VO_PROJ, VO_SUBPROJ, VO_UUR";
+        string query = $"SELECT VO_PROJ, VO_SUBPROJ, VO_UUR, SUM(VO_AANT) as VO_AANT FROM J2W_VOPX WHERE VO_PROJ = @project AND VO_SUBPROJ = @subproject AND VO_SOORT = 'U' GROUP BY VO_PROJ, VO_SUBPROJ, VO_UUR";
         Dictionary<string, object> parameters = new()
         {
             {"@project",  projectId},

@@ -383,11 +383,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                         }
                         else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
                         {
-                            errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                            errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty in table J2W_VOPX");
                         }
                         else if (projectTaskETS.VO_AANT == null)
                         {
-                            errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null for record {projectTaskETS.VO_ID} in table J2W_VOPX");
+                            errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null in table J2W_VOPX");
                         }
                         else
                         {
