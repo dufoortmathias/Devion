@@ -7,6 +7,8 @@ headers = {
 }
 
 # data.csv contains all lines from ETS table J2W_VOPX with all unique combination of "VO_PROJ, VO_SUBPROJ, VO_UUR"
+# QUERY
+# SELECT DISTINCT VO_PROJ, VO_SUBPROJ, VO_UUR FROM J2W_VOPX WHERE VO_SOORT = 'U' AND VO_UUR IS NOT NULL AND VO_UUR != '' GROUP BY VO_PROJ, VO_SUBPROJ, VO_UUR
 df = pd.read_csv("data.csv", delimiter=';', dtype=str)
 
 projects = [p for p in requests.request("GET", "https://api.timechimp.com/v2/projects", headers=headers).json()]
