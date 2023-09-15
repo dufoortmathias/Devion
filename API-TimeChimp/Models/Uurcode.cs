@@ -22,7 +22,7 @@ public class UurcodeTimeChimp
         name = uurcode.UR_OMS;
         code = uurcode.UR_COD;
         billable = true;
-        common = true;
+        common = false;
         unspecified = false;
         active = true;
         tagIds = new int[] { };
