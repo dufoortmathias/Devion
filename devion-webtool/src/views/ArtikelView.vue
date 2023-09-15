@@ -1,20 +1,21 @@
 <template>
   <textInput :id="textInputArtikelSearch.id" :label="textInputArtikelSearch.label" :error="textInputArtikelSearch.error"
-    :placeholder="textInputArtikelSearch.label" @option-selected="handleTextInputArtikelSearch" />
+    :errorText="textInputArtikelSearch.errorText" :placeholder="textInputArtikelSearch.label"
+    @option-selected="handleTextInputArtikelSearch" />
   <buttonDevion :label="searchButton.label" :isDisabled="searchButton.isButtonDisabled" @click="ArtikelZoeken"
     :showButton="searchButton.showButton" class="c-button-search" />
   <div class="c-artikel-form">
     <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel" class="c-form"
       :check="artikelForm.check" ref="article" />
-    <div class="c-artikel-button--save" :class="{'o-hide-accessible': !save.showButton}">
+    <div class="c-artikel-button--save" :class="{ 'o-hide-accessible': !save.showButton }">
       <buttonDevion :label="save.label" :isDisabled="save.isButtonDisabled" :showButton="save.showButton"
         @click="handleSaveButtonClick" class="c-button-artikel--next" />
     </div>
-    <div class="c-artikel-button--next" :class="{'o-hide-accessible': !next.showButton}">
+    <div class="c-artikel-button--next" :class="{ 'o-hide-accessible': !next.showButton }">
       <buttonDevion :label="next.label" :isDisabled="next.isButtonDisabled" :showButton="next.showButton"
         @click="handleNextButtonClick" class="c-button-artikel--next" />
     </div>
-    <div class="c-artikel-button--prev" :class="{'o-hide-accessible': !prev.showButton}">
+    <div class="c-artikel-button--prev" :class="{ 'o-hide-accessible': !prev.showButton }">
       <buttonDevion :label="prev.label" :isDisabled="prev.isButtonDisabled" :showButton="prev.showButton"
         @click="handlePrevButtonClick" class="c-button-artikel--prev" />
     </div>
@@ -57,6 +58,7 @@ export default {
         id: 'artikelSearch',
         label: 'Artikel nummer',
         error: false,
+        errorText: 'Artikel niet gevonden',
       },
       searchButton: {
         components: {
@@ -137,28 +139,37 @@ export default {
           if (artikels[index] == undefined) {
             endpoint = `devion/cebeo/searcharticle?articleReference=${artikelNrs[index]}`
             GetData(endpoint).then((data) => {
-              this.artikelForm.data = data
-              this.artikelForm.showform = true;
-              if (artikelNrs.length > 1) {
-                if (index == artikelNrs.length - 1) {
-                  this.next.showButton = false;
-                  this.save.showButton = true;
-                  this.artikelProgress.showLabel = true;
-                  this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
-                } else {
-                  this.next.showButton = true;
-                  this.save.showButton = false;
-                  this.prev.showButton = true;
-                  this.artikelProgress.showLabel = true;
-                  this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
-                }
+              console.log(data)
+              if (data.status) {
+                this.textInputArtikelSearch.error = true;
+                this.textInputArtikelSearch.errorText = data.detail;
               } else {
-                this.artikelProgress.showLabel = false;
-                this.save.showButton = true;
-                this.next.showButton = false;
-                this.prev.showButton = false;
+                this.artikelForm.data = data
+                this.artikelForm.showform = true;
+                if (artikelNrs.length > 1) {
+                  if (index == artikelNrs.length - 1) {
+                    this.next.showButton = false;
+                    this.save.showButton = true;
+                    this.artikelProgress.showLabel = true;
+                    this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+                  } else {
+                    this.next.showButton = true;
+                    this.save.showButton = false;
+                    this.prev.showButton = true;
+                    this.artikelProgress.showLabel = true;
+                    this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+                  }
+                } else {
+                  this.artikelProgress.showLabel = false;
+                  this.save.showButton = true;
+                  this.next.showButton = false;
+                  this.prev.showButton = false;
+                }
               }
-            })
+            }).catch(error => {
+              this.textInputArtikelSearch.error = true;
+              this.textInputArtikelSearch.errorText = error.message;
+            });
           } else {
             this.artikelForm.data = artikels[index]
             this.artikelForm.showform = true;
@@ -192,11 +203,24 @@ export default {
       artikel = object
       artikels[index] = artikel
       if (save == true) {
-        endpoint = `devion/ets/createarticle`
+        endpoint = `devion/ets/validatearticleform`
         artikels.forEach(artikel => {
           PostDataWithBody(endpoint, artikel).then((data) => {
-            console.log("Created article:", JSON.parse(data)["artikelNr"])
-          }) 
+            data = JSON.parse(data)
+            if (data.status) {
+
+              if (data.errors) {
+                this.$refs.article.validate(data.errors)
+              }
+            } else {
+              endpoint = `devion/ets/createarticle`
+              PostDataWithBody(endpoint, artikel).then(() => { }).catch(error => {
+                console.error(error)
+              })
+            }
+          }).catch(error => {
+            console.error(error)
+          })
         });
       } else {
         save = false

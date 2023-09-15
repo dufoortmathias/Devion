@@ -1,23 +1,25 @@
 <template>
     <div class="c-artikel_form" v-show=showform>
         <textInput :id="artikelNr.id" :label="artikelNr.label" :error="artikelNr.error" :placeholder="artikelNr.placeholder"
-            class="c-artikelNr" @option-selected="handleArtikelNr" />
+            :errorText="artikelNr.errorText" class="c-artikelNr" @option-selected="handleArtikelNr" />
         <textInput :id="reflev.id" :label="reflev.label" :error="reflev.error" :placeholder="reflev.placeholder"
-            class="c-reflev" @option-selected="handleReflev" />
+            :errorText="reflev.errorText" class="c-reflev" @option-selected="handleReflev" />
         <textInput :id="omschrijving.id" :label="omschrijving.label" :error="omschrijving.error"
-            :placeholder="omschrijving.placeholder" :error-text="omschrijving.errorText" class="c-omschrijving" @option-selected="handleOmschrijving" />
+            :placeholder="omschrijving.placeholder" :error-text="omschrijving.errorText" class="c-omschrijving"
+            @option-selected="handleOmschrijving" />
         <textInput :id="tarief.id" :label="tarief.label" :error="tarief.error" :placeholder="tarief.placeholder"
-            class="c-tarief" @option-selected="handletarief" />
+            :errorText="tarief.errorText" class="c-tarief" @option-selected="handletarief" />
         <textInput :id="aankoop.id" :label="aankoop.label" :error="aankoop.error" :placeholder="aankoop.placeholder"
-            class="c-aankoop" @option-selected="handleAankoop" />
-        <textInput :id="stdKorting.id" :label="stdKorting.label" :error="stdKorting.error"
+            :errorText="aankoop.errorText" class="c-aankoop" @option-selected="handleAankoop" />
+        <textInput :id="stdKorting.id" :label="stdKorting.label" :error="stdKorting.error" :errorText="stdKorting.errorText"
             :placeholder="stdKorting.placeholder" class="c-stdKorting" @option-selected="handleStdKorting" />
         <dropdownMenu :id="muntcode.id" :label="muntcode.label" :options="muntcode.options" :error="muntcode.error"
             class="c-muntcode" :selected="muntcode.selected" @option-selected="handleMuntcode" />
         <textInput :id="verkoop.id" :label="verkoop.label" :error="verkoop.error" :placeholder="verkoop.placeholder"
-            class="c-verkoop" @option-selected="handleVerkoop" />
+            :errorText="verkoop.errorText" class="c-verkoop" @option-selected="handleVerkoop" />
         <textInput :id="winstpercentage.id" :label="winstpercentage.label" :error="winstpercentage.error"
-            :placeholder="winstpercentage.placeholder" class="c-winstpercentage" @option-selected="handleWinst" />
+            :errorText="winstpercentage.errorText" :placeholder="winstpercentage.placeholder" class="c-winstpercentage"
+            @option-selected="handleWinst" />
         <dropdownMenu :id="rekver.id" :label="rekver.label" :options="rekver.options" :error="rekver.error" class="c-rekver"
             :selected="rekver.selected" @option-selected="handleRekver" />
         <dropdownMenu :id="aaneh.id" :label="aaneh.label" :options="aaneh.options" :error="aaneh.error"
@@ -27,28 +29,28 @@
         <dropdownMenu :id="btwcode.id" :label="btwcode.label" :options="btwcode.options" :error="btwcode.error"
             class="c-btwcode" :selected="btwcode.selected" @option-selected="handleBtwcode" />
         <textInput :id="omrekfac.id" :label="omrekfac.label" :error="omrekfac.error" :placeholder="omrekfac.placeholder"
-            class="c-omrekfac" @option-selected="handleOmrekfac" />
+            :errorText="omrekfac.errorText" class="c-omrekfac" @option-selected="handleOmrekfac" />
         <dropdownMenu :id="typfac.id" :label="typfac.label" :options="typfac.options" :error="typfac.error" class="c-typfac"
             :selected="typfac.selected" @option-selected="handleTypfac" />
         <textInput :id="merk.id" :label="merk.label" :error="merk.error" :placeholder="merk.placeholder" class="c-merk"
-            @option-selected="handleMerk" />
+            :errorText="merk.errorText" @option-selected="handleMerk" />
         <dropdownMenu :id="familie.id" :label="familie.label" :options="familie.options" :error="familie.error"
             class="c-familie" :selected="familie.selected" @option-selected="handleFamilie" />
         <dropdownMenu :id="subfamilie.id" :label="subfamilie.label" :options="subfamilie.options" :error="subfamilie.error"
             class="c-subfamilie" :selected="subfamilie.selected" @option-selected="handleSubfamilie" />
         <textInput :id="lengte.id" :label="lengte.label" :error="lengte.error" :placeholder="lengte.placeholder"
-            class="c-lengte" @option-selected="handleLengte" />
+            :errorText="lengte.errorText" class="c-lengte" @option-selected="handleLengte" />
         <textInput :id="breedte.id" :label="breedte.label" :error="breedte.error" :placeholder="breedte.placeholder"
-            class="c-breedte" @option-selected="handleBreedte" />
+            :errorText="breedte.errorText" class="c-breedte" @option-selected="handleBreedte" />
         <textInput :id="hoogte.id" :label="hoogte.label" :error="hoogte.error" :placeholder="hoogte.placeholder"
-            class="c-hoogte" @option-selected="handleHoogte" />
+            :errorText="hoogte.errorText" class="c-hoogte" @option-selected="handleHoogte" />
         <dropdownMenu :id="hoofdleverancier.id" :label="hoofdleverancier.label" :options="hoofdleverancier.options"
             :error="hoofdleverancier.error" class="c-hoofdleverancier" :selected="hoofdleverancier.selected"
             @option-selected="handleHoofdleverancier" />
         <linkInput :id="link.id" :label="link.label" :error="link.error" :link="link.link" class="c-link"
             @option-selected="handleLink" />
         <textInput :id="minaan.id" :label="minaan.label" :error="minaan.error" :placeholder="minaan.placeholder"
-            class="c-minaan" @option-selected="handleMinaan" />
+            :errorText="minaan.errorText" class="c-minaan" @option-selected="handleMinaan" />
     </div>
 </template>
 
@@ -82,7 +84,8 @@ export default {
                 id: 'artikelNr',
                 label: 'Artikel nummer',
                 error: false,
-                placeholder: 'artikel nummer'
+                placeholder: 'artikel nummer',
+                errorText: 'Artikel nummer is verplicht'
             },
             reflev: {
                 components: {
@@ -91,7 +94,8 @@ export default {
                 id: 'reflev',
                 label: 'Referentie leverancier',
                 error: false,
-                placeholder: 'referentie leverancier'
+                placeholder: 'referentie leverancier',
+                errorText: 'Referentie leverancier is verplicht'
             },
             omschrijving: {
                 components: {
@@ -110,7 +114,8 @@ export default {
                 id: 'tarief',
                 label: 'Catalogus prijs',
                 error: false,
-                placeholder: 'catalogus prijs'
+                placeholder: 'catalogus prijs',
+                errorText: 'Catalogus prijs is verplicht'
             },
             aankoop: {
                 components: {
@@ -119,7 +124,8 @@ export default {
                 id: 'aankoop',
                 label: 'Aankoop prijs',
                 error: false,
-                placeholder: 'aankoop prijs'
+                placeholder: 'aankoop prijs',
+                errorText: 'Aankoop prijs is verplicht'
             },
             stdKorting: {
                 components: {
@@ -128,7 +134,8 @@ export default {
                 id: 'stdKorting',
                 label: 'Standaard korting (%)',
                 error: false,
-                placeholder: 'standaard korting'
+                placeholder: 'standaard korting',
+                errorText: 'Standaard korting is verplicht'
             },
             muntcode: {
                 components: {
@@ -146,7 +153,8 @@ export default {
                 id: 'verkoop',
                 label: 'Verkoop prijs',
                 error: false,
-                placeholder: 'verkoop prijs'
+                placeholder: 'verkoop prijs',
+                errorText: 'Verkoop prijs is verplicht'
             },
             winstpercentage: {
                 components: {
@@ -155,7 +163,8 @@ export default {
                 id: 'winstpercentage',
                 label: 'Winst percentage (%)',
                 error: false,
-                placeholder: 'winst percentage'
+                placeholder: 'winst percentage',
+                errorText: 'Winst percentage is verplicht'
             },
             rekver: {
                 components: {
@@ -200,7 +209,8 @@ export default {
                 id: 'omrekfac',
                 label: 'Omrekeningsfactor',
                 error: false,
-                placeholder: '1'
+                placeholder: '1',
+                errorText: 'Omrekeningsfactor is verplicht'
             },
             typfac: {
                 components: {
@@ -219,7 +229,8 @@ export default {
                 id: 'merk',
                 label: 'Merk',
                 error: false,
-                placeholder: 'merk'
+                placeholder: 'merk',
+                errorText: 'Merk is verplicht'
             },
             familie: {
                 components: {
@@ -246,7 +257,8 @@ export default {
                 id: 'lengte',
                 label: 'Lengte',
                 error: false,
-                placeholder: '0'
+                placeholder: '0',
+                errorText: 'Lengte is verplicht'
             },
             breedte: {
                 components: {
@@ -255,7 +267,8 @@ export default {
                 id: 'breedte',
                 label: 'Breedte',
                 error: false,
-                placeholder: '0'
+                placeholder: '0',
+                errorText: 'Breedte is verplicht'
             },
             hoogte: {
                 components: {
@@ -264,7 +277,8 @@ export default {
                 id: 'hoogte',
                 label: 'Hoogte',
                 error: false,
-                placeholder: '0'
+                placeholder: '0',
+                errorText: 'Hoogte is verplicht'
             },
             hoofdleverancier: {
                 components: {
@@ -292,7 +306,8 @@ export default {
                 id: 'minaan',
                 label: 'Minimum aantal',
                 error: false,
-                placeholder: '1'
+                placeholder: '1',
+                errorText: 'Minimum aantal is verplicht'
             },
         }
     },
@@ -301,7 +316,7 @@ export default {
     },
     watch: {
         data(object) {
-            if (object.reflev == undefined && object.artikelNr == undefined) {
+            if (object.reflev == undefined && object.artikelNr == undefined && object.number == undefined) {
                 this.artikelNr.placeholder = object.artikelNr
                 artikelNr = object.artikelNr
                 this.reflev.placeholder = object.reflev
@@ -350,17 +365,20 @@ export default {
                 link = object.link
                 this.minaan.placeholder = object.minaan
                 minaan = object.minaan
-            } else if (object.artikelNr != undefined) {
+            } else if (object.number != undefined) {
+                console.log(object)
                 this.returnToDefault()
 
-                this.artikelNr.placeholder = object.artikelNr
-                artikelNr = object.artikelNr
-                this.reflev.placeholder = object.artikelNr
-                reflev = object.artikelNr
-                this.omschrijving.placeholder = object.omschrijving
-                omschrijving = object.omschrijving
-                this.hoofdleverancier.selected = object.hoofdleverancier
-                hoofdleverancier = object.hoofdleverancier
+                this.artikelNr.placeholder = object.number
+                artikelNr = object.number
+                this.reflev.placeholder = object.number
+                reflev = object.number
+                if (object.omschrijving != "") {
+                    this.omschrijving.placeholder = object.description
+                    omschrijving = object.description
+                }
+                this.hoofdleverancier.selected = object.mainSupplier
+                hoofdleverancier = object.mainSupplier
                 this.merk.placeholder = "devion"
                 merk = "devion"
                 this.familie.selected = this.familie.options.find((x) => x.label.toLowerCase() == 'niet courant materiaal').value
@@ -859,6 +877,46 @@ export default {
                     break
             }
         },
+        validate(object) {
+            console.log(object)
+            if (object.artikelNr.length > 0 || object.artikelNr != undefined) {
+                this.artikelNr.error = true
+                this.artikelNr.errorText = object.artikelNr.join(", ")
+            }
+            if (object.reflev.length > 0 && object.reflev != undefined) {
+                console.log(object.reflev)
+                this.reflev.error = true
+                this.reflev.errorText = object.reflev.join(", ")
+            }
+            if (object.omschrijving.length > 0 && object.omschrijving != undefined) {
+                this.omschrijving.error = true
+                this.omschrijving.errorText = object.omschrijving.join(", ")
+            }
+            if (object.tarief.length > 0 && object.tarief != undefined) {
+                this.tarief.error = true
+                this.tarief.errorText = object.tarief.join(", ")
+            }
+            if (object.aankoop.length > 0 && object.aankoop != undefined) {
+                this.aankoop.error = true
+                this.aankoop.errorText = object.aankoop.join(", ")
+            }
+            if (object.aaneh.length > 0 && object.aaneh != undefined) {
+                this.aaneh.error = true
+                this.aaneh.errorText = object.aaneh.join(", ")
+            }
+            if (object.minaan.length > 0 && object.minaan != undefined) {
+                this.minaan.error = true
+                this.minaan.errorText = object.minaan.join(", ")
+            }
+            if (object.merk.length > 0 && object.merk != undefined) {
+                this.merk.error = true
+                this.merk.errorText = object.merk.join(", ")
+            }
+            if (object.verkoop.length > 0 && object.verkoop != undefined) {
+                this.verkoop.error = true
+                this.verkoop.errorText = object.verkoop.join(", ")
+            }
+        }
     }
 }
 </script>

@@ -7,8 +7,6 @@
                     class="c-text">
                     {{ part.number }} ({{ part.description }})
                 </span>
-                <ButtonDevion v-if="!part.existsETS" :label="button.label" :isDisabled="button.isDisabled"
-                    :showButton="button.showButton" @click="handleButton" class="c-button" />
             </div>
             <ul v-if="part.parts && part.expanded">
                 <TreeView :jsonData="part.parts" :showTree="true" />
@@ -18,7 +16,6 @@
 </template>
 
 <script>
-import ButtonDevion from './ButtonDevion.vue';
 export default {
     name: 'TreeView',
     props: {
@@ -26,19 +23,10 @@ export default {
         showTree: Boolean,
     },
     components: {
-        ButtonDevion
     },
     data() {
         return {
             expanded: false,
-            button: {
-                components: {
-                    ButtonDevion
-                },
-                label: 'Toevoegen',
-                isDisabled: false,
-                showButton: true
-            },
         };
     },
     methods: {

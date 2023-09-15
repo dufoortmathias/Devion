@@ -7,8 +7,11 @@
       :error="dropdownBestelbon.error" @option-selected="handledropdownBestelbonSelected" class="c-dropdown" />
     <textInput :id="seperator.id" :label="seperator.label" :error="seperator.error" :placeholder="seperator.label"
       :errorText="seperator.errorText" @option-selected="handletextInputSelected" class="c-text-input" />
+    <checkboxInput :id="checkboxInput.id" :label="checkboxInput.label" :placeholder="checkboxInput.label"
+      @option-selected="handlecheckboxInputSelected" class="c-checkbox-input" />
     <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonDownload"
       class="c-button-artikel-search" :showButton="buttonDevion.showButton" />
+    <labelDevion :label="error.label" :showLabel="error.showLabel" class="c-artikel-error" />
     <TabelBestelbon :showTabel="tabelBestelbon.showTabel" :bestelbonNr="tabelBestelbon.bestelbonNr"
       :showError="tabelBestelbon.showError" :showInfo="tabelBestelbon.showInfo" :artikels="tabelBestelbon.artikels" />
   </div>
@@ -20,19 +23,24 @@ import ButtonDevion from '../components/componenten/ButtonDevion.vue';
 import TabelBestelbon from '../components/componenten/TabelBestelbonDevion.vue';
 import { GetData } from '../global/global.js'
 import textInput from '../components/componenten/textInput.vue'
+import labelDevion from '../components/componenten/LabelDevion.vue'
+import checkboxInput from '../components/componenten/CheckboxInput.vue'
 
 let options = [];
 let endpoint = 'companies'
 let company = "";
 let bestelbonNr = "";
 let seperator = "";
+let forceCSV = false;
 
 export default {
   components: {
     Dropdown,
     ButtonDevion,
     TabelBestelbon,
-    textInput
+    textInput,
+    labelDevion,
+    checkboxInput
   },
   data() {
     return {
@@ -89,6 +97,20 @@ export default {
         options: [],
         error: false,
         errorText: 'Seperator is verplicht',
+      },
+      error: {
+        components: {
+          labelDevion,
+        },
+        label: 'Bestelbon niet gevonden',
+        showLabel: false,
+      },
+      checkboxInput: {
+        components: {
+          checkboxInput,
+        },
+        id: 'checkboxInput',
+        label: 'Force csv',
       },
     };
   },
@@ -202,10 +224,19 @@ export default {
         this.seperator.error = false
         const params = {
           id: bestelbonNr,
-          seperator: seperator
+          seperator: seperator,
+          forceCSV: forceCSV
         }
         endpoint = `${company.toLocaleLowerCase()}/ets/createpurchasefile?${new URLSearchParams(params)}`
         GetData(endpoint).then((bon) => {
+          console.log(bon)
+          if (bon.status) {
+            this.error.showLabel = true
+            this.error.label = bon.detail
+            return
+          } else {
+            this.error.showLabel = false
+          }
           var decodeString = atob(bon.fileContents);
           var blob = new Blob([decodeString], { type: bon.contentType });
           const a = document.createElement("a");
@@ -216,7 +247,11 @@ export default {
           document.body.removeChild(a);
         })
       }
-    }
+    },
+    handlecheckboxInputSelected(selectedOption) {
+      console.log(selectedOption)
+      forceCSV = selectedOption
+    },
   },
 };
 </script>
@@ -230,5 +265,10 @@ export default {
   margin-top: var(--global-whitespace-lg);
   margin-bottom: var(--global-whitespace-lg);
   cursor: pointer;
+}
+
+.c-artikel-error {
+  color: var(--global-color-error);
+  font-size: 32px;
 }
 </style>

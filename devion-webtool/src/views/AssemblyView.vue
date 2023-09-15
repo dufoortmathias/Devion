@@ -168,6 +168,8 @@ export default {
                 let artikels = JSON.parse(response)
                 this.treeView.showTree = true
                 this.treeView.jsonData = artikels
+                notFound = 0
+                totalParts = 0
                 for (let artikel of artikels) {
                     this.checkArtikel(artikel)
                 }
