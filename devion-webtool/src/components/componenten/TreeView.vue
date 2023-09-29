@@ -22,6 +22,8 @@ export default {
         jsonData: Array,
         showTree: Boolean,
     },
+    components: {
+    },
     data() {
         return {
             expanded: false,

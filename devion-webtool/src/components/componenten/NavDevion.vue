@@ -4,19 +4,19 @@ import { RouterLink } from 'vue-router';
 </script>
 
 <template>
-    <nav class="c-nav">
-            <ul class="o-list c-nav__list">
-                <li class="c-nav__item">
-                    <RouterLink to="/Bestelbon" class="c-nav__link">Bestelbonnen</RouterLink>
-                </li>
-                <li class="c-nav__item">
-                    <RouterLink to="/artikel" class="c-nav__link">Nieuw artikel</RouterLink>
-                </li>
-                <li class="c-nav__item">
-                    <RouterLink to="/assembly" class="c-nav__link">Assembly</RouterLink>
-                </li>
-            </ul>
-        </nav>
+  <nav class="c-nav">
+    <ul class="o-list c-nav__list">
+      <li class="c-nav__item">
+        <RouterLink to="/Bestelbon" class="c-nav__link">Bestelbonnen</RouterLink>
+      </li>
+      <li class="c-nav__item">
+        <RouterLink to="/artikel" class="c-nav__link">Cebeo artikel toevoegen</RouterLink>
+      </li>
+      <li class="c-nav__item">
+        <RouterLink to="/assembly" class="c-nav__link">Assembly</RouterLink>
+      </li>
+    </ul>
+  </nav>
 </template>
 
 <style scoped>
@@ -42,8 +42,8 @@ import { RouterLink } from 'vue-router';
 }
 
 .c-nav__item {
-    display: inline-block;
-    margin-right: var(--global-whitespace-md);
+  display: inline-block;
+  margin-right: var(--global-whitespace-md);
 }
 
 .c-nav__item {
@@ -69,7 +69,6 @@ import { RouterLink } from 'vue-router';
     display: inline-block;
   }
 
-  .c-nav__link {
-  }
+  .c-nav__link {}
 }
 </style>

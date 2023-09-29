@@ -173,11 +173,16 @@ export default {
             this.loading.showLoad = true
             let endpoint = 'devion/ets/transformbomexcel'
             FileContents = this.file.file.previewBase64.replace('data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,', '')
-            PostDataWithBody(endpoint, FileContents).then((response) => {
+            var data = {
+                "FileContents": FileContents
+            }
+            PostDataWithBody(endpoint, data).then((response) => {
                 let artikels = JSON.parse(response)
                 this.loading.showLoad = false
                 this.treeView.showTree = true
                 this.treeView.jsonData = artikels
+                notFound = 0
+                totalParts = 0
                 for (let artikel of artikels) {
                     this.checkArtikel(artikel)
                 }

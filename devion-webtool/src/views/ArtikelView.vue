@@ -1,6 +1,7 @@
 <template>
   <textInput :id="textInputArtikelSearch.id" :label="textInputArtikelSearch.label" :error="textInputArtikelSearch.error"
-    :placeholder="textInputArtikelSearch.label" @option-selected="handleTextInputArtikelSearch" />
+    :errorText="textInputArtikelSearch.errorText" :placeholder="textInputArtikelSearch.label"
+    @option-selected="handleTextInputArtikelSearch" />
   <buttonDevion :label="searchButton.label" :isDisabled="searchButton.isButtonDisabled" @click="ArtikelZoeken"
     :showButton="searchButton.showButton" class="c-button-search" />
   <div v-if="loading.showLoad" class="c-load">
@@ -62,6 +63,7 @@ export default {
         id: 'artikelSearch',
         label: 'Artikel nummer',
         error: false,
+        errorText: 'Artikel niet gevonden',
       },
       searchButton: {
         components: {
@@ -142,36 +144,44 @@ export default {
         this.textInputArtikelSearch.error = false;
         let artikelString = artikelSearch.toString()
         if (artikelSearch != '') {
-          artikelNrs = artikelString.split(', ')
+          artikelNrs = [...new Set(artikelString.split(', '))]
         }
         if (artikelNrs != null) {
           if (artikels[index] == undefined) {
             this.loading.showLoad = true;
             endpoint = `devion/cebeo/searcharticle?articleReference=${artikelNrs[index]}`
             GetData(endpoint).then((data) => {
-              this.loading.showLoad = false;
-              this.artikelForm.data = data
-              this.artikelForm.showform = true;
-              if (artikelNrs.length > 1) {
-                if (index == artikelNrs.length - 1) {
-                  this.next.showButton = false;
-                  this.save.showButton = true;
-                  this.artikelProgress.showLabel = true;
-                  this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
-                } else {
-                  this.next.showButton = true;
-                  this.save.showButton = false;
-                  this.prev.showButton = true;
-                  this.artikelProgress.showLabel = true;
-                  this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
-                }
+              console.log(data)
+              if (data.status) {
+                this.textInputArtikelSearch.error = true;
+                this.textInputArtikelSearch.errorText = data.detail;
               } else {
-                this.artikelProgress.showLabel = false;
-                this.save.showButton = true;
-                this.next.showButton = false;
-                this.prev.showButton = false;
+                this.artikelForm.data = data
+                this.artikelForm.showform = true;
+                if (artikelNrs.length > 1) {
+                  if (index == artikelNrs.length - 1) {
+                    this.next.showButton = false;
+                    this.save.showButton = true;
+                    this.artikelProgress.showLabel = true;
+                    this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+                  } else {
+                    this.next.showButton = true;
+                    this.save.showButton = false;
+                    this.prev.showButton = true;
+                    this.artikelProgress.showLabel = true;
+                    this.artikelProgress.label = `Artikel ${index + 1}/${artikelNrs.length}`
+                  }
+                } else {
+                  this.artikelProgress.showLabel = false;
+                  this.save.showButton = true;
+                  this.next.showButton = false;
+                  this.prev.showButton = false;
+                }
               }
-            })
+            }).catch(error => {
+              this.textInputArtikelSearch.error = true;
+              this.textInputArtikelSearch.errorText = error.message;
+            });
           } else {
             this.artikelForm.data = artikels[index]
             this.artikelForm.showform = true;
@@ -205,11 +215,11 @@ export default {
       artikel = object
       artikels[index] = artikel
       if (save == true) {
-        endpoint = `metabil/cebeo/createarticle`
+        endpoint = `devion/ets/validatearticleform`
         artikels.forEach(artikel => {
           PostDataWithBody(endpoint, artikel).then((data) => {
             console.log(data)
-          })
+          }) 
         });
       } else {
         save = false
