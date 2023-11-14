@@ -6,6 +6,7 @@
     <div v-if="loading.showLoad" class="c-load">
         <LoadingAnimation :showLoad="loading.showLoad"/>
     </div>
+    <labelDevion :label="missing.label" :showLabel="missing.showlabel" class="c-artikel-missing" />
     <TreeView :jsonData="treeView.jsonData" :showTree="treeView.showTree" />
     <div v-if="treeView.showTree" class="c-buttons">
         <ButtonDevion :label="buttonSave.label" :isDisabled="buttonSave.isDisabled" :showButton="buttonSave.showButton"
@@ -13,7 +14,6 @@
         <ButtonDevion :label="buttonInsert.label" :isDisabled="buttonInsert.isDisabled"
             :showButton="buttonInsert.showButton" @click="handleButtonInsert" class="c-button c-button-tree" />
     </div>
-    <labelDevion :label="missing.label" :showLabel="missing.showlabel" class="c-artikel-missing" />
     <div class="c-artikel-form">
         <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel"
             class="c-form" :check="artikelForm.check" ref="article" />
@@ -102,7 +102,7 @@ export default {
                 components: {
                     ButtonDevion
                 },
-                label: 'INVOEGEN',
+                label: 'LINKEN',
                 isDisabled: false,
                 showButton: true
             },
@@ -178,6 +178,7 @@ export default {
             }
             PostDataWithBody(endpoint, data).then((response) => {
                 let artikels = JSON.parse(response)
+                console.log(artikels)
                 this.loading.showLoad = false
                 this.treeView.showTree = true
                 this.treeView.jsonData = artikels

@@ -1,0 +1,2036 @@
+[
+    {
+        "number": "220050-005-0073W-REV1",
+        "description": "chassis bovenbouw",
+        "quantity": 1,
+        "mainSupplier": "000085",
+        "parts": [
+            {
+                "number": "220050-005-0074",
+                "description": "Buis 1",
+                "quantity": 4,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0075",
+                "description": "Plaat 1",
+                "quantity": 4,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0076",
+                "description": "Plaat 2",
+                "quantity": 4,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0078",
+                "description": "Kopplaat",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0079",
+                "description": "Afdekplaat",
+                "quantity": 4,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0081",
+                "description": "Plaat 4",
+                "quantity": 8,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0082",
+                "description": "Buis",
+                "quantity": 2,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0083",
+                "description": "Plaat 5",
+                "quantity": 2,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0084",
+                "description": "Kopplaat",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0085",
+                "description": "Plaat 6",
+                "quantity": 2,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0086",
+                "description": "Plaat 7",
+                "quantity": 6,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0088",
+                "description": "Plaat 9",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0090",
+                "description": "Plaat 11",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0091",
+                "description": "Plaat 12",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0089-REV1",
+                "description": "Plaat 10",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0087-REV1",
+                "description": "Plaat 8",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0092-REV1",
+                "description": "Plaat 13",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0077-REV1",
+                "description": "Buis 2",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0080-REV1",
+                "description": "Plaat 3",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0485",
+                "description": "Buis 2",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            }
+        ],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0093M-REV1",
+        "description": "XYZ portaal",
+        "quantity": 1,
+        "mainSupplier": "000085",
+        "parts": [
+            {
+                "number": "220050-005-0150M",
+                "description": "Aandrijving",
+                "quantity": 1,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "220050-005-0155K",
+                        "description": "SKF_SYF 30 TF",
+                        "quantity": 2,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0152",
+                        "description": "As",
+                        "quantity": 1,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0154K",
+                        "description": "AL 60 AT10_32-2",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0153",
+                        "description": "Plaatje voor reactiearm",
+                        "quantity": 2,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0151K",
+                        "description": "KA29_T_CMP71S_BP_PK_AK1H_SB1_20220",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "DIN 6885 - A 8 x 7 x 90",
+                        "description": "DIN 6885 - A 8 x 7 x 90",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "DIN 6885 - A 10 x 8 x 63",
+                        "description": "DIN 6885 - A 10 x 8 x 63",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "ANSI B18.3.6M - M8x1,25 x",
+                        "description": "ANSI B18.3.6M - M8x1,25 x 10, BHSSSFPM",
+                        "quantity": 2,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    }
+                ],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0158M",
+                "description": "Loopwiel",
+                "quantity": 2,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "220050-005-0159",
+                        "description": "Wiel",
+                        "quantity": 1,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0160",
+                        "description": "Tussenbus",
+                        "quantity": 1,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0170K",
+                        "description": "SKF_6305-2RS1",
+                        "quantity": 2,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    }
+                ],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0171M",
+                "description": "Loopwiel",
+                "quantity": 2,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "220050-005-0160",
+                        "description": "Tussenbus",
+                        "quantity": 1,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0170K",
+                        "description": "SKF_6305-2RS1",
+                        "quantity": 2,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0172",
+                        "description": "Wiel",
+                        "quantity": 1,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    }
+                ],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0357K",
+                "description": "Klemplaat",
+                "quantity": 4,
+                "mainSupplier": "000085",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0174",
+                "description": "Plaat",
+                "quantity": 4,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0355K",
+                "description": "1_695m_E6_40_100_100_0___E6_400_100_12_A_1",
+                "quantity": 1,
+                "mainSupplier": "000085",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0156M",
+                "description": "Aandrijving",
+                "quantity": 1,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "220050-005-0155K",
+                        "description": "SKF_SYF 30 TF",
+                        "quantity": 2,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0152",
+                        "description": "As",
+                        "quantity": 1,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0154K",
+                        "description": "AL 60 AT10_32-2",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0153",
+                        "description": "Plaatje voor reactiearm",
+                        "quantity": 2,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0151K",
+                        "description": "KA29_T_CMP71S_BP_PK_AK1H_SB1_20220",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "DIN 6885 - A 10 x 8 x 63",
+                        "description": "DIN 6885 - A 10 x 8 x 63",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "DIN 6885 - A 8 x 7 x 90",
+                        "description": "DIN 6885 - A 8 x 7 x 90",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "ANSI B18.3.6M - M8x1,25 x",
+                        "description": "ANSI B18.3.6M - M8x1,25 x 10, BHSSSFPM",
+                        "quantity": 2,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    }
+                ],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0117K",
+                "description": "K0571.03002555",
+                "quantity": 4,
+                "mainSupplier": "000085",
+                "parts": [],
+                "existsETS": false
+            },
+            {
+                "number": "220050-005-0350",
+                "description": "Ring",
+                "quantity": 4,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0119K",
+                "description": "MM12-#####-#CK-S257039",
+                "quantity": 2,
+                "mainSupplier": "000085",
+                "parts": [],
+                "existsETS": false
+            },
+            {
+                "number": "220050-005-0351",
+                "description": "Plaat",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0352M-REV1",
+                "description": "Onderwiel",
+                "quantity": 4,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "220050-005-0353",
+                        "description": "Plaat",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0128K",
+                        "description": "WU DP 060 020 020 S",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0354",
+                        "description": "Astap",
+                        "quantity": 1,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0355-REV1",
+                        "description": "Verzonken vloot",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "DIN7991 M8X40 RVS",
+                        "description": "Hexagon socket countersunk head cap screws",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": true
+                    }
+                ],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0157K",
+                "description": "getande riem",
+                "quantity": 1,
+                "mainSupplier": "000085",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0356",
+                "description": "plaat ",
+                "quantity": 4,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0173 - REV1",
+                "description": "Plaat",
+                "quantity": 4,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": false
+            },
+            {
+                "number": "220050-005-0365",
+                "description": "Plaat kabelrups",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "E6.40.085.075.0 L1028mm P",
+                "description": "",
+                "quantity": 1,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "1_028m_E6_40_087_075_0___",
+                        "description": "STEP AP214",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [
+                            {
+                                "number": "2022_10_26_14_28_55_0903",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0872",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0841",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0809",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0778",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0747",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0716",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0684",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0591",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0559",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0528",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0497",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0466",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0434",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0403",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0372",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "2022_10_26_14_28_55_0278",
+                                "description": "",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            }
+                        ],
+                        "existsETS": false
+                    }
+                ],
+                "existsETS": false
+            },
+            {
+                "number": "220050-005-0211_REV1",
+                "description": "Plaat 9",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": false
+            },
+            {
+                "number": "220050-005-0094W-REV1",
+                "description": "Chassis XY portaal",
+                "quantity": 1,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "220050-005-0095-REV1",
+                        "description": "Buis 1",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0097",
+                        "description": "Astap",
+                        "quantity": 4,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0096-REV1",
+                        "description": "Plaat 1",
+                        "quantity": 2,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0370-REV1",
+                        "description": "Buis 2",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    }
+                ],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0481",
+                "description": "Afscherming wiel ",
+                "quantity": 1,
+                "mainSupplier": "100322",
+                "parts": [],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0175M-REV1",
+                "description": "Loopweg",
+                "quantity": 1,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "220050-005-0196W",
+                        "description": "Balk van loopweg",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [
+                            {
+                                "number": "220050-005-0197",
+                                "description": "Plaat 1",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0198",
+                                "description": "Plaat 2",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0199",
+                                "description": "Plaat 3",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0200",
+                                "description": "Plaat 4",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            }
+                        ],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0210K",
+                        "description": "K1418.16140",
+                        "quantity": 4,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0206",
+                        "description": "Plaat 6",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0209K",
+                        "description": "K0571.04004055",
+                        "quantity": 4,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0207",
+                        "description": "Plaat 7",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0201W-REV1",
+                        "description": "Balk van rijweg",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [
+                            {
+                                "number": "220050-005-0203",
+                                "description": "Plaat 2",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0199",
+                                "description": "Plaat 3",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0204",
+                                "description": "Plaat 4",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0202-REV1",
+                                "description": "Plaat 1",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            }
+                        ],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0205-REV1",
+                        "description": "Plaat 5",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0208-REV1",
+                        "description": "Plaat 8",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0176M-REV1",
+                        "description": "Aandrijving",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [
+                            {
+                                "number": "220050-005-0195K",
+                                "description": "SKF_FY 20 TF",
+                                "quantity": 2,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "220050-005-0193K",
+                                "description": "62250220",
+                                "quantity": 2,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "220050-005-0192K",
+                                "description": "16877325",
+                                "quantity": 2,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "220050-005-0191K",
+                                "description": "AT 10 riem 25 breed, open lengte",
+                                "quantity": 2,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0184W",
+                                "description": "As",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0185.ipt",
+                                        "description": "As",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0186.ipt",
+                                        "description": "Plaat",
+                                        "quantity": 3,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0187.ipt",
+                                        "description": "Buis",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0194K",
+                                "description": "KA19T_CMP63S_BK_PK_AK1H_SB1_20220413_084201__Q7NZKIHQk_1FshQ6gWbTA",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "220050-005-0188",
+                                "description": "Bus",
+                                "quantity": 1,
+                                "mainSupplier": "100310",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0189",
+                                "description": "Plaat",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0190",
+                                "description": "Bus",
+                                "quantity": 2,
+                                "mainSupplier": "100310",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "DIN 6885 - A 6 x 6 x 100",
+                                "description": "DIN 6885 - A 6 x 6 x 100",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "220050-005-0177M-REV1",
+                                "description": "Keerwiel",
+                                "quantity": 2,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0181K",
+                                        "description": "AL 32 AT10_25-2_2x6204",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0137K",
+                                        "description": "SKF_6204-2RSH",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0178",
+                                        "description": "tussenring",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0179",
+                                        "description": "Astap",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0182K",
+                                        "description": "K0705.110X25",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0183K",
+                                        "description": "K1418.110100",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "DIN 7991 - M8  x  16",
+                                        "description": "Umbraco DIN7991 verzonken kop - M8x16",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0355-REV1",
+                                        "description": "Verzonken vloot",
+                                        "quantity": 1,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    }
+                                ],
+                                "existsETS": true
+                            }
+                        ],
+                        "existsETS": true
+                    }
+                ],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0426M-REV1",
+                "description": "Z as",
+                "quantity": 1,
+                "mainSupplier": "000085",
+                "parts": [
+                    {
+                        "number": "220050-005-0149K",
+                        "description": "DES140-B(0)",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0366",
+                        "description": "Steunplaat kabelrups",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0367",
+                        "description": "Steunplaat kabelrups Z as",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0368",
+                        "description": "Steunplaat kabelrups Z as",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0099M-REV1",
+                        "description": "Basis Z as",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [
+                            {
+                                "number": "220050-005-0100W",
+                                "description": "Chassis Z as",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0101",
+                                        "description": "Buis",
+                                        "quantity": 1,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0102",
+                                        "description": "Plaat",
+                                        "quantity": 1,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0103",
+                                        "description": "Plaat",
+                                        "quantity": 1,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0107M",
+                                "description": "Riemschijf",
+                                "quantity": 4,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0108",
+                                        "description": "Tussenbus",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0109",
+                                        "description": "As",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0110K",
+                                        "description": "AL 60 AT10_25-2_2x6204",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0111K",
+                                        "description": "SKF_6005-2RSH",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "DIN 471 - 25x1,2",
+                                        "description": "DIN 471 - 25x1,2",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0118K",
+                                "description": "K1418.12130",
+                                "quantity": 4,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "220050-005-0117K",
+                                "description": "K0571.03002555",
+                                "quantity": 4,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "220050-005-0116",
+                                "description": "Sensorplaat",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0119K",
+                                "description": "MM12-#####-#CK-S257039",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [],
+                                "existsETS": false
+                            },
+                            {
+                                "number": "220050-005-0112W-REV1",
+                                "description": "Kopplaat Z-as",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0113",
+                                        "description": "Plaat 1",
+                                        "quantity": 1,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0114-REV1",
+                                        "description": "Plaat 2",
+                                        "quantity": 2,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0104W-REV1",
+                                "description": "Kopstuk Z-as",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0105",
+                                        "description": "Plaat",
+                                        "quantity": 1,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0106-REV1",
+                                        "description": "Plaat",
+                                        "quantity": 2,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    }
+                                ],
+                                "existsETS": true
+                            }
+                        ],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0381-REV1",
+                        "description": "Grijper afstandsplaat",
+                        "quantity": 2,
+                        "mainSupplier": "100310",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0382",
+                        "description": "Klamplaat riem deel 1",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0383",
+                        "description": "Klemplaat riem deel 2",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0384",
+                        "description": "Klemplaat riem deel 3",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "Klemplaat AT10-50",
+                        "description": "Klemplaat voor AT10 tandriem, riembreedte 50",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0419M-REV1",
+                        "description": "Wagen voor Z as manipulator",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [
+                            {
+                                "number": "220050-005-0411M",
+                                "description": "Samenstelling wielgeleiding 1",
+                                "quantity": 2,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0410",
+                                        "description": "Montageblok",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "FSTH_70x25_20-15K_483438-",
+                                        "description": "Loopwiel",
+                                        "quantity": 3,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0412",
+                                        "description": "Tussenbus",
+                                        "quantity": 2,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "K0705.20X50",
+                                        "description": "Tapbout",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0413",
+                                        "description": "Montageblok",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0415",
+                                        "description": "Astap",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0417W",
+                                        "description": "Montagestuk",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [
+                                            {
+                                                "number": "220050-005-0414",
+                                                "description": "Plaat",
+                                                "quantity": 1,
+                                                "mainSupplier": "100322",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0416",
+                                                "description": "Bus",
+                                                "quantity": 1,
+                                                "mainSupplier": "100310",
+                                                "parts": [],
+                                                "existsETS": true
+                                            }
+                                        ],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0418",
+                                        "description": "Tussenblok",
+                                        "quantity": 2,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "K0705.10X25",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "K1418.1070",
+                                        "description": "Oogbout",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "K0705.110X16",
+                                        "description": "Tapbout",
+                                        "quantity": 4,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "K0705.110X25",
+                                        "description": "Tapbout",
+                                        "quantity": 3,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": true
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0406M",
+                                "description": "Geleidingswielen",
+                                "quantity": 8,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0405",
+                                        "description": "As",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "FSTH_80x25_25-15K_463992-",
+                                        "description": "Loopwiel",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "DIN 471 - 25x1,2",
+                                        "description": "DIN 471 - 25x1,2",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0420M",
+                                "description": "Samenstelling wielgeleiding 2",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "FSTH_70x25_20-15K_483438-",
+                                        "description": "Loopwiel",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0415",
+                                        "description": "Astap",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0418",
+                                        "description": "Tussenblok",
+                                        "quantity": 2,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "K0705.10X25",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "K1418.1070",
+                                        "description": "Oogbout",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0421W",
+                                        "description": "Wielhouder",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [
+                                            {
+                                                "number": "220050-005-0416",
+                                                "description": "Bus",
+                                                "quantity": 1,
+                                                "mainSupplier": "100310",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0422",
+                                                "description": "Plaat",
+                                                "quantity": 1,
+                                                "mainSupplier": "100322",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0423",
+                                                "description": "Astap",
+                                                "quantity": 1,
+                                                "mainSupplier": "100310",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0424",
+                                                "description": "Plaat",
+                                                "quantity": 1,
+                                                "mainSupplier": "100322",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0477",
+                                                "description": "Plaat",
+                                                "quantity": 1,
+                                                "mainSupplier": "100322",
+                                                "parts": [],
+                                                "existsETS": true
+                                            }
+                                        ],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "FSTH_80x25_25-15K_463992-",
+                                        "description": "Loopwiel",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0129M",
+                                "description": "Keerwiel",
+                                "quantity": 4,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0130",
+                                        "description": "As",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0131K",
+                                        "description": "14088803",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0133K",
+                                        "description": "SKF_6205-2RSH",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "DIN 471 - 25x1,2",
+                                        "description": "DIN 471 - 25x1,2",
+                                        "quantity": 2,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0478M",
+                                "description": "Samenstelling wielgeleiding 2 (links)",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "FSTH_70x25_20-15K_483438-",
+                                        "description": "Loopwiel",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0415",
+                                        "description": "Astap",
+                                        "quantity": 1,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0418",
+                                        "description": "Tussenblok",
+                                        "quantity": 2,
+                                        "mainSupplier": "100310",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "K0705.10X25",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "K1418.1070",
+                                        "description": "Oogbout",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "FSTH_80x25_25-15K_463992-",
+                                        "description": "Loopwiel",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "220050-005-0479W",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [
+                                            {
+                                                "number": "220050-005-0416",
+                                                "description": "Bus",
+                                                "quantity": 1,
+                                                "mainSupplier": "100310",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0422",
+                                                "description": "Plaat",
+                                                "quantity": 1,
+                                                "mainSupplier": "100322",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0423",
+                                                "description": "Astap",
+                                                "quantity": 1,
+                                                "mainSupplier": "100310",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0424",
+                                                "description": "Plaat",
+                                                "quantity": 1,
+                                                "mainSupplier": "100322",
+                                                "parts": [],
+                                                "existsETS": true
+                                            },
+                                            {
+                                                "number": "220050-005-0477",
+                                                "description": "Plaat",
+                                                "quantity": 1,
+                                                "mainSupplier": "100322",
+                                                "parts": [],
+                                                "existsETS": true
+                                            }
+                                        ],
+                                        "existsETS": true
+                                    }
+                                ],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0480",
+                                "description": "Detectieplaat homing",
+                                "quantity": 1,
+                                "mainSupplier": "100322",
+                                "parts": [],
+                                "existsETS": true
+                            },
+                            {
+                                "number": "220050-005-0402W-REV1",
+                                "description": "Chassis wagen",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "220050-005-0403",
+                                        "description": "Plaat 1",
+                                        "quantity": 2,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0425",
+                                        "description": "Plaat 3",
+                                        "quantity": 2,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    },
+                                    {
+                                        "number": "220050-005-0404-REV1",
+                                        "description": "Plaat 2",
+                                        "quantity": 2,
+                                        "mainSupplier": "100322",
+                                        "parts": [],
+                                        "existsETS": true
+                                    }
+                                ],
+                                "existsETS": true
+                            }
+                        ],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "E6.40.085.075.0 L1195mm",
+                        "description": "",
+                        "quantity": 1,
+                        "mainSupplier": "000085",
+                        "parts": [
+                            {
+                                "number": "1_195m_E6_40_087_075_0_",
+                                "description": "STEP AP214",
+                                "quantity": 1,
+                                "mainSupplier": "000085",
+                                "parts": [
+                                    {
+                                        "number": "2022_10_26_13_24_33_0608",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0577",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0545",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0514",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0483",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0452",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0420",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0389",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0295",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0264",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0233",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0202",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0170",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0139",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0108",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_33_0077",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    },
+                                    {
+                                        "number": "2022_10_26_13_24_32_0983",
+                                        "description": "",
+                                        "quantity": 1,
+                                        "mainSupplier": "000085",
+                                        "parts": [],
+                                        "existsETS": false
+                                    }
+                                ],
+                                "existsETS": false
+                            }
+                        ],
+                        "existsETS": false
+                    },
+                    {
+                        "number": "220050-005-0606",
+                        "description": "Afschermplaat",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "220050-005-0607",
+                        "description": "plaat 3,000 mm",
+                        "quantity": 1,
+                        "mainSupplier": "100322",
+                        "parts": [],
+                        "existsETS": true
+                    },
+                    {
+                        "number": "Carrosserievloot RVS - IS",
+                        "description": "Washer ISO 7093-1 - 8",
+                        "quantity": 2,
+                        "mainSupplier": "000085",
+                        "parts": [],
+                        "existsETS": false
+                    }
+                ],
+                "existsETS": true
+            },
+            {
+                "number": "220050-005-0213-REV1",
+                "description": "As",
+                "quantity": 4,
+                "mainSupplier": "100310",
+                "parts": [],
+                "existsETS": true
+            }
+        ],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0358-REV1",
+        "description": "Plaat ",
+        "quantity": 1,
+        "mainSupplier": "100322",
+        "parts": [],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0359",
+        "description": "Afdekplaat",
+        "quantity": 6,
+        "mainSupplier": "100322",
+        "parts": [],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0360",
+        "description": "Plaat",
+        "quantity": 4,
+        "mainSupplier": "100322",
+        "parts": [],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0361",
+        "description": "Plaat",
+        "quantity": 1,
+        "mainSupplier": "100322",
+        "parts": [],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0362",
+        "description": "Plaat",
+        "quantity": 2,
+        "mainSupplier": "100322",
+        "parts": [],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0482K",
+        "description": "Wandelplaat deel 1",
+        "quantity": 1,
+        "mainSupplier": "000085",
+        "parts": [],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0483K",
+        "description": "Wandelplaat deel 2",
+        "quantity": 1,
+        "mainSupplier": "000085",
+        "parts": [],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0600",
+        "description": "Afdekplaat binnenkant frame 1",
+        "quantity": 1,
+        "mainSupplier": "100322",
+        "parts": [],
+        "existsETS": true
+    },
+    {
+        "number": "220050-005-0601",
+        "description": "Afdekplaat binnenkant frame 2",
+        "quantity": 1,
+        "mainSupplier": "100322",
+        "parts": [],
+        "existsETS": true
+    }
+]
