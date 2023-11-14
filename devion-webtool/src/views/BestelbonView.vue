@@ -43,8 +43,7 @@ export default {
     ButtonDevion,
     TabelBestelbon,
     textInput,
-    LoadingAnimation
-    textInput,
+    LoadingAnimation,
     labelDevion,
     checkboxInput
   },
