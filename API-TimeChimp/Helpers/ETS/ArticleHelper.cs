@@ -257,13 +257,13 @@ public class ETSArticleHelper : ETSHelper
         return article;
     }
 
-    public void LinkArticle(string articleNumberMaster, string articleNumberToLink)
+    public void LinkArticle(Item main, Item part)
     {
         string query = $"SELECT COUNT(*) FROM TBL_ARTIKEL_GEKOPPELD AS L LEFT JOIN CSARTPX AS A1 ON A1.ART_ID = L.ARG_ART_ID LEFT JOIN CSARTPX AS A2 ON A2.ART_ID = L.ARG_MASTER_ID WHERE A1.ART_NR = @artikel AND A2.ART_NR = @master";
         Dictionary<string, object> parameters = new()
         {
-            {"@artikel", articleNumberToLink},
-            {"@master", articleNumberMaster }
+            {"@artikel", part.Number},
+            {"@master", main.Number }
         };
 
         string response = ETSClient.selectQuery(query, parameters);
@@ -272,6 +272,7 @@ public class ETSArticleHelper : ETSHelper
         if (count == 0)
         {
             // TODO  (Create query) to link articles in ETS -> Table: TBL_ARTIKEL_GEKOPPELD
+            Console.WriteLine("linking master: " + main.Number + " article: " + part.Number + " lynNumber: " + part.LynNumber + " quantity: " + part.Quantity);
         }
     }
 }

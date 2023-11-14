@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
@@ -762,6 +764,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     foreach (DataRow row in table.Rows)
                     {
                         List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
+                        Console.WriteLine(hierarchy.Last());
                         List<Item?> parentList = assemblies;
                         foreach (int level in hierarchy)
                         {
@@ -778,7 +781,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             }
                             else
                             {
-                                Item part = new((string)row["Part Number"], row["Description"] is System.DBNull ? String.Empty : (string)row["Description"], Convert.ToInt32((double)row["QTY"]));
+                                Item part = new((string)row["Part Number"], row["Description"] is System.DBNull ? String.Empty : (string)row["Description"], Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
 
                                 if (part.Number.Length > 25)
                                 {
@@ -813,7 +816,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             {
                 foreach (Item part in main.Parts.Where(i => i != null).Cast<Item>().ToList())
                 {
-                    articleHelperETS.LinkArticle(main.Number, part.Number);
+                    articleHelperETS.LinkArticle(main, part);
                     LinkArticles(part);
                 }
             };

@@ -2,11 +2,12 @@
 {
     public class Item
     {
-        public Item(string number, string description, int quantity)
+        public Item(string number, string description, int quantity, string lynNumber)
         {
             Number = number;
             Quantity = quantity;
             Description = description;
+            LynNumber = lynNumber;
         }
 
         public string Number { get; set; }
@@ -15,5 +16,6 @@
         public string? MainSupplier { get; set; }
         public List<Item?> Parts { get; set; } = new();
         public Boolean ExistsETS { get; set; } = false;
+        public string? LynNumber { get; set; }
     }
 }
