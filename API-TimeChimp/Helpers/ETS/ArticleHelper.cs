@@ -273,6 +273,42 @@ public class ETSArticleHelper : ETSHelper
         {
             // TODO  (Create query) to link articles in ETS -> Table: TBL_ARTIKEL_GEKOPPELD
             Console.WriteLine("linking master: " + main.Number + " article: " + part.Number + " lynNumber: " + part.LynNumber + " quantity: " + part.Quantity);
+            string query1 = "select art_id from csartpx where art_nr = @number";
+            Dictionary<string, object> parametersMain = new()
+            {
+                {"@number", main.Number }
+            };
+
+            Dictionary<string, object> parametersPart = new()
+            { {"@number", part.Number}};
+
+            string jsonMasterId = ETSClient.selectQuery(query1, parametersMain);
+            string masterId = "";
+            if (jsonMasterId != null && jsonMasterId != "[]")
+            {
+                masterId = JsonTool.ConvertTo<List<Dictionary<string, string>>>(jsonMasterId).First()["ART_ID"];
+            }
+
+            string jsonPartId = ETSClient.selectQuery(query1,parametersPart);
+            string partId = "";
+            if (jsonPartId != null && jsonPartId != "[]")
+            {
+                partId = JsonTool.ConvertTo<List<Dictionary<string, string>>>(jsonPartId).First()["ART_ID"];
+            }
+
+            if (masterId != "" && partId != "")
+            {
+                //TODO: query schrijven voor linken
+                Dictionary<string, object> propertiesMain = new()
+                {
+                    {"@masterId", masterId },
+                    {"@partId", partId },
+                    {"@lynNumber", part.LynNumber },
+                    {"@quantity", part.Quantity }
+                };
+                //TODO: execute schrijven
+            }
+
         }
     }
 }

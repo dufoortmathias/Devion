@@ -741,11 +741,14 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}CreateArticle").WithTags(company);
 
-    app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile) =>
+    _ = app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile, string fileName) =>
     {
         try
         {
+            //TODO: part number halen uit naam file
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Item mainPart = new(fileName.Split("_").First(), String.Empty, 1, "0");
+
             using (var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content")))
             {
                 using (var reader = ExcelReaderFactory.CreateReader(stream))
@@ -764,7 +767,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     foreach (DataRow row in table.Rows)
                     {
                         List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
-                        Console.WriteLine(hierarchy.Last());
                         List<Item?> parentList = assemblies;
                         foreach (int level in hierarchy)
                         {
@@ -798,7 +800,14 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             }
                         }
                     }
-                    return Results.Ok(assemblies);
+                    mainPart.Parts = assemblies;
+                    mainPart.MainSupplier = supplierHelperETS.FindSupplierId("Metabil");
+                    mainPart.Description = mainPart.Number.ToString();
+                    List<Item> items = new()
+                    {
+                        mainPart
+                    };
+                    return Results.Ok(items);
                 }
             }
         }
