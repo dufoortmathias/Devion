@@ -11,7 +11,7 @@ export async function PostDataWithBody(endpoint, data) {
     redirect: 'follow'
   }
 
-  return fetch('http://devionserverets:5000/api/' + endpoint, requestOptions)
+  return fetch('http://192.168.100.209:5142/api/' + endpoint, requestOptions)
     .then((response) => response.text())
     .then((result) => result)
     .catch((error) => console.error(error))

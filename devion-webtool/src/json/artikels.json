@@ -11,7 +11,8 @@
                 "quantity": 4,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "1"
             },
             {
                 "number": "220050-005-0075",
@@ -19,7 +20,8 @@
                 "quantity": 4,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "2"
             },
             {
                 "number": "220050-005-0076",
@@ -27,7 +29,8 @@
                 "quantity": 4,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "3"
             },
             {
                 "number": "220050-005-0078",
@@ -35,7 +38,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "4"
             },
             {
                 "number": "220050-005-0079",
@@ -43,7 +47,8 @@
                 "quantity": 4,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "5"
             },
             {
                 "number": "220050-005-0081",
@@ -51,7 +56,8 @@
                 "quantity": 8,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "6"
             },
             {
                 "number": "220050-005-0082",
@@ -59,7 +65,8 @@
                 "quantity": 2,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "7"
             },
             {
                 "number": "220050-005-0083",
@@ -67,7 +74,8 @@
                 "quantity": 2,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "8"
             },
             {
                 "number": "220050-005-0084",
@@ -75,7 +83,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "9"
             },
             {
                 "number": "220050-005-0085",
@@ -83,7 +92,8 @@
                 "quantity": 2,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "10"
             },
             {
                 "number": "220050-005-0086",
@@ -91,7 +101,8 @@
                 "quantity": 6,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "11"
             },
             {
                 "number": "220050-005-0088",
@@ -99,7 +110,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "12"
             },
             {
                 "number": "220050-005-0090",
@@ -107,7 +119,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "13"
             },
             {
                 "number": "220050-005-0091",
@@ -115,7 +128,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "14"
             },
             {
                 "number": "220050-005-0089-REV1",
@@ -123,7 +137,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "15"
             },
             {
                 "number": "220050-005-0087-REV1",
@@ -131,7 +146,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "16"
             },
             {
                 "number": "220050-005-0092-REV1",
@@ -139,7 +155,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "17"
             },
             {
                 "number": "220050-005-0077-REV1",
@@ -147,7 +164,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "18"
             },
             {
                 "number": "220050-005-0080-REV1",
@@ -155,7 +173,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "19"
             },
             {
                 "number": "220050-005-0485",
@@ -163,10 +182,12 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "20"
             }
         ],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "1"
     },
     {
         "number": "220050-005-0093M-REV1",
@@ -186,7 +207,8 @@
                         "quantity": 2,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "1"
                     },
                     {
                         "number": "220050-005-0152",
@@ -194,7 +216,8 @@
                         "quantity": 1,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "2"
                     },
                     {
                         "number": "220050-005-0154K",
@@ -202,7 +225,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "3"
                     },
                     {
                         "number": "220050-005-0153",
@@ -210,7 +234,8 @@
                         "quantity": 2,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "4"
                     },
                     {
                         "number": "220050-005-0151K",
@@ -218,7 +243,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "5"
                     },
                     {
                         "number": "DIN 6885 - A 8 x 7 x 90",
@@ -226,7 +252,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "6"
                     },
                     {
                         "number": "DIN 6885 - A 10 x 8 x 63",
@@ -234,7 +261,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "7"
                     },
                     {
                         "number": "ANSI B18.3.6M - M8x1,25 x",
@@ -242,10 +270,12 @@
                         "quantity": 2,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "8"
                     }
                 ],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "1"
             },
             {
                 "number": "220050-005-0158M",
@@ -259,7 +289,8 @@
                         "quantity": 1,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "1"
                     },
                     {
                         "number": "220050-005-0160",
@@ -267,7 +298,8 @@
                         "quantity": 1,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "2"
                     },
                     {
                         "number": "220050-005-0170K",
@@ -275,10 +307,12 @@
                         "quantity": 2,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "3"
                     }
                 ],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "2"
             },
             {
                 "number": "220050-005-0171M",
@@ -292,7 +326,8 @@
                         "quantity": 1,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "1"
                     },
                     {
                         "number": "220050-005-0170K",
@@ -300,7 +335,8 @@
                         "quantity": 2,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "2"
                     },
                     {
                         "number": "220050-005-0172",
@@ -308,10 +344,12 @@
                         "quantity": 1,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "3"
                     }
                 ],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "3"
             },
             {
                 "number": "220050-005-0357K",
@@ -319,7 +357,8 @@
                 "quantity": 4,
                 "mainSupplier": "000085",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "4"
             },
             {
                 "number": "220050-005-0174",
@@ -327,7 +366,8 @@
                 "quantity": 4,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "5"
             },
             {
                 "number": "220050-005-0355K",
@@ -335,7 +375,8 @@
                 "quantity": 1,
                 "mainSupplier": "000085",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "6"
             },
             {
                 "number": "220050-005-0156M",
@@ -349,7 +390,8 @@
                         "quantity": 2,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "1"
                     },
                     {
                         "number": "220050-005-0152",
@@ -357,7 +399,8 @@
                         "quantity": 1,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "2"
                     },
                     {
                         "number": "220050-005-0154K",
@@ -365,7 +408,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "3"
                     },
                     {
                         "number": "220050-005-0153",
@@ -373,7 +417,8 @@
                         "quantity": 2,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "4"
                     },
                     {
                         "number": "220050-005-0151K",
@@ -381,7 +426,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "5"
                     },
                     {
                         "number": "DIN 6885 - A 10 x 8 x 63",
@@ -389,7 +435,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "6"
                     },
                     {
                         "number": "DIN 6885 - A 8 x 7 x 90",
@@ -397,7 +444,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "7"
                     },
                     {
                         "number": "ANSI B18.3.6M - M8x1,25 x",
@@ -405,10 +453,12 @@
                         "quantity": 2,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "8"
                     }
                 ],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "7"
             },
             {
                 "number": "220050-005-0117K",
@@ -416,7 +466,8 @@
                 "quantity": 4,
                 "mainSupplier": "000085",
                 "parts": [],
-                "existsETS": false
+                "existsETS": false,
+                "lynNumber": "8"
             },
             {
                 "number": "220050-005-0350",
@@ -424,7 +475,8 @@
                 "quantity": 4,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "9"
             },
             {
                 "number": "220050-005-0119K",
@@ -432,7 +484,8 @@
                 "quantity": 2,
                 "mainSupplier": "000085",
                 "parts": [],
-                "existsETS": false
+                "existsETS": false,
+                "lynNumber": "10"
             },
             {
                 "number": "220050-005-0351",
@@ -440,7 +493,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "11"
             },
             {
                 "number": "220050-005-0352M-REV1",
@@ -454,7 +508,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "1"
                     },
                     {
                         "number": "220050-005-0128K",
@@ -462,7 +517,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "2"
                     },
                     {
                         "number": "220050-005-0354",
@@ -470,7 +526,8 @@
                         "quantity": 1,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "3"
                     },
                     {
                         "number": "220050-005-0355-REV1",
@@ -478,7 +535,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "4"
                     },
                     {
                         "number": "DIN7991 M8X40 RVS",
@@ -486,10 +544,12 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "5"
                     }
                 ],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "12"
             },
             {
                 "number": "220050-005-0157K",
@@ -497,7 +557,8 @@
                 "quantity": 1,
                 "mainSupplier": "000085",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "13"
             },
             {
                 "number": "220050-005-0356",
@@ -505,7 +566,8 @@
                 "quantity": 4,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "14"
             },
             {
                 "number": "220050-005-0173 - REV1",
@@ -513,7 +575,8 @@
                 "quantity": 4,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": false
+                "existsETS": false,
+                "lynNumber": "15"
             },
             {
                 "number": "220050-005-0365",
@@ -521,7 +584,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "16"
             },
             {
                 "number": "E6.40.085.075.0 L1028mm P",
@@ -541,7 +605,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "1"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0872",
@@ -549,7 +614,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "2"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0841",
@@ -557,7 +623,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "3"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0809",
@@ -565,7 +632,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "4"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0778",
@@ -573,7 +641,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "5"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0747",
@@ -581,7 +650,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "6"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0716",
@@ -589,7 +659,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "7"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0684",
@@ -597,7 +668,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "8"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0591",
@@ -605,7 +677,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "9"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0559",
@@ -613,7 +686,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "10"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0528",
@@ -621,7 +695,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "11"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0497",
@@ -629,7 +704,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "12"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0466",
@@ -637,7 +713,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "13"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0434",
@@ -645,7 +722,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "14"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0403",
@@ -653,7 +731,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "15"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0372",
@@ -661,7 +740,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "16"
                             },
                             {
                                 "number": "2022_10_26_14_28_55_0278",
@@ -669,13 +749,16 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "17"
                             }
                         ],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "1"
                     }
                 ],
-                "existsETS": false
+                "existsETS": false,
+                "lynNumber": "17"
             },
             {
                 "number": "220050-005-0211_REV1",
@@ -683,7 +766,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": false
+                "existsETS": false,
+                "lynNumber": "18"
             },
             {
                 "number": "220050-005-0094W-REV1",
@@ -697,7 +781,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "1"
                     },
                     {
                         "number": "220050-005-0097",
@@ -705,7 +790,8 @@
                         "quantity": 4,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "2"
                     },
                     {
                         "number": "220050-005-0096-REV1",
@@ -713,7 +799,8 @@
                         "quantity": 2,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "3"
                     },
                     {
                         "number": "220050-005-0370-REV1",
@@ -721,10 +808,12 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "4"
                     }
                 ],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "19"
             },
             {
                 "number": "220050-005-0481",
@@ -732,7 +821,8 @@
                 "quantity": 1,
                 "mainSupplier": "100322",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "20"
             },
             {
                 "number": "220050-005-0175M-REV1",
@@ -752,7 +842,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "1"
                             },
                             {
                                 "number": "220050-005-0198",
@@ -760,7 +851,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "2"
                             },
                             {
                                 "number": "220050-005-0199",
@@ -768,7 +860,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "3"
                             },
                             {
                                 "number": "220050-005-0200",
@@ -776,10 +869,12 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "4"
                             }
                         ],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "1"
                     },
                     {
                         "number": "220050-005-0210K",
@@ -787,7 +882,8 @@
                         "quantity": 4,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "2"
                     },
                     {
                         "number": "220050-005-0206",
@@ -795,7 +891,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "3"
                     },
                     {
                         "number": "220050-005-0209K",
@@ -803,7 +900,8 @@
                         "quantity": 4,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "4"
                     },
                     {
                         "number": "220050-005-0207",
@@ -811,7 +909,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "5"
                     },
                     {
                         "number": "220050-005-0201W-REV1",
@@ -825,7 +924,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "1"
                             },
                             {
                                 "number": "220050-005-0199",
@@ -833,7 +933,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "2"
                             },
                             {
                                 "number": "220050-005-0204",
@@ -841,7 +942,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "3"
                             },
                             {
                                 "number": "220050-005-0202-REV1",
@@ -849,10 +951,12 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "4"
                             }
                         ],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "6"
                     },
                     {
                         "number": "220050-005-0205-REV1",
@@ -860,7 +964,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "7"
                     },
                     {
                         "number": "220050-005-0208-REV1",
@@ -868,7 +973,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "8"
                     },
                     {
                         "number": "220050-005-0176M-REV1",
@@ -882,7 +988,8 @@
                                 "quantity": 2,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "1"
                             },
                             {
                                 "number": "220050-005-0193K",
@@ -890,7 +997,8 @@
                                 "quantity": 2,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "2"
                             },
                             {
                                 "number": "220050-005-0192K",
@@ -898,7 +1006,8 @@
                                 "quantity": 2,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "3"
                             },
                             {
                                 "number": "220050-005-0191K",
@@ -906,7 +1015,8 @@
                                 "quantity": 2,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "4"
                             },
                             {
                                 "number": "220050-005-0184W",
@@ -920,7 +1030,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0186.ipt",
@@ -928,7 +1039,8 @@
                                         "quantity": 3,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0187.ipt",
@@ -936,10 +1048,12 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "3"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "5"
                             },
                             {
                                 "number": "220050-005-0194K",
@@ -947,7 +1061,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "6"
                             },
                             {
                                 "number": "220050-005-0188",
@@ -955,7 +1070,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100310",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "7"
                             },
                             {
                                 "number": "220050-005-0189",
@@ -963,7 +1079,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "8"
                             },
                             {
                                 "number": "220050-005-0190",
@@ -971,7 +1088,8 @@
                                 "quantity": 2,
                                 "mainSupplier": "100310",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "9"
                             },
                             {
                                 "number": "DIN 6885 - A 6 x 6 x 100",
@@ -979,7 +1097,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "10"
                             },
                             {
                                 "number": "220050-005-0177M-REV1",
@@ -993,7 +1112,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0137K",
@@ -1001,7 +1121,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0178",
@@ -1009,7 +1130,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "3"
                                     },
                                     {
                                         "number": "220050-005-0179",
@@ -1017,7 +1139,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "4"
                                     },
                                     {
                                         "number": "220050-005-0182K",
@@ -1025,7 +1148,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "5"
                                     },
                                     {
                                         "number": "220050-005-0183K",
@@ -1033,7 +1157,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "6"
                                     },
                                     {
                                         "number": "DIN 7991 - M8  x  16",
@@ -1041,7 +1166,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "7"
                                     },
                                     {
                                         "number": "220050-005-0355-REV1",
@@ -1049,16 +1175,20 @@
                                         "quantity": 1,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "8"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "11"
                             }
                         ],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "9"
                     }
                 ],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "21"
             },
             {
                 "number": "220050-005-0426M-REV1",
@@ -1072,7 +1202,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "1"
                     },
                     {
                         "number": "220050-005-0366",
@@ -1080,7 +1211,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "2"
                     },
                     {
                         "number": "220050-005-0367",
@@ -1088,7 +1220,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "3"
                     },
                     {
                         "number": "220050-005-0368",
@@ -1096,7 +1229,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "4"
                     },
                     {
                         "number": "220050-005-0099M-REV1",
@@ -1116,7 +1250,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0102",
@@ -1124,7 +1259,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0103",
@@ -1132,10 +1268,12 @@
                                         "quantity": 1,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "3"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "1"
                             },
                             {
                                 "number": "220050-005-0107M",
@@ -1149,7 +1287,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0109",
@@ -1157,7 +1296,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0110K",
@@ -1165,7 +1305,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "3"
                                     },
                                     {
                                         "number": "220050-005-0111K",
@@ -1173,7 +1314,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "4"
                                     },
                                     {
                                         "number": "DIN 471 - 25x1,2",
@@ -1181,10 +1323,12 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "5"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "2"
                             },
                             {
                                 "number": "220050-005-0118K",
@@ -1192,7 +1336,8 @@
                                 "quantity": 4,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "3"
                             },
                             {
                                 "number": "220050-005-0117K",
@@ -1200,7 +1345,8 @@
                                 "quantity": 4,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "4"
                             },
                             {
                                 "number": "220050-005-0116",
@@ -1208,7 +1354,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "5"
                             },
                             {
                                 "number": "220050-005-0119K",
@@ -1216,7 +1363,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "000085",
                                 "parts": [],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "6"
                             },
                             {
                                 "number": "220050-005-0112W-REV1",
@@ -1230,7 +1378,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0114-REV1",
@@ -1238,10 +1387,12 @@
                                         "quantity": 2,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "2"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "7"
                             },
                             {
                                 "number": "220050-005-0104W-REV1",
@@ -1255,7 +1406,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0106-REV1",
@@ -1263,13 +1415,16 @@
                                         "quantity": 2,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "2"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "8"
                             }
                         ],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "5"
                     },
                     {
                         "number": "220050-005-0381-REV1",
@@ -1277,7 +1432,8 @@
                         "quantity": 2,
                         "mainSupplier": "100310",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "6"
                     },
                     {
                         "number": "220050-005-0382",
@@ -1285,7 +1441,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "7"
                     },
                     {
                         "number": "220050-005-0383",
@@ -1293,7 +1450,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "8"
                     },
                     {
                         "number": "220050-005-0384",
@@ -1301,7 +1459,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "9"
                     },
                     {
                         "number": "Klemplaat AT10-50",
@@ -1309,7 +1468,8 @@
                         "quantity": 1,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "10"
                     },
                     {
                         "number": "220050-005-0419M-REV1",
@@ -1329,7 +1489,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "FSTH_70x25_20-15K_483438-",
@@ -1337,7 +1498,8 @@
                                         "quantity": 3,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0412",
@@ -1345,7 +1507,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "3"
                                     },
                                     {
                                         "number": "K0705.20X50",
@@ -1353,7 +1516,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "4"
                                     },
                                     {
                                         "number": "220050-005-0413",
@@ -1361,7 +1525,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "5"
                                     },
                                     {
                                         "number": "220050-005-0415",
@@ -1369,7 +1534,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "6"
                                     },
                                     {
                                         "number": "220050-005-0417W",
@@ -1383,7 +1549,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100322",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "1"
                                             },
                                             {
                                                 "number": "220050-005-0416",
@@ -1391,10 +1558,12 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100310",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "2"
                                             }
                                         ],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "7"
                                     },
                                     {
                                         "number": "220050-005-0418",
@@ -1402,7 +1571,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "8"
                                     },
                                     {
                                         "number": "K0705.10X25",
@@ -1410,7 +1580,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "9"
                                     },
                                     {
                                         "number": "K1418.1070",
@@ -1418,7 +1589,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "10"
                                     },
                                     {
                                         "number": "K0705.110X16",
@@ -1426,7 +1598,8 @@
                                         "quantity": 4,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "11"
                                     },
                                     {
                                         "number": "K0705.110X25",
@@ -1434,10 +1607,12 @@
                                         "quantity": 3,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "12"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "1"
                             },
                             {
                                 "number": "220050-005-0406M",
@@ -1451,7 +1626,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "FSTH_80x25_25-15K_463992-",
@@ -1459,7 +1635,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "DIN 471 - 25x1,2",
@@ -1467,10 +1644,12 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "3"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "2"
                             },
                             {
                                 "number": "220050-005-0420M",
@@ -1484,7 +1663,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0415",
@@ -1492,7 +1672,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0418",
@@ -1500,7 +1681,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "3"
                                     },
                                     {
                                         "number": "K0705.10X25",
@@ -1508,7 +1690,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "4"
                                     },
                                     {
                                         "number": "K1418.1070",
@@ -1516,7 +1699,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "5"
                                     },
                                     {
                                         "number": "220050-005-0421W",
@@ -1530,7 +1714,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100310",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "1"
                                             },
                                             {
                                                 "number": "220050-005-0422",
@@ -1538,7 +1723,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100322",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "2"
                                             },
                                             {
                                                 "number": "220050-005-0423",
@@ -1546,7 +1732,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100310",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "3"
                                             },
                                             {
                                                 "number": "220050-005-0424",
@@ -1554,7 +1741,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100322",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "4"
                                             },
                                             {
                                                 "number": "220050-005-0477",
@@ -1562,10 +1750,12 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100322",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "5"
                                             }
                                         ],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "6"
                                     },
                                     {
                                         "number": "FSTH_80x25_25-15K_463992-",
@@ -1573,10 +1763,12 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "7"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "3"
                             },
                             {
                                 "number": "220050-005-0129M",
@@ -1590,7 +1782,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0131K",
@@ -1598,7 +1791,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0133K",
@@ -1606,7 +1800,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "3"
                                     },
                                     {
                                         "number": "DIN 471 - 25x1,2",
@@ -1614,10 +1809,12 @@
                                         "quantity": 2,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "4"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "4"
                             },
                             {
                                 "number": "220050-005-0478M",
@@ -1631,7 +1828,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0415",
@@ -1639,7 +1837,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0418",
@@ -1647,7 +1846,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "100310",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "3"
                                     },
                                     {
                                         "number": "K0705.10X25",
@@ -1655,7 +1855,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "4"
                                     },
                                     {
                                         "number": "K1418.1070",
@@ -1663,7 +1864,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "5"
                                     },
                                     {
                                         "number": "FSTH_80x25_25-15K_463992-",
@@ -1671,7 +1873,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "6"
                                     },
                                     {
                                         "number": "220050-005-0479W",
@@ -1685,7 +1888,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100310",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "1"
                                             },
                                             {
                                                 "number": "220050-005-0422",
@@ -1693,7 +1897,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100322",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "2"
                                             },
                                             {
                                                 "number": "220050-005-0423",
@@ -1701,7 +1906,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100310",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "3"
                                             },
                                             {
                                                 "number": "220050-005-0424",
@@ -1709,7 +1915,8 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100322",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "4"
                                             },
                                             {
                                                 "number": "220050-005-0477",
@@ -1717,13 +1924,16 @@
                                                 "quantity": 1,
                                                 "mainSupplier": "100322",
                                                 "parts": [],
-                                                "existsETS": true
+                                                "existsETS": true,
+                                                "lynNumber": "5"
                                             }
                                         ],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "7"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "5"
                             },
                             {
                                 "number": "220050-005-0480",
@@ -1731,7 +1941,8 @@
                                 "quantity": 1,
                                 "mainSupplier": "100322",
                                 "parts": [],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "6"
                             },
                             {
                                 "number": "220050-005-0402W-REV1",
@@ -1745,7 +1956,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "220050-005-0425",
@@ -1753,7 +1965,8 @@
                                         "quantity": 2,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "220050-005-0404-REV1",
@@ -1761,13 +1974,16 @@
                                         "quantity": 2,
                                         "mainSupplier": "100322",
                                         "parts": [],
-                                        "existsETS": true
+                                        "existsETS": true,
+                                        "lynNumber": "3"
                                     }
                                 ],
-                                "existsETS": true
+                                "existsETS": true,
+                                "lynNumber": "7"
                             }
                         ],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "11"
                     },
                     {
                         "number": "E6.40.085.075.0 L1195mm",
@@ -1787,7 +2003,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "1"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0577",
@@ -1795,7 +2012,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "2"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0545",
@@ -1803,7 +2021,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "3"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0514",
@@ -1811,7 +2030,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "4"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0483",
@@ -1819,7 +2039,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "5"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0452",
@@ -1827,7 +2048,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "6"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0420",
@@ -1835,7 +2057,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "7"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0389",
@@ -1843,7 +2066,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "8"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0295",
@@ -1851,7 +2075,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "9"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0264",
@@ -1859,7 +2084,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "10"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0233",
@@ -1867,7 +2093,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "11"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0202",
@@ -1875,7 +2102,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "12"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0170",
@@ -1883,7 +2111,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "13"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0139",
@@ -1891,7 +2120,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "14"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0108",
@@ -1899,7 +2129,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "15"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_33_0077",
@@ -1907,7 +2138,8 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "16"
                                     },
                                     {
                                         "number": "2022_10_26_13_24_32_0983",
@@ -1915,13 +2147,16 @@
                                         "quantity": 1,
                                         "mainSupplier": "000085",
                                         "parts": [],
-                                        "existsETS": false
+                                        "existsETS": false,
+                                        "lynNumber": "17"
                                     }
                                 ],
-                                "existsETS": false
+                                "existsETS": false,
+                                "lynNumber": "1"
                             }
                         ],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "12"
                     },
                     {
                         "number": "220050-005-0606",
@@ -1929,7 +2164,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "13"
                     },
                     {
                         "number": "220050-005-0607",
@@ -1937,7 +2173,8 @@
                         "quantity": 1,
                         "mainSupplier": "100322",
                         "parts": [],
-                        "existsETS": true
+                        "existsETS": true,
+                        "lynNumber": "14"
                     },
                     {
                         "number": "Carrosserievloot RVS - IS",
@@ -1945,10 +2182,12 @@
                         "quantity": 2,
                         "mainSupplier": "000085",
                         "parts": [],
-                        "existsETS": false
+                        "existsETS": false,
+                        "lynNumber": "15"
                     }
                 ],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "22"
             },
             {
                 "number": "220050-005-0213-REV1",
@@ -1956,10 +2195,12 @@
                 "quantity": 4,
                 "mainSupplier": "100310",
                 "parts": [],
-                "existsETS": true
+                "existsETS": true,
+                "lynNumber": "23"
             }
         ],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "2"
     },
     {
         "number": "220050-005-0358-REV1",
@@ -1967,7 +2208,8 @@
         "quantity": 1,
         "mainSupplier": "100322",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "3"
     },
     {
         "number": "220050-005-0359",
@@ -1975,7 +2217,8 @@
         "quantity": 6,
         "mainSupplier": "100322",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "4"
     },
     {
         "number": "220050-005-0360",
@@ -1983,7 +2226,8 @@
         "quantity": 4,
         "mainSupplier": "100322",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "5"
     },
     {
         "number": "220050-005-0361",
@@ -1991,7 +2235,8 @@
         "quantity": 1,
         "mainSupplier": "100322",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "6"
     },
     {
         "number": "220050-005-0362",
@@ -1999,7 +2244,8 @@
         "quantity": 2,
         "mainSupplier": "100322",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "7"
     },
     {
         "number": "220050-005-0482K",
@@ -2007,7 +2253,8 @@
         "quantity": 1,
         "mainSupplier": "000085",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "8"
     },
     {
         "number": "220050-005-0483K",
@@ -2015,7 +2262,8 @@
         "quantity": 1,
         "mainSupplier": "000085",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "9"
     },
     {
         "number": "220050-005-0600",
@@ -2023,7 +2271,8 @@
         "quantity": 1,
         "mainSupplier": "100322",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "10"
     },
     {
         "number": "220050-005-0601",
@@ -2031,6 +2280,7 @@
         "quantity": 1,
         "mainSupplier": "100322",
         "parts": [],
-        "existsETS": true
+        "existsETS": true,
+        "lynNumber": "11"
     }
 ]
