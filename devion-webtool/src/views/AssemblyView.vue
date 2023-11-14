@@ -47,6 +47,7 @@ import LoadingAnimation from '../components/componenten/LoadingAnimation.vue';
 import { PostDataWithBody, PutDataWithBody } from '../global/global';
 
 let FileContents = null
+let FileName = null
 let partsNotFound = []
 let notFound = 0
 let totalParts = 0
@@ -173,12 +174,13 @@ export default {
             this.loading.showLoad = true
             let endpoint = 'devion/ets/transformbomexcel'
             FileContents = this.file.file.previewBase64.replace('data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,', '')
+            FileName = this.file.filename
             var data = {
                 "FileContents": FileContents
             }
+            endpoint += "?fileName=" + FileName
             PostDataWithBody(endpoint, data).then((response) => {
                 let artikels = JSON.parse(response)
-                console.log(artikels)
                 this.loading.showLoad = false
                 this.treeView.showTree = true
                 this.treeView.jsonData = artikels
