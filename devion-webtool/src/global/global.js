@@ -36,25 +36,6 @@ export async function PutDataWithBody(endpoint, data) {
     .catch((error) => console.error(error))
 }
 
-export async function PutDataWithBody(endpoint, data) {
-  var myHeaders = new Headers()
-  myHeaders.append('Content-Type', 'application/json')
-  myHeaders.append('Access-Control-Allow-Origin', '*')
-  myHeaders.append('Access-Control-Allow-Headers', '*')
-
-  var requestOptions = {
-    method: 'PUT',
-    headers: myHeaders,
-    body: data,
-    redirect: 'follow'
-  }
-
-  return fetch('http://192.168.100.237:5000/api/' + endpoint, requestOptions)
-    .then((response) => response.text())
-    .then((result) => result)
-    .catch((error) => console.error(error))
-}
-
 export async function GetData(endpoint) {
   return fetch('http://devionserverets:5000/api/' + endpoint)
     .then((response) => response.json())
