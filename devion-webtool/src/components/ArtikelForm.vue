@@ -560,13 +560,13 @@ export default {
 
                 options = []
                 for (element of data.measureTypes) {
-                    options.push({ value: element.CODE, label: element.DESCRIPTION })
+                    options.push({ value: element.CODE, label: element.SHORT_DESCRIPTION })
                 }
                 this.aaneh.options = options
 
                 options = []
                 for (element of data.measureTypes) {
-                    options.push({ value: element.CODE, label: element.DESCRIPTION })
+                    options.push({ value: element.CODE, label: element.SHORT_DESCRIPTION })
                 }
                 this.vereh.options = options
 

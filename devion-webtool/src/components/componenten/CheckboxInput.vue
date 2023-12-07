@@ -9,7 +9,7 @@
 
 export default {
     props: {
-        label: Object,
+        label: String,
         placeholder: String,
     },
     data() {

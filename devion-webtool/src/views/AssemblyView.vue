@@ -4,8 +4,10 @@
     <ButtonDevion :label="button.label" :isDisabled="button.isDisabled" :showButton="button.showButton"
         @click="handleButton" class="c-button" />
     <div v-if="loading.showLoad" class="c-load">
-        <LoadingAnimation :showLoad="loading.showLoad"/>
+        <LoadingAnimation :showLoad="loading.showLoad" />
     </div>
+    <ButtonDevion :label="test.label" :isDisabled="test.isDisabled" :showButton="test.showButton" @click="reveal"
+        class="c-button" />
     <labelDevion :label="missing.label" :showLabel="missing.showlabel" class="c-artikel-missing" />
     <TreeView :jsonData="treeView.jsonData" :showTree="treeView.showTree" />
     <div v-if="treeView.showTree" class="c-buttons">
@@ -14,6 +16,7 @@
         <ButtonDevion :label="buttonInsert.label" :isDisabled="buttonInsert.isDisabled"
             :showButton="buttonInsert.showButton" @click="handleButtonInsert" class="c-button c-button-tree" />
     </div>
+    <LabelDevion :label="linked.label" :showLabel="linked.showlabel" class="c-linked" />
     <div class="c-artikel-form">
         <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel"
             class="c-form" :check="artikelForm.check" ref="article" />
@@ -34,6 +37,7 @@
                 class="c-artikel-progress__text" />
         </div>
     </div>
+    <DialogsWrapper />
 </template>
 
 <script>
@@ -43,6 +47,9 @@ import TreeView from '../components/componenten/TreeView.vue';
 import ArtikelForm from '../components/ArtikelForm.vue';
 import LabelDevion from '../components/componenten/LabelDevion.vue';
 import LoadingAnimation from '../components/componenten/LoadingAnimation.vue';
+import DialogDevion from '../components/componenten/DialogDevion.vue';
+import { createConfirmDialog } from "vuejs-confirm-dialog";
+// import { useConfirmBeforeAction } from '../composables';
 
 import { PostDataWithBody, PutDataWithBody } from '../global/global';
 
@@ -52,7 +59,9 @@ let partsNotFound = []
 let notFound = 0
 let totalParts = 0
 let index, index2, save
-let artikels = []
+let artikelen = []
+let artikels
+let test = "merk"
 
 export default {
     components: {
@@ -81,6 +90,15 @@ export default {
                     ButtonDevion
                 },
                 label: 'IMPORTEREN',
+                isDisabled: false,
+                showButton: true
+            },
+            test: {
+                components: {
+                    ButtonDevion
+                },
+                id: 'test',
+                label: "test",
                 isDisabled: false,
                 showButton: true
             },
@@ -158,8 +176,26 @@ export default {
                     LoadingAnimation
                 },
                 showLoad: false
+            },
+            linked: {
+                components: {
+                    LabelDevion
+                },
+                label: 'artikelen gekoppeld',
+                showlabel: false
             }
         }
+    },
+    setup() {
+        const { reveal, onConfirm } = createConfirmDialog(DialogDevion, {
+            question: "Are you sure you want to change "+ test +"?",
+        })
+
+        onConfirm(() => {
+            console.log('confirm')
+        })
+
+        return {reveal}
     },
     methods: {
         handleFileUpdate(file) {
@@ -181,13 +217,21 @@ export default {
             endpoint += "?fileName=" + FileName
             PostDataWithBody(endpoint, data).then((response) => {
                 let artikels = JSON.parse(response)
+                for (let artikel of artikels) {
+                    if (artikel) {
+                        artikelen.push(artikel)
+                    }
+                }
                 this.loading.showLoad = false
                 this.treeView.showTree = true
-                this.treeView.jsonData = artikels
+                this.treeView.jsonData = artikelen
                 notFound = 0
                 totalParts = 0
-                for (let artikel of artikels) {
-                    this.checkArtikel(artikel)
+                for (let artikel of artikelen) {
+                    if (artikel) {
+                        console.log(artikel)
+                        this.checkArtikel(artikel)
+                    }
                 }
                 if (notFound > 0) {
                     this.missing.showlabel = true
@@ -217,17 +261,19 @@ export default {
         },
         checkArtikel(artikel) {
             totalParts++
-            if (artikel.parts) {
-                for (let part of artikel.parts) {
-                    this.checkArtikel(part)
+            if (artikel) {
+                if (artikel.parts) {
+                    for (let part of artikel.parts) {
+                        this.checkArtikel(part)
+                    }
                 }
-            }
-            if (artikel.existsETS == false) {
-                if (partsNotFound.includes(artikel)) {
-                    console.log('already in array')
-                } else {
-                    partsNotFound.push(artikel)
-                    notFound++
+                if (artikel.existsETS == false) {
+                    if (partsNotFound.includes(artikel)) {
+                        console.log('already in array')
+                    } else {
+                        partsNotFound.push(artikel)
+                        notFound++
+                    }
                 }
             }
         },
@@ -249,9 +295,12 @@ export default {
                 this.missing.showlabel = false
             } else {
                 this.loading.showLoad = true
-                PutDataWithBody('devion/ets/updatalinkedarticles', artikels).then((response) => {
+                PutDataWithBody('devion/ets/updatelinkedarticles', artikelen).then((response) => {
                     console.log(response)
                     this.loading.showLoad = false
+                    this.linked.showlabel = true
+                }).error((error) => {
+                    console.error(error)
                 })
             }
         },
@@ -320,6 +369,9 @@ export default {
             save = true
             this.$refs.article.createInfoObject()
         },
+        handleTest() {
+
+        }
     }
 }
 </script>
@@ -351,5 +403,10 @@ export default {
 .c-load {
     display: flex;
     justify-content: center;
+}
+
+.c-linked {
+    display: flex;
+    justify-content: flex-end;
 }
 </style>
