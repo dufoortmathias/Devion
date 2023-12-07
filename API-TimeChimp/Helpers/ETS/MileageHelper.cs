@@ -35,7 +35,8 @@ public class ETSMileageHelper : ETSHelper
                 {"@start", $"{mileage.PLA_START:yyyy-MM-dd}%" },
                 {"@persoon", mileage.PLA_PERSOON ?? throw new Exception($"Mileage {mileage.PLA_ID} from ETS has no PLA_PERSOON")}
             };
-        } else
+        }
+        else
         {
 
             queryGet = $"SELECT * FROM tbl_planning WHERE PLA_PROJECT = @project AND PLA_SUBPROJECT = @subproject AND PLA_START LIKE @start AND PLA_PERSOON = @persoon;";

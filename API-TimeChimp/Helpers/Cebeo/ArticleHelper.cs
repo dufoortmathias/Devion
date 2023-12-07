@@ -1,5 +1,3 @@
-using Api.Devion.Models;
-
 namespace Api.Devion.Helpers.ETS;
 
 public class CebeoArticleHelper
@@ -34,12 +32,12 @@ public class CebeoArticleHelper
         XmlSerializer serializer = new(typeof(CebeoXML));
         using (StringReader reader = new(responseXML))
         {
-            CebeoXML result = (CebeoXML) (serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}"));
+            CebeoXML result = (CebeoXML)(serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}"));
 
-            return result.Response?.Article?.List?.Item?.Find(x => 
-                x.Material != null && 
-                x.Material.Reference != null && x.Material.Reference.Equals(reference) && 
-                (reelCode == null || (x.Material.ReelCode != null && x.Material.ReelCode.Equals(reelCode))) && 
+            return result.Response?.Article?.List?.Item?.Find(x =>
+                x.Material != null &&
+                x.Material.Reference != null && x.Material.Reference.Equals(reference) &&
+                (reelCode == null || (x.Material.ReelCode != null && x.Material.ReelCode.Equals(reelCode))) &&
                 (reelLength == null || (x.Material.ReelLength != null && x.Material.ReelLength.Equals(reelLength))));
         }
     }

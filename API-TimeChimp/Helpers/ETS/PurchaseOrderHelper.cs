@@ -80,7 +80,7 @@ LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1
 
         //get all purchase orders from the json
         List<PurchaseOrderDetailETS> purchaseOrders = JsonTool.ConvertTo<List<PurchaseOrderDetailETS>>(json);
-        
+
         return purchaseOrders;
     }
 

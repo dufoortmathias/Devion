@@ -1,5 +1,3 @@
-using Api.Devion.Models;
-
 namespace Api.Devion.Helpers.TimeChimp;
 
 public class TimeChimpContactHelper : TimeChimpHelper

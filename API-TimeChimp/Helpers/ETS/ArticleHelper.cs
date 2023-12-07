@@ -243,13 +243,15 @@ public class ETSArticleHelper : ETSHelper
         if (price - price * maxPriceDiff < newPrice || newPrice < price + price * maxPriceDiff)
         {
             string query = $"EXECUTE PROCEDURE UPDATE_ARTIKEL_PRIJS @number, @price";
-            Dictionary<string, object> parameters = new()
+            Dictionary<string, object> parameter = new()
             {
-                {"@number", articleNumber},
+                {"@number", int.Parse(articleNumber)},
                 {"@price", newPrice }
             };
 
-            ETSClient.ExecuteQuery(query, parameters);
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            ETSClient.ExecuteQuery(query, parameter);
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 
             article.ART_AANKP = newPrice;
         }
@@ -263,7 +265,7 @@ public class ETSArticleHelper : ETSHelper
         Dictionary<string, object> parameters = new()
         {
             {"@artikel", part.Number},
-            {"@master", main.Number }
+            {"@master", main.Number}
         };
 
         string response = ETSClient.selectQuery(query, parameters);
@@ -289,7 +291,7 @@ public class ETSArticleHelper : ETSHelper
                 masterId = JsonTool.ConvertTo<List<Dictionary<string, string>>>(jsonMasterId).First()["ART_ID"];
             }
 
-            string jsonPartId = ETSClient.selectQuery(query1,parametersPart);
+            string jsonPartId = ETSClient.selectQuery(query1, parametersPart);
             string partId = "";
             if (jsonPartId != null && jsonPartId != "[]")
             {
@@ -299,14 +301,26 @@ public class ETSArticleHelper : ETSHelper
             if (masterId != "" && partId != "")
             {
                 //TODO: query schrijven voor linken
-                Dictionary<string, object> propertiesMain = new()
+                string query2 = "insert into TBL_ARTIKEL_GEKOPPELD (arg_master_id, arg_art_id, arg_lynnr, arg_aantal) values (@masterId, @partId, @lynNumber, @quantity)";
+#pragma warning disable CS8604 // Possible null reference argument.
+                Dictionary<string, object?> propertiesMain = new()
                 {
-                    {"@masterId", masterId },
-                    {"@partId", partId },
-                    {"@lynNumber", part.LynNumber },
+                    {"@masterId", int.Parse(masterId) },
+                    {"@partId", int.Parse(partId) },
+                    {"@lynNumber", int.Parse(part.LynNumber) },
                     {"@quantity", part.Quantity }
                 };
+#pragma warning restore CS8604 // Possible null reference argument.
+
                 //TODO: execute schrijven
+                try
+                {
+                    ETSClient.ExecuteQuery(query2, propertiesMain);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
 
         }

@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
@@ -13,8 +11,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowOrigins", builder =>
     {
-        builder.WithOrigins(config["AllowedHosts"]);
+        builder.WithOrigins("*");
         builder.WithHeaders("*");
+        builder.AllowAnyMethod();
     });
 });
 
@@ -48,6 +47,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     ETSSupplierHelper supplierHelperETS = new(ETSClient);
     ETSTimeHelper timeHelperETS = new(ETSClient, TCClient);
     ETSUurcodeHelper uurcodeHelperETS = new(ETSClient);
+    ETSProjVoortgangHelper projVoortgangHelperETS = new(ETSClient);
 
     TimeChimpContactHelper contactHelperTC = new(TCClient);
     TimeChimpCustomerHelper customerHelperTC = new(TCClient);
@@ -369,7 +369,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                 TCSubproject.id = subProject.id;
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
-                
+
                 if (TCSubproject.active ?? false)
                 {
                     //update budgethours for each projecttask in timeChimp
@@ -741,75 +741,65 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}CreateArticle").WithTags(company);
 
-    _ = app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile, string fileName) =>
+    app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile, string fileName) =>
     {
         try
         {
             //TODO: part number halen uit naam file
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            Item mainPart = new(fileName.Split("_").First(), String.Empty, 1, "0");
 
-            using (var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content")))
+            using var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content"));
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+            DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
             {
-                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
                 {
-                    DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
+                    UseHeaderRow = true
+                }
+            });
+
+            DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
+
+            List<Item?> assemblies = new();
+            foreach (DataRow row in table.Rows)
+            {
+                List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
+                List<Item?> parentList = assemblies;
+                foreach (int level in hierarchy)
+                {
+                    while (level >= parentList.Count)
                     {
-                        ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
-                        {
-                            UseHeaderRow = true
-                        }
-                    });
-
-                    DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
-
-                    List<Item?> assemblies = new();
-                    foreach (DataRow row in table.Rows)
-                    {
-                        List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
-                        List<Item?> parentList = assemblies;
-                        foreach (int level in hierarchy)
-                        {
-                            while (level >= parentList.Count)
-                            {
-                                parentList.Add(null);
-                            }
-
-                            if (parentList[level] != null)
-                            {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                                parentList = parentList[level].Parts;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-                            }
-                            else
-                            {
-                                Item part = new((string)row["Part Number"], row["Description"] is System.DBNull ? String.Empty : (string)row["Description"], Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
-
-                                if (part.Number.Length > 25)
-                                {
-                                    throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
-                                }
-                                string operation = ((string)row["Bewerking 1"]).ToUpper().Trim();
-                                string supplier = config[$"Operations:{operation}"] ?? config[$"Operations:"];
-
-                                part.MainSupplier = supplierHelperETS.FindSupplierId(supplier);
-
-                                part.ExistsETS = articleHelperETS.ArticleWithNumberExists(part.Number);
-
-                                parentList[level] = part;
-                            }
-                        }
+                        parentList.Add(null);
                     }
-                    mainPart.Parts = assemblies;
-                    mainPart.MainSupplier = supplierHelperETS.FindSupplierId("Metabil");
-                    mainPart.Description = mainPart.Number.ToString();
-                    List<Item> items = new()
+
+                    if (parentList[level] != null)
                     {
-                        mainPart
-                    };
-                    return Results.Ok(items);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                        parentList = parentList[level].Parts;
+                    }
+                    else
+                    {
+#pragma warning disable CS8604 // Dereference of a possibly linenull reference.
+                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"], Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
+#pragma warning restore CS8604 // Dereference of a possibly null reference.
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+                        if (part.Number.Length > 25)
+                        {
+                            throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
+                        }
+                        string operation = ((string)row["Bewerking 1"]).ToUpper().Trim();
+                        string supplier = config[$"Operations:{operation}"] ?? config[$"Operations:"];
+
+                        part.MainSupplier = supplierHelperETS.FindSupplierId(supplier);
+
+                        part.ExistsETS = articleHelperETS.ArticleWithNumberExists(part.Number);
+
+                        parentList[level] = part;
+                    }
                 }
             }
+            return Results.Ok(assemblies);
         }
         catch (Exception e)
         {
@@ -821,24 +811,45 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
+            if (articles == null || !articles.Any())
+            {
+                // Handle the case where no articles are provided
+                return Results.BadRequest("No articles provided.");
+            }
+
+            Console.WriteLine($"Received {articles.Count} articles.");
+
             void LinkArticles(Item main)
             {
-                foreach (Item part in main.Parts.Where(i => i != null).Cast<Item>().ToList())
+                if (main.Parts != null)
                 {
-                    articleHelperETS.LinkArticle(main, part);
-                    LinkArticles(part);
+                    foreach (Item part in main.Parts.Where(i => i != null).OfType<Item>())
+                    {
+                        articleHelperETS.LinkArticle(main, part);
+                        LinkArticles(part);
+                    }
                 }
-            };
+            }
 
-            articles.ForEach(a => LinkArticles(a));
+            foreach (Item article in articles)
+            {
+                LinkArticles(article);
+            }
 
-            return Results.Ok();
+            return Results.Ok(articles);
         }
         catch (Exception e)
         {
+            Console.WriteLine($"Error: {e.Message}");
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/ets/projectenvoortgang", () =>
+    {
+
+        return projVoortgangHelperETS.GetProjectenVoortgang();
+    }).WithName($"{company}ProjectenVoortgang").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
