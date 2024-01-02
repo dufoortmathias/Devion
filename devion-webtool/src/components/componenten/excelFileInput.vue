@@ -41,7 +41,6 @@ export default {
                     file.previewBase64 = reader.result
                     // Emit the file with the new previewBase64 property on it
                     this.$emit('file-updated', file)
-                    console.log(file)
                 }
                 reader.onerror = (error) => {
                     console.error(error)

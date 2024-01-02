@@ -3,13 +3,13 @@
         <li v-for="(part, index) in jsonData" :key="index" class="c-placement">
             <div>
                 <span @click="toggleNode(part)"
-                    :class="{ 'caret': hasChildParts(part), 'no-caret': !hasChildParts(part), 'caret-down': part.expanded, 'exists': part.existsDev, 'not-exists': !part.existsDev}"
+                    :class="{ 'caret': hasChildParts(part), 'no-caret': !hasChildParts(part), 'caret-down': part.expanded, 'exists': part.existsMet, 'not-exists': !part.existsMet}"
                     class="c-text">
                     {{ part.number }} ({{ part.description }})
                 </span>
             </div>
             <ul v-if="part.parts && part.expanded">
-                <TreeView :jsonData="part.parts" :showTree="true" />
+                <TreeViewMet :jsonData="part.parts" :showTree="true" />
             </ul>
         </li>
     </ul>
@@ -17,7 +17,7 @@
 
 <script>
 export default {
-    name: 'TreeView',
+    name: 'TreeViewMet',
     props: {
         jsonData: Array,
         showTree: Boolean,

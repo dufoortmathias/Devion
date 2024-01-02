@@ -8,8 +8,19 @@
     </div>
     <ButtonDevion :label="test.label" :isDisabled="test.isDisabled" :showButton="test.showButton" @click="reveal"
         class="c-button" />
+    <h2 v-show="treeView.showTree">
+        Devion</h2>
     <labelDevion :label="missing.label" :showLabel="missing.showlabel" class="c-artikel-missing" />
     <TreeView :jsonData="treeView.jsonData" :showTree="treeView.showTree" />
+    <div v-show="treeViewMet.showTree" class="c-metabil">
+        <h2 class="c-title">Metabil</h2>
+        <labelDevion :label="link.label" :showLabel="link.showlabel" class="c-link" />
+        <BasicToggleSwitch v-model="LinkModel" class="c-toggle" />
+        <textInput :id="mass.id" :label="mass.label" :error="mass.error" :placeholder="mass.placeholder"
+            :errorText="mass.errorText" class="c-mass" @option-selected="handlemass" />
+    </div>
+    <labelDevion :label="missingMet.label" :showLabel="missingMet.showlabel" class="c-artikel-missing" />
+    <TreeViewMet :jsonData="treeViewMet.jsonData" :showTree="treeViewMet.showTree" />
     <div v-if="treeView.showTree" class="c-buttons">
         <ButtonDevion :label="buttonSave.label" :isDisabled="buttonSave.isDisabled" :showButton="buttonSave.showButton"
             @click="handleButtonSave" class="c-button c-button-tree" />
@@ -49,19 +60,28 @@ import LabelDevion from '../components/componenten/LabelDevion.vue';
 import LoadingAnimation from '../components/componenten/LoadingAnimation.vue';
 import DialogDevion from '../components/componenten/DialogDevion.vue';
 import { createConfirmDialog } from "vuejs-confirm-dialog";
+import TreeViewMet from '../components/componenten/TreeViewMet.vue';
+import BasicToggleSwitch from '../components/componenten/ToggleButton.vue';
+import textInput from '../components/componenten/textInput.vue';
 // import { useConfirmBeforeAction } from '../composables';
+import { ref } from 'vue'
 
-import { PostDataWithBody, PutDataWithBody } from '../global/global';
+import { GetData, PostDataWithBody, PutDataWithBody } from '../global/global';
 
 let FileContents = null
 let FileName = null
 let partsNotFound = []
 let notFound = 0
 let totalParts = 0
+let partsNotFoundMet = []
+let notFoundMet = 0
+let totalPartsMet = 0
 let index, index2, save
 let artikelen = []
+let artikelenMet = []
 let artikels
 let test = "merk"
+const LinkModel = ref(true)
 
 export default {
     components: {
@@ -70,10 +90,24 @@ export default {
         TreeView,
         ArtikelForm,
         LabelDevion,
-        LoadingAnimation
+        LoadingAnimation,
+        TreeViewMet,
+        BasicToggleSwitch,
+        textInput
     },
     data() {
         return {
+            LinkModel: true,
+            mass: {
+                components: {
+                    textInput,
+                },
+                id: 'mass',
+                label: 'prijs/kg',
+                error: false,
+                placeholder: 'euro',
+                errorText: 'mass prijs is verplicht'
+            },
             file: {
                 components: {
                     ExcelFileInput
@@ -100,14 +134,21 @@ export default {
                 id: 'test',
                 label: "test",
                 isDisabled: false,
-                showButton: true
+                showButton: false
             },
             treeView: {
                 components: {
                     TreeView
                 },
                 showTree: false,
-                jsonData: null
+                jsonData: []
+            },
+            treeViewMet: {
+                components: {
+                    TreeViewMet
+                },
+                showTree: false,
+                jsonData: []
             },
             buttonSave: {
                 components: {
@@ -171,6 +212,13 @@ export default {
                 label: 'Artikel niet gevonden 0/0',
                 showlabel: false
             },
+            missingMet: {
+                components: {
+                    LabelDevion
+                },
+                label: 'Artikel niet gevonden 0/0',
+                showlabel: false
+            },
             loading: {
                 components: {
                     LoadingAnimation
@@ -183,19 +231,25 @@ export default {
                 },
                 label: 'artikelen gekoppeld',
                 showlabel: false
-            }
+            },
+            link: {
+                components: {
+                    LabelDevion
+                },
+                label: 'Link Metabil: ',
+                showlabel: true
+            },
         }
     },
     setup() {
         const { reveal, onConfirm } = createConfirmDialog(DialogDevion, {
-            question: "Are you sure you want to change "+ test +"?",
+            question: "Are you sure you want to change " + test + "?",
         })
 
         onConfirm(() => {
             console.log('confirm')
         })
-
-        return {reveal}
+        return { reveal }
     },
     methods: {
         handleFileUpdate(file) {
@@ -225,28 +279,20 @@ export default {
                 this.loading.showLoad = false
                 this.treeView.showTree = true
                 this.treeView.jsonData = artikelen
+                this.treeViewMet.showTree = true
                 notFound = 0
                 totalParts = 0
                 for (let artikel of artikelen) {
                     if (artikel) {
-                        console.log(artikel)
-                        this.checkArtikel(artikel)
+                        this.checkArtikel(artikel, false)
                     }
                 }
-                if (notFound > 0) {
-                    this.missing.showlabel = true
-                } else {
-                    this.missing.showlabel = false
-                }
-                this.missing.label = 'Artikels niet gevonden ' + notFound + '/' + totalParts
             })
         },
         handleButtonSave() {
             if (notFound > 0) {
                 this.artikelForm.showform = true
-                index = 89
-                this.artikelForm.data = partsNotFound[index]
-                this.save.showButton = true
+                this.save.showButton = false
                 this.next.showButton = true
                 this.prev.showButton = true
                 this.artikelProgress.showLabel = true
@@ -254,27 +300,98 @@ export default {
                 this.file.showFile = false
                 this.button.showButton = false
                 this.treeView.showTree = false
+                this.treeViewMet.showTree = false
                 this.buttonSave.showButton = false
                 this.buttonInsert.showButton = false
                 this.missing.showlabel = false
+                this.missingMet.showlabel = false
             }
         },
-        checkArtikel(artikel) {
+        checkArtikel(artikel, metabil) {
             totalParts++
             if (artikel) {
+                if (artikel.number.charAt(artikel.number.length - 1) == 'W') {
+                    metabil = true
+                }
                 if (artikel.parts) {
                     for (let part of artikel.parts) {
-                        this.checkArtikel(part)
+                        this.checkArtikel(part, metabil)
                     }
                 }
-                if (artikel.existsETS == false) {
-                    if (partsNotFound.includes(artikel)) {
-                        console.log('already in array')
-                    } else {
-                        partsNotFound.push(artikel)
-                        notFound++
-                    }
+                if (artikel.bewerking1.toUpperCase() == "LASSEN" || artikel.bewerking2.toUpperCase() == "LASSEN" || artikel.bewerking3.toUpperCase() == "LASSEN" || artikel.bewerking4.toUpperCase() == "LASSEN") {
+                    metabil = true
+                } else if (metabil == true) {
+                    metabil = true
+                } else {
+                    metabil = false
                 }
+                if (metabil == false || artikel.number.charAt(artikel.number.length - 1) == 'W')
+                    GetData(`devion/ets/articleexists?ArticleNumber=` + artikel.number).then((result) => result).then((data) => {
+                        artikel.existsDev = data
+                        if (artikel.existsDev == false) {
+                            if (partsNotFound.includes(artikel)) {
+                                console.log('already in array')
+                            } else {
+                                partsNotFound.push(artikel)
+                                notFound++
+                            }
+                        }
+
+                        if (notFound > 0) {
+                            this.missing.showlabel = true
+                        } else {
+                            this.missing.showlabel = false
+                        }
+                        this.missing.label = 'Artikels niet gevonden ' + notFound + '/' + totalParts
+                    })
+
+                if (metabil == true) {
+                    GetData('metabil/ets/articleexists?ArticleNumber=' + artikel.number).then((result) => result).then((data) => {
+                        totalPartsMet++
+                        artikel.existsMet = data
+                        if (artikel.existsMet == false) {
+                            if (partsNotFoundMet.includes(artikel)) {
+                                console.log('already in array')
+                            } else {
+                                partsNotFoundMet.push(artikel)
+                                notFoundMet++
+                            }
+                        }
+                        if (artikel.number.charAt(artikel.number.length - 1) == 'W') {
+                            artikelenMet.push(artikel)
+                            // Find the index of the item in artikelen based on the number property
+                            // Find the index of the item in artikelen based on the number property
+                            let i = artikelen.findIndex(item => item.number === artikel.number);
+                            console.log("Index:", i);
+
+                            // Check if the item exists at the found index in this.treeView.jsonData
+                            if (i !== -1 && this.treeView.jsonData[i]) {
+                                // Create a deep copy of the item you're about to remove
+                                const retainedItem = JSON.parse(JSON.stringify(this.treeView.jsonData[i]));
+
+                                // Set the parts array of the item to an empty array
+                                this.treeView.jsonData[i].parts = [];
+
+                                console.log("Updated this.treeView.jsonData:", this.treeView.jsonData);
+
+                                // Now, you can add the deep-copied retainedItem to this.treeViewMet.jsonData
+                                this.treeViewMet.jsonData.push(retainedItem);
+
+                                console.log("Updated this.treeViewMet.jsonData:", this.treeViewMet.jsonData);
+                            } else {
+                                console.log("Item not found or already removed.");
+                            }
+                        }
+
+                        if (notFoundMet > 0) {
+                            this.missingMet.showlabel = true
+                        } else {
+                            this.missingMet.showlabel = false
+                        }
+                        this.missingMet.label = 'Artikels niet gevonden ' + notFoundMet + '/' + totalPartsMet
+                    })
+                }
+
             }
         },
         async handleButtonInsert() {
@@ -290,16 +407,18 @@ export default {
                 this.file.showFile = false
                 this.button.showButton = false
                 this.treeView.showTree = false
+                this.treeView.showTree = false
                 this.buttonSave.showButton = false
                 this.buttonInsert.showButton = false
                 this.missing.showlabel = false
+                this.missingMet.showlabel = false
             } else {
                 this.loading.showLoad = true
                 PutDataWithBody('devion/ets/updatelinkedarticles', artikelen).then((response) => {
                     console.log(response)
                     this.loading.showLoad = false
                     this.linked.showlabel = true
-                }).error((error) => {
+                }).catch((error) => {
                     console.error(error)
                 })
             }
@@ -369,9 +488,8 @@ export default {
             save = true
             this.$refs.article.createInfoObject()
         },
-        handleTest() {
-
-        }
+        handleTest() { },
+        handleMass() { }
     }
 }
 </script>
@@ -408,5 +526,28 @@ export default {
 .c-linked {
     display: flex;
     justify-content: flex-end;
+}
+
+.c-metabil {
+    display: grid;
+    grid-template-areas: "title link toggle mass";
+    grid-template-columns: 2fr 1fr 1fr 2fr 4fr;
+    align-items: baseline;
+}
+
+.c-title {
+    grid-area: "title"
+}
+
+.c-link {
+    grid-area: "link";
+}
+
+.c-toggle {
+    grid-area: "toggle"
+}
+
+.c-mass {
+    grid-area: "mass"
 }
 </style>
