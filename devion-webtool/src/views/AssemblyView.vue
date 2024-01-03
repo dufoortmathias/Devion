@@ -19,8 +19,8 @@
         <textInput :id="mass.id" :label="mass.label" :error="mass.error" :placeholder="mass.placeholder"
             :errorText="mass.errorText" class="c-mass" @option-selected="handleMass" />
     </div>
-    <labelDevion :label="missingMet.label" :showLabel="missingMet.showlabel" class="c-artikel-missing" />
-    <TreeViewMet :jsonData="treeViewMet.jsonData" :showTree="treeViewMet.showTree" />
+    <labelDevion :label="missingMet.label" :showLabel="missingMet.showlabel && LinkModel" class="c-artikel-missing"/>
+    <TreeViewMet :jsonData="treeViewMet.jsonData" :showTree="treeViewMet.showTree && LinkModel"/>
     <div v-if="treeView.showTree" class="c-buttons">
         <ButtonDevion :label="buttonSave.label" :isDisabled="buttonSave.isDisabled" :showButton="buttonSave.showButton"
             @click="handleButtonSave" class="c-button c-button-tree" />
