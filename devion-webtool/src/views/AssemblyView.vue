@@ -17,7 +17,7 @@
         <labelDevion :label="link.label" :showLabel="link.showlabel" class="c-link" />
         <BasicToggleSwitch v-model="LinkModel" class="c-toggle" />
         <textInput :id="mass.id" :label="mass.label" :error="mass.error" :placeholder="mass.placeholder"
-            :errorText="mass.errorText" class="c-mass" @option-selected="handlemass" />
+            :errorText="mass.errorText" class="c-mass" @option-selected="handleMass" />
     </div>
     <labelDevion :label="missingMet.label" :showLabel="missingMet.showlabel" class="c-artikel-missing" />
     <TreeViewMet :jsonData="treeViewMet.jsonData" :showTree="treeViewMet.showTree" />
@@ -271,14 +271,12 @@ export default {
             endpoint += "?fileName=" + FileName
             PostDataWithBody(endpoint, data).then((response) => {
                 let artikels = JSON.parse(response)
-                for (let artikel of artikels) {
-                    if (artikel) {
-                        artikelen.push(artikel)
-                    }
-                }
+                artikelen.push(artikels)
+                console.log(artikelen)
                 this.loading.showLoad = false
                 this.treeView.showTree = true
-                this.treeView.jsonData = artikelen
+                this.treeView.jsonData = Array.from(artikelen)
+                console.log(this.treeView.jsonData)
                 this.treeViewMet.showTree = true
                 notFound = 0
                 totalParts = 0
@@ -325,6 +323,7 @@ export default {
                 } else {
                     metabil = false
                 }
+                
                 if (metabil == false || artikel.number.charAt(artikel.number.length - 1) == 'W')
                     GetData(`devion/ets/articleexists?ArticleNumber=` + artikel.number).then((result) => result).then((data) => {
                         artikel.existsDev = data
@@ -361,16 +360,18 @@ export default {
                             artikelenMet.push(artikel)
                             // Find the index of the item in artikelen based on the number property
                             // Find the index of the item in artikelen based on the number property
-                            let i = artikelen.findIndex(item => item.number === artikel.number);
+                            let i = artikelen[0].parts.findIndex(item => item.number === artikel.number);
                             console.log("Index:", i);
+
+                            console.log(this.treeView.jsonData[0].parts[i])
 
                             // Check if the item exists at the found index in this.treeView.jsonData
                             if (i !== -1 && this.treeView.jsonData[i]) {
                                 // Create a deep copy of the item you're about to remove
-                                const retainedItem = JSON.parse(JSON.stringify(this.treeView.jsonData[i]));
+                                const retainedItem = JSON.parse(JSON.stringify(this.treeView.jsonData[0].parts[i]));
 
                                 // Set the parts array of the item to an empty array
-                                this.treeView.jsonData[i].parts = [];
+                                this.treeView.jsonData[0].parts[i].parts = [];
 
                                 console.log("Updated this.treeView.jsonData:", this.treeView.jsonData);
 
