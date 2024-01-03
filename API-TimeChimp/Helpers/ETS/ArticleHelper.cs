@@ -82,11 +82,10 @@ public class ETSArticleHelper : ETSHelper
         string query = "SELECT * FROM CSARTPX WHERE ART_NR = @number";
         Dictionary<string, object> parameters = new()
         {
-            {"@number", articleNumber},
+            {"@number", articleNumber.ToUpper()},
         };
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article from ETS with query: " + query);
-
         return JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0;
     }
 

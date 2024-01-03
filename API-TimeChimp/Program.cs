@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
@@ -758,6 +760,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 }
             });
 
+            Item MainPart = new Item();
+            string number = fileName.Split('.')[0].Split('_')[0];
+            string omschrijving = fileName.Split('.')[0].Split('_')[1];
+            MainPart.Number = number;
+            MainPart.Description = omschrijving;
+            MainPart.LynNumber = "1";
+
             DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
 
             List<Item?> assemblies = new();
@@ -780,26 +789,46 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     else
                     {
 #pragma warning disable CS8604 // Dereference of a possibly linenull reference.
-                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"], Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
+                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
 #pragma warning restore CS8604 // Dereference of a possibly null reference.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-                        if (part.Number.Length > 25)
+                        if (part.Number is not null && part.Number.Length > 25)
                         {
                             throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
                         }
-                        string operation = ((string)row["Bewerking 1"]).ToUpper().Trim();
-                        string supplier = config[$"Operations:{operation}"] ?? config[$"Operations:"];
+                        try
+                        {
 
-                        part.MainSupplier = supplierHelperETS.FindSupplierId(supplier);
+                            part.MainSupplier = row["VENDOR"] != DBNull.Value ? ((string)row["VENDOR"]) : string.Empty;
 
-                        part.ExistsETS = articleHelperETS.ArticleWithNumberExists(part.Number);
+                            part.Bewerking1 = row["Bewerking 1"] != DBNull.Value ? ((string)row["Bewerking 1"]).ToUpper().Trim() : "-";
+                            part.Bewerking2 = row["Bewerking 2"] != DBNull.Value ? ((string)row["Bewerking 2"]).ToUpper().Trim() : "-";
+                            part.Bewerking3 = row["Bewerking 3"] != DBNull.Value ? ((string)row["Bewerking 3"]).ToUpper().Trim() : "-";
+                            part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
 
-                        parentList[level] = part;
+                            float massValue;
+                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Split(' ')[0], out massValue) ? massValue : 0;
+
+                            part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
+                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? (int)((double)row["Aankoop per"]) : 1;
+                            part.Verbruikseenh = row["Verbruikseenh"] != DBNull.Value ? ((string)row["Verbruikseenh"]).ToUpper().Trim() : "ST";
+                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? (int)((double)row["Omrekeningsfactor"]) : 1;
+                            part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
+
+                            parentList[level] = part;
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            return Results.Problem(e.Message);
+                        }
                     }
                 }
             }
-            return Results.Ok(assemblies);
+            MainPart.Parts = assemblies;
+            return Results.Ok(MainPart);
         }
         catch (Exception e)
         {
@@ -850,6 +879,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
         return projVoortgangHelperETS.GetProjectenVoortgang();
     }).WithName($"{company}ProjectenVoortgang").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/ets/articleExists", (string ArticleNumber) =>
+    {
+        return Results.Ok(articleHelperETS.ArticleWithNumberExists(ArticleNumber));
+    }).WithName($"{company}ArticleExists").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
