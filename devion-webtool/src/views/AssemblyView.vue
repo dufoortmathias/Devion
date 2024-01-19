@@ -8,9 +8,14 @@
     </div>
     <ButtonDevion :label="test.label" :isDisabled="test.isDisabled" :showButton="test.showButton" @click="reveal"
         class="c-button" />
-    <h2 v-show="treeView.showTree">
-        Devion</h2>
+    <div v-show="treeView.showTree" class="c-dev">
+        <h2 class="c-dev-title">Devion</h2>
+        <ButtonDevion :label="changeDev.label" :isDisabled="changeDev.isDisabled" :showButton="changeDev.showButton"
+            @click="() => TogglePopup('changeDevion')" class="c-button c-change-dev" />
+    </div>
     <labelDevion :label="missing.label" :showLabel="missing.showlabel" class="c-artikel-missing" />
+    <PopupDevion :TogglePopup="() => TogglePopup('changeDevion')" :data="changeDev.data" v-show="popupTriggers.changeDevion"
+        @change-items="updateItemsDev" />
     <TreeView :jsonData="treeView.jsonData" :showTree="treeView.showTree" />
     <div v-show="treeViewMet.showTree" class="c-metabil">
         <h2 class="c-title">Metabil</h2>
@@ -18,9 +23,13 @@
         <BasicToggleSwitch v-model="LinkModel" class="c-toggle" />
         <textInput :id="mass.id" :label="mass.label" :error="mass.error" :placeholder="mass.placeholder"
             :errorText="mass.errorText" class="c-mass" @option-selected="handleMass" />
+        <buttonDevion :label="changeMet.label" :isDisabled="changeMet.isDisabled" :showButton="changeMet.showButton"
+            @click="() => TogglePopup('changeMetabil')" class="c-button c-change-met" />
     </div>
-    <labelDevion :label="missingMet.label" :showLabel="missingMet.showlabel && LinkModel" class="c-artikel-missing"/>
-    <TreeViewMet :jsonData="treeViewMet.jsonData" :showTree="treeViewMet.showTree && LinkModel"/>
+    <PopupDevion :TogglePopup="() => TogglePopup('changeMetabil')" :data="changeMet.data"
+        v-show="popupTriggers.changeMetabil" @change-items="updateItemsMet" />
+    <labelDevion :label="missingMet.label" :showLabel="missingMet.showlabel && LinkModel" class="c-artikel-missing" />
+    <TreeViewMet :jsonData="treeViewMet.jsonData" :showTree="treeViewMet.showTree && LinkModel" />
     <div v-if="treeView.showTree" class="c-buttons">
         <ButtonDevion :label="buttonSave.label" :isDisabled="buttonSave.isDisabled" :showButton="buttonSave.showButton"
             @click="handleButtonSave" class="c-button c-button-tree" />
@@ -63,6 +72,7 @@ import { createConfirmDialog } from "vuejs-confirm-dialog";
 import TreeViewMet from '../components/componenten/TreeViewMet.vue';
 import BasicToggleSwitch from '../components/componenten/ToggleButton.vue';
 import textInput from '../components/componenten/textInput.vue';
+import PopupDevion from '../components/componenten/PopupDevion.vue';
 // import { useConfirmBeforeAction } from '../composables';
 import { ref } from 'vue'
 
@@ -82,6 +92,13 @@ let artikelenMet = []
 let artikels
 let test = "merk"
 const LinkModel = ref(true)
+let changesDev = []
+let changesMet = []
+const popupTriggers = ref({
+    changeDevion: false,
+    changeMetabil: false
+})
+let logs = []
 
 export default {
     components: {
@@ -93,10 +110,13 @@ export default {
         LoadingAnimation,
         TreeViewMet,
         BasicToggleSwitch,
-        textInput
+        textInput,
+        PopupDevion,
     },
     data() {
         return {
+            artikelenMet: Array(),
+            popupTriggers,
             LinkModel: true,
             mass: {
                 components: {
@@ -124,7 +144,7 @@ export default {
                     ButtonDevion
                 },
                 label: 'IMPORTEREN',
-                isDisabled: false,
+                isDisabled: true,
                 showButton: true
             },
             test: {
@@ -239,6 +259,26 @@ export default {
                 label: 'Link Metabil: ',
                 showlabel: true
             },
+            changeDev: {
+                components: {
+                    ButtonDevion,
+                    PopupDevion
+                },
+                label: 'Changes',
+                isButtonDisabled: false,
+                showButton: false,
+                data: changesDev
+            },
+            changeMet: {
+                components: {
+                    ButtonDevion,
+                    PopupDevion
+                },
+                label: 'Changes',
+                isButtonDisabled: false,
+                showButton: false,
+                data: changesMet
+            },
         }
     },
     setup() {
@@ -251,6 +291,14 @@ export default {
         })
         return { reveal }
     },
+    watch: {
+        artikelenMet: function (newValue) {
+            for (let artikel of newValue) {
+                this.removeArtikel(this.treeView.jsonData, artikel)
+                this.$forceUpdate()
+            }
+        }
+    },
     methods: {
         handleFileUpdate(file) {
             this.file.error = false;
@@ -258,7 +306,7 @@ export default {
             this.file.showButton = true;
             this.file.filename = file.name;
             this.file.file = file;
-
+            this.button.isDisabled = false;
         },
         async handleButton() {
             this.loading.showLoad = true
@@ -270,20 +318,39 @@ export default {
             }
             endpoint += "?fileName=" + FileName
             PostDataWithBody(endpoint, data).then((response) => {
-                let artikels = JSON.parse(response)
-                artikelen.push(artikels)
-                console.log(artikelen)
+                this.button.isDisabled = true;
+                let artikelMetDev = JSON.parse(response)
+                let artikelDev = artikelMetDev[0][0]
+                artikelenMet = []
+                for (let item of artikelMetDev[1]) {
+                    artikelenMet.push(item)
+                }
                 this.loading.showLoad = false
+                artikelen = []
+                artikelen.push(artikelDev)
                 this.treeView.showTree = true
                 this.treeView.jsonData = Array.from(artikelen)
-                console.log(this.treeView.jsonData)
-                this.treeViewMet.showTree = true
+                changesDev = []
+                changesMet = []
                 notFound = 0
                 totalParts = 0
                 for (let artikel of artikelen) {
                     if (artikel) {
-                        this.checkArtikel(artikel, false)
+                        this.checkArtikel(artikel)
                     }
+                }
+                if (artikelenMet.length > 0) {
+                    this.treeViewMet.showTree = true
+                    this.treeViewMet.jsonData = Array.from(artikelenMet)
+                    notFoundMet = 0
+                    totalPartsMet = 0
+                    for (let artikel of artikelenMet) {
+                        if (artikel) {
+                            this.checkArtikelMet(artikel)
+                        }
+                    }
+                } else {
+                    this.treeViewMet.showTree = false
                 }
             })
         },
@@ -305,94 +372,113 @@ export default {
                 this.missingMet.showlabel = false
             }
         },
-        checkArtikel(artikel, metabil) {
+        async checkArtikel(artikel) {
             totalParts++
             if (artikel) {
                 if (artikel.number.charAt(artikel.number.length - 1) == 'W') {
-                    metabil = true
+                    artikel.parts = null
                 }
+
                 if (artikel.parts) {
                     for (let part of artikel.parts) {
-                        this.checkArtikel(part, metabil)
+                        this.checkArtikel(part)
                     }
                 }
-                if (artikel.bewerking1.toUpperCase() == "LASSEN" || artikel.bewerking2.toUpperCase() == "LASSEN" || artikel.bewerking3.toUpperCase() == "LASSEN" || artikel.bewerking4.toUpperCase() == "LASSEN") {
-                    metabil = true
-                } else if (metabil == true) {
-                    metabil = true
-                } else {
-                    metabil = false
+                GetData('Devion/ets/articleexists?ArticleNumber=' + artikel.number).then((result) => result).then((data) => {
+                    let log = { "artikelNumber": artikel.number, "action": "get", "extra": "Devion" }
+                    logs.push(log)
+                    artikel.existsDev = data
+                    if (artikel.existsDev == false) {
+                        if (!partsNotFound.includes(artikel)) {
+                            partsNotFound.push(artikel)
+                            notFound++
+                        }
+                    } else {
+                        PostDataWithBody('Devion/ets/articledifference', artikel).then((response) => {
+                            if (response != "{}") {
+                                artikel.changedDev = true
+                                let res = { artikel: artikel.number, changes: JSON.parse(response) }
+                                changesDev.push(res)
+                                this.changeDev.data = changesDev
+                            }
+
+                            if (changesDev.length != 0) {
+                                this.changeDev.showButton = true
+                            } else {
+                                this.changeDev.showButton = false
+                            }
+
+                        })
+                    }
+
+                    if (notFound > 0) {
+                        this.missing.showlabel = true
+                    } else {
+                        this.missing.showlabel = false
+                    }
+                    this.missing.label = 'Artikels niet gevonden ' + notFound + '/' + totalParts
+
+                })
+            }
+        },
+        async checkArtikelMet(artikel) {
+            totalPartsMet++
+            if (artikel) {
+                if (artikel.parts) {
+                    for (let part of artikel.parts) {
+                        this.checkArtikelMet(part)
+                    }
                 }
-                
-                if (metabil == false || artikel.number.charAt(artikel.number.length - 1) == 'W')
-                    GetData(`devion/ets/articleexists?ArticleNumber=` + artikel.number).then((result) => result).then((data) => {
-                        artikel.existsDev = data
-                        if (artikel.existsDev == false) {
-                            if (partsNotFound.includes(artikel)) {
-                                console.log('already in array')
-                            } else {
-                                partsNotFound.push(artikel)
-                                notFound++
+                GetData('Metabil/ets/articleexists?ArticleNumber=' + artikel.number).then((result) => result).then((data) => {
+                    let log = { "artikelNumber": artikel.number, "action": "get", "extra": "Metabil" }
+                    logs.push(log)
+                    artikel.existsMet = data
+                    if (artikel.existsMet == false) {
+                        if (!partsNotFoundMet.includes(artikel)) {
+                            partsNotFoundMet.push(artikel)
+                            notFoundMet++
+
+                        }
+                    } else {
+                        PostDataWithBody('Metabil/ets/articledifference', artikel).then((response) => {
+                            if (response != "{}") {
+                                artikel.changed = true
+                                let res = { artikel: artikel.number, changes: JSON.parse(response) }
+                                changesMet.push(res)
+                                this.changeMet.data = changesMet
                             }
-                        }
 
-                        if (notFound > 0) {
-                            this.missing.showlabel = true
-                        } else {
-                            this.missing.showlabel = false
-                        }
-                        this.missing.label = 'Artikels niet gevonden ' + notFound + '/' + totalParts
-                    })
-
-                if (metabil == true) {
-                    GetData('metabil/ets/articleexists?ArticleNumber=' + artikel.number).then((result) => result).then((data) => {
-                        totalPartsMet++
-                        artikel.existsMet = data
-                        if (artikel.existsMet == false) {
-                            if (partsNotFoundMet.includes(artikel)) {
-                                console.log('already in array')
+                            if (changesMet.length != 0) {
+                                this.changeMet.showButton = true
                             } else {
-                                partsNotFoundMet.push(artikel)
-                                notFoundMet++
+                                this.changeMet.showButton = false
                             }
-                        }
-                        if (artikel.number.charAt(artikel.number.length - 1) == 'W') {
-                            artikelenMet.push(artikel)
-                            // Find the index of the item in artikelen based on the number property
-                            // Find the index of the item in artikelen based on the number property
-                            let i = artikelen[0].parts.findIndex(item => item.number === artikel.number);
-                            console.log("Index:", i);
 
-                            console.log(this.treeView.jsonData[0].parts[i])
 
-                            // Check if the item exists at the found index in this.treeView.jsonData
-                            if (i !== -1 && this.treeView.jsonData[i]) {
-                                // Create a deep copy of the item you're about to remove
-                                const retainedItem = JSON.parse(JSON.stringify(this.treeView.jsonData[0].parts[i]));
+                        })
+                    }
 
-                                // Set the parts array of the item to an empty array
-                                this.treeView.jsonData[0].parts[i].parts = [];
+                    if (notFoundMet > 0) {
+                        this.missingMet.showlabel = true
+                    } else {
+                        this.missingMet.showlabel = false
+                    }
+                    this.missingMet.label = 'Artikels niet gevonden ' + notFoundMet + '/' + totalPartsMet
 
-                                console.log("Updated this.treeView.jsonData:", this.treeView.jsonData);
-
-                                // Now, you can add the deep-copied retainedItem to this.treeViewMet.jsonData
-                                this.treeViewMet.jsonData.push(retainedItem);
-
-                                console.log("Updated this.treeViewMet.jsonData:", this.treeViewMet.jsonData);
-                            } else {
-                                console.log("Item not found or already removed.");
-                            }
-                        }
-
-                        if (notFoundMet > 0) {
-                            this.missingMet.showlabel = true
-                        } else {
-                            this.missingMet.showlabel = false
-                        }
-                        this.missingMet.label = 'Artikels niet gevonden ' + notFoundMet + '/' + totalPartsMet
-                    })
+                })
+            }
+        },
+        removeArtikel(main, artikel) {
+            if (main.parts != []) {
+                let index = main.parts.findIndex(part => part.number === artikel.number)
+                if (index !== -1) {
+                    main.parts[index].parts = []
                 }
-
+                main.parts.forEach(part => {
+                    if (part.parts != []) {
+                        this.removeArtikel(part, artikel)
+                    }
+                })
             }
         },
         async handleButtonInsert() {
@@ -416,13 +502,37 @@ export default {
             } else {
                 this.loading.showLoad = true
                 PutDataWithBody('devion/ets/updatelinkedarticles', artikelen).then((response) => {
-                    console.log(response)
                     this.loading.showLoad = false
                     this.linked.showlabel = true
+                    let log = JSON.parse(response)
+                    const lengthlogs = logs.length
+                    for (let i in log) {
+                        logs[lengthlogs + i] = log[i]
+                    }
+
+                    this.createCSV()
                 }).catch((error) => {
                     console.error(error)
                 })
             }
+
+            if (LinkModel.value) {
+                console.log("test")
+            }
+        },
+        createCSV() {
+            // create a csv from my logs objects and download it
+            let cleanjson = logs.filter(item => Object.values(item).every(value => value !== ''))
+            const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
+            const header = Object.keys(cleanjson[0])
+            let csv = cleanjson.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+            csv.unshift(header.join(','))
+            csv = csv.join('\r\n')
+            var blob = new Blob([csv], { type: "text/plain;charset utf-8" });
+            var link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "logs.csv";
+            link.click();
         },
         handleArtikel(object) {
             let artikel = object
@@ -490,9 +600,39 @@ export default {
             this.$refs.article.createInfoObject()
         },
         handleTest() { },
-        handleMass() { }
+        handleMass() { },
+        TogglePopup(trigger) {
+            popupTriggers.value[trigger] = !popupTriggers.value[trigger]
+        },
+        updateItemsDev(object) {
+            if (object) {
+                for (let change of object) {
+                    const endpoint = "devion/ets/updateitem"
+                    PutDataWithBody(endpoint, change).then((response) => {
+                        const log = JSON.parse(response)
+                        logs.push(log)
+                    }
+                    )
+                }
+                this.handleButton();
+            }
+        },
+        updateItemsMet(object) {
+            if (object) {
+                for (let change of object) {
+                    const endpoint = "metabil/ets/updateitem"
+                    PutDataWithBody(endpoint, change).then((response) => {
+                        const log = JSON.parse(response)
+                        logs.push(log)
+                    }
+                    )
+                }
+                this.handleButton();
+            }
+        }
     }
 }
+
 </script>
 
 <style scoped>
@@ -531,7 +671,7 @@ export default {
 
 .c-metabil {
     display: grid;
-    grid-template-areas: "title link toggle mass";
+    grid-template-areas: "title link toggle mass button";
     grid-template-columns: 2fr 1fr 1fr 2fr 4fr;
     align-items: baseline;
 }
@@ -550,5 +690,29 @@ export default {
 
 .c-mass {
     grid-area: "mass"
+}
+
+
+.c-change-met {
+    grid-area: "button";
+    max-width: 50%;
+    justify-self: end;
+}
+
+.c-dev {
+    display: grid;
+    grid-template-areas: "title button";
+    grid-template-columns: 6fr 4fr;
+    align-items: baseline;
+}
+
+.c-dev-title {
+    grid-area: "title"
+}
+
+.c-change-dev {
+    grid-area: "button";
+    max-width: 50%;
+    justify-self: end;
 }
 </style>

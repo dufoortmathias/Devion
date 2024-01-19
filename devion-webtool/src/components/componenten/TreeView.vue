@@ -3,7 +3,7 @@
         <li v-for="(part, index) in jsonData" :key="index" class="c-placement">
             <div>
                 <span @click="toggleNode(part)"
-                    :class="{ 'caret': hasChildParts(part), 'no-caret': !hasChildParts(part), 'caret-down': part.expanded, 'exists': part.existsDev, 'not-exists': !part.existsDev}"
+                    :class="{ 'caret': hasChildParts(part), 'no-caret': !hasChildParts(part), 'caret-down': part.expanded, 'exists': part.existsDev, 'not-exists': !part.existsDev, 'changed': part.changedDev}" 
                     class="c-text">
                     {{ part.number }} ({{ part.description }})
                 </span>
@@ -88,6 +88,10 @@ export default {
 
 .not-exists {
     color: red;
+}
+
+.changed {
+    color: darkorange;
 }
 
 .c-placement {
