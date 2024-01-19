@@ -324,4 +324,92 @@ public class ETSArticleHelper : ETSHelper
 
         }
     }
+
+    public Dictionary<string, Change> ArticleDifference(Item Article)
+    {
+        if (Article is not null)
+        {
+            ArticleETS? articleETS = GetArticle(Article.Number);
+
+            var dict = new Dictionary<string, Change>();
+
+            if (articleETS is not null)
+            {
+                if (articleETS.ART_NR != Article.Number)
+                {
+                    var ch = new Change
+                    {
+                        ETSWaarde = articleETS.ART_NR,
+                        NewWaarde = Article.Number
+                    };
+                    dict.Add("number", ch);
+                }
+                if (articleETS.ART_OMS is not null && Article.Description is not null && articleETS.ART_OMS.ToUpper() != Article.Description)
+                {
+                    var ch = new Change
+                    {
+                        ETSWaarde = articleETS.ART_OMS.ToString(),
+                        NewWaarde = Article.Description
+                    };
+                    dict.Add("omschrijving", ch);
+                }
+                if (articleETS.ART_AANKOOP_PER is not null && articleETS.ART_AANKOOP_PER.ToString() != Article.AankoopPer.ToString())
+                {
+                    var ch = new Change
+                    {
+                        ETSWaarde = articleETS.ART_AANKOOP_PER.ToString(),
+                        NewWaarde = Article.AankoopPer.ToString(),
+                    };
+                    dict.Add("AankoopPer", ch);
+                }
+
+                string query = "select eh_oms2 from eenheid where eh_cod = " + articleETS.ART_EENH;
+                var aankoopeh = ETSClient.selectQuery(query) ?? throw new Exception("Error getting article from ETS with query: " + query);
+                var aaneh = JsonConvert.DeserializeObject<List<dynamic>>(aankoopeh);
+                if (aaneh is not null)
+                {
+                    if (aaneh[0].EH_OMS2.ToString() != Article.Verbruikseenh.ToString())
+                    {
+                        var ch = new Change
+                        {
+                            ETSWaarde = aaneh[0].EH_OMS2.ToString(),
+                            NewWaarde = Article.Aankoopeenh
+                        };
+                        dict.Add("aankoopeenheid", ch);
+                    }
+                }
+
+                query = "select eh_oms2 from eenheid where eh_cod = " + articleETS.ART_VERK_EENH;
+                var verkoopeh = ETSClient.selectQuery(query) ?? throw new Exception("Error getting article from ETS with query: " + query);
+                var vereh = JsonConvert.DeserializeObject<List<dynamic>>(verkoopeh);
+                if (vereh is not null)
+                {
+                    if (vereh[0].EH_OMS2.ToString() != Article.Verbruikseenh.ToString())
+                    {
+                        var ch = new Change
+                        {
+                            ETSWaarde = vereh[0].EH_OMS2.ToString(),
+                            NewWaarde = Article.Verbruikseenh
+                        };
+                        dict.Add("verbruikseenheid", ch);
+                    }
+                }
+
+                if (articleETS.ART_CONVERSIEFACTOR.ToString() != Article.Omrekeningsfactor.ToString())
+                {
+                    var ch = new Change
+                    {
+                        ETSWaarde = articleETS.ART_CONVERSIEFACTOR_TYPE.ToString(),
+                        NewWaarde = Article.Omrekeningsfactor.ToString()
+                    };
+                    dict.Add("omrekeningsfactor", ch);
+                }
+            }
+            return dict;
+        }
+        else
+        {
+            throw new Exception("Article is empty");
+        }
+    }
 }

@@ -8,6 +8,7 @@ global using ExcelDataReader;
 //nuget namespaces
 global using FirebirdSql.Data.FirebirdClient;
 global using Microsoft.AspNetCore.Mvc;
+global using Newtonsoft.Json;
 //dotnet namespaces
 global using System;
 global using System.Collections.Generic;

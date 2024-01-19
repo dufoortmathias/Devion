@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -767,15 +768,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             MainPart.Description = omschrijving;
             MainPart.LynNumber = "1";
 
+            List<Item> Metabil = new List<Item>();
+
             DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
 
             List<Item?> assemblies = new();
             foreach (DataRow row in table.Rows)
             {
+
                 List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
                 List<Item?> parentList = assemblies;
                 foreach (int level in hierarchy)
                 {
+                    Console.WriteLine(hierarchy.ToArray());
                     while (level >= parentList.Count)
                     {
                         parentList.Add(null);
@@ -808,13 +813,19 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
 
                             float massValue;
-                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Split(' ')[0], out massValue) ? massValue : 0;
+                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Replace(",", ".").Split(' ')[0], out massValue) ? massValue : 0;
 
                             part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
                             part.AankoopPer = row["Aankoop per"] != DBNull.Value ? (int)((double)row["Aankoop per"]) : 1;
                             part.Verbruikseenh = row["Verbruikseenh"] != DBNull.Value ? ((string)row["Verbruikseenh"]).ToUpper().Trim() : "ST";
                             part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? (int)((double)row["Omrekeningsfactor"]) : 1;
                             part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
+
+                            if (part.Number.EndsWith('W'))
+                            {
+                                Metabil.Add(part);
+                                part.Parts = null;
+                            }
 
                             parentList[level] = part;
 
@@ -828,7 +839,14 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 }
             }
             MainPart.Parts = assemblies;
-            return Results.Ok(MainPart);
+            // create one object of Mainpart and Metabil
+            string main = JsonTool.ConvertFromWithNullValues(MainPart);
+            string meta = JsonTool.ConvertFromWithNullValues(Metabil);
+            JObject combined = new JObject();
+            combined.Add("Devion", main);
+            combined.Add("Metabil", meta);
+            string jsonString = JsonTool.ConvertFromWithNullValues(combined);
+            return Results.Ok(combined);
         }
         catch (Exception e)
         {
@@ -840,6 +858,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
+            List<Dictionary<string, string>> logs = new List<Dictionary<string, string>>();
             if (articles == null || !articles.Any())
             {
                 // Handle the case where no articles are provided
@@ -855,6 +874,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     foreach (Item part in main.Parts.Where(i => i != null).OfType<Item>())
                     {
                         articleHelperETS.LinkArticle(main, part);
+                        Dictionary<string, string> log = new()
+                    {
+                        {"artikelNumber", part.Number },
+                        {"action", "link" },
+                        {"extra", "linked to "+main.Number }
+                    };
+                        logs.Add(log);
                         LinkArticles(part);
                     }
                 }
@@ -865,7 +891,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 LinkArticles(article);
             }
 
-            return Results.Ok(articles);
+            return Results.Ok(logs);
         }
         catch (Exception e)
         {
@@ -884,6 +910,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         return Results.Ok(articleHelperETS.ArticleWithNumberExists(ArticleNumber));
     }).WithName($"{company}ArticleExists").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/ets/articledifference", ([FromBody] Item articles) =>
+    {
+        Dictionary<string, Change> difference = articleHelperETS.ArticleDifference(articles);
+        return difference;
+
+    }).WithName($"{company}ArticleDifference").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");

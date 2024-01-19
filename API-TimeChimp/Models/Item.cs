@@ -30,4 +30,10 @@
         public int Omrekeningsfactor { get; set; } = 1;
         public string? TypeFactor { get; set; } = "Deelfactor";
     }
+
+    public class Change
+    {
+        public string? ETSWaarde { get; set; }
+        public string? NewWaarde { get; set; }
+    }
 }
