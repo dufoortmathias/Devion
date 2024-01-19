@@ -35,5 +35,23 @@
     {
         public string? ETSWaarde { get; set; }
         public string? NewWaarde { get; set; }
+
+        public override string ToString()
+        {
+            return $"ETSWaarde: {ETSWaarde}; NewWaarde: {NewWaarde}";
+        }
+    }
+
+    public class ItemChange
+    {
+        public string? ArticleNumber { get; set; }
+        public Change? Change { get; set; }
+        public string? Key { get; set; }
+
+        //tostring override
+        public override string ToString()
+        {
+            return $"ArticleNumber: {ArticleNumber}, Change: {Change}, Key: {Key}";
+        }
     }
 }

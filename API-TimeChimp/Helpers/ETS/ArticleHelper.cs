@@ -342,7 +342,7 @@ public class ETSArticleHelper : ETSHelper
                         ETSWaarde = articleETS.ART_NR,
                         NewWaarde = Article.Number
                     };
-                    dict.Add("number", ch);
+                    dict.Add("ART_NR", ch);
                 }
                 if (articleETS.ART_OMS is not null && Article.Description is not null && articleETS.ART_OMS.ToUpper() != Article.Description)
                 {
@@ -351,7 +351,7 @@ public class ETSArticleHelper : ETSHelper
                         ETSWaarde = articleETS.ART_OMS.ToString(),
                         NewWaarde = Article.Description
                     };
-                    dict.Add("omschrijving", ch);
+                    dict.Add("ART_OMS", ch);
                 }
                 if (articleETS.ART_AANKOOP_PER is not null && articleETS.ART_AANKOOP_PER.ToString() != Article.AankoopPer.ToString())
                 {
@@ -360,7 +360,7 @@ public class ETSArticleHelper : ETSHelper
                         ETSWaarde = articleETS.ART_AANKOOP_PER.ToString(),
                         NewWaarde = Article.AankoopPer.ToString(),
                     };
-                    dict.Add("AankoopPer", ch);
+                    dict.Add("ART_AANKOOP_PER", ch);
                 }
 
                 string query = "select eh_oms2 from eenheid where eh_cod = " + articleETS.ART_EENH;
@@ -375,7 +375,7 @@ public class ETSArticleHelper : ETSHelper
                             ETSWaarde = aaneh[0].EH_OMS2.ToString(),
                             NewWaarde = Article.Aankoopeenh
                         };
-                        dict.Add("aankoopeenheid", ch);
+                        dict.Add("ART_EENH", ch);
                     }
                 }
 
@@ -391,7 +391,7 @@ public class ETSArticleHelper : ETSHelper
                             ETSWaarde = vereh[0].EH_OMS2.ToString(),
                             NewWaarde = Article.Verbruikseenh
                         };
-                        dict.Add("verbruikseenheid", ch);
+                        dict.Add("ART_VERK_EEN", ch);
                     }
                 }
 
@@ -402,7 +402,7 @@ public class ETSArticleHelper : ETSHelper
                         ETSWaarde = articleETS.ART_CONVERSIEFACTOR_TYPE.ToString(),
                         NewWaarde = Article.Omrekeningsfactor.ToString()
                     };
-                    dict.Add("omrekeningsfactor", ch);
+                    dict.Add("ART_CONVERSIEFACTOR_TYPE", ch);
                 }
             }
             return dict;

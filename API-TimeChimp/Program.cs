@@ -1,6 +1,3 @@
-using Newtonsoft.Json.Linq;
-using System.Runtime.InteropServices;
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
@@ -35,9 +32,11 @@ List<string> companies = new();
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
+    //create clients
     WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
+    //create helpers
     CebeoArticleHelper articleHelperCebeo = new(config);
 
     ETSArticleHelper articleHelperETS = new(ETSClient);
@@ -51,6 +50,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     ETSTimeHelper timeHelperETS = new(ETSClient, TCClient);
     ETSUurcodeHelper uurcodeHelperETS = new(ETSClient);
     ETSProjVoortgangHelper projVoortgangHelperETS = new(ETSClient);
+    ETSItemHelper itemHelperETS = new(ETSClient);
 
     TimeChimpContactHelper contactHelperTC = new(TCClient);
     TimeChimpCustomerHelper customerHelperTC = new(TCClient);
@@ -62,6 +62,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     TimeChimpTimeHelper timeHelperTC = new(TCClient, ETSClient);
     TimeChimpUurcodeHelper uurcodeHelperTC = new(TCClient);
 
+    //get companies from config
     string company = config[$"Companies:{companyIndex}:Name"];
     companies.Add(company);
 
@@ -601,7 +602,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}CreatePurchaseFile").WithTags(company);
-
+    
+    //get all articles from cebeo
     app.MapGet($"/api/{company.ToLower()}/cebeo/articles", () =>
     {
         try
@@ -617,6 +619,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetArticles").WithTags(company);
 
+    //update article from cebeo in ets
     app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumberETS, float maxPriceDiff) =>
     {
         try
@@ -636,6 +639,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}UpdateArticlePrice").WithTags(company);
 
+    //searches for article in cebeo
     app.MapGet($"/api/{company.ToLower()}/cebeo/searcharticle", (string articleReference) =>
     {
         try
@@ -664,6 +668,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}SearchArticleCebeo").WithTags(company);
 
+    //get article form info
     app.MapGet($"/api/{company.ToLower()}/ets/articleforminfo", () =>
     {
         try
@@ -712,6 +717,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}ArticleFormInfo").WithTags(company);
 
+    //validate article form
     app.MapPost($"/api/{company.ToLower()}/ets/validatearticleform", ([FromBody] ArticleWeb article) =>
     {
         try
@@ -731,7 +737,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ValidateArticleForm").WithTags(company);
-
+    
+    //create article in ets
     app.MapPost($"/api/{company.ToLower()}/ets/createarticle", ([FromBody] ArticleWeb article) =>
     {
         try
@@ -744,6 +751,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}CreateArticle").WithTags(company);
 
+    //transform bom excel file to json
     app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile, string fileName) =>
     {
         try
@@ -768,19 +776,17 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             MainPart.Description = omschrijving;
             MainPart.LynNumber = "1";
 
-            List<Item> Metabil = new List<Item>();
+            List<Item> MetabilItems = new List<Item>();
 
             DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
 
             List<Item?> assemblies = new();
             foreach (DataRow row in table.Rows)
             {
-
                 List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
                 List<Item?> parentList = assemblies;
                 foreach (int level in hierarchy)
                 {
-                    Console.WriteLine(hierarchy.ToArray());
                     while (level >= parentList.Count)
                     {
                         parentList.Add(null);
@@ -821,13 +827,37 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? (int)((double)row["Omrekeningsfactor"]) : 1;
                             part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
 
-                            if (part.Number.EndsWith('W'))
-                            {
-                                Metabil.Add(part);
-                                part.Parts = null;
-                            }
 
                             parentList[level] = part;
+                            bool save = true;
+
+                            void inList(Item item)
+                            {
+                                if (item.Parts.Count > 0)
+                                {
+                                    foreach (Item? item2 in item.Parts)
+                                    {
+                                        inList(item2);
+                                    }
+                                }
+                                
+                                if (part.Number == item.Number)
+                                {
+                                    save = false;
+                                }
+                            }
+
+                            if (part.Number.EndsWith('W'))
+                            {
+                                foreach(Item item in MetabilItems)
+                                {
+                                    inList(item);
+                                }
+                                if (save)
+                                {
+                                    MetabilItems.Add(part);
+                                }
+                            }
 
                         }
                         catch (Exception e)
@@ -839,14 +869,18 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 }
             }
             MainPart.Parts = assemblies;
-            // create one object of Mainpart and Metabil
-            string main = JsonTool.ConvertFromWithNullValues(MainPart);
-            string meta = JsonTool.ConvertFromWithNullValues(Metabil);
-            JObject combined = new JObject();
-            combined.Add("Devion", main);
-            combined.Add("Metabil", meta);
-            string jsonString = JsonTool.ConvertFromWithNullValues(combined);
-            return Results.Ok(combined);
+            List<Item> Main = new()
+            {
+                MainPart
+            };
+
+            List<List<Item>> items = new()
+            {
+                Main,
+                MetabilItems
+            };
+
+            return Results.Ok(items);
         }
         catch (Exception e)
         {
@@ -854,6 +888,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}TransformBomExcel").WithTags(company);
 
+    //update article links in ets
     app.MapPut($"/api/{company.ToLower()}/ets/updatelinkedarticles", ([FromBody] List<Item> articles) =>
     {
         try
@@ -900,23 +935,41 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
 
+    //get projecten voortgang from ets
     app.MapGet($"/api/{company.ToLower()}/ets/projectenvoortgang", () =>
     {
 
         return projVoortgangHelperETS.GetProjectenVoortgang();
     }).WithName($"{company}ProjectenVoortgang").WithTags(company);
 
+    //get an boolean if article exists in ets
     app.MapGet($"/api/{company.ToLower()}/ets/articleExists", (string ArticleNumber) =>
     {
         return Results.Ok(articleHelperETS.ArticleWithNumberExists(ArticleNumber));
     }).WithName($"{company}ArticleExists").WithTags(company);
 
+    //gets differences between articles in ets and bom
     app.MapPost($"/api/{company.ToLower()}/ets/articledifference", ([FromBody] Item articles) =>
     {
         Dictionary<string, Change> difference = articleHelperETS.ArticleDifference(articles);
         return difference;
 
     }).WithName($"{company}ArticleDifference").WithTags(company);
+
+    //updates article in ets
+    app.MapPut($"/api/{company.ToLower()}/ets/updateitem", ([FromBody] ItemChange item) =>
+    {
+        try
+        {
+            Dictionary<string, string> log = itemHelperETS.UpdateItem(item);
+            
+            return Results.Ok(log);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}Updateitem").WithTags(company);   
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
@@ -929,3 +982,4 @@ else
 {
     app.Run();
 }
+
