@@ -7,7 +7,7 @@ namespace Api.Devion.Tools
         //convert to object
         public static T ConvertTo<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json) ?? throw new Exception($"JSONTool could not convert json: {json} to {typeof(T).FullName}");
         }
 
         //convert to string without null values

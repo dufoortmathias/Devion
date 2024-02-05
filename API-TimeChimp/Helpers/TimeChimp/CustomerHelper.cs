@@ -38,7 +38,8 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     public CustomerTimeChimp UpdateCustomer(CustomerTimeChimp customer)
     {
         //get id from customer
-        customer.id = GetCustomers().Find(c => c.relationId.Equals(customer.relationId)).id;
+        CustomerTimeChimp customerFound = GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(customer.relationId)) ?? throw new Exception($"No customer found in timechimp with id = {customer.relationId}");
+        customer.id = customerFound.id;
 
         //check if customer exists
         if (customer.id == null)

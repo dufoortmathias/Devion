@@ -2,16 +2,12 @@ namespace Api.Devion.Helpers.ETS;
 
 public class ETSArticleHelper : ETSHelper
 {
-    WebClient webClient;
-    ConfigurationManager config;
 
-    public ETSArticleHelper(FirebirdClientETS clientETS, ConfigurationManager config) : base(clientETS)
+    public ETSArticleHelper(FirebirdClientETS clientETS) : base(clientETS)
     {
-        webClient = new();
-        this.config = config;
     }
 
-    public ArticleETS GetArticle(string articleNumber)
+    public ArticleETS? GetArticle(string articleNumber)
     {
         string query = "SELECT * FROM CSARTPX WHERE ART_NR = @number";
         Dictionary<string, object> parameters = new()
@@ -21,80 +17,399 @@ public class ETSArticleHelper : ETSHelper
 
         string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
 
-        ArticleETS article = JsonTool.ConvertTo<List<ArticleETS>>(json).First() ?? throw new Exception($"ETS han no article with number = {articleNumber}");
+        ArticleETS? article = JsonTool.ConvertTo<List<ArticleETS>>(json).FirstOrDefault();
 
         return article;
     }
 
-    public List<string> GetAriclesCebeo()
+    public string? GetArticleReference(string articleNumber, string supplierId)
     {
-        string query = "SELECT CSARTPX.* FROM CSARTPX LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 WHERE LOWER(LVPX.LV_NAM) LIKE '%cebeo%'";
+        string query = "SELECT CO_REFLEV FROM CONTACT3 WHERE CO_ARTNR = @number AND CO_LEVNR = @supplier";
+        Dictionary<string, object> parameters = new()
+            {
+                {"@number", articleNumber},
+                {"@supplier", supplierId}
+            };
 
-        string json = ETSClient.selectQuery(query) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article reference from ETS with query: " + query);
+        string? articleReference = JsonTool.ConvertTo<List<Dictionary<string, string>>>(json).FirstOrDefault()?["CO_REFLEV"];
+        articleReference = string.IsNullOrEmpty(articleReference) ? null : articleReference;
 
-        List<string?> articles = JsonTool.ConvertTo<List<ArticleETS>>(json).Select(a => a.ART_NR).Distinct().ToList();
-        articles.RemoveAll(string.IsNullOrEmpty);
+        if (articleReference == null)
+        {
+            ArticleETS? article = GetArticle(articleNumber);
+            if (article != null && article.ART_LEV1 != null && article.ART_LEV1.Equals(supplierId) && article.ART_LEVREF != null)
+            {
+                return article.ART_LEVREF;
+            }
+        }
+
+        return articleReference;
+    }
+
+    public bool ArticleWithReferenceExists(string articleReference, string supplierId)
+    {
+        // Search for article with reference in table CSARTPX
+        string query = "SELECT * FROM CSARTPX WHERE ART_LEVREF = @number AND ART_LEV1 = @supplier";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@number", articleReference},
+            {"@supplier", supplierId}
+        };
+
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article from ETS with query: " + query);
+
+        if (JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0)
+        {
+            return true;
+        }
+
+        // Search for article with reference in table CONTACT3
+        query = "SELECT * FROM CONTACT3 WHERE CO_REFLEV = @number AND CO_LEVNR = @supplier";
+        parameters = new()
+        {
+            {"@number", articleReference},
+            {"@supplier", supplierId}
+        };
+
+        json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article from ETS with query: " + query);
+
+        return JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0;
+    }
+
+    public bool ArticleWithNumberExists(string articleNumber)
+    {
+        string query = "SELECT * FROM CSARTPX WHERE ART_NR = @number";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@number", articleNumber.ToUpper()},
+        };
+
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting article from ETS with query: " + query);
+        return JsonTool.ConvertTo<List<ArticleETS>>(json).Count > 0;
+    }
+
+    public List<string> GetAricles(string supplierId)
+    {
+        string query = "SELECT CSARTPX.* FROM CSARTPX LEFT JOIN LVPX ON LVPX.LV_COD = CSARTPX.ART_LEV1 WHERE ART_LEV1 = @supplierId";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@supplierId", supplierId},
+        };
+
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting artikelnumbers from ETS with query: " + query);
+
+        List<string> articles = JsonTool.ConvertTo<List<ArticleETS>>(json)
+            .Select(a => a.ART_NR).Distinct()
+            .Where(x => x != null)
+            .Cast<string>()
+            .ToList();
 
         return articles;
     }
 
-    public string? GetArticleNumberCebeo(string articleReference)
+    public Dictionary<string, List<string>> ValidateArticle(ArticleWeb article)
     {
-        CebeoXML cebeoXML = CebeoXML.CreateArticleSearchRequest(articleReference, config);
+        Dictionary<string, List<string>> problems = new()
+            {
+                {"artikelNr", new() },
+                {"reflev", new() },
+                {"omschrijving", new() },
+                {"merk", new() },
+                {"aaneh", new() },
+                {"minaan", new() },
+                {"aankoop", new() },
+                {"tarief", new() },
+                {"link", new() }
+        };
 
-        string requestXML = cebeoXML.GetXML();
-
-        var responseXML = webClient.PostAsync("http://b2b.cebeo.be/webservices/xml", requestXML);
-
-        XmlSerializer serializer = new(typeof(CebeoXML));
-        using (StringReader reader = new(responseXML))
+        if (string.IsNullOrEmpty(article.artikelNr))
         {
-            CebeoXML response = (CebeoXML)serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}");
-
-            string? articleNumber = response.Response.Article?.List?.Item?.Find(x => x.Material?.Reference != null && x.Material.Reference.Equals(articleReference))?.Material?.SupplierItemID;
-
-            return articleNumber;
+            problems["artikelNr"].Add("Can't be empty");
         }
+        else if (!article.artikelNr.Equals(article.artikelNr.ToUpper()))
+        {
+            problems["artikelNr"].Add("Articlenumber contains lower case characters");
+        }
+        else if (ArticleWithNumberExists(article.artikelNr))
+        {
+            problems["artikelNr"].Add("Articlenumber already exists in ETS");
+        }
+
+        if (string.IsNullOrEmpty(article.reflev))
+        {
+            problems["reflev"].Add("Can't be empty");
+        }
+
+        if (string.IsNullOrEmpty(article.omschrijving))
+        {
+            problems["omschrijving"].Add("Can't be empty");
+        }
+
+        if (string.IsNullOrEmpty(article.merk))
+        {
+            problems["merk"].Add("Can't be empty");
+        }
+
+        string query = "SELECT EH_COD AS CODE, EH_OMS1 AS DESCRIPTION, EH_OMS2 AS SHORT_DESCRIPTION FROM EENHEID";
+        string[] MeasureTypes = JsonTool.ConvertTo<List<Dictionary<string, string>>>(ETSClient.selectQuery(query)).Select(x => x["CODE"]).ToArray();
+        if (string.IsNullOrEmpty(article.aaneh))
+        {
+            problems["aaneh"].Add("Can't be empty");
+        }
+        else if (!MeasureTypes.Contains(article.aaneh))
+        {
+            problems["aaneh"].Add("Chosen value not valid");
+        }
+
+        if (article.minaan < 0)
+        {
+            problems["minaan"].Add("Can't be below zero");
+        }
+
+        if (article.aankoop < 0)
+        {
+            problems["aankoop"].Add("Price can't be below zero");
+        }
+        else if (article.tarief < 0)
+        {
+            problems["tarief"].Add("Price can't be below zero");
+        }
+        else if (article.tarief < article.aankoop)
+        {
+            problems["aankoop"].Add("Price can't be higher then tarif price");
+            problems["tarief"].Add("Price can't be lower then netto price");
+        }
+
+        if (string.IsNullOrEmpty(article.link))
+        {
+            problems["link"].Add("Can't be empty");
+        }
+
+        return problems;
     }
 
-    public float? GetArticlePriceCebeo(string articleNumber)
+    public ArticleWeb CreateArticle(ArticleWeb article)
     {
-        CebeoXML cebeoXML = CebeoXML.CreateArticleRequest(articleNumber, config);
-
-        string requestXML = cebeoXML.GetXML();
-
-        var responseXML = webClient.PostAsync("http://b2b.cebeo.be/webservices/xml", requestXML);
-
-        XmlSerializer serializer = new(typeof(CebeoXML));
-        using (StringReader reader = new(responseXML))
+        if (ValidateArticle(article).Any(x => x.Value.Count > 0))
         {
-            CebeoXML response = (CebeoXML)serializer.Deserialize(reader) ?? throw new Exception($"Request to cebeo failed with xml: \n{requestXML}");
-
-            string? netPrice = response.Response.Article.List.Item.FirstOrDefault()?.UnitPrice?.NetPrice;
-
-            return netPrice != null ? float.Parse(netPrice) : null;
+            throw new Exception("Some fields from article given are not valid");
         }
+
+        string createQuery = "EXECUTE PROCEDURE INSERT_ARTIKEL_WS @number, @description, null, @reference, @familie, @subfamilie, null, null, null, null, @lengte, @breedte, @hoogte, @omrekfac, @typfac, @aaneh, null, @aankoop, @verkoop, @aankoopEenh, @verkoopEenh, 1, 1, @supplier, null, null";
+        Dictionary<string, object?> createParameters = new()
+        {
+            { "@number", article.artikelNr },
+            { "@description", article.omschrijving },
+            { "@reference", article.reflev },
+            { "@familie", article.familie },
+            { "@subfamilie", article.subfamilie },
+            { "@lengte", article.lengte },
+            { "@breedte", article.breedte },
+            { "@hoogte", article.hoogte },
+            { "@omrekfac", article.omrekfac },
+            { "@typfac", article.typfac },
+            { "@aaneh", article.aaneh },
+            { "@aankoop", article.aankoop },
+            { "@verkoop", article.verkoop },
+            { "@aankoopEenh", article.aankoop },
+            { "@verkoopEenh", article.verkoop },
+            { "@supplier", article.hoofdleverancier}
+        };
+
+        ETSClient.ExecuteQuery(createQuery, createParameters);
+
+        //update query
+        string updateQuery = $"UPDATE CSARTPX SET ART_MERK = @merk, ART_KORT = @korting, ART_HYPERLINK = @url WHERE ART_NR = @id;";
+        Dictionary<string, object?> updateParameters = new()
+        {
+            { "@id", article.artikelNr },
+            { "@url", article.link },
+            { "@merk", article.merk },
+            { "@korting", article.stdKorting }
+        };
+
+        ETSClient.ExecuteQuery(updateQuery, updateParameters);
+
+        return article;
     }
 
     public ArticleETS UpdateArticlePriceETS(string articleNumber, float newPrice, float maxPriceDiff)
     {
-        ArticleETS article = GetArticle(articleNumber);
+        ArticleETS article = GetArticle(articleNumber) ?? throw new Exception($"ETS han no article with number = {articleNumber}");
         float price = article.ART_AANKP ?? throw new Exception($"Article with number = {articleNumber}, has no old price assigned");
 
         if (price - price * maxPriceDiff < newPrice || newPrice < price + price * maxPriceDiff)
         {
             string query = $"EXECUTE PROCEDURE UPDATE_ARTIKEL_PRIJS @number, @price";
-            Dictionary<string, object> parameters = new()
+            Dictionary<string, object> parameter = new()
             {
-                {"@number", articleNumber},
+                {"@number", int.Parse(articleNumber)},
                 {"@price", newPrice }
             };
 
-            ETSClient.ExecuteQuery(query, parameters);
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            ETSClient.ExecuteQuery(query, parameter);
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 
             article.ART_AANKP = newPrice;
         }
 
         return article;
+    }
+
+    public void LinkArticle(Item main, Item part)
+    {
+        string query = $"SELECT COUNT(*) FROM TBL_ARTIKEL_GEKOPPELD AS L LEFT JOIN CSARTPX AS A1 ON A1.ART_ID = L.ARG_ART_ID LEFT JOIN CSARTPX AS A2 ON A2.ART_ID = L.ARG_MASTER_ID WHERE A1.ART_NR = @artikel AND A2.ART_NR = @master";
+        Dictionary<string, object> parameters = new()
+        {
+            {"@artikel", part.Number},
+            {"@master", main.Number}
+        };
+
+        string response = ETSClient.selectQuery(query, parameters);
+        int count = JsonTool.ConvertTo<List<Dictionary<string, int>>>(response).First()["COUNT"];
+
+        if (count == 0)
+        {
+            // TODO  (Create query) to link articles in ETS -> Table: TBL_ARTIKEL_GEKOPPELD
+            Console.WriteLine("linking master: " + main.Number + " article: " + part.Number + " lynNumber: " + part.LynNumber + " quantity: " + part.Quantity);
+            string query1 = "select art_id from csartpx where art_nr = @number";
+            Dictionary<string, object> parametersMain = new()
+            {
+                {"@number", main.Number }
+            };
+
+            Dictionary<string, object> parametersPart = new()
+            { {"@number", part.Number}};
+
+            string jsonMasterId = ETSClient.selectQuery(query1, parametersMain);
+            string masterId = "";
+            if (jsonMasterId != null && jsonMasterId != "[]")
+            {
+                masterId = JsonTool.ConvertTo<List<Dictionary<string, string>>>(jsonMasterId).First()["ART_ID"];
+            }
+
+            string jsonPartId = ETSClient.selectQuery(query1, parametersPart);
+            string partId = "";
+            if (jsonPartId != null && jsonPartId != "[]")
+            {
+                partId = JsonTool.ConvertTo<List<Dictionary<string, string>>>(jsonPartId).First()["ART_ID"];
+            }
+
+            if (masterId != "" && partId != "")
+            {
+                //TODO: query schrijven voor linken
+                string query2 = "insert into TBL_ARTIKEL_GEKOPPELD (arg_master_id, arg_art_id, arg_lynnr, arg_aantal) values (@masterId, @partId, @lynNumber, @quantity)";
+#pragma warning disable CS8604 // Possible null reference argument.
+                Dictionary<string, object?> propertiesMain = new()
+                {
+                    {"@masterId", int.Parse(masterId) },
+                    {"@partId", int.Parse(partId) },
+                    {"@lynNumber", int.Parse(part.LynNumber) },
+                    {"@quantity", part.Quantity }
+                };
+#pragma warning restore CS8604 // Possible null reference argument.
+
+                //TODO: execute schrijven
+                try
+                {
+                    ETSClient.ExecuteQuery(query2, propertiesMain);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+
+        }
+    }
+
+    public Dictionary<string, Change> ArticleDifference(Item Article)
+    {
+        if (Article is not null)
+        {
+            ArticleETS? articleETS = GetArticle(Article.Number);
+
+            var dict = new Dictionary<string, Change>();
+
+            if (articleETS is not null)
+            {
+                if (articleETS.ART_NR != Article.Number)
+                {
+                    var ch = new Change
+                    {
+                        ETSWaarde = articleETS.ART_NR,
+                        NewWaarde = Article.Number
+                    };
+                    dict.Add("ART_NR", ch);
+                }
+                if (articleETS.ART_OMS is not null && Article.Description is not null && articleETS.ART_OMS.ToUpper() != Article.Description)
+                {
+                    var ch = new Change
+                    {
+                        ETSWaarde = articleETS.ART_OMS.ToString(),
+                        NewWaarde = Article.Description
+                    };
+                    dict.Add("ART_OMS", ch);
+                }
+                if (articleETS.ART_AANKOOP_PER is not null && articleETS.ART_AANKOOP_PER.ToString() != Article.AankoopPer.ToString())
+                {
+                    var ch = new Change
+                    {
+                        ETSWaarde = articleETS.ART_AANKOOP_PER.ToString(),
+                        NewWaarde = Article.AankoopPer.ToString(),
+                    };
+                    dict.Add("ART_AANKOOP_PER", ch);
+                }
+
+                string query = "select eh_oms2 from eenheid where eh_cod = " + articleETS.ART_EENH;
+                var aankoopeh = ETSClient.selectQuery(query) ?? throw new Exception("Error getting article from ETS with query: " + query);
+                var aaneh = JsonConvert.DeserializeObject<List<dynamic>>(aankoopeh);
+                if (aaneh is not null)
+                {
+                    if (aaneh[0].EH_OMS2.ToString() != Article.Verbruikseenh.ToString())
+                    {
+                        var ch = new Change
+                        {
+                            ETSWaarde = aaneh[0].EH_OMS2.ToString(),
+                            NewWaarde = Article.Aankoopeenh
+                        };
+                        dict.Add("ART_EENH", ch);
+                    }
+                }
+
+                query = "select eh_oms2 from eenheid where eh_cod = " + articleETS.ART_VERK_EENH;
+                var verkoopeh = ETSClient.selectQuery(query) ?? throw new Exception("Error getting article from ETS with query: " + query);
+                var vereh = JsonConvert.DeserializeObject<List<dynamic>>(verkoopeh);
+                if (vereh is not null)
+                {
+                    if (vereh[0].EH_OMS2.ToString() != Article.Verbruikseenh.ToString())
+                    {
+                        var ch = new Change
+                        {
+                            ETSWaarde = vereh[0].EH_OMS2.ToString(),
+                            NewWaarde = Article.Verbruikseenh
+                        };
+                        dict.Add("ART_VERK_EEN", ch);
+                    }
+                }
+
+                if (articleETS.ART_CONVERSIEFACTOR.ToString() != Article.Omrekeningsfactor.ToString())
+                {
+                    var ch = new Change
+                    {
+                        ETSWaarde = articleETS.ART_CONVERSIEFACTOR_TYPE.ToString(),
+                        NewWaarde = Article.Omrekeningsfactor.ToString()
+                    };
+                    dict.Add("ART_CONVERSIEFACTOR_TYPE", ch);
+                }
+            }
+            return dict;
+        }
+        else
+        {
+            throw new Exception("Article is empty");
+        }
     }
 }

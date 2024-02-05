@@ -46,11 +46,6 @@ import { RouterLink } from 'vue-router';
   margin-right: var(--global-whitespace-md);
 }
 
-.c-nav__item {
-  display: inline-block;
-  margin-right: var(--global-whitespace-md);
-}
-
 .c-nav__link:active {
   color: var(--global-color-active);
 }
@@ -58,6 +53,7 @@ import { RouterLink } from 'vue-router';
 .c-nav__link:hover,
 .c-nav__link:focus {
   color: var(--global-color-hover);
+  text-decoration: underline;
 }
 
 .c-nav__link--active {

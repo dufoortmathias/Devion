@@ -13,13 +13,7 @@ public class ETSEmployeeHelper : ETSHelper
         string query = "SELECT * FROM J2W_PNPX";
 
         //get data form ETS
-        string response = ETSClient.selectQuery(query);
-
-        //check if response is succesfull
-        if (response == null)
-        {
-            throw new Exception("Error getting employees from ETS with query: " + query);
-        }
+        string response = ETSClient.selectQuery(query) ?? throw new Exception("Error getting employees from ETS with query: " + query);
 
         //convert data to employeeETS object
         List<EmployeeETS> employees = JsonTool.ConvertTo<List<EmployeeETS>>(response);
@@ -44,6 +38,7 @@ public class ETSEmployeeHelper : ETSHelper
         //get data from ETS
         string json = ETSClient.selectQuery(query, parameters);
 
+        Console.WriteLine(json);
         //check if json is not empty
         if (json == null)
         {
@@ -53,12 +48,14 @@ public class ETSEmployeeHelper : ETSHelper
         //get all ids from json
         List<string> ids = JsonTool.ConvertTo<List<EmployeeETS>>(json)
             .Select(employee => employee.PN_ID)
+            .Where(x => x != null)
+            .Cast<string>()
             .ToList();
         return ids;
     }
 
     //get employee by employeeId
-    public EmployeeETS GetEmployee(string employeeId)
+    public EmployeeETS? GetEmployee(string employeeId)
     {
         //create query
         string query = $"select * from J2W_PNPX where PN_ID = @employee";
@@ -77,7 +74,7 @@ public class ETSEmployeeHelper : ETSHelper
         }
 
         //convert data to employeeETS object
-        EmployeeETS employee = JsonTool.ConvertTo<EmployeeETS[]>(json).FirstOrDefault();
+        EmployeeETS? employee = JsonTool.ConvertTo<EmployeeETS[]>(json).FirstOrDefault();
         return employee;
     }
 }

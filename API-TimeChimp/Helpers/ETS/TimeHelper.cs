@@ -32,7 +32,7 @@ public class ETSTimeHelper : ETSHelper
             query = $"select PN_NAM from J2W_PNPX where PN_ID = @persoon";
             Dictionary<string, object> parameters = new()
             {
-                {"@persoon",  time.PLA_PERSOON},
+                {"@persoon",  time.PLA_PERSOON ?? throw new Exception($"Time {time.PLA_ID} ETS has no PLA_PERSOON")},
             };
 
 
@@ -58,9 +58,9 @@ public class ETSTimeHelper : ETSHelper
         //get the max id from the table
         string response = ETSClient.selectQuery("select max(PLA_ID) from tbl_planning");
 
-        int max = JsonTool.ConvertTo<List<Dictionary<string, int>>>(response).First()["MAX"];
+        int maxId = JsonTool.ConvertTo<List<Dictionary<string, int>>>(response).First()["MAX"];
         //set the id of the new time
-        timeETS.PLA_ID = max + 1;
+        timeETS.PLA_ID = maxId + 1;
 
         //get data from ETS for the customer
         CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(timeTC.customerId) ?? throw new Exception("Error getting customer from TimeChimp with id: " + timeTC.customerId);
@@ -72,39 +72,44 @@ public class ETSTimeHelper : ETSHelper
 
         //get data from ETS for the project
         ProjectTimeChimp subProject = new TimeChimpProjectHelper(TCClient).GetProject(timeTC.projectId) ?? throw new Exception("Error getting project from TimeChimp with id: " + timeTC.projectId);
-        timeETS.PLA_PROJECT = subProject.code[..7];
-        timeETS.PLA_SUBPROJECT = subProject.code[7..];
+        timeETS.PLA_PROJECT = subProject.code?[..7];
+        timeETS.PLA_SUBPROJECT = subProject.code?[7..];
+
+
+        //get data from ETS for the project
+        ProjectETS mainProject = new ETSProjectHelper(ETSClient).GetProject(timeETS.PLA_PROJECT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_PROJECT")) ?? throw new Exception("Error getting project from ETS with id: " + timeETS.PLA_PROJECT);
 
         //get data from ETS for the employee
         EmployeeTimeChimp employee = new TimeChimpEmployeeHelper(TCClient).GetEmployee(timeTC.userId) ?? throw new Exception("Error getting employee from TimeChimp with id: " + timeTC.userId);
         timeETS.PLA_PERSOON = employee.employeeNumber;
 
         //create the caption
-        timeETS.PLA_CAPTION = subProject.code;
+        timeETS.PLA_CAPTION = $"{subProject.code}: {mainProject.PR_KROM}";
 
         //create the text
         timeETS.PLA_TEKST =
-            $"{timeTC.projectName}: {uurCode.name} ({timeETS.PLA_UURCODE})\n" +
+            $"{timeETS.PLA_SUBPROJECT}: {timeTC.projectName}\n" +
+            $"{uurCode.name} ({timeETS.PLA_UURCODE})\n" +
             $"TimeChimp: {timeTC.id}\n" +
             timeTC.notes;
 
         //create the query
-        string query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE, PLA_KM, PLA_KM_HEEN_TERUG, PLA_KM_VERGOEDING) " +
-                    $"VALUES (@id, @kleur, @caption, @start, @eind, @pauze, @tekst, @project, @subproject, @persoon, @klant, @uurcode, 0, 0, 0)";
+        string query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE, PLA_KM, PLA_KM_HEEN_TERUG, PLA_KM_VERGOEDING, PLA_INTERN) " +
+                    $"VALUES (GEN_ID(PLANNINGSITEM_GEN,1), @kleur, @caption, @start, @eind, @pauze, @tekst, @project, @subproject, @persoon, @klant, @uurcode, 0, 0, 0, @timechimp)";
         Dictionary<string, object> parameters = new()
         {
-            {"@id", timeETS.PLA_ID},
-            {"@kleur", timeETS.PLA_KLEUR},
-            {"@caption", timeETS.PLA_CAPTION},
-            {"@start", timeETS.PLA_START},
-            {"@eind", timeETS.PLA_EINDE},
-            {"@pauze", timeETS.PLA_KM_PAUZE},
-            {"@tekst",  timeETS.PLA_TEKST},
-            {"@project", timeETS.PLA_PROJECT },
-            {"@subproject", timeETS.PLA_SUBPROJECT },
-            {"@persoon", timeETS.PLA_PERSOON },
-            {"@klant", timeETS.PLA_KLANT },
-            {"@uurcode", timeETS.PLA_UURCODE }
+            {"@kleur", timeETS.PLA_KLEUR ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_KLEUR")},
+            {"@caption", timeETS.PLA_CAPTION ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_CAPTION")},
+            {"@start", timeETS.PLA_START ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_START")},
+            {"@eind", timeETS.PLA_EINDE ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_EINDE")},
+            {"@pauze", timeETS.PLA_KM_PAUZE ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_KM_PAUZE")},
+            {"@tekst",  timeETS.PLA_TEKST ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_TEKST")},
+            {"@project", timeETS.PLA_PROJECT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_PROJECT")},
+            {"@subproject", timeETS.PLA_SUBPROJECT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_SUBPROJECT")},
+            {"@persoon", timeETS.PLA_PERSOON ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_PERSOON")},
+            {"@klant", timeETS.PLA_KLANT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_KLANT")},
+            {"@uurcode", timeETS.PLA_UURCODE ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_UURCODE")},
+            {"@timechimp", timeTC.id}
         };
 
         //send data to ETS

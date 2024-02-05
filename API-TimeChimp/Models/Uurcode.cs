@@ -2,16 +2,16 @@ namespace Api.Devion.Models;
 
 public class UurcodeTimeChimp
 {
-    public int id { get; set; }
-    public bool active { get; set; }
-    public string name { get; set; }
-    public string code { get; set; }
+    public int? id { get; set; }
+    public bool? active { get; set; }
+    public string? name { get; set; }
+    public string? code { get; set; }
     public string? hourlyRate { get; set; }
-    public bool billable { get; set; }
-    public bool common { get; set; }
-    public bool unspecified { get; set; }
-    public int[] tagIds { get; set; }
-    public string[] tagNames { get; set; }
+    public bool? billable { get; set; }
+    public bool? common { get; set; }
+    public bool? unspecified { get; set; }
+    public int[]? tagIds { get; set; }
+    public string[]? tagNames { get; set; }
 
     //constructor without specific parameters
     public UurcodeTimeChimp() { }
@@ -22,7 +22,7 @@ public class UurcodeTimeChimp
         name = uurcode.UR_OMS;
         code = uurcode.UR_COD;
         billable = true;
-        common = true;
+        common = false;
         unspecified = false;
         active = true;
         tagIds = new int[] { };

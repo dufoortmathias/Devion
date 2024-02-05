@@ -4,6 +4,9 @@
     @option-selected="handleTextInputArtikelSearch" />
   <buttonDevion :label="searchButton.label" :isDisabled="searchButton.isButtonDisabled" @click="ArtikelZoeken"
     :showButton="searchButton.showButton" class="c-button-search" />
+  <div v-if="loading.showLoad" class="c-load">
+    <LoadingAnimation :showLoad="loading.showLoad" />
+  </div>
   <div class="c-artikel-form">
     <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel" class="c-form"
       :check="artikelForm.check" ref="article" />
@@ -31,6 +34,7 @@ import textInput from '../components/componenten/textInput.vue';
 import buttonDevion from '../components/componenten/ButtonDevion.vue';
 import artikelForm from '../components/ArtikelForm.vue';
 import labelDevion from '../components/componenten/LabelDevion.vue';
+import LoadingAnimation from '../components/componenten/LoadingAnimation.vue';
 import { GetData, PostDataWithBody } from '../global/global.js';
 
 let artikelSearch = ""
@@ -47,7 +51,8 @@ export default {
     textInput,
     buttonDevion,
     artikelForm,
-    labelDevion
+    labelDevion,
+    LoadingAnimation
   },
   data() {
     return {
@@ -114,6 +119,12 @@ export default {
         label: 'Artikel 1/1',
         showLabel: false,
       },
+      loading: {
+        components: {
+          LoadingAnimation,
+        },
+        showLoad: false,
+      },
     };
   },
   beforeUnmount() {
@@ -137,6 +148,7 @@ export default {
         }
         if (artikelNrs != null) {
           if (artikels[index] == undefined) {
+            this.loading.showLoad = true;
             endpoint = `devion/cebeo/searcharticle?articleReference=${artikelNrs[index]}`
             GetData(endpoint).then((data) => {
               console.log(data)
@@ -206,21 +218,8 @@ export default {
         endpoint = `devion/ets/validatearticleform`
         artikels.forEach(artikel => {
           PostDataWithBody(endpoint, artikel).then((data) => {
-            data = JSON.parse(data)
-            if (data.status) {
-
-              if (data.errors) {
-                this.$refs.article.validate(data.errors)
-              }
-            } else {
-              endpoint = `devion/ets/createarticle`
-              PostDataWithBody(endpoint, artikel).then(() => { }).catch(error => {
-                console.error(error)
-              })
-            }
-          }).catch(error => {
-            console.error(error)
-          })
+            console.log(data)
+          }) 
         });
       } else {
         save = false
@@ -265,5 +264,10 @@ export default {
   margin-top: var(--global-whitespace-lg);
   margin-bottom: var(--global-whitespace-lg);
   cursor: pointer;
+}
+
+.c-load {
+    display: flex;
+    justify-content: center;
 }
 </style>

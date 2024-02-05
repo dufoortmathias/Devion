@@ -52,22 +52,10 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         TimeChimpProjectHelper projectHelper = new(TCClient);
 
         //get projectId from timechimp
-        int projectId = projectHelper.GetProjects().Find(p => p.code.Equals(projectNumber)).id.Value;
-
-        //check if projectID is not null
-        if (projectId == null)
-        {
-            throw new Exception($"Error getting project from timechimp with endpoint: v1/projects/{projectId}");
-        }
+        int projectId = projectHelper.GetProjects().Find(p => p.code != null && p.code.Equals(projectNumber))?.id ?? throw new Exception($"Error getting project from timechimp with code = {projectNumber}");
 
         //get project from timechimp
-        ProjectTimeChimp project = projectHelper.GetProject(projectId);
-
-        //check if project is not null
-        if (project == null)
-        {
-            throw new Exception($"Error getting project from timechimp with endpoint: v1/projects/{projectId}");
-        }
+        ProjectTimeChimp project = projectHelper.GetProject(projectId) ?? throw new Exception($"Error getting project from timechimp with endpoint: v1/projects/{projectId}");
 
         //get projectusers from timechimp
         List<ProjectUserTimechimp> projectUsers = GetProjectUsersByProject(projectId);
@@ -82,18 +70,11 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         foreach (EmployeeTimeChimp employee in new TimeChimpEmployeeHelper(TCClient).GetEmployees())
         {
             //check if user is not already added to project
-            if (!projectUsers.Exists(e => e.userId.Equals(employee.id)))
+            if (employee.id != null && !projectUsers.Exists(e => e.userId.Equals(employee.id)))
             {
                 //create projectuser
-                ProjectUserTimechimp projectUser = new(employee.id.Value, project.id.Value);
-                ProjectUserTimechimp response = AddProjectUser(projectUser);
-
-                //check if projectuser is not null
-                if (response == null)
-                {
-                    throw new Exception($"Error adding projectuser to timechimp with endpoint: v1/projectusers");
-                }
-
+                ProjectUserTimechimp projectUser = new(employee.id.Value, projectId);
+                ProjectUserTimechimp response = AddProjectUser(projectUser) ?? throw new Exception($"Error adding projectuser to timechimp with endpoint: v1/projectusers");
                 projectUsersAdded.Add(projectUser);
             }
         }
@@ -115,12 +96,6 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
     public object AddAllProjectUserForEmployee(int employeeId)
     {
         TimeChimpEmployeeHelper employeeHelper = new(TCClient);
-
-        //check if employeeid is not null
-        if (employeeId == null)
-        {
-            throw new Exception($"Error getting employee from timechimp with endpoint: v1/users/{employeeId}");
-        }
 
         //get employee from timechimp
         EmployeeTimeChimp employee = employeeHelper.GetEmployee(employeeId);
@@ -144,17 +119,10 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         foreach (ProjectTimeChimp project in new TimeChimpProjectHelper(TCClient).GetProjects())
         {
             //check if user is not already added to project
-            if (!projectUsers.Exists(e => e.projectId.Equals(project.id)))
+            if (project.id != null && !projectUsers.Exists(e => e.projectId.Equals(project.id)))
             {
                 ProjectUserTimechimp projectUser = new(employeeId, project.id.Value);
-                ProjectUserTimechimp response = AddProjectUser(projectUser);
-
-                //check if projectuser is not null
-                if (response == null)
-                {
-                    throw new Exception($"Error adding projectuser to timechimp with endpoint: v1/projectusers");
-                }
-
+                ProjectUserTimechimp response = AddProjectUser(projectUser) ?? throw new Exception($"Error adding projectuser to timechimp with endpoint: v1/projectusers");
                 projectUsersAdded.Add(projectUser);
             }
         }

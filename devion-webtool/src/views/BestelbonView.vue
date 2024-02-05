@@ -11,6 +11,9 @@
       @option-selected="handlecheckboxInputSelected" class="c-checkbox-input" />
     <ButtonDevion :label="buttonDevion.label" :isDisabled="buttonDevion.isButtonDisabled" @click="BestelbonDownload"
       class="c-button-artikel-search" :showButton="buttonDevion.showButton" />
+    <div v-if="loading.showLoad" class="c-load">
+      <LoadingAnimation :showLoad="loading.showLoad" />
+    </div>
     <labelDevion :label="error.label" :showLabel="error.showLabel" class="c-artikel-error" />
     <TabelBestelbon :showTabel="tabelBestelbon.showTabel" :bestelbonNr="tabelBestelbon.bestelbonNr"
       :showError="tabelBestelbon.showError" :showInfo="tabelBestelbon.showInfo" :artikels="tabelBestelbon.artikels" />
@@ -23,6 +26,7 @@ import ButtonDevion from '../components/componenten/ButtonDevion.vue';
 import TabelBestelbon from '../components/componenten/TabelBestelbonDevion.vue';
 import { GetData } from '../global/global.js'
 import textInput from '../components/componenten/textInput.vue'
+import LoadingAnimation from '../components/componenten/LoadingAnimation.vue'
 import labelDevion from '../components/componenten/LabelDevion.vue'
 import checkboxInput from '../components/componenten/CheckboxInput.vue'
 
@@ -39,6 +43,7 @@ export default {
     ButtonDevion,
     TabelBestelbon,
     textInput,
+    LoadingAnimation,
     labelDevion,
     checkboxInput
   },
@@ -97,6 +102,12 @@ export default {
         options: [],
         error: false,
         errorText: 'Seperator is verplicht',
+      },
+      loading: {
+        components: {
+          LoadingAnimation,
+        },
+        showLoad: false,
       },
       error: {
         components: {
@@ -168,7 +179,10 @@ export default {
         id: selectedOption
       }
       endpoint = `${company}/ets/purchaseorder?${new URLSearchParams(params)}`
+      this.tabelBestelbon.showTabel = false
+      this.loading.showLoad = true
       GetData(endpoint).then((data) => {
+        this.loading.showLoad = false
         return data
       }).then((data) => {
         if (data != null) {
@@ -265,6 +279,11 @@ export default {
   margin-top: var(--global-whitespace-lg);
   margin-bottom: var(--global-whitespace-lg);
   cursor: pointer;
+}
+
+.c-load {
+    display: flex;
+    justify-content: center;
 }
 
 .c-artikel-error {

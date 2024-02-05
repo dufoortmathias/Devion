@@ -9,17 +9,19 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowOrigins", builder => builder.WithOrigins(config["AllowedHosts"]));
+    options.AddPolicy("AllowOrigins", builder =>
+    {
+        builder.WithOrigins("*");
+        builder.WithHeaders("*");
+        builder.AllowAnyMethod();
+    });
 });
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseCors("AllowOrigins");
 //app.UseHttpsRedirection();
 
@@ -30,9 +32,37 @@ List<string> companies = new();
 int companyIndex = -1;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
+    //create clients
     WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
+    //create helpers
+    CebeoArticleHelper articleHelperCebeo = new(config);
+
+    ETSArticleHelper articleHelperETS = new(ETSClient);
+    ETSContactHelper contactHelperETS = new(ETSClient);
+    ETSCustomerHelper customerHelperETS = new(ETSClient);
+    ETSEmployeeHelper employeeHelperETS = new(ETSClient);
+    ETSMileageHelper mileageHelperETS = new(ETSClient);
+    ETSProjectHelper projectHelperETS = new(ETSClient);
+    ETSPurchaseOrderHelper purchaseOrderHelperETS = new(ETSClient);
+    ETSSupplierHelper supplierHelperETS = new(ETSClient);
+    ETSTimeHelper timeHelperETS = new(ETSClient, TCClient);
+    ETSUurcodeHelper uurcodeHelperETS = new(ETSClient);
+    ETSProjVoortgangHelper projVoortgangHelperETS = new(ETSClient);
+    ETSItemHelper itemHelperETS = new(ETSClient);
+
+    TimeChimpContactHelper contactHelperTC = new(TCClient);
+    TimeChimpCustomerHelper customerHelperTC = new(TCClient);
+    TimeChimpEmployeeHelper employeeHelperTC = new(TCClient);
+    TimeChimpMileageHelper mileageHelperTC = new(TCClient);
+    TimeChimpProjectHelper projectHelperTC = new(TCClient);
+    TimeChimpProjectUserHelper projectUserHelperTC = new(TCClient);
+    TimeChimpProjectTaskHelper projectTaskHelperTC = new(TCClient);
+    TimeChimpTimeHelper timeHelperTC = new(TCClient, ETSClient);
+    TimeChimpUurcodeHelper uurcodeHelperTC = new(TCClient);
+
+    //get companies from config
     string company = config[$"Companies:{companyIndex}:Name"];
     companies.Add(company);
 
@@ -92,7 +122,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            return Results.Ok(new ETSCustomerHelper(ETSClient).GetCustomerIdsChangedAfter(DateTime.Parse(dateString)));
+            return Results.Ok(customerHelperETS.GetCustomerIdsChangedAfter(DateTime.Parse(dateString)));
         }
         catch (Exception e)
         {
@@ -106,7 +136,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get customer from ets
-            CustomerETS ETSCustomer = new ETSCustomerHelper(ETSClient).GetCustomer(customerId);
+            CustomerETS? ETSCustomer = customerHelperETS.GetCustomer(customerId);
 
             // Handle when customer doesn't exist in ETS
             if (ETSCustomer == null)
@@ -117,12 +147,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             //change to timechimp class
             CustomerTimeChimp TCCustomer = new(ETSCustomer);
 
-            TimeChimpCustomerHelper customerHelper = new(TCClient);
-
             //check if customer exists in timechimp
-            return customerHelper.CustomerExists(customerId)
-                ? Results.Ok(customerHelper.UpdateCustomer(TCCustomer))
-                : Results.Ok(customerHelper.CreateCustomer(TCCustomer));
+            return customerHelperTC.CustomerExists(customerId)
+                ? Results.Ok(customerHelperTC.UpdateCustomer(TCCustomer))
+                : Results.Ok(customerHelperTC.CreateCustomer(TCCustomer));
         }
         catch (Exception e)
         {
@@ -135,7 +163,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            return Results.Ok(new ETSContactHelper(ETSClient).GetContactIdsChangedAfter(DateTime.Parse(dateString)));
+            return Results.Ok(contactHelperETS.GetContactIdsChangedAfter(DateTime.Parse(dateString)));
         }
         catch (Exception e)
         {
@@ -149,26 +177,18 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get contact from ets
-            ContactETS ETSContact = new ETSContactHelper(ETSClient).GetContact(contactId);
+            ContactETS ETSContact = contactHelperETS.GetContact(contactId) ?? throw new Exception($"ETS doesn't contain a contact with id = {contactId}");
 
-            // Handle when contact doesn't exist in ETS
-            if (ETSContact == null)
-            {
-                throw new Exception($"ETS doesn't contain a contact with id = {contactId}");
-            }
-
-            CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSContact.CO_KLCOD)) ?? throw new Exception($"Customer with number = {ETSContact.CO_KLCOD} doesn't exist in TimeChimp");
-            int customerId = customer.id.Value;
+            CustomerTimeChimp customer = customerHelperTC.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSContact.CO_KLCOD)) ?? throw new Exception($"Customer with number = {ETSContact.CO_KLCOD} doesn't exist in TimeChimp");
+            int customerId = customer.id ?? throw new Exception("Customer received from timechimp has no id");
 
             //change to timechimp class
             ContactTimeChimp TCContact = new(ETSContact, customerId);
 
-            TimeChimpContactHelper contactHelper = new(TCClient);
-
             //check if contact exists in timechimp
-            return contactHelper.ContactExists(ETSContact)
-                ? Results.Ok(contactHelper.UpdateContact(TCContact))
-                : Results.Ok(contactHelper.CreateContact(TCContact));
+            return contactHelperTC.ContactExists(ETSContact)
+                ? Results.Ok(contactHelperTC.UpdateContact(TCContact))
+                : Results.Ok(contactHelperTC.CreateContact(TCContact));
         }
         catch (Exception e)
         {
@@ -181,7 +201,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            return Results.Ok(new ETSUurcodeHelper(ETSClient).GetUurcodes(DateTime.Parse(dateString)));
+            return Results.Ok(uurcodeHelperETS.GetUurcodes(DateTime.Parse(dateString)));
         }
         catch (Exception e)
         {
@@ -195,7 +215,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get uurcode from ets
-            UurcodeETS ETSUurcode = new ETSUurcodeHelper(ETSClient).GetUurcode(uurcodeId);
+            UurcodeETS? ETSUurcode = uurcodeHelperETS.GetUurcode(uurcodeId);
 
             // Handle when uurcode doesn't exist in ETS
             if (ETSUurcode == null)
@@ -206,12 +226,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             //change to timechimp class
             UurcodeTimeChimp TCUurcode = new(ETSUurcode);
 
-            TimeChimpUurcodeHelper uurcodeHelper = new(TCClient);
-
             //check if uurcode exists in timechimp
-            return uurcodeHelper.uurcodeExists(uurcodeId)
-                ? Results.Ok(uurcodeHelper.UpdateUurcode(TCUurcode))
-                : Results.Ok(uurcodeHelper.CreateUurcode(TCUurcode));
+            return uurcodeHelperTC.uurcodeExists(uurcodeId)
+                ? Results.Ok(uurcodeHelperTC.UpdateUurcode(TCUurcode))
+                : Results.Ok(uurcodeHelperTC.CreateUurcode(TCUurcode));
         }
         catch (Exception e)
         {
@@ -224,7 +242,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            return Results.Ok(new ETSEmployeeHelper(ETSClient).GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName));
+            return Results.Ok(employeeHelperETS.GetEmployeeIdsChangedAfter(DateTime.Parse(dateString), teamName));
         }
         catch (Exception e)
         {
@@ -238,7 +256,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             //get employee from ets
-            EmployeeETS ETSEmployee = new ETSEmployeeHelper(ETSClient).GetEmployee(employeeId);
+            EmployeeETS? ETSEmployee = employeeHelperETS.GetEmployee(employeeId);
 
             // Handle when contact doesn't exist in ETS
             if (ETSEmployee == null)
@@ -246,13 +264,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 return Results.Problem($"ETS doesn't contain an employee with id = {employeeId}");
             }
 
-
-            TimeChimpEmployeeHelper employeeHelper = new(TCClient);
-
             //determine role by most used role for all users except admins/managers
-            int roleId = employeeHelper.GetEmployees()
+            int roleId = employeeHelperTC.GetEmployees()
                 .Where(e => e.roleId > 4 || e.roleId == 1)
-                .GroupBy(e => e.roleId.Value)
+                .GroupBy(e => e.roleId ?? throw new Exception("Employee received from timechimp has no roleId"))
                 .Select(g => new
                 {
                     RoleId = g.Key,
@@ -264,9 +279,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             EmployeeTimeChimp TCEmployee = new(ETSEmployee, roleId);
 
             //check if employee exists in timechimp
-            if (employeeHelper.EmployeeExists(employeeId))
+            if (employeeHelperTC.EmployeeExists(employeeId))
             {
-                return Results.Ok(employeeHelper.UpdateEmployee(TCEmployee));
+                return Results.Ok(employeeHelperTC.UpdateEmployee(TCEmployee));
             }
             else
             {
@@ -276,12 +291,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     return Results.Problem($"Can't create the employee {TCEmployee.displayName} without an emailaddress");
                 }
 
-                EmployeeTimeChimp employee = employeeHelper.CreateEmployee(TCEmployee);
+                EmployeeTimeChimp employee = employeeHelperTC.CreateEmployee(TCEmployee);
                 TCEmployee.id = employee.id;
-                employee = employeeHelper.UpdateEmployee(TCEmployee);
+                employee = employeeHelperTC.UpdateEmployee(TCEmployee);
 
                 //adds employee to all existing projects in TimeChimp
-                _ = new TimeChimpProjectUserHelper(TCClient).AddAllProjectUserForEmployee(employee.id.Value);
+                projectUserHelperTC.AddAllProjectUserForEmployee(employee.id ?? throw new Exception("User received from timechimp has no id"));
 
                 return Results.Ok(employee);
             }
@@ -298,7 +313,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            return Results.Ok(new ETSProjectHelper(ETSClient).GetProjectIdsChangedAfter(DateTime.Parse(dateString)));
+            return Results.Ok(projectHelperETS.GetProjectIdsChangedAfter(DateTime.Parse(dateString)));
         }
         catch (Exception e)
         {
@@ -311,9 +326,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            ETSProjectHelper projectHelperETS = new(ETSClient);
-            TimeChimpProjectHelper projectHelperTC = new(TCClient);
-
             // Get project from ETS
             ProjectETS ETSProject = projectHelperETS.GetProject(projectId);
 
@@ -330,22 +342,26 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // Find customer id TimeChimpETSContact.CO_KLCOD
             if (ETSProject.PR_KLNR == null)
             {
-                customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.intern) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
+                customer = customerHelperTC.GetCustomers().Find(c => c.intern != null && c.intern.Value) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
             }
             else
             {
-                customer = new TimeChimpCustomerHelper(TCClient).GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
+                customer = customerHelperTC.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
             }
-            TCProject.customerId = customer.id.Value;
+            TCProject.customerId = customer.id ?? throw new Exception("Customer received from timechimp has no id");
 
             ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
 
+            // update mainproject
+            TCProject.id = mainProject.id;
+            mainProject = projectHelperTC.UpdateProject(TCProject);
+
             List<string> errorMessages = new();
             double totalBudgetHours = 0;
-            List<UurcodeTimeChimp> uurcodes = new TimeChimpUurcodeHelper(TCClient).GetUurcodes();
+            List<UurcodeTimeChimp> uurcodes = uurcodeHelperTC.GetUurcodes();
             // get subprojects from ETS
             List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
-            foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
+            foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => subProject.SU_SUB != null && !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
             {
                 // Change to TimeChimp class
                 ProjectTimeChimp TCSubproject = new(ETSSubproject, mainProject)
@@ -353,40 +369,35 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     mainProjectId = mainProject.id
                 };
 
-                ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.code) ?? projectHelperTC.CreateProject(TCSubproject);
+                ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.code ?? throw new Exception("Subproject received from timechimp has no code")) ?? projectHelperTC.CreateProject(TCSubproject);
 
                 TCSubproject.id = subProject.id;
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
 
-                //update budgethours for each projecttask in timeChimp
-                List<ProjectTaskETS> projectTasksETS = new ETSUurcodeHelper(ETSClient).GetUurcodesSubproject(ETSProject.PR_NR, ETSSubproject.SU_SUB);
-                foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
+                if (TCSubproject.active ?? false)
                 {
-                    if (string.IsNullOrEmpty(projectTaskETS.VO_PROJ?.Trim()))
+                    //update budgethours for each projecttask in timeChimp
+                    List<ProjectTaskETS> projectTasksETS = uurcodeHelperETS.GetUurcodesSubproject(ETSProject.PR_NR ?? throw new Exception("Project received from ETS has no NR"), ETSSubproject.SU_SUB ?? throw new Exception("Subproject received from ETS has no SUBNR"));
+                    foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
                     {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (string.IsNullOrEmpty(projectTaskETS.VO_SUBPROJ?.Trim()))
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (projectTaskETS.VO_AANT == null)
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else
-                    {
-                        int taskId = uurcodes.Find(u => u.code.Equals(projectTaskETS.VO_UUR)).id;
-                        ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks.Find(p => p.taskId.Equals(taskId));
-
-                        projectTaskTimechimp.budgetHours = projectTaskETS.VO_AANT;
-                        totalBudgetHours += projectTaskETS.VO_AANT.Value;
-
-                        TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTaskTimechimp));
+                        if (subProject.id == null)
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} has no id");
+                        }
+                        else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty in table J2W_VOPX");
+                        }
+                        else if (projectTaskETS.VO_AANT == null)
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null in table J2W_VOPX");
+                        }
+                        else
+                        {
+                            int taskId = uurcodes.Find(u => u.code != null && u.code.Equals(projectTaskETS.VO_UUR))?.id ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
+                            projectTaskHelperTC.CreateOrUpdateProjectTask(taskId, subProject.id.Value, projectTaskETS.VO_AANT.Value);
+                            totalBudgetHours += projectTaskETS.VO_AANT.Value;
+                        }
                     }
                 }
             }
@@ -415,7 +426,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            return Results.Ok(new TimeChimpTimeHelper(TCClient, ETSClient).GetTimes(DateTime.Parse(dateString)));
+            return Results.Ok(timeHelperTC.GetTimes(DateTime.Parse(dateString)));
         }
         catch (Exception e)
         {
@@ -428,9 +439,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            ETSTimeHelper timeHelperETS = new(ETSClient, TCClient);
-            TimeChimpTimeHelper timeHelperTC = new(TCClient, ETSClient);
-
             // Get time from TimeChimp
             TimeTimeChimp TCTime = timeHelperTC.GetTime(timeId);
 
@@ -459,7 +467,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            return Results.Ok(new TimeChimpMileageHelper(TCClient).GetApprovedMileageIdsByDate(DateTime.Parse(dateString)));
+            return Results.Ok(mileageHelperTC.GetApprovedMileageIdsByDate(DateTime.Parse(dateString)));
         }
         catch (Exception exception)
         {
@@ -472,21 +480,21 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            MileageTimeChimp mileage = new TimeChimpMileageHelper(TCClient).GetMileage(mileageId);
+            MileageTimeChimp mileage = mileageHelperTC.GetMileage(mileageId);
 
             if (mileage.status == 3)
             {
                 throw new Exception($"Mileage with id ({mileageId}) already invoiced");
             }
 
-            string projectNumber = new TimeChimpProjectHelper(TCClient).GetProject(mileage.projectId).code;
-            string employeeNumber = new TimeChimpEmployeeHelper(TCClient).GetEmployee(mileage.userId).employeeNumber;
+            string projectNumber = projectHelperTC.GetProject(mileage.projectId).code ?? throw new Exception("Project received from timechimp has no code");
+            string employeeNumber = employeeHelperTC.GetEmployee(mileage.userId).employeeNumber ?? throw new Exception("Employee received from timechimp has no employeeNumber");
 
             MileageETS mileageETS = new(mileage, projectNumber, employeeNumber);
-            MileageETS response = new ETSMileageHelper(ETSClient).UpdateMileage(mileageETS);
+            MileageETS response = mileageHelperETS.UpdateMileage(mileageETS);
 
             //change status
-            MileageTimeChimp responseStatus = new TimeChimpMileageHelper(TCClient).changeStatus(mileageId);
+            MileageTimeChimp responseStatus = mileageHelperTC.changeStatus(mileageId);
 
             return Results.Ok(response);
         }
@@ -501,7 +509,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            List<PurchaseOrderHeaderETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetOpenPurchaseOrders();
+            List<PurchaseOrderHeaderETS> purchaseOrders = purchaseOrderHelperETS.GetOpenPurchaseOrders();
             var purchaseOrderIds = purchaseOrders.Select(p => p.FH_BONNR).Distinct();
             return Results.Ok(purchaseOrderIds);
         }
@@ -516,25 +524,28 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            List<PurchaseOrderDetailETS> purchaseOrders = new ETSPurchaseOrderHelper(ETSClient).GetPurchaseOrderDetails(id);
+            PurchaseOrderHeaderETS header = purchaseOrderHelperETS.GetPurchaseOrderHeader(id);
+
+
+            List<PurchaseOrderDetailETS> purchaseOrders = purchaseOrderHelperETS.GetPurchaseOrderDetails(id);
 
             //convert to a dictionary for the web
-            Dictionary<string, object> result = new()
+            Dictionary<string, object?> result = new()
                 {
                     {"bonNummer", id},
-                    {"artikels", new List<Dictionary<string, object>>()},
-                    {"klant", purchaseOrders.FirstOrDefault()?.KLANTNAAM},
-                    {"project", purchaseOrders.FirstOrDefault()?.FD_PROJ},
-                    {"subproject", purchaseOrders.FirstOrDefault()?.FD_SUBPROJ}
+                    {"artikels", new List<Dictionary<string, object?>>()},
+                    {"klant", header.KL_NAM},
+                    {"project", header.FH_PROJ},
+                    {"subproject", header.FH_SUBPROJ}
                 };
             foreach (PurchaseOrderDetailETS purchaseOrder in purchaseOrders.Where(p => p.FD_ARTNR != null))
             {
-                ((List<Dictionary<string, object>>)result["artikels"]).Add(new()
+                ((List<Dictionary<string, object?>>)(result["artikels"] ?? throw new Exception("Value at key artikels is null"))).Add(new()
                     {
-                        {"artikelNummer", purchaseOrder.FD_ARTNR},
-                        {"omschrijving", purchaseOrder.FD_OMS},
-                        {"aantal", purchaseOrder.FD_AANTAL.Value},
-                        {"leverancier", purchaseOrder.LV_NAM}
+                        {"artikelNummer", articleHelperETS.GetArticleReference(purchaseOrder.FD_ARTNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no ARTNR"), header.FH_KLNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no KLNR"))},
+                        {"omschrijving", purchaseOrder.ART_OMS},
+                        {"aantal", purchaseOrder.TOTAAL_AANTAL},
+                        {"leverancier", header.LV_NAM}
                     });
             }
 
@@ -547,31 +558,44 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}GetPurchaseOrder").WithTags(company);
 
     //returns file information for each supplier about file needed for order 
-    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id) =>
+    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id, string seperator, bool forceCSV) =>
     {
         try
         {
-            ETSPurchaseOrderHelper helper = new(ETSClient);
+            PurchaseOrderHeaderETS header = purchaseOrderHelperETS.GetPurchaseOrderHeader(id);
 
-            List<FileContentResult> fileContents = new();
-            helper.GetPurchaseOrderDetails(id)
-                .Where(po => po.LV_COD != null)
-                .GroupBy(po => po.LV_COD)
-                .Select(g => g.ToList())
-                .ToList()
-                .ForEach(purchaseOrders =>
+            string supplier = header.LV_NAM ?? throw new Exception($"PurchaseOrder header in ETS with number = {header.FH_BONNR} has no LV_NAM");
+            string supplierId = header.FH_KLNR ?? throw new Exception($"PurchaseOrder header in ETS with number = {header.FH_BONNR} has no FH_KLNR");
+
+            List<PurchaseOrderDetailETS> purchaseOrders = purchaseOrderHelperETS.GetPurchaseOrderDetails(id);
+            purchaseOrders.ForEach(po => po.FD_KLANTREFERENTIE = articleHelperETS.GetArticleReference(po.FD_ARTNR ?? throw new Exception($"PurchaseOrder detail in ETS with number = {po.FD_BONNR} has no ART_NR"), supplierId));
+            purchaseOrders = purchaseOrders.Where(po => po.FD_KLANTREFERENTIE != null).ToList();
+
+            FileContentResult fileContent;
+            if (!forceCSV && supplier.ToLower().Contains("cebeo"))
+            {
+                List<Dictionary<string, object>> orderLines = new();
+                purchaseOrders.ForEach(purchaseOrder =>
                 {
-                    if (purchaseOrders.First().LV_NAM.ToLower().Contains("cebeo"))
+                    if (purchaseOrder.FD_KLANTREFERENTIE != null)
                     {
-                        fileContents.Add(helper.CreateFileCebeo(purchaseOrders, config));
-                    }
-                    else
-                    {
-                        fileContents.Add(helper.CreateCSVFile(purchaseOrders));
+                        string cebeoArticleNumber = articleHelperCebeo.SearchForArticleWithReference(purchaseOrder.FD_KLANTREFERENTIE)?.Material?.SupplierItemID ?? throw new Exception($"Cebeo has no article with reference = {purchaseOrder.FD_KLANTREFERENTIE}");
+                        orderLines.Add(new Dictionary<string, object>()
+                        {
+                            { "number", cebeoArticleNumber },
+                            { "aantal", purchaseOrder.TOTAAL_AANTAL ?? 0 }
+                        });
                     }
                 });
 
-            return Results.Ok(fileContents);
+                fileContent = purchaseOrderHelperETS.CreateFileCebeo(orderLines, id, supplier, config);
+            }
+            else
+            {
+                fileContent = purchaseOrderHelperETS.CreateCSVFile(purchaseOrders, supplier, seperator);
+            }
+
+            return Results.Ok(fileContent);
         }
         catch (Exception e)
         {
@@ -579,11 +603,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}CreatePurchaseFile").WithTags(company);
 
+    //get all articles from cebeo
     app.MapGet($"/api/{company.ToLower()}/cebeo/articles", () =>
     {
         try
         {
-            List<string> articles = new ETSArticleHelper(ETSClient, config).GetAriclesCebeo();
+            string supplierId = supplierHelperETS.FindSupplierId("cebeo");
+            List<string> articles = articleHelperETS.GetAricles(supplierId);
 
             return Results.Ok(articles);
         }
@@ -593,29 +619,392 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetArticles").WithTags(company);
 
+    //update article from cebeo in ets
     app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumberETS, float maxPriceDiff) =>
     {
         try
         {
-            ETSArticleHelper helper = new(ETSClient, config);
+            string articleReference = (articleHelperETS.GetArticle(articleNumberETS) ?? throw new Exception($"ETS han no article with number = {articleNumberETS}")).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
 
-            string articleReference = helper.GetArticle(articleNumberETS).ART_LEVREF ?? throw new Exception($"Article in ETS with number = {articleNumberETS}, has no supplier reference number");
+            float newPrice = articleHelperCebeo.GetArticlePriceCebeo(articleReference);
 
-            string articleNumberCebeo = helper.GetArticleNumberCebeo(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+            ArticleETS article = articleHelperETS.UpdateArticlePriceETS(articleNumberETS, newPrice, maxPriceDiff);
 
-            float newPrice = helper.GetArticlePriceCebeo(articleNumberCebeo) ?? throw new Exception($"Cebeo has no article with number = {articleNumberCebeo}");
-
-            ArticleETS article = helper.UpdateArticlePriceETS(articleNumberETS, newPrice, maxPriceDiff);
-
-            return Results.Ok(article.ART_AANKP == newPrice ? $"Price updated to {article.ART_AANKP}" : $"Price not updated, price diff is {Math.Abs(article.ART_AANKP.Value - newPrice) / article.ART_AANKP * 100}%");
+            float updatedPrice = article.ART_AANKP ?? throw new Exception($"Article from ETS with number = {articleNumberETS} has no AANKP");
+            return Results.Ok(updatedPrice == newPrice ? $"Price updated to {updatedPrice}" : $"Price not updated, price diff is {Math.Abs(updatedPrice - newPrice) / article.ART_AANKP * 100}%");
         }
         catch (Exception e)
         {
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}UpdateArticlePrice").WithTags(company);
+
+    //searches for article in cebeo
+    app.MapGet($"/api/{company.ToLower()}/cebeo/searcharticle", (string articleReference) =>
+    {
+        try
+        {
+            string supplierId = supplierHelperETS.FindSupplierId("cebeo");
+
+            if (articleHelperETS.ArticleWithReferenceExists(articleReference, supplierId))
+            {
+                throw new Exception($"ETS already has an article with reference = {articleReference}");
+            }
+
+            if (articleHelperETS.ArticleWithNumberExists(articleReference))
+            {
+                throw new Exception($"ETS already has an article with number = {articleReference}");
+            }
+
+            CebeoItem articleCebeo = articleHelperCebeo.SearchForArticleWithReference(articleReference) ?? throw new Exception($"Cebeo has no article with reference = {articleReference}");
+
+            ArticleWeb article = new(articleCebeo);
+
+            return Results.Ok(article);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}SearchArticleCebeo").WithTags(company);
+
+    //get article form info
+    app.MapGet($"/api/{company.ToLower()}/ets/articleforminfo", () =>
+    {
+        try
+        {
+            string query = "SELECT AR_COD AS CODE, AR_OMS1 AS DESCRIPTION FROM ARTFAM";
+            string responseFamilies = ETSClient.selectQuery(query);
+
+            query = "SELECT ASF_COD AS CODE, ASF_OMS1 AS DESCRIPTION FROM ARTSUBFAM";
+            string responseSubfamilies = ETSClient.selectQuery(query);
+
+            query = "SELECT EH_COD AS CODE, EH_OMS1 AS DESCRIPTION, EH_OMS2 AS SHORT_DESCRIPTION FROM EENHEID";
+            string responseMeasureTypes = ETSClient.selectQuery(query);
+
+            query = "SELECT TBL_REKENING.REK_CODE AS CODE, TBL_REKENING_TAAL.RET_OMSCHRIJVING AS DESCRIPTION FROM TBL_REKENING LEFT JOIN TBL_REKENING_TAAL ON TBL_REKENING.REK_ID = TBL_REKENING_TAAL.RET_MASTER_ID";
+            string responseBankAccounts = ETSClient.selectQuery(query);
+
+            query = "SELECT EURO_COD AS CODE, EURO_OMS AS DESCRIPTION FROM EURO";
+            string responseCoinTypes = ETSClient.selectQuery(query);
+
+            query = "SELECT CODE, OMSCHRIJF AS DESCRIPTION FROM BTW_CODE";
+            string responseBTWCodes = ETSClient.selectQuery(query);
+
+            List<string> suppliers = config.GetSection("Operations").GetChildren().Select(x => x.Value.ToUpper()).Distinct().ToList();
+            suppliers.Add("CEBEO".ToUpper());
+            string queryPart = string.Join("' OR UPPER(LV_NAM) LIKE '", suppliers.Select(s => $"%{s}%").ToList());
+
+            query = "SELECT LV_COD AS CODE, LV_NAM AS NAME FROM LVPX WHERE (UPPER(LV_NAM) LIKE '" + queryPart + "') AND NOT UPPER(LV_NAM) LIKE '%BV%'";
+            string responseSuppliers = ETSClient.selectQuery(query);
+
+            Dictionary<string, object> result = new()
+            {
+                {"families", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseFamilies)},
+                {"subfamilies", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseSubfamilies)},
+                {"measureTypes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseMeasureTypes)},
+                {"bankAccounts", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseBankAccounts)},
+                {"coinTypes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseCoinTypes)},
+                {"BTWCodes", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseBTWCodes)},
+                {"suppliers", JsonTool.ConvertTo<List<Dictionary<string, object>>>(responseSuppliers)}
+            };
+
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}ArticleFormInfo").WithTags(company);
+
+    //validate article form
+    app.MapPost($"/api/{company.ToLower()}/ets/validatearticleform", ([FromBody] ArticleWeb article) =>
+    {
+        try
+        {
+            Dictionary<string, string[]> problems = new();
+            articleHelperETS.ValidateArticle(article).ToList().ForEach(x => problems.Add(x.Key, x.Value.ToArray()));
+
+            if (problems.Any(x => x.Value.Length > 0))
+            {
+                return Results.ValidationProblem(problems);
+            }
+
+            return Results.Ok(article);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}ValidateArticleForm").WithTags(company);
+
+    //create article in ets
+    app.MapPost($"/api/{company.ToLower()}/ets/createarticle", ([FromBody] ArticleWeb article) =>
+    {
+        try
+        {
+            return Results.Ok(articleHelperETS.CreateArticle(article));
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}CreateArticle").WithTags(company);
+
+    //transform bom excel file to json
+    app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile, string fileName) =>
+    {
+        try
+        {
+            //TODO: part number halen uit naam file
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            using var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content"));
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+            DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
+            {
+                ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+                {
+                    UseHeaderRow = true
+                }
+            });
+
+            Item MainPart = new Item();
+            string number = fileName.Split('.')[0].Split('_')[0];
+            string omschrijving = fileName.Split('.')[0].Split('_')[1];
+            MainPart.Number = number;
+            MainPart.Description = omschrijving;
+            MainPart.LynNumber = "1";
+
+            List<Item> MetabilItems = new List<Item>();
+
+            DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
+
+            List<Item?> assemblies = new();
+            foreach (DataRow row in table.Rows)
+            {
+                List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
+                List<Item?> parentList = assemblies;
+                foreach (int level in hierarchy)
+                {
+                    while (level >= parentList.Count)
+                    {
+                        parentList.Add(null);
+                    }
+
+                    if (parentList[level] != null)
+                    {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                        parentList = parentList[level].Parts;
+                    }
+                    else
+                    {
+#pragma warning disable CS8604 // Dereference of a possibly linenull reference.
+                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
+#pragma warning restore CS8604 // Dereference of a possibly null reference.
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+                        if (part.Number is not null && part.Number.Length > 25)
+                        {
+                            throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
+                        }
+                        try
+                        {
+
+                            part.MainSupplier = row["VENDOR"] != DBNull.Value ? ((string)row["VENDOR"]) : string.Empty;
+
+                            part.Bewerking1 = row["Bewerking 1"] != DBNull.Value ? ((string)row["Bewerking 1"]).ToUpper().Trim() : "-";
+                            part.Bewerking2 = row["Bewerking 2"] != DBNull.Value ? ((string)row["Bewerking 2"]).ToUpper().Trim() : "-";
+                            part.Bewerking3 = row["Bewerking 3"] != DBNull.Value ? ((string)row["Bewerking 3"]).ToUpper().Trim() : "-";
+                            part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
+
+                            float massValue;
+                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Replace(",", ".").Split(' ')[0], out massValue) ? massValue : 0;
+
+                            part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
+                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? (int)((double)row["Aankoop per"]) : 1;
+                            part.Verbruikseenh = row["Verbruikseenh"] != DBNull.Value ? ((string)row["Verbruikseenh"]).ToUpper().Trim() : "ST";
+                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? (int)((double)row["Omrekeningsfactor"]) : 1;
+                            part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
+
+
+                            parentList[level] = part;
+                            bool save = true;
+
+                            void inList(Item item)
+                            {
+                                if (item.Parts.Count > 0)
+                                {
+                                    foreach (Item? item2 in item.Parts)
+                                    {
+                                        inList(item2);
+                                    }
+                                }
+
+                                if (part.Number == item.Number)
+                                {
+                                    save = false;
+                                }
+                            }
+
+                            if (part.Number.EndsWith('W'))
+                            {
+                                foreach (Item item in MetabilItems)
+                                {
+                                    inList(item);
+                                }
+                                if (save)
+                                {
+                                    MetabilItems.Add(part);
+                                }
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            return Results.Problem(e.Message);
+                        }
+                    }
+                }
+            }
+            MainPart.Parts = assemblies;
+            List<Item> Main = new()
+            {
+                MainPart
+            };
+
+            List<List<Item>> items = new()
+            {
+                Main,
+                MetabilItems
+            };
+
+            return Results.Ok(items);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}TransformBomExcel").WithTags(company);
+
+    //update article links in ets
+    app.MapPut($"/api/{company.ToLower()}/ets/updatelinkedarticles", ([FromBody] List<Item> articles) =>
+    {
+        try
+        {
+            List<Dictionary<string, string>> logs = new List<Dictionary<string, string>>();
+            if (articles == null || !articles.Any())
+            {
+                // Handle the case where no articles are provided
+                return Results.BadRequest("No articles provided.");
+            }
+
+            Console.WriteLine($"Received {articles.Count} articles.");
+
+            void LinkArticles(Item main)
+            {
+                if (main.Parts != null)
+                {
+                    foreach (Item part in main.Parts.Where(i => i != null).OfType<Item>())
+                    {
+                        articleHelperETS.LinkArticle(main, part);
+                        Dictionary<string, string> log = new()
+                    {
+                        {"artikelNumber", part.Number },
+                        {"action", "link" },
+                        {"extra", "linked to "+main.Number }
+                    };
+                        logs.Add(log);
+                        LinkArticles(part);
+                    }
+                }
+            }
+
+            foreach (Item article in articles)
+            {
+                LinkArticles(article);
+            }
+
+            return Results.Ok(logs);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error: {e.Message}");
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
+
+    //get projecten voortgang from ets
+    app.MapGet($"/api/{company.ToLower()}/ets/projectenvoortgang", () =>
+    {
+
+        return projVoortgangHelperETS.GetProjectenVoortgang();
+    }).WithName($"{company}ProjectenVoortgang").WithTags(company);
+
+    //get an boolean if article exists in ets
+    app.MapGet($"/api/{company.ToLower()}/ets/articleExists", (string ArticleNumber) =>
+    {
+        return Results.Ok(articleHelperETS.ArticleWithNumberExists(ArticleNumber));
+    }).WithName($"{company}ArticleExists").WithTags(company);
+
+    //gets differences between articles in ets and bom
+    app.MapPost($"/api/{company.ToLower()}/ets/articledifference", ([FromBody] Item articles) =>
+    {
+        Dictionary<string, Change> difference = articleHelperETS.ArticleDifference(articles);
+        return difference;
+
+    }).WithName($"{company}ArticleDifference").WithTags(company);
+
+    //updates article in ets
+    app.MapPut($"/api/{company.ToLower()}/ets/updateitem", ([FromBody] ItemChange item) =>
+    {
+        try
+        {
+            Dictionary<string, string> log = itemHelperETS.UpdateItem(item);
+
+            return Results.Ok(log);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}Updateitem").WithTags(company);
+
+    //sync timechimp via python file
+    app.MapGet($"api/{company.ToLower()}/sync", () =>
+    {
+        try
+        {
+            ProcessStartInfo start = new()
+            {
+                FileName = "python",
+                Arguments = $"sync.py {company.ToLower()}",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            };
+
+            using Process process = Process.Start(start);
+            using StreamReader reader = process.StandardOutput;
+            string result = reader.ReadToEnd();
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}Sync").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
 
-app.Run();
+if (app.Environment.IsProduction())
+{
+    app.Run("http://*:5000");
+}
+else
+{
+    app.Run();
+}
+
