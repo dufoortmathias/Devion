@@ -9,6 +9,7 @@ import os
 import smtplib
 import ssl
 import sys
+import calendar
 
 from email import encoders
 from email.mime.multipart import MIMEMultipart
@@ -41,6 +42,7 @@ notify_emails = config.get("LIST_RECEIVER_EMAILS").split(", ")
 send_mail = False
 
 max_price_diff = int(config.get("PERCENTAGE_MAX_PRICE_DIFF"))/100
+log_dir = config.get("PATH_LOG_DIRECTORY")
 
 # Variable that keeps track of all the information that was logged
 # Initiliazing it with a title
@@ -96,7 +98,7 @@ seconds = duration.total_seconds() % 60
 log(f"\nDuration: {minutes} min {seconds} sec")
 
 # Create log file
-log_filename = f"{current_dir}/logs/{company}-cebeo/{start_time.year}/{start_time.month}/{start_time.day}/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
+log_filename = f"{log_dir}/logs/{company}-cebeo/{start_time.year}/{calendar.month_name[start_time.month]}/{start_time.day}/log-{start_time.strftime('%d%m%y-%H%M%S')}.txt"
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 with open(log_filename, "w+") as log_file:
     log_file.write(output)
@@ -137,6 +139,4 @@ Bekijk bijlage voor meer informatie.
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
         server.login(sender_email, password)
-        for email in notify_emails:
-            message["To"] = email
-            server.sendmail(sender_email, email, message.as_string())
+        server.sendmail(sender_email, notify_emails, message.as_string())
