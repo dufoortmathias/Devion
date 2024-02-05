@@ -1,4 +1,4 @@
-const baseUrl = 'http://192.168.100.209:5142/api/'
+const baseUrl = 'http://localhost:5142/api/'
 
 export async function PostDataWithBody(endpoint, data) {
   var myHeaders = new Headers()

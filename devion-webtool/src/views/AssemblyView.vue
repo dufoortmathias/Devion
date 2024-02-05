@@ -6,10 +6,10 @@
     <div v-if="loading.showLoad" class="c-load">
         <LoadingAnimation :showLoad="loading.showLoad" />
     </div>
-    <ButtonDevion :label="test.label" :isDisabled="test.isDisabled" :showButton="test.showButton" @click="reveal"
-        class="c-button" />
     <div v-show="treeView.showTree" class="c-dev">
         <h2 class="c-dev-title">Devion</h2>
+        <textInput :id="mass.id" :label="mass.label" :error="mass.error" :placeholder="mass.placeholder"
+            :errorText="mass.errorText" class="c-mass" @option-selected="handleMass" />
         <ButtonDevion :label="changeDev.label" :isDisabled="changeDev.isDisabled" :showButton="changeDev.showButton"
             @click="() => TogglePopup('changeDevion')" class="c-button c-change-dev" />
     </div>
@@ -21,8 +21,6 @@
         <h2 class="c-title">Metabil</h2>
         <labelDevion :label="link.label" :showLabel="link.showlabel" class="c-link" />
         <BasicToggleSwitch v-model="LinkModel" class="c-toggle" />
-        <textInput :id="mass.id" :label="mass.label" :error="mass.error" :placeholder="mass.placeholder"
-            :errorText="mass.errorText" class="c-mass" @option-selected="handleMass" />
         <buttonDevion :label="changeMet.label" :isDisabled="changeMet.isDisabled" :showButton="changeMet.showButton"
             @click="() => TogglePopup('changeMetabil')" class="c-button c-change-met" />
     </div>
@@ -30,16 +28,18 @@
         v-show="popupTriggers.changeMetabil" @change-items="updateItemsMet" />
     <labelDevion :label="missingMet.label" :showLabel="missingMet.showlabel && LinkModel" class="c-artikel-missing" />
     <TreeViewMet :jsonData="treeViewMet.jsonData" :showTree="treeViewMet.showTree && LinkModel" />
-    <div v-if="treeView.showTree" class="c-buttons">
+    <div v-if="treeView.showTree || treeViewMet.showTree" class="c-buttons">
         <ButtonDevion :label="buttonSave.label" :isDisabled="buttonSave.isDisabled" :showButton="buttonSave.showButton"
             @click="handleButtonSave" class="c-button c-button-tree" />
         <ButtonDevion :label="buttonInsert.label" :isDisabled="buttonInsert.isDisabled"
             :showButton="buttonInsert.showButton" @click="handleButtonInsert" class="c-button c-button-tree" />
     </div>
     <LabelDevion :label="linked.label" :showLabel="linked.showlabel" class="c-linked" />
+    <TitleDevion :title="titleDevion.title" v-show="artikelForm.showform" class="c-form-title" />
     <div class="c-artikel-form">
+
         <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel"
-            class="c-form" :check="artikelForm.check" ref="article" />
+            :mass="artikelForm.mass" class="c-form" :check="artikelForm.check" ref="article" />
         <div class="c-artikel-button--save" :class="{ 'o-hide-accessible': !save.showButton }">
             <buttonDevion :label="save.label" :isDisabled="save.isButtonDisabled" :showButton="save.showButton"
                 @click="handleSaveButtonClick" class="c-button-artikel--next" />
@@ -73,6 +73,7 @@ import TreeViewMet from '../components/componenten/TreeViewMet.vue';
 import BasicToggleSwitch from '../components/componenten/ToggleButton.vue';
 import textInput from '../components/componenten/textInput.vue';
 import PopupDevion from '../components/componenten/PopupDevion.vue';
+import TitleDevion from '../components/componenten/TitleDevion.vue';
 // import { useConfirmBeforeAction } from '../composables';
 import { ref } from 'vue'
 
@@ -86,7 +87,9 @@ let totalParts = 0
 let partsNotFoundMet = []
 let notFoundMet = 0
 let totalPartsMet = 0
-let index, index2, save
+let index, index2, save, metIndex, metIndex2
+let metSave = false
+let metArtikel = false
 let artikelen = []
 let artikelenMet = []
 let artikels
@@ -99,6 +102,7 @@ const popupTriggers = ref({
     changeMetabil: false
 })
 let logs = []
+let mass = parseFloat(0).toFixed(2)
 
 export default {
     components: {
@@ -112,6 +116,7 @@ export default {
         BasicToggleSwitch,
         textInput,
         PopupDevion,
+        TitleDevion
     },
     data() {
         return {
@@ -186,13 +191,21 @@ export default {
                 isDisabled: false,
                 showButton: true
             },
+            titleDevion: {
+                components: {
+                    TitleDevion
+                },
+                title: 'Devion',
+                showTitle: false
+            },
             artikelForm: {
                 components: {
                     ArtikelForm
                 },
                 showform: false,
                 data: null,
-                check: false
+                check: false,
+                mass: 0
             },
             save: {
                 components: {
@@ -355,12 +368,19 @@ export default {
             })
         },
         handleButtonSave() {
-            if (notFound > 0) {
+            if (partsNotFound == 0){
+                metArtikel = true
+            } else {
+                metArtikel = false
+            }
+            if (!metArtikel) {
                 this.artikelForm.showform = true
                 this.save.showButton = false
                 this.next.showButton = true
                 this.prev.showButton = true
+                index = 0
                 this.artikelProgress.showLabel = true
+                this.artikelForm.data = partsNotFound[0]
                 this.artikelProgress.label = 'Artikel 1/' + partsNotFound.length
                 this.file.showFile = false
                 this.button.showButton = false
@@ -370,6 +390,26 @@ export default {
                 this.buttonInsert.showButton = false
                 this.missing.showlabel = false
                 this.missingMet.showlabel = false
+                this.titleDevion.title = 'Devion'
+            } else if (metArtikel) {
+                this.artikelForm.showform = true
+                this.save.showButton = false
+                this.next.showButton = true
+                this.prev.showButton = true
+                metIndex = 0
+                this.artikelProgress.showLabel = true
+                this.artikelForm.data = partsNotFoundMet[0]
+                this.artikelForm.mass = mass
+                this.artikelProgress.label = 'Artikel 1/' + partsNotFoundMet.length
+                this.file.showFile = false
+                this.button.showButton = false
+                this.treeView.showTree = false
+                this.treeViewMet.showTree = false
+                this.buttonSave.showButton = false
+                this.buttonInsert.showButton = false
+                this.missing.showlabel = false
+                this.missingMet.showlabel = false
+                this.titleDevion.title = 'Metabil'
             }
         },
         async checkArtikel(artikel) {
@@ -483,22 +523,22 @@ export default {
         },
         async handleButtonInsert() {
             if (notFound > 0) {
-                this.artikelForm.showform = true
-                index = 0
-                this.artikelForm.data = partsNotFound[index]
-                this.save.showButton = false
-                this.next.showButton = true
-                this.prev.showButton = false
-                this.artikelProgress.showLabel = true
-                this.artikelProgress.label = 'Artikel 1/' + partsNotFound.length
-                this.file.showFile = false
-                this.button.showButton = false
-                this.treeView.showTree = false
-                this.treeView.showTree = false
-                this.buttonSave.showButton = false
-                this.buttonInsert.showButton = false
-                this.missing.showlabel = false
-                this.missingMet.showlabel = false
+                // this.artikelForm.showform = true
+                // index = 0
+                // this.artikelForm.data = partsNotFound[index]
+                // this.save.showButton = false
+                // this.next.showButton = true
+                // this.prev.showButton = false
+                // this.artikelProgress.showLabel = true
+                // this.artikelProgress.label = 'Artikel 1/' + partsNotFound.length
+                // this.file.showFile = false
+                // this.button.showButton = false
+                // this.treeView.showTree = false
+                // this.treeView.showTree = false
+                // this.buttonSave.showButton = false
+                // this.buttonInsert.showButton = false
+                // this.missing.showlabel = false
+                // this.missingMet.showlabel = false
             } else {
                 this.loading.showLoad = true
                 PutDataWithBody('devion/ets/updatelinkedarticles', artikelen).then((response) => {
@@ -537,70 +577,141 @@ export default {
         handleArtikel(object) {
             let artikel = object
             artikels[index] = artikel
-            if (save == true) {
-                // let endpoint = `metabil/cebeo/createarticle`
-                // artikels.forEach(artikel => {
-                //     PostDataWithBody(endpoint, artikel).then((data) => {
-                //         console.log(data)
-                //     })
-                // });
-                console.log("saved")
-                this.artikelForm.showform = false
-                this.save.showButton = false
-                this.next.showButton = false
-                this.prev.showButton = false
-                this.artikelProgress.showLabel = false
-                this.file.showFile = true
-                this.button.showButton = true
-                this.treeView.showTree = true
-                this.buttonSave.showButton = true
-                this.buttonInsert.showButton = true
-                this.handleButton()
-            } else {
-                save = false
-                index = index2
-                if (index == partsNotFound.length - 1) {
-                    this.next.showButton = false;
-                    this.save.showButton = true;
-                    this.artikelProgress.label = `Artikel ${index + 1}/${partsNotFound.length}`
-                } else if (index == 0) {
-                    this.next.showButton = true;
-                    this.save.showButton = false;
-                    this.prev.showButton = false;
-                    this.artikelProgress.label = `Artikel ${index + 1}/${partsNotFound.length}`
+            if (metArtikel) {
+
+                if (save == true) {
+                    // let endpoint = `metabil/cebeo/createarticle`
+                    // artikels.forEach(artikel => {
+                    //     PostDataWithBody(endpoint, artikel).then((data) => {
+                    //         console.log(data)
+                    //     })
+                    // });
+                    console.log("saved")
+                    this.artikelForm.showform = false
+                    this.save.showButton = false
+                    this.next.showButton = false
+                    this.prev.showButton = false
+                    this.artikelProgress.showLabel = false
+                    this.file.showFile = true
+                    this.button.showButton = true
+                    this.treeView.showTree = true
+                    this.buttonSave.showButton = true
+                    this.buttonInsert.showButton = true
+                    this.handleButton()
                 } else {
-                    this.next.showButton = true;
-                    this.save.showButton = false;
-                    this.prev.showButton = true;
-                    this.artikelProgress.label = `Artikel ${index + 1}/${partsNotFound.length}`
+                    save = false
+                    metIndex = metIndex2
+                    if (metIndex == partsNotFoundMet.length - 1) {
+                        this.next.showButton = false;
+                        this.save.showButton = true;
+                        this.artikelProgress.label = `Artikel ${metIndex + 1}/${partsNotFoundMet.length}`
+                    } else if (metIndex == 0) {
+                        this.next.showButton = true;
+                        this.save.showButton = false;
+                        this.prev.showButton = false;
+                        this.artikelProgress.label = `Artikel ${metIndex + 1}/${partsNotFoundMet.length}`
+                    } else {
+                        this.next.showButton = true;
+                        this.save.showButton = false;
+                        this.prev.showButton = true;
+                        this.artikelProgress.label = `Artikel ${metIndex + 1}/${partsNotFoundMet.length}`
+                    }
+                    this.ArtikelZoeken()
                 }
-                this.ArtikelZoeken()
+            } else {
+                if (save == true) {
+                    // let endpoint = `devion/cebeo/createarticle`
+                    // artikels.forEach(artikel => {
+                    //     PostDataWithBody(endpoint, artikel).then((data) => {
+                    //         console.log(data)
+                    //     })
+                    // });
+                    console.log("saved")
+                    this.artikelForm.showform = false
+                    this.save.showButton = false
+                    this.next.showButton = false
+                    this.prev.showButton = false
+                    this.artikelProgress.showLabel = false
+                    this.file.showFile = true
+                    this.button.showButton = true
+                    this.treeView.showTree = true
+                    this.buttonSave.showButton = true
+                    this.buttonInsert.showButton = true
+                    this.handleButton()
+                } else {
+                    save = false
+                    index = index2
+                    if (index == partsNotFound.length - 1) {
+                        this.next.showButton = false;
+                        this.save.showButton = true;
+                        this.artikelProgress.label = `Artikel ${index + 1}/${partsNotFound.length}`
+                    } else if (index == 0) {
+                        this.next.showButton = true;
+                        this.save.showButton = false;
+                        this.prev.showButton = false;
+                        this.artikelProgress.label = `Artikel ${index + 1}/${partsNotFound.length}`
+                    } else {
+                        this.next.showButton = true;
+                        this.save.showButton = false;
+                        this.prev.showButton = true;
+                        this.artikelProgress.label = `Artikel ${index + 1}/${partsNotFound.length}`
+                    }
+                    this.ArtikelZoeken()
+                }
             }
         },
         ArtikelZoeken() {
-            this.artikelForm.showform = true;
-            this.artikelForm.data = partsNotFound[index]
-            this.artikelForm.check = true
-            this.file.showFile = false
-            this.button.showButton = false
-            this.treeView.showTree = false
-            this.buttonSave.showButton = false
-            this.buttonInsert.showButton = false
+            if (metArtikel) {
+                this.artikelForm.showform = true;
+                this.artikelForm.data = partsNotFoundMet[metIndex]
+                this.artikelForm.check = true
+                this.file.showFile = false
+                this.button.showButton = false
+                this.treeView.showTree = false
+                this.buttonSave.showButton = false
+                this.buttonInsert.showButton = false
+            } else {
+                this.artikelForm.showform = true;
+                this.artikelForm.data = partsNotFound[index]
+                this.artikelForm.check = true
+                this.file.showFile = false
+                this.button.showButton = false
+                this.treeView.showTree = false
+                this.buttonSave.showButton = false
+                this.buttonInsert.showButton = false
+            }
         },
         handleNextButtonClick() {
-            index2 = index + 1
-            this.$refs.article.createInfoObject()
+            if (metArtikel) {
+                metIndex2 = metIndex + 1
+                this.$refs.article.createInfoObject()
+            } else {
+                index2 = index + 1
+                this.$refs.article.createInfoObject()
+            }
         },
         handlePrevButtonClick() {
-            index2 = index - 1
-            this.$refs.article.createInfoObject()
+            if (metArtikel) {
+                metIndex2 = metIndex - 1
+                this.$refs.article.createInfoObject()
+            } else {
+                index2 = index - 1
+                this.$refs.article.createInfoObject()
+            }
         },
         handleSaveButtonClick() {
-            save = true
-            this.$refs.article.createInfoObject()
+            if (metArtikel) {
+                metSave = true
+                this.$refs.article.createInfoObject()
+            } else {
+                save = true
+                this.$refs.article.createInfoObject()
+            }
         },
         handleTest() { },
-        handleMass() { },
+        handleMass(object) {
+            mass = parseFloat(object).toFixed(2)
+        },
         TogglePopup(trigger) {
             popupTriggers.value[trigger] = !popupTriggers.value[trigger]
         },
@@ -701,8 +812,8 @@ export default {
 
 .c-dev {
     display: grid;
-    grid-template-areas: "title button";
-    grid-template-columns: 6fr 4fr;
+    grid-template-areas: "title mass button";
+    grid-template-columns: 6fr 2fr 4fr;
     align-items: baseline;
 }
 
@@ -714,5 +825,15 @@ export default {
     grid-area: "button";
     max-width: 50%;
     justify-self: end;
+}
+
+.c-form-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    width: 70vw;
+    height: 100px;
 }
 </style>
