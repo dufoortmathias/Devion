@@ -602,7 +602,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}CreatePurchaseFile").WithTags(company);
-    
+
     //get all articles from cebeo
     app.MapGet($"/api/{company.ToLower()}/cebeo/articles", () =>
     {
@@ -737,7 +737,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ValidateArticleForm").WithTags(company);
-    
+
     //create article in ets
     app.MapPost($"/api/{company.ToLower()}/ets/createarticle", ([FromBody] ArticleWeb article) =>
     {
@@ -840,7 +840,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                                         inList(item2);
                                     }
                                 }
-                                
+
                                 if (part.Number == item.Number)
                                 {
                                     save = false;
@@ -849,7 +849,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                             if (part.Number.EndsWith('W'))
                             {
-                                foreach(Item item in MetabilItems)
+                                foreach (Item item in MetabilItems)
                                 {
                                     inList(item);
                                 }
@@ -962,14 +962,39 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             Dictionary<string, string> log = itemHelperETS.UpdateItem(item);
-            
+
             return Results.Ok(log);
         }
         catch (Exception e)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}Updateitem").WithTags(company);   
+    }).WithName($"{company}Updateitem").WithTags(company);
+
+    //sync timechimp via python file
+    app.MapGet($"api/{company.ToLower()}/sync", () =>
+    {
+        try
+        {
+            ProcessStartInfo start = new()
+            {
+                FileName = "python",
+                Arguments = $"sync.py {company.ToLower()}",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            };
+
+            using Process process = Process.Start(start);
+            using StreamReader reader = process.StandardOutput;
+            string result = reader.ReadToEnd();
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}Sync").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
