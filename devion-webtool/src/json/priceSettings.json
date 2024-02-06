@@ -1,0 +1,16 @@
+{
+    "devion": {
+        "frezen": 0,
+        "lassen": 0,
+        "draaien": 0,
+        "printen": 0,
+        "laseren": 0
+    },
+    "metabil": {
+        "frezen": 0,
+        "lassen": 0,
+        "draaien": 0,
+        "printen": 0,
+        "laseren": 0
+    }
+}

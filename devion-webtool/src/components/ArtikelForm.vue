@@ -66,7 +66,7 @@ export default {
     props: {
         showform: Boolean,
         data: Object,
-        mass: Float64Array
+        priceData: Object
     },
     components: {
         textInput,
@@ -304,7 +304,6 @@ export default {
     },
     watch: {
         data(object) {
-            console.log(object)
             if (object.number == undefined) {
                 this.artikelNr.placeholder = object.artikelNr
                 artikelNr = object.artikelNr
@@ -352,8 +351,7 @@ export default {
                 hoofdleverancier = object.mainSupplier
                 this.minaan.placeholder = object.minaan
                 minaan = object.minaan
-            } else if (object.existsMet == false){
-                console.log(object)
+            } else if (object.existsMet == false && !object.existsDev){
                 this.returnToDefault()
 
                 this.artikelNr.placeholder = object.number
@@ -364,7 +362,6 @@ export default {
                     this.omschrijving.placeholder = object.description
                     omschrijving = object.description
                 }
-                console.log(object.bewerking1)
                 this.hoofdleverancier.placeholder = object.bewerking1.toString()
                 hoofdleverancier = object.bewerking1.toString()
                 this.merk.placeholder = "devion"
@@ -389,15 +386,27 @@ export default {
                 rekver = this.rekver.options.find((x) => x.value == "700000").value
                 this.tarief.placeholder = "0"
                 tarief = "0"
-                this.aankoop.placeholder = "0"
-                aankoop = "0"
+
+                let prices = this.priceData["metabil"]
+                console.log(prices)
+                if (prices[object.bewerking1.toLowerCase()])
+                {
+                    const price = prices[object.bewerking1.toLowerCase()] * object.mass
+                    this.tarief.placeholder = price.toString()
+                    tarief = price.toString()
+                } else {
+                    this.tarief.placeholder = "0"
+                    tarief = "0"
+                }
+
                 this.stdKorting.placeholder = "0"
                 stdKorting = "0"
-                this.verkoop.placeholder = (aankoop * (1 + (1 / 3))).toFixed(2).toString()
-                verkoop = (aankoop * (1 + (1 / 3))).toFixed(2)
-                console.log(aankoop, verkoop, object.mass, this.mass, (1 + (1 / 3)))
+                this.aankoop.placeholder = (tarief * (1 - (stdKorting / 100))).toFixed(2).toString()    
+                aankoop = (tarief * (1 - (stdKorting / 100))).toFixed(2).toString() 
                 this.winstpercentage.placeholder = "33.33"
                 winstpercentage = "33.33"
+                this.verkoop.placeholder = (aankoop * (1 + (winstpercentage * 100))).toFixed(2).toString()
+                verkoop = (aankoop * (1 + (winstpercentage * 100))).toFixed(2).toString()
                 this.minaan.placeholder = "1"
                 minaan = "1"
             }else if (object.existsDev == false){
@@ -437,27 +446,30 @@ export default {
                 this.tarief.placeholder = "0"
                 tarief = "0"
 
-                // check if number ends with a W
-                if (object.number.charAt(object.number.length - 1) == 'W')
+                let prices = this.priceData["devion"]
+                console.log(prices)
+                if (prices[object.bewerking1.toLowerCase()])
                 {
-                    
-                    this.aankoop.placeholder = (object.mass * this.mass).toString()
-                    aankoop = object.mass * this.mass
+                    const price = prices[object.bewerking1.toLowerCase()] * object.mass
+                    this.tarief.placeholder = price.toFixed(2).toString()
+                    tarief = price.toFixed(2).toString()
                 } else {
-                    this.aankoop.placeholder = "0"
-                    aankoop = 0
+                    this.tarief.placeholder = "0"
+                    tarief = "0"
                 }
+
                 this.stdKorting.placeholder = "0"
                 stdKorting = "0"
-                this.verkoop.placeholder = (aankoop * (1 + (1 / 3))).toString()
-                verkoop = aankoop * (1 + (1 / 3))
+                this.aankoop.placeholder = (tarief * (1 - (stdKorting / 100))).toFixed(2).toString()    
+                aankoop = (tarief * (1 - (stdKorting / 100))).toFixed(2).toString() 
                 this.winstpercentage.placeholder = "33.33"
                 winstpercentage = "33.33"
+                this.verkoop.placeholder = (aankoop * (1 + (winstpercentage * 100))).toFixed(2).toString()
+                verkoop = (aankoop * (1 + (winstpercentage * 100))).toFixed(2).toString()
                 this.minaan.placeholder = "1"
                 minaan = "1"
             }
             else if (object.number != undefined) {
-                console.log(object)
                 this.returnToDefault()
 
                 this.artikelNr.placeholder = object.number
@@ -468,6 +480,7 @@ export default {
                     this.omschrijving.placeholder = object.description
                     omschrijving = object.description
                 }
+
                 if (object.bewerking1 != '') {
                     this.hoofdleverancier.placeholder = object.bewerking1
                     hoofdleverancier = object.bewerking1
@@ -501,13 +514,12 @@ export default {
                 aankoop = "0"
                 this.stdKorting.placeholder = "0"
                 stdKorting = "0"
-                this.verkoop.placeholder = "0"
-                verkoop = "0"
+                this.verkoop.placeholder = aankoop * winstpercentage
+                verkoop = aankoop * winstpercentage
                 this.winstpercentage.placeholder = "0"
                 winstpercentage = "0"
                 this.minaan.placeholder = "1"
                 minaan = "1"
-
             } else {
                 this.returnToDefault()
 
@@ -625,17 +637,18 @@ export default {
             omrekfac = "1"
             this.typfac.selected = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
             typfac = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
-            this.$refs.aaneh.reset();
-            aaneh = undefined
-            this.$refs.vereh.reset();
-            vereh = undefined
             this.omschrijving.placeholder = "omschrijving"
             omschrijving = undefined
             this.aankoop.placeholder = "0"
-            aankoop = 0
+            aankoop = "0".toString()
             this.winstpercentage.placeholder = "33.33%"
             winstpercentage = 33.33
-            this.verkoop.placeholder = parseFloat(aankoop * (1 + 1 / 3)).toFixed(4)
+            this.verkoop.placeholder = parseFloat(aankoop * (1 + 1 / 3)).toFixed(2)
+            verkoop = parseFloat(aankoop * (1 + 1 / 3)).toFixed(2).toString()
+            aaneh = this.aaneh.options.find((x)=> x.label.toLowerCase() == 'st').value
+            this.aaneh.placeholder = this.aaneh.options.find((x)=> x.label.toLowerCase() =='st').value
+            vereh = this.vereh.options.find((x)=> x.label.toLowerCase() == 'st').value
+            this.vereh.placeholder = this.vereh.options.find((x)=> x.label.toLowerCase() =='st').value
         },
         async getOptions() {
             let endpoint = `${companie}/ets/articleforminfo`
@@ -663,16 +676,16 @@ export default {
                     options.push({ value: element.CODE, label: element.SHORT_DESCRIPTION })
                 }
                 this.aaneh.options = options
-                this.aaneh.selected = this.aaneh.options.find((x) => x.label.toLowerCase() == 'stuk').value
-                aaneh = this.aaneh.options.find((x) => x.label.toLowerCase() == 'stuk').value
+                this.aaneh.selected = this.aaneh.options.find((x) => x.label.toLowerCase() == 'st').value
+                aaneh = this.aaneh.options.find((x) => x.label.toLowerCase() == 'st').value
 
                 options = []
                 for (element of data.measureTypes) {
                     options.push({ value: element.CODE, label: element.SHORT_DESCRIPTION })
                 }
                 this.vereh.options = options
-                this.vereh.selected = this.vereh.options.find((x) => x.label.toLowerCase() == 'stuk').value
-                vereh = this.vereh.options.find((x) => x.label.toLowerCase() == 'stuk').value
+                this.vereh.selected = this.vereh.options.find((x) => x.label.toLowerCase() == 'st').value
+                vereh = this.vereh.options.find((x) => x.label.toLowerCase() == 'st').value
 
                 options = []
                 for (element of data.BTWCodes) {
@@ -879,9 +892,11 @@ export default {
                 minaan: minaan,
             }
             const keys = Object.keys(object)
+            console.log(object)
             let errors = 0
             for (const key of keys) {
-                if ((object[key] == undefined || object[key] == '') && key != 'link') {
+                if ((object[key] == undefined || object[key] == '' ) && key != 'link') {
+                    console.log(object[key], key)
                     this.changeErrorState(key, true)
                     errors++
                 } else {
@@ -966,13 +981,11 @@ export default {
             }
         },
         validate(object) {
-            console.log(object)
             if (object.artikelNr.length > 0 || object.artikelNr != undefined) {
                 this.artikelNr.error = true
                 this.artikelNr.errorText = object.artikelNr.join(", ")
             }
             if (object.reflev.length > 0 && object.reflev != undefined) {
-                console.log(object.reflev)
                 this.reflev.error = true
                 this.reflev.errorText = object.reflev.join(", ")
             }
