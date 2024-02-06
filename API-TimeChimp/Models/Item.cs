@@ -54,4 +54,31 @@
             return $"ArticleNumber: {ArticleNumber}, Change: {Change}, Key: {Key}";
         }
     }
+
+    public class NewItem
+    {
+        public string ArtikelNr { get; set; }
+        public string Reflev { get; set; }
+        public string Omschrijving { get; set; }
+        public string Tarief { get; set; }
+        public string Aankoop { get; set; }
+        public string StdKorting { get; set; }
+        public string Muntcode { get; set; }
+        public string Verkoop { get; set; }
+        public string Winstpercentage { get; set; }
+        public string Rekver { get; set; }
+        public string Aaneh { get; set; }
+        public string Vereh { get; set; }
+        public string Btwcode { get; set; }
+        public string Omrekfac { get; set; }
+        public string Typfac { get; set; }
+        public string Merk { get; set; }
+        public string Familie { get; set; }
+        public string Subfamilie { get; set; }
+        public string Lengte { get; set; }
+        public string Breedte { get; set; }
+        public string Hoogte { get; set; }
+        public string Hoofdleverancier { get; set; }
+        public string Minaan { get; set; }
+    }
 }
