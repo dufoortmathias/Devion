@@ -1,7 +1,10 @@
+using Api.Devion.Models;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
 
+Config config1 = new Config(config);
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -819,7 +822,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
 
                             float massValue;
-                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Replace(",", ".").Split(' ')[0], out massValue) ? massValue : 0;
+                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Replace(",", ".").Split(' ')[0], out massValue) ? float.Parse(row["Mass"].ToString().Replace(",", ".").Split(' ')[0]) : 0;
 
                             part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
                             part.AankoopPer = row["Aankoop per"] != DBNull.Value ? (int)((double)row["Aankoop per"]) : 1;
@@ -971,11 +974,30 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}Updateitem").WithTags(company);
 
-    //sync timechimp via python file
-    app.MapGet($"api/{company.ToLower()}/sync", () =>
+    //create article in ets
+    app.MapPost($"/api/{company.ToLower()}/ets/createitem", ([FromBody] NewItem item) =>
     {
         try
         {
+            item.Hoofdleverancier = config[$"Operations:{item.Hoofdleverancier}"];
+            Dictionary<string, string> log = itemHelperETS.CreateItem(item);
+
+            return Results.Ok(log);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}CreateItem").WithTags(company);
+
+    //sync timechimp via python file
+    app.MapGet($"/api/{company.ToLower()}/sync", () =>
+    {
+        try
+        {
+            Console.WriteLine("sync");
+            string argument = config["SyncFilePath"] + " " + company.ToLower();
+            Console.WriteLine(argument);
             ProcessStartInfo start = new()
             {
                 FileName = "python",
@@ -984,20 +1006,53 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 RedirectStandardOutput = true,
                 CreateNoWindow = true
             };
-
             using Process process = Process.Start(start);
             using StreamReader reader = process.StandardOutput;
             string result = reader.ReadToEnd();
+            Console.WriteLine(result);
             return Results.Ok(result);
         }
         catch (Exception e)
         {
+            Console.WriteLine($"error: {e.Message}");
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}Sync").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
+
+app.MapGet("/api/pricesettings", () =>
+{
+    try
+    {
+        PriceSettings data = new PriceSettings();
+        string json = File.ReadAllText("./Json/priceSettings.json");
+        data = JsonTool.ConvertTo<PriceSettings>(json);
+        return Results.Ok(data);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"error: {e.Message}");
+        return Results.Problem(e.Message);
+    }
+}).WithName($"GetPriceSettings");
+
+app.MapPost("/api/pricesettings", ([FromBody] PriceSettings settings) =>
+{
+    try
+    {
+        //write to file
+        string json = JsonTool.ConvertFrom(settings);
+        File.WriteAllText("./Json/priceSettings.json", json);
+        return Results.Ok(settings);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"error: {e.Message}");
+        return Results.Problem("Error while writing to file");
+    }
+}).WithName($"PostPriceSettings");
 
 if (app.Environment.IsProduction())
 {
