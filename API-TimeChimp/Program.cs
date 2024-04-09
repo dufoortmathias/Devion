@@ -32,7 +32,12 @@ app.UseCors("AllowOrigins");
 
 List<string> companies = new();
 
+Dictionary<string, Dictionary<string, float>> priceSettings = new();
+Dictionary<string, Dictionary<string, string>> bewerkingenSettings = new();
+
 int companyIndex = -1;
+int syncDevion = 0;
+int syncMetabil = 0;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
     //create clients
@@ -694,7 +699,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             query = "SELECT CODE, OMSCHRIJF AS DESCRIPTION FROM BTW_CODE";
             string responseBTWCodes = ETSClient.selectQuery(query);
 
-            List<string> suppliers = config.GetSection("Operations").GetChildren().Select(x => x.Value.ToUpper()).Distinct().ToList();
+            List<string> suppliers = config.GetSection($"Operations:{company}").GetChildren().Select(x => x.Value.ToUpper()).Distinct().ToList();
             suppliers.Add("CEBEO".ToUpper());
             string queryPart = string.Join("' OR UPPER(LV_NAM) LIKE '", suppliers.Select(s => $"%{s}%").ToList());
 
@@ -716,6 +721,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.Message);
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ArticleFormInfo").WithTags(company);
@@ -759,7 +765,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            //TODO: part number halen uit naam file
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             using var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content"));
@@ -821,13 +826,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             part.Bewerking3 = row["Bewerking 3"] != DBNull.Value ? ((string)row["Bewerking 3"]).ToUpper().Trim() : "-";
                             part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
 
-                            float massValue;
-                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Replace(",", ".").Split(' ')[0], out massValue) ? float.Parse(row["Mass"].ToString().Replace(",", ".").Split(' ')[0]) : 0;
+                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Split(' ')[0], out float massValue) ? float.Parse(row["Mass"].ToString().Split(' ')[0]) : 0;
 
                             part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
-                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? (int)((double)row["Aankoop per"]) : 1;
+                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? ((string)row["Aankoop per"]) : "1";
                             part.Verbruikseenh = row["Verbruikseenh"] != DBNull.Value ? ((string)row["Verbruikseenh"]).ToUpper().Trim() : "ST";
-                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? (int)((double)row["Omrekeningsfactor"]) : 1;
+                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? ((string)row["Omrekeningsfactor"]) : "1";
                             part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
 
 
@@ -903,8 +907,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 return Results.BadRequest("No articles provided.");
             }
 
-            Console.WriteLine($"Received {articles.Count} articles.");
-
             void LinkArticles(Item main)
             {
                 if (main.Parts != null)
@@ -977,15 +979,24 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     //create article in ets
     app.MapPost($"/api/{company.ToLower()}/ets/createitem", ([FromBody] NewItem item) =>
     {
-        try
-        {
-            item.Hoofdleverancier = config[$"Operations:{item.Hoofdleverancier}"];
+    try
+    {
+        if (item.Hoofdleverancier.ToLower() == "lassen" || item.Hoofdleverancier.ToLower() == "oplassen" && company.ToLower() == "metabil")
+            {
+                item.Hoofdleverancier = "";
+            }
+            else
+            {
+                item.Hoofdleverancier = bewerkingenSettings[company.ToUpper()][item.Hoofdleverancier];
+            }
+
             Dictionary<string, string> log = itemHelperETS.CreateItem(item);
 
             return Results.Ok(log);
         }
         catch (Exception e)
         {
+            Console.WriteLine($"error: {e.Message}");
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}CreateItem").WithTags(company);
@@ -995,9 +1006,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            Console.WriteLine("sync");
             string argument = config["SyncFilePath"] + " " + company.ToLower();
-            Console.WriteLine(argument);
             ProcessStartInfo start = new()
             {
                 FileName = "python",
@@ -1009,7 +1018,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             using Process process = Process.Start(start);
             using StreamReader reader = process.StandardOutput;
             string result = reader.ReadToEnd();
-            Console.WriteLine(result);
             return Results.Ok(result);
         }
         catch (Exception e)
@@ -1018,17 +1026,141 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}Sync").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/sync/start", () =>
+    {
+        if (company.ToLower() == "metabil")
+        {
+            syncMetabil = 1;
+        }
+        else if (company.ToLower() == "devion")
+        {
+            syncDevion = 1;
+        }
+        return Results.Ok("Sync Started");
+    }).WithName($"{company}SyncStart").WithTags(company);
+
+    app.MapGet($"api/{company.ToLower()}/sync/stop", () =>
+    {
+        if (company.ToLower() == "metabil")
+        {
+            syncMetabil = 0;
+        }
+        else if (company.ToLower() == "devion")
+        {
+            syncDevion = 0;
+        }
+        return Results.Ok("Sync Stopped");
+    }).WithName($"{company}SyncStop").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/sync/status", () =>
+    {
+        Dictionary<string, int> sync = new();
+        if (company.ToLower() == "metabil")
+        {
+            sync.Add("sync", syncMetabil);
+        }
+        else if (company.ToLower() == "devion")
+        {
+            sync.Add("sync", syncDevion);
+        }
+        return Results.Ok(sync);
+    }).WithName($"{company}SyncStatus").WithTags(company);
+
+    app.MapGet($"api/{company.ToLower()}/projecten/voortgang/export", () =>
+    {
+        Console.WriteLine("Exporting projecten voortgang");
+        return Results.Ok();
+    }).WithName($"{company}ProjectenVoortgangExport").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/projecten/voortgang/import", ([FromBody] OwnFileContentResult excelFile, string FileName) =>
+    {
+        try
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            using var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content"));
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+            DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
+            {
+                ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+                {
+                    UseHeaderRow = true
+                }
+            });
+
+            DataTable tableTask = data.Tables["Task_Table"] ?? throw new Exception("There wasn't a table fond with the name (Task_Table)");
+            DataTable tableResource = data.Tables["Resource_Table"] ?? throw new Exception("There wasn't a table fond with the name (Resource_Table)");
+            DataTable tableAssignment = data.Tables["Assignment_Table"] ?? throw new Exception("There wasn't a table fond with the name (Assignment_Table)");
+
+            List<ProjectVoortgangTask> tasks = new List<ProjectVoortgangTask>();
+
+            if (tableTask.Rows.Count != 0)
+            {
+                foreach (DataRow row in tableTask.Rows)
+                {
+                    ProjectVoortgangTask task = new()
+                    {
+                        Id = Int32.Parse((string)row["ID"]),
+                        Active = row["Active"] == DBNull.Value ? "" : (string)row["Active"],
+                        TaskMode = row["Task Mode"] == DBNull.Value ? "" : (string)row["Task Mode"],
+                        Name = row["Name"] == DBNull.Value ? "" : (string)row["Name"],
+                        Duration = row["Duration"] == DBNull.Value ? "" : (string)row["Duration"],
+                        Start = row["Start"] == DBNull.Value ? "" : (string)row["Start"],
+                        Finish = row["Finish"] == DBNull.Value ? "" : (string)row["Finish"],
+                        Predecessors = row["Predecessors"] == DBNull.Value ? "" : (string)row["Predecessors"],
+                        OutlineLevel = Int32.Parse((string)row["Outline Level"]),
+                        Notes = row["Notes"] == DBNull.Value ? "" : (string)row["Notes"],
+                    };
+                    task.Name = task.Name.Split(' ').First();
+                    task.Duration = task.Duration.Split(' ').First();
+                    tasks.Add(task);
+                }
+            }
+
+            foreach (ProjectVoortgangTask task in tasks)
+            {
+                if (task.Predecessors != "")
+                {
+                    string[] predecessors = task.Predecessors.Split(',');
+                    string newPredecessors = "";
+                    foreach (string predecessor in predecessors)
+                    {
+                        string[] splitPredecessor = predecessor.Split(' ');
+                        if (newPredecessors != "")
+                        {
+                            newPredecessors += ", " + tasks.Find(t => t.Id == Int32.Parse(splitPredecessor[0])).Name;
+                        }
+                        else
+                        {
+                            newPredecessors += tasks.Find(t => t.Id == Int32.Parse(splitPredecessor[0])).Name;
+                        }
+                    }
+                    task.Predecessors = newPredecessors;
+                }
+                Console.WriteLine(task.Predecessors);
+            }
+            return Results.Ok(tasks);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"error: {e.Message}");
+            Console.WriteLine($"line: {e.StackTrace}");
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}ProjectenVoortgangImport").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
 
-app.MapGet("/api/pricesettings", () =>
+app.MapGet("/api/price", () =>
 {
     try
     {
-        PriceSettings data = new PriceSettings();
+        Dictionary<string, Dictionary<string, float>> data = new Dictionary<string, Dictionary<string, float>>();
         string json = File.ReadAllText("./Json/priceSettings.json");
-        data = JsonTool.ConvertTo<PriceSettings>(json);
+        data = JsonTool.ConvertTo<Dictionary<string, Dictionary<string, float>>>(json);
+        priceSettings = data;
         return Results.Ok(data);
     }
     catch (Exception e)
@@ -1038,11 +1170,12 @@ app.MapGet("/api/pricesettings", () =>
     }
 }).WithName($"GetPriceSettings");
 
-app.MapPost("/api/pricesettings", ([FromBody] PriceSettings settings) =>
+app.MapPost("/api/price", ([FromBody] Dictionary<string, Dictionary<string, float>> settings) =>
 {
     try
     {
         //write to file
+        priceSettings = settings;
         string json = JsonTool.ConvertFrom(settings);
         File.WriteAllText("./Json/priceSettings.json", json);
         return Results.Ok(settings);
@@ -1053,6 +1186,40 @@ app.MapPost("/api/pricesettings", ([FromBody] PriceSettings settings) =>
         return Results.Problem("Error while writing to file");
     }
 }).WithName($"PostPriceSettings");
+
+app.MapGet("/api/bewerkingen", () =>
+{
+    try
+    {
+        Dictionary<string, Dictionary<string, string>> data = new Dictionary<string, Dictionary<string, string>>();
+        string json = File.ReadAllText("./Json/bewerkingenSettings.json");
+        data = JsonTool.ConvertTo<Dictionary<string, Dictionary<string, string>>>(json);
+        bewerkingenSettings = data;
+        return Results.Ok(data);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"error: {e.Message}");
+        return Results.Problem(e.Message);
+    }
+}).WithName($"GetBewerkingenSettings");
+
+app.MapPost("/api/bewerkingen", ([FromBody] Dictionary<string, Dictionary<string, string>> settings) =>
+{
+    try
+    {
+        //write to file
+        bewerkingenSettings = settings;
+        string json = JsonTool.ConvertFrom(settings);
+        File.WriteAllText("./Json/bewerkingenSettings.json", json);
+        return Results.Ok(settings);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"error: {e.Message}");
+        return Results.Problem("Error while writing to file");
+    }
+}).WithName($"PostBewerkingenSettings");
 
 if (app.Environment.IsProduction())
 {

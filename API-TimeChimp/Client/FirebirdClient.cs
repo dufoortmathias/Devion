@@ -73,7 +73,7 @@ public class FirebirdClientETS
         connection.Open();
 
         //execute the query
-        command.ExecuteNonQuery();
+        var rows = command.ExecuteNonQuery();
 
         //close the connection
         connection.Close();
