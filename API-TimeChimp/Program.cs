@@ -1,7 +1,10 @@
+using Api.Devion.Models;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager config = builder.Configuration;
 
+Config config1 = new Config(config);
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -11,19 +14,17 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowOrigins", builder =>
     {
-        builder.WithOrigins(config["AllowedHosts"]);
+        builder.WithOrigins("*");
         builder.WithHeaders("*");
+        builder.AllowAnyMethod();
     });
 });
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseCors("AllowOrigins");
 //app.UseHttpsRedirection();
 
@@ -31,12 +32,19 @@ app.UseCors("AllowOrigins");
 
 List<string> companies = new();
 
+Dictionary<string, Dictionary<string, float>> priceSettings = new();
+Dictionary<string, Dictionary<string, string>> bewerkingenSettings = new();
+
 int companyIndex = -1;
+int syncDevion = 0;
+int syncMetabil = 0;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
+    //create clients
     WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
+    //create helpers
     CebeoArticleHelper articleHelperCebeo = new(config);
 
     ETSArticleHelper articleHelperETS = new(ETSClient);
@@ -49,6 +57,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     ETSSupplierHelper supplierHelperETS = new(ETSClient);
     ETSTimeHelper timeHelperETS = new(ETSClient, TCClient);
     ETSUurcodeHelper uurcodeHelperETS = new(ETSClient);
+    ETSProjVoortgangHelper projVoortgangHelperETS = new(ETSClient);
+    ETSItemHelper itemHelperETS = new(ETSClient);
 
     TimeChimpContactHelper contactHelperTC = new(TCClient);
     TimeChimpCustomerHelper customerHelperTC = new(TCClient);
@@ -56,9 +66,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     TimeChimpMileageHelper mileageHelperTC = new(TCClient);
     TimeChimpProjectHelper projectHelperTC = new(TCClient);
     TimeChimpProjectUserHelper projectUserHelperTC = new(TCClient);
+    TimeChimpProjectTaskHelper projectTaskHelperTC = new(TCClient);
     TimeChimpTimeHelper timeHelperTC = new(TCClient, ETSClient);
     TimeChimpUurcodeHelper uurcodeHelperTC = new(TCClient);
 
+    //get companies from config
     string company = config[$"Companies:{companyIndex}:Name"];
     companies.Add(company);
 
@@ -370,36 +382,30 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 TCSubproject.id = subProject.id;
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
 
-                //update budgethours for each projecttask in timeChimp
-                List<ProjectTaskETS> projectTasksETS = uurcodeHelperETS.GetUurcodesSubproject(ETSProject.PR_NR ?? throw new Exception("Project received from ETS has no NR"), ETSSubproject.SU_SUB ?? throw new Exception("Subproject received from ETS has no SUBNR"));
-                foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
+                if (TCSubproject.active ?? false)
                 {
-                    if (string.IsNullOrEmpty(projectTaskETS.VO_PROJ?.Trim()))
+                    //update budgethours for each projecttask in timeChimp
+                    List<ProjectTaskETS> projectTasksETS = uurcodeHelperETS.GetUurcodesSubproject(ETSProject.PR_NR ?? throw new Exception("Project received from ETS has no NR"), ETSSubproject.SU_SUB ?? throw new Exception("Subproject received from ETS has no SUBNR"));
+                    foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
                     {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (string.IsNullOrEmpty(projectTaskETS.VO_SUBPROJ?.Trim()))
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_PROJ is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else if (projectTaskETS.VO_AANT == null)
-                    {
-                        errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null for record {projectTaskETS.VO_ID} in table J2W_VOPX");
-                    }
-                    else
-                    {
-                        UurcodeTimeChimp uurcode = uurcodes.Find(u => u.code != null && u.code.Equals(projectTaskETS.VO_UUR)) ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
-                        int taskId = uurcode.id ?? throw new Exception("Uurcode in TimeChimp has no id");
-                        ProjectTaskTimechimp projectTaskTimechimp = subProject.projectTasks?.Find(p => p.taskId.Equals(taskId)) ?? throw new Exception($"Subproject with code = {subProject.code} has no projecttask with id = {taskId}");
-
-                        projectTaskTimechimp.budgetHours = projectTaskETS.VO_AANT;
-                        totalBudgetHours += projectTaskETS.VO_AANT.Value;
-
-                        TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTaskTimechimp));
+                        if (subProject.id == null)
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} has no id");
+                        }
+                        else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} field VO_UUR is empty in table J2W_VOPX");
+                        }
+                        else if (projectTaskETS.VO_AANT == null)
+                        {
+                            errorMessages.Add($"Subproject {subProject.code} field VO_AANT is null in table J2W_VOPX");
+                        }
+                        else
+                        {
+                            int taskId = uurcodes.Find(u => u.code != null && u.code.Equals(projectTaskETS.VO_UUR))?.id ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
+                            projectTaskHelperTC.CreateOrUpdateProjectTask(taskId, subProject.id.Value, projectTaskETS.VO_AANT.Value);
+                            totalBudgetHours += projectTaskETS.VO_AANT.Value;
+                        }
                     }
                 }
             }
@@ -545,8 +551,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 ((List<Dictionary<string, object?>>)(result["artikels"] ?? throw new Exception("Value at key artikels is null"))).Add(new()
                     {
                         {"artikelNummer", articleHelperETS.GetArticleReference(purchaseOrder.FD_ARTNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no ARTNR"), header.FH_KLNR ?? throw new Exception($"PurchaseOrder ETS with number = {purchaseOrder.FD_BONNR} has no KLNR"))},
-                        {"omschrijving", purchaseOrder.FD_OMS},
-                        {"aantal", purchaseOrder.FD_AANTAL},
+                        {"omschrijving", purchaseOrder.ART_OMS},
+                        {"aantal", purchaseOrder.TOTAAL_AANTAL},
                         {"leverancier", header.LV_NAM}
                     });
             }
@@ -560,7 +566,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     }).WithName($"{company}GetPurchaseOrder").WithTags(company);
 
     //returns file information for each supplier about file needed for order 
-    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id, string seperator) =>
+    app.MapGet($"/api/{company.ToLower()}/ets/createpurchasefile", (string id, string seperator, bool forceCSV) =>
     {
         try
         {
@@ -574,7 +580,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             purchaseOrders = purchaseOrders.Where(po => po.FD_KLANTREFERENTIE != null).ToList();
 
             FileContentResult fileContent;
-            if (supplier.ToLower().Contains("cebeo"))
+            if (!forceCSV && supplier.ToLower().Contains("cebeo"))
             {
                 List<Dictionary<string, object>> orderLines = new();
                 purchaseOrders.ForEach(purchaseOrder =>
@@ -585,7 +591,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                         orderLines.Add(new Dictionary<string, object>()
                         {
                             { "number", cebeoArticleNumber },
-                            { "aantal", purchaseOrder.FD_AANTAL ?? 0 }
+                            { "aantal", purchaseOrder.TOTAAL_AANTAL ?? 0 }
                         });
                     }
                 });
@@ -605,6 +611,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}CreatePurchaseFile").WithTags(company);
 
+    //get all articles from cebeo
     app.MapGet($"/api/{company.ToLower()}/cebeo/articles", () =>
     {
         try
@@ -620,6 +627,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}GetArticles").WithTags(company);
 
+    //update article from cebeo in ets
     app.MapGet($"/api/{company.ToLower()}/cebeo/updatearticleprice", (string articleNumberETS, float maxPriceDiff) =>
     {
         try
@@ -639,6 +647,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}UpdateArticlePrice").WithTags(company);
 
+    //searches for article in cebeo
     app.MapGet($"/api/{company.ToLower()}/cebeo/searcharticle", (string articleReference) =>
     {
         try
@@ -667,6 +676,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}SearchArticleCebeo").WithTags(company);
 
+    //get article form info
     app.MapGet($"/api/{company.ToLower()}/ets/articleforminfo", () =>
     {
         try
@@ -689,7 +699,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             query = "SELECT CODE, OMSCHRIJF AS DESCRIPTION FROM BTW_CODE";
             string responseBTWCodes = ETSClient.selectQuery(query);
 
-            List<string> suppliers = config.GetSection("Operations").GetChildren().Select(x => x.Value.ToUpper()).Distinct().ToList();
+            List<string> suppliers = config.GetSection($"Operations:{company}").GetChildren().Select(x => x.Value.ToUpper()).Distinct().ToList();
             suppliers.Add("CEBEO".ToUpper());
             string queryPart = string.Join("' OR UPPER(LV_NAM) LIKE '", suppliers.Select(s => $"%{s}%").ToList());
 
@@ -711,10 +721,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.Message);
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ArticleFormInfo").WithTags(company);
 
+    //validate article form
     app.MapPost($"/api/{company.ToLower()}/ets/validatearticleform", ([FromBody] ArticleWeb article) =>
     {
         try
@@ -735,6 +747,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}ValidateArticleForm").WithTags(company);
 
+    //create article in ets
     app.MapPost($"/api/{company.ToLower()}/ets/createarticle", ([FromBody] ArticleWeb article) =>
     {
         try
@@ -747,65 +760,134 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}CreateArticle").WithTags(company);
 
-    app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile) =>
+    //transform bom excel file to json
+    app.MapPost($"/api/{company.ToLower()}/ets/transformbomexcel", ([FromBody] OwnFileContentResult excelFile, string fileName) =>
     {
         try
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            using (var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content")))
+
+            using var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content"));
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+            DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
             {
-                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
                 {
-                    DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
+                    UseHeaderRow = true
+                }
+            });
+
+            Item MainPart = new Item();
+            string number = fileName.Split('.')[0].Split('_')[0];
+            string omschrijving = fileName.Split('.')[0].Split('_')[1];
+            MainPart.Number = number;
+            MainPart.Description = omschrijving;
+            MainPart.LynNumber = "1";
+
+            List<Item> MetabilItems = new List<Item>();
+
+            DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
+
+            List<Item?> assemblies = new();
+            foreach (DataRow row in table.Rows)
+            {
+                List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
+                List<Item?> parentList = assemblies;
+                foreach (int level in hierarchy)
+                {
+                    while (level >= parentList.Count)
                     {
-                        ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
-                        {
-                            UseHeaderRow = true
-                        }
-                    });
+                        parentList.Add(null);
+                    }
 
-                    DataTable table = data.Tables["BOM"] ?? throw new Exception("There was not table found in excel with the name (BOM)");
-
-                    List<Item?> assemblies = new();
-                    foreach (DataRow row in table.Rows)
+                    if (parentList[level] != null)
                     {
-                        List<int> hierarchy = row["Item"]?.ToString()?.Split('.')?.Select(x => int.Parse(x) - 1)?.ToList() ?? new();
-                        List<Item?> parentList = assemblies;
-                        foreach (int level in hierarchy)
-                        {
-                            while (level >= parentList.Count)
-                            {
-                                parentList.Add(null);
-                            }
-
-                            if (parentList[level] != null)
-                            {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-                                parentList = parentList[level].Parts;
+                        parentList = parentList[level].Parts;
+                    }
+                    else
+                    {
+#pragma warning disable CS8604 // Dereference of a possibly linenull reference.
+                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
+#pragma warning restore CS8604 // Dereference of a possibly null reference.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
-                            }
-                            else
+
+                        if (part.Number is not null && part.Number.Length > 25)
+                        {
+                            throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
+                        }
+                        try
+                        {
+
+                            part.MainSupplier = row["VENDOR"] != DBNull.Value ? ((string)row["VENDOR"]) : string.Empty;
+
+                            part.Bewerking1 = row["Bewerking 1"] != DBNull.Value ? ((string)row["Bewerking 1"]).ToUpper().Trim() : "-";
+                            part.Bewerking2 = row["Bewerking 2"] != DBNull.Value ? ((string)row["Bewerking 2"]).ToUpper().Trim() : "-";
+                            part.Bewerking3 = row["Bewerking 3"] != DBNull.Value ? ((string)row["Bewerking 3"]).ToUpper().Trim() : "-";
+                            part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
+
+                            part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Split(' ')[0], out float massValue) ? float.Parse(row["Mass"].ToString().Split(' ')[0]) : 0;
+
+                            part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
+                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? ((string)row["Aankoop per"]) : "1";
+                            part.Verbruikseenh = row["Verbruikseenh"] != DBNull.Value ? ((string)row["Verbruikseenh"]).ToUpper().Trim() : "ST";
+                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? ((string)row["Omrekeningsfactor"]) : "1";
+                            part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
+
+
+                            parentList[level] = part;
+                            bool save = true;
+
+                            void inList(Item item)
                             {
-                                Item part = new((string)row["Part Number"], row["Description"] is System.DBNull ? String.Empty : (string)row["Description"], Convert.ToInt32((double)row["QTY"]));
-
-                                if (part.Number.Length > 25)
+                                if (item.Parts.Count > 0)
                                 {
-                                    throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
+                                    foreach (Item? item2 in item.Parts)
+                                    {
+                                        inList(item2);
+                                    }
                                 }
-                                string operation = ((string)row["Bewerking 1"]).ToUpper().Trim();
-                                string supplier = config[$"Operations:{operation}"] ?? config[$"Operations:"];
 
-                                part.MainSupplier = supplierHelperETS.FindSupplierId(supplier);
-
-                                part.ExistsETS = articleHelperETS.ArticleWithNumberExists(part.Number);
-
-                                parentList[level] = part;
+                                if (part.Number == item.Number)
+                                {
+                                    save = false;
+                                }
                             }
+
+                            if (part.Number.EndsWith('W'))
+                            {
+                                foreach (Item item in MetabilItems)
+                                {
+                                    inList(item);
+                                }
+                                if (save)
+                                {
+                                    MetabilItems.Add(part);
+                                }
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            return Results.Problem(e.Message);
                         }
                     }
-                    return Results.Ok(assemblies);
                 }
             }
+            MainPart.Parts = assemblies;
+            List<Item> Main = new()
+            {
+                MainPart
+            };
+
+            List<List<Item>> items = new()
+            {
+                Main,
+                MetabilItems
+            };
+
+            return Results.Ok(items);
         }
         catch (Exception e)
         {
@@ -813,31 +895,331 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}TransformBomExcel").WithTags(company);
 
+    //update article links in ets
     app.MapPut($"/api/{company.ToLower()}/ets/updatelinkedarticles", ([FromBody] List<Item> articles) =>
     {
         try
         {
+            List<Dictionary<string, string>> logs = new List<Dictionary<string, string>>();
+            if (articles == null || !articles.Any())
+            {
+                // Handle the case where no articles are provided
+                return Results.BadRequest("No articles provided.");
+            }
+
             void LinkArticles(Item main)
             {
-                foreach (Item part in main.Parts.Where(i => i != null).Cast<Item>().ToList())
+                if (main.Parts != null)
                 {
-                    articleHelperETS.LinkArticle(main.Number, part.Number);
-                    LinkArticles(part);
+                    foreach (Item part in main.Parts.Where(i => i != null).OfType<Item>())
+                    {
+                        articleHelperETS.LinkArticle(main, part);
+                        Dictionary<string, string> log = new()
+                    {
+                        {"artikelNumber", part.Number },
+                        {"action", "link" },
+                        {"extra", "linked to "+main.Number }
+                    };
+                        logs.Add(log);
+                        LinkArticles(part);
+                    }
                 }
-            };
+            }
 
-            articles.ForEach(a => LinkArticles(a));
+            foreach (Item article in articles)
+            {
+                LinkArticles(article);
+            }
 
-            return Results.Ok();
+            return Results.Ok(logs);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error: {e.Message}");
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
+
+    //get projecten voortgang from ets
+    app.MapGet($"/api/{company.ToLower()}/ets/projectenvoortgang", () =>
+    {
+
+        return projVoortgangHelperETS.GetProjectenVoortgang();
+    }).WithName($"{company}ProjectenVoortgang").WithTags(company);
+
+    //get an boolean if article exists in ets
+    app.MapGet($"/api/{company.ToLower()}/ets/articleExists", (string ArticleNumber) =>
+    {
+        return Results.Ok(articleHelperETS.ArticleWithNumberExists(ArticleNumber));
+    }).WithName($"{company}ArticleExists").WithTags(company);
+
+    //gets differences between articles in ets and bom
+    app.MapPost($"/api/{company.ToLower()}/ets/articledifference", ([FromBody] Item articles) =>
+    {
+        Dictionary<string, Change> difference = articleHelperETS.ArticleDifference(articles);
+        return difference;
+
+    }).WithName($"{company}ArticleDifference").WithTags(company);
+
+    //updates article in ets
+    app.MapPut($"/api/{company.ToLower()}/ets/updateitem", ([FromBody] ItemChange item) =>
+    {
+        try
+        {
+            Dictionary<string, string> log = itemHelperETS.UpdateItem(item);
+
+            return Results.Ok(log);
         }
         catch (Exception e)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}UpdateLinkedArticles").WithTags(company);
+    }).WithName($"{company}Updateitem").WithTags(company);
+
+    //create article in ets
+    app.MapPost($"/api/{company.ToLower()}/ets/createitem", ([FromBody] NewItem item) =>
+    {
+    try
+    {
+        if (item.Hoofdleverancier.ToLower() == "lassen" || item.Hoofdleverancier.ToLower() == "oplassen" && company.ToLower() == "metabil")
+            {
+                item.Hoofdleverancier = "";
+            }
+            else
+            {
+                item.Hoofdleverancier = bewerkingenSettings[company.ToUpper()][item.Hoofdleverancier];
+            }
+
+            Dictionary<string, string> log = itemHelperETS.CreateItem(item);
+
+            return Results.Ok(log);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"error: {e.Message}");
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}CreateItem").WithTags(company);
+
+    //sync timechimp via python file
+    app.MapGet($"/api/{company.ToLower()}/sync", () =>
+    {
+        try
+        {
+            string argument = config["SyncFilePath"] + " " + company.ToLower();
+            ProcessStartInfo start = new()
+            {
+                FileName = "python",
+                Arguments = $"R:\\Devion Software\\Scripts\\algemene-sync.py {company.ToLower()}",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            };
+            using Process process = Process.Start(start);
+            using StreamReader reader = process.StandardOutput;
+            string result = reader.ReadToEnd();
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"error: {e.Message}");
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}Sync").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/sync/start", () =>
+    {
+        if (company.ToLower() == "metabil")
+        {
+            syncMetabil = 1;
+        }
+        else if (company.ToLower() == "devion")
+        {
+            syncDevion = 1;
+        }
+        return Results.Ok("Sync Started");
+    }).WithName($"{company}SyncStart").WithTags(company);
+
+    app.MapGet($"api/{company.ToLower()}/sync/stop", () =>
+    {
+        if (company.ToLower() == "metabil")
+        {
+            syncMetabil = 0;
+        }
+        else if (company.ToLower() == "devion")
+        {
+            syncDevion = 0;
+        }
+        return Results.Ok("Sync Stopped");
+    }).WithName($"{company}SyncStop").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/sync/status", () =>
+    {
+        Dictionary<string, int> sync = new();
+        if (company.ToLower() == "metabil")
+        {
+            sync.Add("sync", syncMetabil);
+        }
+        else if (company.ToLower() == "devion")
+        {
+            sync.Add("sync", syncDevion);
+        }
+        return Results.Ok(sync);
+    }).WithName($"{company}SyncStatus").WithTags(company);
+
+    app.MapGet($"api/{company.ToLower()}/projecten/voortgang/export", () =>
+    {
+        Console.WriteLine("Exporting projecten voortgang");
+        return Results.Ok();
+    }).WithName($"{company}ProjectenVoortgangExport").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/projecten/voortgang/import", ([FromBody] OwnFileContentResult excelFile, string FileName) =>
+    {
+        try
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            using var stream = new MemoryStream(excelFile.FileContents ?? throw new Exception("File given has no content"));
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+            DataSet data = reader.AsDataSet(new ExcelDataSetConfiguration()
+            {
+                ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+                {
+                    UseHeaderRow = true
+                }
+            });
+
+            DataTable tableTask = data.Tables["Task_Table"] ?? throw new Exception("There wasn't a table fond with the name (Task_Table)");
+            DataTable tableResource = data.Tables["Resource_Table"] ?? throw new Exception("There wasn't a table fond with the name (Resource_Table)");
+            DataTable tableAssignment = data.Tables["Assignment_Table"] ?? throw new Exception("There wasn't a table fond with the name (Assignment_Table)");
+
+            List<ProjectVoortgangTask> tasks = new List<ProjectVoortgangTask>();
+
+            if (tableTask.Rows.Count != 0)
+            {
+                foreach (DataRow row in tableTask.Rows)
+                {
+                    ProjectVoortgangTask task = new()
+                    {
+                        Id = Int32.Parse((string)row["ID"]),
+                        Active = row["Active"] == DBNull.Value ? "" : (string)row["Active"],
+                        TaskMode = row["Task Mode"] == DBNull.Value ? "" : (string)row["Task Mode"],
+                        Name = row["Name"] == DBNull.Value ? "" : (string)row["Name"],
+                        Duration = row["Duration"] == DBNull.Value ? "" : (string)row["Duration"],
+                        Start = row["Start"] == DBNull.Value ? "" : (string)row["Start"],
+                        Finish = row["Finish"] == DBNull.Value ? "" : (string)row["Finish"],
+                        Predecessors = row["Predecessors"] == DBNull.Value ? "" : (string)row["Predecessors"],
+                        OutlineLevel = Int32.Parse((string)row["Outline Level"]),
+                        Notes = row["Notes"] == DBNull.Value ? "" : (string)row["Notes"],
+                    };
+                    task.Name = task.Name.Split(' ').First();
+                    task.Duration = task.Duration.Split(' ').First();
+                    tasks.Add(task);
+                }
+            }
+
+            foreach (ProjectVoortgangTask task in tasks)
+            {
+                if (task.Predecessors != "")
+                {
+                    string[] predecessors = task.Predecessors.Split(',');
+                    string newPredecessors = "";
+                    foreach (string predecessor in predecessors)
+                    {
+                        string[] splitPredecessor = predecessor.Split(' ');
+                        if (newPredecessors != "")
+                        {
+                            newPredecessors += ", " + tasks.Find(t => t.Id == Int32.Parse(splitPredecessor[0])).Name;
+                        }
+                        else
+                        {
+                            newPredecessors += tasks.Find(t => t.Id == Int32.Parse(splitPredecessor[0])).Name;
+                        }
+                    }
+                    task.Predecessors = newPredecessors;
+                }
+                Console.WriteLine(task.Predecessors);
+            }
+            return Results.Ok(tasks);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"error: {e.Message}");
+            Console.WriteLine($"line: {e.StackTrace}");
+            return Results.Problem(e.Message);
+        }
+    }).WithName($"{company}ProjectenVoortgangImport").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
+
+app.MapGet("/api/price", () =>
+{
+    try
+    {
+        Dictionary<string, Dictionary<string, float>> data = new Dictionary<string, Dictionary<string, float>>();
+        string json = File.ReadAllText("./Json/priceSettings.json");
+        data = JsonTool.ConvertTo<Dictionary<string, Dictionary<string, float>>>(json);
+        priceSettings = data;
+        return Results.Ok(data);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"error: {e.Message}");
+        return Results.Problem(e.Message);
+    }
+}).WithName($"GetPriceSettings");
+
+app.MapPost("/api/price", ([FromBody] Dictionary<string, Dictionary<string, float>> settings) =>
+{
+    try
+    {
+        //write to file
+        priceSettings = settings;
+        string json = JsonTool.ConvertFrom(settings);
+        File.WriteAllText("./Json/priceSettings.json", json);
+        return Results.Ok(settings);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"error: {e.Message}");
+        return Results.Problem("Error while writing to file");
+    }
+}).WithName($"PostPriceSettings");
+
+app.MapGet("/api/bewerkingen", () =>
+{
+    try
+    {
+        Dictionary<string, Dictionary<string, string>> data = new Dictionary<string, Dictionary<string, string>>();
+        string json = File.ReadAllText("./Json/bewerkingenSettings.json");
+        data = JsonTool.ConvertTo<Dictionary<string, Dictionary<string, string>>>(json);
+        bewerkingenSettings = data;
+        return Results.Ok(data);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"error: {e.Message}");
+        return Results.Problem(e.Message);
+    }
+}).WithName($"GetBewerkingenSettings");
+
+app.MapPost("/api/bewerkingen", ([FromBody] Dictionary<string, Dictionary<string, string>> settings) =>
+{
+    try
+    {
+        //write to file
+        bewerkingenSettings = settings;
+        string json = JsonTool.ConvertFrom(settings);
+        File.WriteAllText("./Json/bewerkingenSettings.json", json);
+        return Results.Ok(settings);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"error: {e.Message}");
+        return Results.Problem("Error while writing to file");
+    }
+}).WithName($"PostBewerkingenSettings");
 
 if (app.Environment.IsProduction())
 {
@@ -847,3 +1229,4 @@ else
 {
     app.Run();
 }
+

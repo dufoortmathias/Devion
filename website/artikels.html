@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Devion Intern</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/screen.css" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="logo.png" />
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Script -->
+    <script src="Script/app.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+  </head>
+  <body>
+    <svg
+      aria-hidden="true"
+      style="position: absolute; width: 0; height: 0; overflow: hidden"
+      version="1.1"
+      xmlns="http://ww.w3.org/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+    >
+      <defs>
+        <symbol id="c-icon--devion" viewbox="0 0 150.189 35.37">
+          <title>icon_devion</title>
+          <path
+            fill="#007fb5"
+            d="M57.055 35.279a3.317 3.317 0 01-.784.079 1.324 1.324 0 01-1.388-1.477v-.565a1.324 1.324 0 011.388-1.478 3.332 3.332 0 01.784.078c.1.025.127.062.127.159v.394c0 .062-.049.093-.11.093h-.017a5.132 5.132 0 00-.784-.043c-.287 0-.584.164-.584.8v.565c0 .633.3.8.584.8a5.406 5.406 0 00.784-.043h.017c.061 0 .11.029.11.091v.395c0 .1-.024.133-.127.158M60.701 35.358h-.037a1.327 1.327 0 01-1.385-1.471v-1.879a.124.124 0 01.115-.129h.571a.124.124 0 01.117.129v1.879c0 .632.23.777.582.777h.037c.354 0 .584-.145.584-.777v-1.879a.124.124 0 01.115-.129h.571a.124.124 0 01.117.129v1.879a1.328 1.328 0 01-1.387 1.471M65.422 35.358a5.038 5.038 0 01-1.088-.121.136.136 0 01-.115-.14v-.364a.1.1 0 01.1-.1h.024c.291.037.839.066 1.021.066.377 0 .432-.127.432-.292 0-.114-.072-.187-.268-.309l-.832-.512a1 1 0 01-.512-.838c0-.608.383-.912 1.157-.912a4.562 4.562 0 011.082.121.135.135 0 01.109.141v.351c0 .074-.037.117-.1.117h-.018a8.737 8.737 0 00-1-.074c-.291 0-.42.068-.42.256 0 .1.092.158.244.248l.8.488a.974.974 0 01.582.923c0 .53-.394.949-1.191.949M70.385 35.31a5.3 5.3 0 01-.711.049c-.6 0-.961-.207-.961-.912v-3.066a.133.133 0 01.121-.117l.566-.1h.014a.121.121 0 01.105.122v.6h.856a.12.12 0 01.121.121v.357a.121.121 0 01-.121.122h-.856v1.964c0 .243.108.285.37.285h.48c.08 0 .127.031.127.092v.376c0 .06-.035.1-.115.11M74.506 33.352c0-.5-.225-.821-.649-.821s-.652.323-.652.821v.492c0 .5.225.82.652.82s.649-.322.649-.82zm-.649 2.006a1.379 1.379 0 01-1.453-1.514v-.492a1.454 1.454 0 112.906 0v.492a1.38 1.38 0 01-1.453 1.514M81.714 35.31h-.571a.124.124 0 01-.117-.128V33c0-.414-.146-.494-.425-.494h-.147c-.352 0-.4.195-.4.494v2.182a.123.123 0 01-.116.128h-.578a.123.123 0 01-.115-.128V33c0-.3-.049-.494-.4-.494H78.7c-.279 0-.426.08-.426.494v2.182a.123.123 0 01-.115.128h-.572a.123.123 0 01-.115-.128V33a1.08 1.08 0 011.228-1.162h.145a1.2 1.2 0 01.8.242 1.208 1.208 0 01.807-.242h.147A1.081 1.081 0 0181.827 33v2.182a.123.123 0 01-.115.128M84.793 35.31h-.559a.129.129 0 01-.123-.128v-3.18a.122.122 0 01.123-.121h.559a.121.121 0 01.121.121v3.18a.128.128 0 01-.121.128m.021-3.886h-.59a.127.127 0 01-.127-.121v-.539a.125.125 0 01.127-.121h.59a.122.122 0 01.123.121v.535a.124.124 0 01-.123.121M89.387 35.31H87.26a.243.243 0 01-.246-.246v-.262a.314.314 0 01.079-.195l1.47-2.024c.014-.018.02-.024.02-.037s-.02-.018-.037-.018h-1.372a.1.1 0 01-.108-.1v-.432a.121.121 0 01.121-.121h2.067a.25.25 0 01.244.248v.348a.4.4 0 01-.031.14l-1.416 1.939-.012.018c0 .018.012.025.035.025H89.4a.1.1 0 01.11.1v.492a.123.123 0 01-.123.122M93.586 33.279c0-.474-.262-.747-.639-.747s-.65.267-.65.747v.024h1.289zm.687.6h-1.982v.018a.686.686 0 00.728.773c.444 0 .864-.037 1.12-.061h.017c.061 0 .111.03.111.091v.4c0 .1-.019.14-.128.157a5.338 5.338 0 01-1.18.1 1.4 1.4 0 01-1.471-1.527v-.451a1.456 1.456 0 112.906 0v.342c0 .1-.037.152-.121.152M98.494 32.537a5.137 5.137 0 00-.584-.043c-.521 0-.65.372-.65.87v.468c0 .5.129.869.65.869a3.474 3.474 0 00.584-.042zm.639 2.663a5.191 5.191 0 01-1.223.158 1.342 1.342 0 01-1.453-1.526v-.468a1.342 1.342 0 011.453-1.526 4.821 4.821 0 01.584.041v-1.076a.122.122 0 01.123-.12h.557a.122.122 0 01.123.12v4.232c0 .092-.024.129-.164.165M106.504 32.537a3.565 3.565 0 00-.584-.043c-.522 0-.651.372-.651.87v.468c0 .5.129.869.651.869a3.474 3.474 0 00.584-.042zm.638 2.663a5.2 5.2 0 01-1.222.158 1.341 1.341 0 01-1.453-1.526v-.468a1.342 1.342 0 011.453-1.526 5.2 5.2 0 011.222.158c.139.037.163.073.163.164v2.875c0 .092-.024.129-.163.165M110.974 35.358h-.037a1.328 1.328 0 01-1.386-1.471v-1.879a.123.123 0 01.115-.129h.572a.123.123 0 01.115.129v1.879c0 .632.231.777.584.777h.037c.352 0 .584-.145.584-.777v-1.879a.122.122 0 01.116-.129h.57a.122.122 0 01.115.129v1.879a1.327 1.327 0 01-1.385 1.471M116.262 35.31a5.357 5.357 0 01-.713.049c-.6 0-.959-.207-.959-.912v-3.066a.132.132 0 01.124-.117l.566-.1h.018a.121.121 0 01.1.122v.6h.858a.121.121 0 01.121.121v.357a.122.122 0 01-.121.122h-.858v1.964c0 .243.11.285.371.285h.481c.078 0 .127.031.127.092v.376c0 .06-.037.1-.115.11M120.383 33.352c0-.5-.225-.821-.651-.821s-.65.323-.65.821v.492c0 .5.225.82.65.82s.651-.322.651-.82zm-.651 2.006a1.379 1.379 0 01-1.453-1.514v-.492a1.454 1.454 0 112.906 0v.492a1.379 1.379 0 01-1.453 1.514M127.592 35.31h-.571a.124.124 0 01-.117-.128V33c0-.414-.146-.494-.424-.494h-.146c-.354 0-.4.195-.4.494v2.182a.124.124 0 01-.117.128h-.576a.124.124 0 01-.117-.128V33c0-.3-.049-.494-.4-.494h-.145c-.279 0-.426.08-.426.494v2.182a.122.122 0 01-.115.128h-.572a.122.122 0 01-.114-.128V33a1.08 1.08 0 011.227-1.162h.145a1.2 1.2 0 01.8.242 1.213 1.213 0 01.809-.242h.146A1.079 1.079 0 01127.706 33v2.182a.122.122 0 01-.115.128M131.904 32.537a3.565 3.565 0 00-.584-.043c-.521 0-.65.372-.65.87v.468c0 .5.129.869.65.869a3.474 3.474 0 00.584-.042zm.639 2.663a5.191 5.191 0 01-1.223.158 1.342 1.342 0 01-1.453-1.526v-.468a1.342 1.342 0 011.453-1.526 5.191 5.191 0 011.223.158c.14.037.164.073.164.164v2.875c0 .092-.024.129-.164.165M136.635 35.31a5.3 5.3 0 01-.711.049c-.6 0-.961-.207-.961-.912v-3.066a.134.134 0 01.123-.121l.564-.1h.018a.121.121 0 01.1.122v.6h.856a.122.122 0 01.123.121v.361a.123.123 0 01-.123.122h-.856v1.964c0 .243.108.285.369.285h.481c.08 0 .129.031.129.092v.376c0 .06-.037.1-.117.11M139.494 35.31h-.559a.128.128 0 01-.121-.128v-3.18a.121.121 0 01.121-.121h.559a.12.12 0 01.121.121v3.18a.127.127 0 01-.121.128m.018-3.886h-.59a.127.127 0 01-.127-.121v-.539a.125.125 0 01.127-.121h.59a.121.121 0 01.123.121v.535a.122.122 0 01-.123.121M143.887 33.352c0-.5-.225-.821-.651-.821s-.65.323-.65.821v.492c0 .5.224.82.65.82s.651-.322.651-.82zm-.651 2.006a1.379 1.379 0 01-1.453-1.514v-.492a1.454 1.454 0 112.906 0v.492a1.379 1.379 0 01-1.453 1.514M149.529 35.31h-.572a.123.123 0 01-.115-.128v-2.1c0-.3-.061-.572-.414-.572h-.377c-.352 0-.412.276-.412.572v2.1a.123.123 0 01-.116.128h-.572a.123.123 0 01-.115-.128v-2.1a1.134 1.134 0 011.215-1.24h.377a1.134 1.134 0 011.216 1.24v2.1a.123.123 0 01-.115.128M24.195.964c-5.14 2.586-10.773 7.97-13.019 13.1-2.383 5.272-1.38 10.29 3.639 15.446l-.174-.083C7.244 26.932 2.814 23.121 4.375 17.764c1.07-5.163 5.875-11.5 12.326-15.624s7.307-.984 7.494-1.171"
+          />
+          <path
+            fill="#007fb5"
+            d="M34.279 5.474a35.9 35.9 0 00-6.01-.011c-2.894.238-6.213.495-8.685 2.187 2 .47 4.088.59 6.12.888 3.558.522 7.5 1.575 9.175 5.1 1.774 3.739-.873 7.856-3.4 10.5-6.545 6.826-19.61 11.687-27.394 4.126a14.843 14.843 0 01-2.032-2.474c-.645-.977-1.954.983-2.043 2.676-.361 6.858 8.792 7.268 13.737 6.761a59.191 59.191 0 0020.815-6.574c5.26-2.724 14.712-9.1 13.411-16.267-.842-4.631-6.633-5.8-10.508-6.493q-1.583-.281-3.186-.418"
+          />
+          <path
+            fill="#4c4d4f"
+            d="M57.914 18.735a3.094 3.094 0 00.353 1.441 3.786 3.786 0 00.993 1.207 4.735 4.735 0 001.478.811 5.51 5.51 0 001.811.288 5.57 5.57 0 001.787-.288 4.431 4.431 0 001.478-.811 4.216 4.216 0 00.994-1.207 2.957 2.957 0 00.375-1.441v-5.188a3.115 3.115 0 00-.353-1.441 3.839 3.839 0 00-.994-1.208 4.8 4.8 0 00-1.479-.81 5.527 5.527 0 00-1.808-.288 5.6 5.6 0 00-1.789.288 4.468 4.468 0 00-1.477.81 4.228 4.228 0 00-.994 1.208 2.954 2.954 0 00-.375 1.441zm9.269-16.5a1.21 1.21 0 01.487-.971 1.821 1.821 0 011.191-.4 1.848 1.848 0 011.17.4 1.2 1.2 0 01.508.972v16.5a5.244 5.244 0 01-.639 2.521 6.844 6.844 0 01-1.722 2.072 8.188 8.188 0 01-2.539 1.387 9.786 9.786 0 01-6.2 0 8.531 8.531 0 01-2.539-1.387 6.417 6.417 0 01-1.72-2.072 5.362 5.362 0 01-.618-2.521v-5.189a5.239 5.239 0 01.639-2.522 6.835 6.835 0 011.721-2.072 8.262 8.262 0 012.539-1.389 9.379 9.379 0 013.09-.505A9.179 9.179 0 0165 7.383a9.672 9.672 0 012.185.9zM76.021 14.772h9.268v-1.225a2.954 2.954 0 00-.375-1.441 4.243 4.243 0 00-.994-1.207 4.454 4.454 0 00-1.477-.811 5.6 5.6 0 00-1.789-.288 5.527 5.527 0 00-1.808.288 4.738 4.738 0 00-1.479.811 3.8 3.8 0 00-.994 1.207 3.09 3.09 0 00-.352 1.441zm-3.355-1.225a5.394 5.394 0 01.617-2.522 6.435 6.435 0 011.723-2.072 8.552 8.552 0 012.537-1.389 9.77 9.77 0 016.2 0 8.218 8.218 0 012.537 1.387 6.871 6.871 0 011.723 2.072 5.254 5.254 0 01.64 2.522v2.594a1.21 1.21 0 01-.486.973 1.819 1.819 0 01-1.191.4H76.021v1.225a2.963 2.963 0 00.375 1.442 4.2 4.2 0 00.993 1.206 4.412 4.412 0 001.478.811 5.57 5.57 0 001.787.288 5.356 5.356 0 002.539-.594 4.091 4.091 0 001.7-1.6l.044-.107a1.348 1.348 0 01.595-.632 1.929 1.929 0 01.949-.234 1.768 1.768 0 011.192.415 1.23 1.23 0 01.486.955 1.079 1.079 0 01-.133.5l-.088.143a7.021 7.021 0 01-2.869 2.812 8.919 8.919 0 01-4.414 1.079 9.315 9.315 0 01-3.088-.5 8.188 8.188 0 01-2.539-1.387 6.815 6.815 0 01-1.722-2.072 5.244 5.244 0 01-.639-2.521zM89.533 9.079a1.146 1.146 0 01-.131-.54 1.294 1.294 0 01.442-.937 1.624 1.624 0 011.191-.432 1.94 1.94 0 01.9.215 1.513 1.513 0 01.641.613l6.531 12.43 6.533-12.43a1.6 1.6 0 011.545-.828 1.624 1.624 0 011.19.432 1.3 1.3 0 01.443.937 1.148 1.148 0 01-.133.54l-8.033 15.313a1.657 1.657 0 01-1.545.829 1.546 1.546 0 01-1.545-.829zM110.494 8.575a1.212 1.212 0 01.486-.973 1.822 1.822 0 011.19-.4 1.846 1.846 0 011.17.4 1.2 1.2 0 01.509.973v15.132a1.21 1.21 0 01-.486.973 1.825 1.825 0 01-1.193.4 1.845 1.845 0 01-1.168-.4 1.2 1.2 0 01-.508-.973zm0-6.342a1.213 1.213 0 01.486-.969 1.822 1.822 0 011.19-.4 1.846 1.846 0 011.17.4 1.2 1.2 0 01.509.973v1.041a1.21 1.21 0 01-.486.973 1.821 1.821 0 01-1.193.4 1.84 1.84 0 01-1.168-.4 1.2 1.2 0 01-.508-.973zM119.519 18.735a2.957 2.957 0 00.375 1.441 4.229 4.229 0 00.993 1.207 4.441 4.441 0 001.48.811 5.756 5.756 0 003.6 0 4.757 4.757 0 001.478-.811 3.8 3.8 0 00.994-1.207 3.105 3.105 0 00.352-1.441v-5.188a2.954 2.954 0 00-.377-1.441 4.287 4.287 0 00-.992-1.208 4.5 4.5 0 00-1.479-.81 5.6 5.6 0 00-1.787-.288 5.53 5.53 0 00-1.81.288 4.8 4.8 0 00-1.479.81 3.8 3.8 0 00-.992 1.208 3.092 3.092 0 00-.354 1.441zm-3.355-5.188a5.393 5.393 0 01.619-2.522 6.454 6.454 0 011.721-2.072 8.611 8.611 0 012.539-1.387 9.764 9.764 0 016.2 0 8.239 8.239 0 012.539 1.387 6.835 6.835 0 011.721 2.072 5.251 5.251 0 01.64 2.522v5.188a5.409 5.409 0 01-.617 2.521 6.423 6.423 0 01-1.722 2.072 8.457 8.457 0 01-2.561 1.387 9.718 9.718 0 01-6.178 0 8.177 8.177 0 01-2.537-1.387 6.786 6.786 0 01-1.722-2.072 5.246 5.246 0 01-.641-2.521zM134.214 13.547a5.4 5.4 0 01.619-2.523 6.461 6.461 0 011.721-2.071 8.588 8.588 0 012.539-1.387 9.77 9.77 0 016.2 0 8.23 8.23 0 012.537 1.387 6.844 6.844 0 011.721 2.071 5.247 5.247 0 01.64 2.523v10.16a1.2 1.2 0 01-.507.973 1.853 1.853 0 01-1.17.4 1.824 1.824 0 01-1.192-.4 1.21 1.21 0 01-.486-.973v-10.16a2.976 2.976 0 00-.373-1.441 4.281 4.281 0 00-.994-1.208 4.488 4.488 0 00-1.479-.81 5.6 5.6 0 00-1.787-.288 5.52 5.52 0 00-1.809.288 4.793 4.793 0 00-1.48.81 3.794 3.794 0 00-.992 1.208 3.083 3.083 0 00-.354 1.441v10.16a1.2 1.2 0 01-.506.973 1.853 1.853 0 01-1.171.4 1.824 1.824 0 01-1.192-.4 1.21 1.21 0 01-.486-.973z"
+          />
+        </symbol>
+      </defs>
+    </svg>
+    <div class="c-header">
+      <svg class="c-app_logo">
+        <use xlink:href="#c-icon--devion"></use>
+      </svg>
+      <nav class="c-nav">
+        <ul class="o-list c-nav__list">
+          <li class="c-nav__item">
+            <a href="index.html" class="c-nav__link">bestelbon</a>
+          </li>
+          <li class="c-nav__item" active>
+            <a href="artikels.html" class="c-nav__link c-nav__link--active"
+              >nieuw artikel</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="c-app">
+      <div class="c-app_topbar">
+        <h1 class="c-artikel_title">Artikels</h1>
+      </div>
+      <div class="c-app_body">
+        <div class="c-artikel">
+          <div class="c-artikel_text">
+            <label class="c-label c-label--artikel" for="artikelNr"
+              >Type hier je artikelnummer</label
+            >
+            <input
+              class="c-input c-input--artikel js-artikel-nr"
+              type="text"
+              name="artikelNr"
+              id="artikelNr"
+              placeholder="artikelnummer"
+            />
+            <label
+              class="c-label c-label--error c-label--error-artikelnrsearch o-hide-accessible js-artikelnr-search-error"
+              for="artikelNr"
+              >Dit artikel bestaat al</label
+            >
+          </div>
+          <div class="c-file-input">
+            <input
+              type="file"
+              class="c-file-input__input js-file-input"
+              name="file"
+              id="file"
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            />
+          </div>
+          <button
+            type="submit"
+            class="o-button-reset c-button c-button-artikel-search js-button-artikel-search"
+          >
+            artikel(en) opzoeken
+          </button>
+          <form class="c-artikel_form o-hide-accessible js-artikel-form">
+            <div class="c-artikel-artikelnr">
+              <label for="" class="c-label c-label-artikelnr">Artikel nummer</label>
+              <input
+                type="text"
+                class="c-input c-input-artikelnr js-input-artikelnr"
+                placeholder="artikelnr"
+                name="artikelnr"
+                id="artikelnr"
+              />
+            </div>
+            <div class="c-artikel-reflevnr">
+              <label for="" class="c-label c-label-reflevnr">Referentie leverancier</label>
+              <input
+                type="text"
+                class="c-input c-input-reflevnr js-input-reflevnr"
+                placeholder="reflevnr"
+                name="reflevnr"
+                id="reflevnr"
+                disabled
+              />
+            </div>
+            <div class="c-artikel-hoofdlev">
+              <label for="" class="c-label c-label-hoofdlev">Hoofdleverancier</label>
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-hoofdlev js-input-hoofdlev"
+                placeholder="hoofdlev"
+                name="hoofdlev"
+                id="hoofdlev"
+              >
+                <option value="cebeo" selected>cebeo</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--hoofdlev"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+              </span>
+            </span>
+            </div>
+            <div class="c-artikel-omschrijving">
+              <label for="" class="c-label c-label-omschrijving"
+                >Omschrijving</label
+              >
+              <input
+                type="text"
+                class="c-input c-input-omschrijving js-input-omschrijving"
+                placeholder="omschrijving"
+                name="omschrijving"
+                id="omschrijving"
+              />
+            </div>
+            <div class="c-artikel-prijs">
+              <label for="" class="c-label c-label-prijs">Aankoopprijs</label>
+              <input
+                type="text"
+                class="c-input c-input-prijs js-input-prijs"
+                placeholder="prijs"
+                name="prijs"
+                id="prijs"
+              />
+            </div>
+            <div class="c-artikel-familie">
+              <label for="" class="c-label c-label-familie">Familie</label>
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-familie js-input-familie"
+                placeholder="familie"
+                name="familie"
+                id="familie"
+              >
+                <option value="1" selected>NIET COURANT MATERIAAL</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--familie"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+            </span>
+            </div>
+            <div class="c-artikel-akprijseh">
+              <label for="" class="c-label c-label-akprijseh">Akp verbr. eh.</label>
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-akprijseh js-input-akprijseh"
+                placeholder="akprijseh"
+                name="akprijseh"
+                id="akprijseh"
+              >
+                <option value="01" selected>ST</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--akprijseh"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+            </span>
+            </div>
+            <div class="c-artikel-verbruikseh">
+              <label for="" class="c-label c-label-verbruikseh"
+                >Vkp verbr. eh.</label
+              >
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-verbruikseh js-input-verbruikseh"
+                placeholder="verbruikseh"
+                name="verbruikseh"
+                id="verbruikseh"
+              >
+                <option value="01" selected>ST</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--verbruikseh"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+            </span>
+            </div>
+            <div class="c-artikel-subfamilie">
+              <label for="" class="c-label c-label-subfamilie"
+                >subfamilie</label
+              >
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-subfamilie js-input-subfamilie"
+                placeholder="subfamilie"
+                name="subfamilie"
+                id="subfamilie"
+              >
+                <option value="2A" selected>NON STOCK</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--subfamilie"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+            </span>
+            </div>
+            <div class="c-artikel-lengte">
+              <label for="" class="c-label c-label-lengte">lengte</label>
+              <input
+                type="text"
+                class="c-input c-input-lengte js-input-lengte"
+                value="0"
+                name="lengte"
+                id="lengte"
+              />
+            </div>
+            <div class="c-artikel-breedte">
+              <label for="" class="c-label c-label-breedte">breedte</label>
+              <input
+                type="text"
+                class="c-input c-input-breedte js-input-breedte"
+                value="0"
+                name="breedte"
+                id="breedte"
+              />
+            </div>
+            <div class="c-artikel-hoogte">
+              <label for="" class="c-label c-label-hoogte">hoogte</label>
+              <input
+                type="text"
+                class="c-input c-input-hoogte js-input-hoogte"
+                value="0"
+                name="hoogte"
+                id="hoogte"
+              />
+            </div>
+            <div class="c-artikel-btwcode">
+              <label for="" class="c-label c-label-btwcode">BTW code</label>
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-btwcode js-input-btwcode"
+                placeholder="btwcode"
+                name="btwcode"
+                id="btwcode"
+              >
+                <option value="21" selected>BTW 21%</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--btwcode"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+            </span>
+            </div>
+            <div class="c-artikel-rekver">
+              <label for="" class="c-label c-label-rekver"
+                >Rekening verkoop</label
+              >
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-rekver js-input-rekver"
+                placeholder="rekver"
+                name="rekver"
+                id="rekver"
+              >
+                <option value="700000" selected>700000 - verkopen</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--rekver"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+            </span>
+            </div>
+            <div class="c-artikel-muntcode">
+              <label for="" class="c-label c-label-muntcode">Muntcode</label>
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-muntcode js-input-muntcode"
+                placeholder="muntcode"
+                name="muntcode"
+                id="muntcode"
+              >
+                <option value="EUR" selected>EUR</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--muntcode"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+            </span>
+            </div>
+            <div class="c-artikel-omrekfac">
+              <label for="" class="c-label c-label-omrekfac"
+                >omrekenings factor</label
+              >
+              <input
+                type="text"
+                class="c-input c-input-omrekfac js-input-omrekfac"
+                placeholder="omrekfac"
+                name="omrekfac"
+                id="omrekfac"
+              />
+            </div>
+            <div class="c-artikel-typfac">
+              <label for="" class="c-label c-label-typfac">type factor</label>
+              <span class="c-custom-select">
+              <select
+                class="c-input c-custom-select__input c-input-typfac js-input-typfac"
+                placeholder="typfac"
+                name="typfac"
+                id="typfac"
+              >
+                <option value="1" selected>Vermenigvuldigingsfactor</option>
+                <option value="0">Deelfactor</option>
+              </select>
+              <svg
+                class="c-custom-select__symbol c-custom-select__symbol--typfac"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7,10l5,5,5-5Z" />
+              </svg>
+              </span>
+            </div>
+            <div class="c-artikel-merk">
+              <label for="" class="c-label c-label-merk">merk</label>
+              <input
+                type="text"
+                class="c-input c-input-merk js-input-merk"
+                placeholder="merk"
+                name="merk"
+                id="merk"
+              />
+            </div>
+            <div class="c-artikel-tarief">
+              <label for="" class="c-label c-label-tarief"
+                >catalogus prijs</label
+              >
+              <input
+                type="text"
+                class="c-input c-input-tarief js-input-tarief"
+                placeholder="catalogus prijs"
+                name="tarief"
+                id="tarief"
+                disabled
+              />
+            </div>
+            <div class="c-artikel-verkoop">
+              <label for="" class="c-label c-label-verkoop"
+                >verkoop prijs</label
+              >
+              <input
+                type="text"
+                class="c-input c-input-verkoop js-input-verkoop"
+                placeholder="verkoop prijs"
+                name="verkoop"
+                id="verkoop"
+              />
+            </div>
+            <div class="c-artikel-winst">
+              <label for="" class="c-label c-label-winst"
+                >winstpercentage (%)</label
+              >
+              <input
+                type="text"
+                class="c-input c-input-winst js-input-winst"
+                placeholder="winstpercentage"
+                name="winst"
+                id="winst"
+              />
+            </div>
+            <div class="c-artikel-link">
+              <label for="" class="c-label c-label-link">link</label>
+              <a
+                href="#"
+                class="c-link c-link-artikel js-link-icon"
+                target="_blank"
+                >?</a
+              >
+              <input
+                type="url"
+                class="c-input c-input-link js-input-link"
+                placeholder="link"
+                name="link"
+                id="link"
+                disabled
+              />
+            </div>
+            <div class="c-artikel-stdkorting">
+              <label for="" class="c-label c-label-stdkorting"
+                >std. korting (%)</label
+              >
+              <input
+                type="text"
+                class="c-input c-input-stdkorting js-input-stdkorting"
+                placeholder="std. korting"
+                name="stdkorting"
+                id="stdkorting"
+              />
+            </div>
+            <div class="c-artikel-minaan">
+              <label for="" class="c-label c-label-minaan"
+                >minimum aantal aankoop</label
+              >
+              <input
+                type="text"
+                class="c-input c-input-minaan js-input-minaan"
+                placeholder="minimum aantal"
+                name="minaan"
+                id="minaan"
+              />
+            </div>
+            <div class="c-artikel-button--save">
+              <button
+                type="button"
+                class="o-button-reset c-button c-button-artikel c-button-artikel--save js-button-artikel-toevoegen"
+              >
+                artikel(en) toevoegen
+              </button>
+            </div>
+            <div class="c-artikel-button--next">
+              <button
+                type="button"
+                class="o-button-reset c-button c-button-artikel c-button-artikel--next js-button-artikel-next o-hide-accessible"
+              >
+                next
+              </button>
+            </div>
+            <div class="c-artikel-button--prev">
+              <button
+                type="button"
+                class="o-button-reset c-button c-button-artikel c-button-artikel--prev js-button-artikel-prev o-hide-accessible"
+              >
+                prev
+              </button>
+            </div>
+            <div class="c-artikel-progress">
+              <div class="c-artikel-progress__text js-artikel-progress">
+                1/1
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

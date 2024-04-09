@@ -1,0 +1,18 @@
+{
+  "Devion": {
+    "Frezen": 0.0,
+    "Lassen": 35.0,
+    "Draaien": 15.3,
+    "Printen": 0.0,
+    "Laseren": 13.0,
+    "Buislaseren": 0.0
+  },
+  "Metabil": {
+    "frezen": 13.25,
+    "lassen": 15.78,
+    "draaien": 35.24,
+    "printen": 15.68,
+    "laseren": 65.25,
+    "buislaseren": 125.36
+  }
+}

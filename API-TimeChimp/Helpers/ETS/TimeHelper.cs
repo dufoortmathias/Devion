@@ -88,10 +88,9 @@ public class ETSTimeHelper : ETSHelper
 
         //create the text
         timeETS.PLA_TEKST =
-            $"{timeETS.PLA_SUBPROJECT}: {timeTC.projectName}" +
+            timeTC.notes + "\n" +
             $"{uurCode.name} ({timeETS.PLA_UURCODE})\n" +
-            $"TimeChimp: {timeTC.id}\n" +
-            timeTC.notes;
+            $"TimeChimp: {timeTC.id}\n";
 
         //create the query
         string query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE, PLA_KM, PLA_KM_HEEN_TERUG, PLA_KM_VERGOEDING, PLA_INTERN) " +

@@ -1,0 +1,102 @@
+<template>
+    <div class="c-input-placement">
+        <label :for="id" class="c-label">{{ label }}:</label>
+        <div v-if="error">
+            <select :id="id" v-model="selectedOption" @change="emitSelectedOption"
+                class="c-input c-custom-select c-input--error">
+                <option value="-1" disabled selected>Selecteer een {{ label }}</option>
+                <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.label }}</option>
+            </select>
+            <svg class="c-custom-select__symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M7,10l5,5,5-5Z" />
+            </svg>
+            <label class="c-label--error"> {{ label }} is verplicht!</label>
+        </div>
+        <div v-else>
+            <select :id="id" v-model="selectedOption" @change="emitSelectedOption" class="c-input c-custom-select">
+                <option value="-1" disabled >Selecteer een {{ label }}</option>
+                <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.label }}</option>
+            </select>
+            <svg class="c-custom-select__symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M7,10l5,5,5-5Z" />
+            </svg>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    props: {
+        id: String,
+        label: String,
+        options: Array,
+        error: Boolean,
+        selected: String
+    },
+    data() {
+        return {
+            selectedOption: this.selected==undefined? '-1': this.selected
+        };
+    },
+    watch: {
+        selected(value) {
+            this.selectedOption = value==undefined? '-1': value;
+        }
+    },
+    methods: {
+        emitSelectedOption() {
+            // Emit the selected option when the value changes
+            this.$emit('option-selected', this.selectedOption);
+        },
+        reset() {
+            this.selectedOption = '-1';
+        }
+    }
+};
+</script>
+
+<style scoped>
+/* Add your custom styles for the dropdown here */
+.c-custom-select {
+    grid-area: select;
+    display: block;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+}
+
+.c-label {
+    grid-area: label;
+    display: block;
+    font-size: var(--global-font-size);
+    font-weight: var(--global-font-weight-bold);
+    margin-bottom: var(--global-baseline);
+    padding-top: 11px;
+}
+
+.c-custom-select__symbol {
+    width: calc(var(--global-baseline) * 3);
+    height: calc(var(--global-baseline) * 3);
+    fill: var(--global-color-neutral-x-light);
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    pointer-events: none;
+}
+
+.c-label--error {
+    grid-area: error;
+    color: var(--global-color-error);
+}
+
+.c-input--error {
+    border-color: var(--global-color-error);
+}
+
+.c-input-placement {
+    position: relative;
+    display: grid;
+    grid-template-areas: "label select" "none error";
+    grid-template-columns: 1fr 2fr;
+}
+</style>

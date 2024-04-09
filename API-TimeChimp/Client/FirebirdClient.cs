@@ -58,13 +58,13 @@ public class FirebirdClientETS
     }
 
     //execute query
-    public void ExecuteQuery(string query, Dictionary<string, object> parameters)
+    public void ExecuteQuery(string query, Dictionary<string, object?> parameters)
     {
         //create connection
         FbConnection connection = new(_connectionString);
         using FbCommand command = new(query, connection);
 
-        foreach (KeyValuePair<string, object> record in parameters)
+        foreach (KeyValuePair<string, object?> record in parameters)
         {
             command.Parameters.AddWithValue(record.Key, record.Value);
         }
@@ -73,7 +73,7 @@ public class FirebirdClientETS
         connection.Open();
 
         //execute the query
-        _ = command.ExecuteNonQuery();
+        var rows = command.ExecuteNonQuery();
 
         //close the connection
         connection.Close();

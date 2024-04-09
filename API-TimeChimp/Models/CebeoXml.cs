@@ -5,7 +5,7 @@ namespace Api.Devion.Models;
 [XmlRoot(ElementName = "Customer")]
 public class Customer
 {
-    public Customer() {}
+    public Customer() { }
 
     public Customer(ConfigurationManager config)
     {
@@ -188,8 +188,8 @@ public class OrderLine
 
     public OrderLine(Dictionary<string, object> orderLine)
     {
-        Material = new((string) orderLine["number"]);
-        OrderedQuantity = (int) orderLine["aantal"];
+        Material = new((string)orderLine["number"]);
+        OrderedQuantity = (int)orderLine["aantal"];
     }
 
     [XmlElement(ElementName = "Material")]
@@ -271,7 +271,8 @@ public class Order
 {
     public Order() { }
 
-    public Order(List<Dictionary<string, object>> orderLines) {
+    public Order(List<Dictionary<string, object>> orderLines)
+    {
         Create = new(orderLines);
     }
 
@@ -451,8 +452,8 @@ public class CebeoXML
                 {
                     Get = new()
                     {
-                        Material = new Material[] {new() { SupplierItemID = articleNumber }}.ToList()
-                    } 
+                        Material = new Material[] { new() { SupplierItemID = articleNumber } }.ToList()
+                    }
                 }
             },
             Version = config["Cebeo:Version"],
