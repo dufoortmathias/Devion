@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:5142/api/'
+const baseUrl = 'http://192.168.100.211:5000/api/'
 
 export async function PostDataWithBody(endpoint, data) {
   var myHeaders = new Headers()
@@ -12,7 +12,7 @@ export async function PostDataWithBody(endpoint, data) {
     body: JSON.stringify(data),
     redirect: 'follow'
   }
-
+  
   return fetch(baseUrl + endpoint, requestOptions)
     .then((response) => response.text())
     .then((result) => result)

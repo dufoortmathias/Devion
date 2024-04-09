@@ -58,7 +58,7 @@ import dropdownMenu from '../components/componenten/DropdownMenu.vue'
 import { GetData } from '../global/global'
 
 const companie = 'devion'
-let artikelNr, reflev, omschrijving, tarief, aankoop, stdKorting, muntcode, verkoop, winstpercentage, rekver, aaneh, vereh, btwcode, omrekfac, typfac, merk, familie, subfamilie, lengte, breedte, hoogte, hoofdleverancier, minaan
+let artikelNr, reflev, omschrijving, tarief, aankoop, stdKorting, muntcode, verkoop, winstpercentage, rekver, aaneh, vereh, btwcode, omrekfac, typfac, merk, familie, subfamilie, lengte, breedte, hoogte, hoofdleverancier, minaan, mass
 
 let object = {}
 
@@ -303,8 +303,11 @@ export default {
         this.getOptions()
     },
     watch: {
+        showform() {
+            this.returnToDefault()
+        },
         data(object) {
-            if (object.number == undefined) {
+            if (!object.number) {
                 this.artikelNr.placeholder = object.artikelNr
                 artikelNr = object.artikelNr
                 this.reflev.placeholder = object.reflev
@@ -351,8 +354,9 @@ export default {
                 hoofdleverancier = object.mainSupplier
                 this.minaan.placeholder = object.minaan
                 minaan = object.minaan
-            } else if (object.existsMet == false && !object.existsDev){
+            } else if ((object.existsMet == false && !object.existsDev) || (object.existsMet == false && object.existsDev == true)) {
                 this.returnToDefault()
+                mass = object.mass.toString().replace(',', '.')
 
                 this.artikelNr.placeholder = object.number
                 artikelNr = object.number
@@ -387,10 +391,8 @@ export default {
                 this.tarief.placeholder = "0"
                 tarief = "0"
 
-                let prices = this.priceData["metabil"]
-                console.log(prices)
-                if (prices[object.bewerking1.toLowerCase()])
-                {
+                let prices = this.priceData["Metabil"]
+                if (prices[object.bewerking1.toLowerCase()]) {
                     const price = prices[object.bewerking1.toLowerCase()] * object.mass
                     this.tarief.placeholder = price.toString()
                     tarief = price.toString()
@@ -401,17 +403,17 @@ export default {
 
                 this.stdKorting.placeholder = "0"
                 stdKorting = "0"
-                this.aankoop.placeholder = (tarief * (1 - (stdKorting / 100))).toFixed(2).toString()    
-                aankoop = (tarief * (1 - (stdKorting / 100))).toFixed(2).toString() 
+                this.aankoop.placeholder = (tarief * (1 - (stdKorting / 100))).toFixed(4).toString()
+                aankoop = (tarief * (1 - (stdKorting / 100))).toFixed(4).toString()
                 this.winstpercentage.placeholder = "33.33"
                 winstpercentage = "33.33"
-                this.verkoop.placeholder = (aankoop * (1 + (winstpercentage * 100))).toFixed(2).toString()
-                verkoop = (aankoop * (1 + (winstpercentage * 100))).toFixed(2).toString()
+                this.verkoop.placeholder = (aankoop * (1 + (winstpercentage / 100))).toFixed(4).toString()
+                verkoop = (aankoop * (1 + (winstpercentage / 100))).toFixed(4).toString()
                 this.minaan.placeholder = "1"
                 minaan = "1"
-            }else if (object.existsDev == false){
-                console.log(object)
+            } else if (object.existsDev == false) {
                 this.returnToDefault()
+                mass = object.mass.toString().replace(',', '.')
 
                 this.artikelNr.placeholder = object.number
                 artikelNr = object.number
@@ -447,12 +449,10 @@ export default {
                 tarief = "0"
 
                 let prices = this.priceData["devion"]
-                console.log(prices)
-                if (prices[object.bewerking1.toLowerCase()])
-                {
+                if (prices[object.bewerking1.toLowerCase()]) {
                     const price = prices[object.bewerking1.toLowerCase()] * object.mass
-                    this.tarief.placeholder = price.toFixed(2).toString()
-                    tarief = price.toFixed(2).toString()
+                    this.tarief.placeholder = price.toString()
+                    tarief = price.toString()
                 } else {
                     this.tarief.placeholder = "0"
                     tarief = "0"
@@ -460,12 +460,12 @@ export default {
 
                 this.stdKorting.placeholder = "0"
                 stdKorting = "0"
-                this.aankoop.placeholder = (tarief * (1 - (stdKorting / 100))).toFixed(2).toString()    
-                aankoop = (tarief * (1 - (stdKorting / 100))).toFixed(2).toString() 
+                this.aankoop.placeholder = (tarief * (1 - (stdKorting / 100))).toFixed(4).toString()
+                aankoop = (tarief * (1 - (stdKorting / 100))).toFixed(4).toString()
                 this.winstpercentage.placeholder = "33.33"
                 winstpercentage = "33.33"
-                this.verkoop.placeholder = (aankoop * (1 + (winstpercentage * 100))).toFixed(2).toString()
-                verkoop = (aankoop * (1 + (winstpercentage * 100))).toFixed(2).toString()
+                this.verkoop.placeholder = (aankoop * (1 + (winstpercentage / 100))).toFixed(4).toString()
+                verkoop = (aankoop * (1 + (winstpercentage / 100))).toFixed(4).toString()
                 this.minaan.placeholder = "1"
                 minaan = "1"
             }
@@ -579,6 +579,7 @@ export default {
         hoogte = null
         hoofdleverancier = null
         minaan = null
+        mass = null
 
         object = {}
 
@@ -641,14 +642,14 @@ export default {
             omschrijving = undefined
             this.aankoop.placeholder = "0"
             aankoop = "0".toString()
-            this.winstpercentage.placeholder = "33.33%"
-            winstpercentage = 33.33
-            this.verkoop.placeholder = parseFloat(aankoop * (1 + 1 / 3)).toFixed(2)
-            verkoop = parseFloat(aankoop * (1 + 1 / 3)).toFixed(2).toString()
-            aaneh = this.aaneh.options.find((x)=> x.label.toLowerCase() == 'st').value
-            this.aaneh.placeholder = this.aaneh.options.find((x)=> x.label.toLowerCase() =='st').value
-            vereh = this.vereh.options.find((x)=> x.label.toLowerCase() == 'st').value
-            this.vereh.placeholder = this.vereh.options.find((x)=> x.label.toLowerCase() =='st').value
+            this.winstpercentage.placeholder = "33,33%"
+            winstpercentage = "33.33"
+            this.verkoop.placeholder = parseFloat(aankoop * (1 + 1 / 3)).toFixed(4)
+            verkoop = parseFloat(aankoop * (1 + 1 / 3)).toFixed(4).toString()
+            aaneh = this.aaneh.options.find((x) => x.label.toLowerCase() == 'st').value
+            this.aaneh.placeholder = this.aaneh.options.find((x) => x.label.toLowerCase() == 'st').value
+            vereh = this.vereh.options.find((x) => x.label.toLowerCase() == 'st').value
+            this.vereh.placeholder = this.vereh.options.find((x) => x.label.toLowerCase() == 'st').value
         },
         async getOptions() {
             let endpoint = `${companie}/ets/articleforminfo`
@@ -726,7 +727,7 @@ export default {
                 breedte = "0"
                 hoogte = "0"
                 omrekfac = "1"
-                typfac = this.typfac.options.find((x) => x.label.toLowerCase() == "vermenigvuldigingsfactor").value
+                typfac = this.typfac.options.find((x) => x.label.toLowerCase() == "deelfactor").value
             })
         },
         handleArtikelNr(value) {
@@ -742,20 +743,34 @@ export default {
         },
         handletarief(selectedOption) {
             tarief = selectedOption
-
-        },
-        handleAankoop(value) {
-            aankoop = value
-            if (winstpercentage.includes("33.33")) {
+            aankoop = parseFloat(
+                tarief * (1 - stdKorting / 100)
+            ).toFixed(4).toString()
+            if (winstpercentage.includes("33,33")) {
                 verkoop = parseFloat(
                     aankoop * (1 + 1 / 3)
-                ).toFixed(4)
+                ).toFixed(4).toString()
             } else {
                 verkoop = parseFloat(
                     aankoop * (1 + winstpercentage / 100)
-                ).toFixed(4)
+                ).toFixed(4).toString()
             }
-
+            this.tarief.placeholder = tarief
+            this.aankoop.placeholder = aankoop
+            this.verkoop.placeholder = verkoop
+        },
+        handleAankoop(value) {
+            aankoop = value
+            if (winstpercentage.includes("33,33")) {
+                verkoop = parseFloat(
+                    aankoop * (1 + 1 / 3)
+                ).toFixed(4).toString()
+            } else {
+                verkoop = parseFloat(
+                    aankoop * (1 + winstpercentage / 100)
+                ).toFixed(4).toString()
+            }
+            aankoop
             this.aankoop.placeholder = aankoop
             this.verkoop.placeholder = verkoop
 
@@ -766,15 +781,15 @@ export default {
 
             aankoop = parseFloat(
                 tarief * (1 - value / 100)
-            ).toFixed(4)
-            if (winstpercentage.includes("33.33")) {
+            ).toFixed(4).toString()
+            if (winstpercentage.includes("33,33")) {
                 verkoop = parseFloat(
                     aankoop * (1 + 1 / 3)
-                ).toFixed(4)
+                ).toFixed(4).toString()
             } else {
                 verkoop.value = parseFloat(
                     aankoop * (1 + winstpercentage / 100)
-                ).toFixed(4)
+                ).toFixed(4).toString()
             }
             this.aankoop.placeholder = aankoop
             this.verkoop.placeholder = verkoop
@@ -796,17 +811,17 @@ export default {
 
         },
         handleWinst(value) {
-            winstpercentage = value
+            winstpercentage = value.toString()
 
-            if (value.includes("33.33")) {
+            if (value.includes("33,33")) {
                 this.verkoop.placeholder = parseFloat(
                     aankoop * (1 + 1 / 3)
-                ).toFixed(4)
+                ).toFixed(4).toString()
 
             } else {
                 this.verkoop.placeholder = parseFloat(
                     aankoop * (1 + value / 100)
-                ).toFixed(4)
+                ).toFixed(4).toString()
             }
             verkoop = this.verkoop.placeholder
 
@@ -890,12 +905,12 @@ export default {
                 hoogte: hoogte,
                 hoofdleverancier: hoofdleverancier,
                 minaan: minaan,
+                mass: mass.toString().replace('.', ',')
             }
             const keys = Object.keys(object)
-            console.log(object)
             let errors = 0
             for (const key of keys) {
-                if ((object[key] == undefined || object[key] == '' ) && key != 'link') {
+                if ((object[key] == undefined || object[key] == '') && key != 'link') {
                     console.log(object[key], key)
                     this.changeErrorState(key, true)
                     errors++

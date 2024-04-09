@@ -20,7 +20,7 @@
     <div v-show="treeViewMet.showTree" class="c-metabil">
         <h2 class="c-title">Metabil</h2>
         <labelDevion :label="link.label" :showLabel="link.showlabel" class="c-link" />
-        <BasicToggleSwitch v-model="LinkModel" class="c-toggle" />
+        <BasicToggleSwitch v-model="LinkModel" class="c-toggle"/>
         <buttonDevion :label="changeMet.label" :isDisabled="changeMet.isDisabled" :showButton="changeMet.showButton"
             @click="() => TogglePopup('changeMetabil')" class="c-button c-change-met" />
     </div>
@@ -88,12 +88,12 @@ let totalParts = 0
 let partsNotFoundMet = []
 let notFoundMet = 0
 let totalPartsMet = 0
-let index, index2, save, metIndex, metIndex2
+let index, index2, save
+let metIndex = 0, metIndex2 = 0
 let metSave = false
 let metArtikel = false
 let artikelen = []
 let artikelenMet = []
-let artikels
 let test = "merk"
 const LinkModel = ref(true)
 let changesDev = []
@@ -105,6 +105,8 @@ const popupTriggers = ref({
 })
 let logs = []
 let priceData = []
+let artikelSave = [], artikelSaveMet = []
+
 
 export default {
     components: {
@@ -313,12 +315,23 @@ export default {
     },
     methods: {
         GetPriceSettings() {
-            GetData("pricesettings").then(Response => {
+            GetData("price").then(Response => {
                 return Response;
             })
                 .then(data => {
                     priceData = data;
                     this.artikelForm.priceData = priceData;
+                })
+                .catch(error => {
+                    console.error('Error during fetch:', error);
+                });
+        },
+        GetBewerkingenSettings(){
+            GetData("bewerkingen").then(Response => {
+                return Response;
+            })
+                .then(data => {
+                    bewerkingenData = data;
                 })
                 .catch(error => {
                     console.error('Error during fetch:', error);
@@ -344,6 +357,7 @@ export default {
             PostDataWithBody(endpoint, data).then((response) => {
                 this.button.isDisabled = true;
                 let artikelMetDev = JSON.parse(response)
+                console.log(artikelMetDev)
                 let artikelDev = artikelMetDev[0][0]
                 artikelenMet = []
                 for (let item of artikelMetDev[1]) {
@@ -380,11 +394,12 @@ export default {
             this.GetPriceSettings()
         },
         handleButtonSave() {
-            if (partsNotFound == 0) {
+            if (partsNotFound.length == 0) {
                 metArtikel = true
             } else {
                 metArtikel = false
             }
+            console.log(LinkModel.value)
             if (!metArtikel) {
                 this.artikelForm.showform = true
                 if (partsNotFound.length == 1) {
@@ -410,7 +425,7 @@ export default {
                 this.missing.showlabel = false
                 this.missingMet.showlabel = false
                 this.titleDevion.title = 'Devion'
-            } else if (metArtikel) {
+            } else if (metArtikel && LinkModel.value == true) {
                 this.artikelForm.showform = true
                 if (partsNotFoundMet.length == 1) {
                     this.save.showButton = true
@@ -580,6 +595,21 @@ export default {
                 }).catch((error) => {
                     console.error(error)
                 })
+
+                if (artikelenMet.length > 0 && LinkModel.value) {
+                    PutDataWithBody('metabil/ets/updatelinkedarticles', artikelenMet).then((response) => {
+                        this.loading.showLoad = false
+                        this.linked.showlabel = true
+                        let log = JSON.parse(response)
+                        const lengthlogs = logs.length
+                        for (let i in log) {
+                            logs[lengthlogs + i] = log[i]
+                        }
+                        this.createCSV()
+                    }).catch((error) => {
+                        console.error(error)
+                    })
+                }
             }
 
             if (LinkModel.value) {
@@ -597,21 +627,25 @@ export default {
             var blob = new Blob([csv], { type: "text/plain;charset utf-8" });
             var link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "logs.csv";
+            var datum = new Date().getDate()+"-"+new Date().getMonth()+"-"+new Date().getFullYear();
+            var time = new Date().getHours()+"-"+new Date().getMinutes()+"-"+new Date().getSeconds();
+            link.download = `logs_${datum}_${time}.csv`;
             link.click();
         },
         handleArtikel(object) {
             let artikel = object
             if (metArtikel) {
-                let indexMet = artikelenMet.findIndex(art => art.number === artikel.number)
-                artikelenMet[indexMet] = artikel
+                if (artikel.artikelNr) {
+                    artikelSaveMet.push(artikel)
+                }
                 if (metSave == true) {
                     let endpoint = `metabil/ets/createitem`
-                    artikels.forEach(artikel => {
+                    for (let artikel of artikelSaveMet) {
+                        console.log(artikel)
                         PostDataWithBody(endpoint, artikel).then((data) => {
                             console.log(data)
                         })
-                    });
+                    }
                     console.log("saved")
                     this.artikelForm.showform = false
                     this.save.showButton = false
@@ -625,7 +659,7 @@ export default {
                     this.buttonInsert.showButton = true
                     this.handleButton()
                 } else {
-                    save = false
+                    metSave = false
                     metIndex = metIndex2
                     if (metIndex == partsNotFoundMet.length - 1) {
                         this.next.showButton = false;
@@ -645,15 +679,16 @@ export default {
                     this.ArtikelZoeken()
                 }
             } else {
-                let indexDev = artikelen.findIndex(art => art.number === artikel.number)
-                artikelen[indexDev] = artikel
+                if (artikel.artikelNr) {
+                    artikelSave.push(artikel)
+                }
                 if (save == true) {
                     let endpoint = `devion/ets/createitem`
-                    artikelen.forEach(artikel => {
+                    artikelSave.foreach((artikel) => {
                         PostDataWithBody(endpoint, artikel).then((data) => {
                             console.log(data)
                         })
-                    });
+                    })
                     console.log("saved")
                     this.artikelForm.showform = false
                     this.save.showButton = false
@@ -669,7 +704,6 @@ export default {
                 } else {
                     save = false
                     index = index2
-                    console.log(partsNotFound.length)
                     if (index == partsNotFound.length - 1) {
                         this.next.showButton = false;
                         this.save.showButton = true;
@@ -777,7 +811,6 @@ export default {
             }
         },
         ToggleSettings() {
-            console.log("test")
             this.settings.showSettings = !this.settings.showSettings
         }
     }

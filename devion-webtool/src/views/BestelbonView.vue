@@ -167,6 +167,7 @@ export default {
       }).then((data) => {
         data.sort()
         data.reverse()
+        this.dropdownBestelbon.options = []
         for (var element of data) {
           this.dropdownBestelbon.options.push({ value: element, label: element })
         }

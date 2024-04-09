@@ -8,13 +8,23 @@
                         d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
                 </svg>
             </div>
-            <h2>Settings</h2>
+            <h1>Settings</h1>
             <div class="spacer"></div>
+            <h2>Prijzen/kilo (€)</h2>
             <div v-for="(item, index1) in data" :key="index1">
                 <h3>{{ index1 }}</h3>
                 <div v-for="(subItem, index2) in item" :key="index2" class="input">
                     <TextInput :v-model:value="data[index1][index2]" :label="index2" :placeholder="subItem.toString()"
-                        @option-selected="handleChange($event, index1, index2)" />
+                        @option-selected="handleChangePrice($event, index1, index2)" />
+                </div>
+            </div>
+            <h2>bewerkingen</h2>
+            <a style="color: red;">Dit moet getypt staan zoals in ETS!</a>
+            <div v-for="(item, key) in dataBewerkingen" :key="key">
+                <h3>{{ key }}</h3>
+                <div v-for="(subItem, subKey) in item" :key="subKey" class="input">
+                    <TextInput :v-model:value="dataBewerkingen[key][subKey]" :label="subKey" :placeholder="subItem"
+                        @option-selected="handleChangeBewerkingen($event, key, subKey)" />
                 </div>
             </div>
         </div>
@@ -32,28 +42,40 @@ export default {
     },
     data() {
         return {
-            data: null
+            data: null,
+            dataBewerkingen: null
         };
     },
     created: function () {
         this.priceSettings();
+        this.bewerkingenSettings();
     },
     components: { TextInput },
     methods: {
         priceSettings() {
-            GetData("pricesettings").then(Response => {
-            console.log(Response);
-            return Response;
-        })
-            .then(data => {
-                console.log(data);
-                this.data = data;
+            GetData("price").then(Response => {
+                return Response;
             })
-            .catch(error => {
-                console.error('Error during fetch:', error);
-            });
+                .then(data => {
+                    this.data = data;
+                })
+                .catch(error => {
+                    console.error('Error during fetch:', error);
+                });
         },
-        handleChange(event, index1, index2) {
+        bewerkingenSettings() {
+            GetData("bewerkingen").then(Response => {
+                return Response;
+            })
+                .then(data => {
+                    console.log(data);
+                    this.dataBewerkingen = data;
+                })
+                .catch(error => {
+                    console.error('Error during fetch:', error);
+                });
+        },
+        handleChangePrice(event, index1, index2) {
             this.data[index1][index2] = event;
             let jsonData = this.data;
             for (const key in jsonData) {
@@ -71,7 +93,7 @@ export default {
                 }
             }
             console.log(jsonData);
-            PostDataWithBody("pricesettings", jsonData).then(Response => {
+            PostDataWithBody("price", jsonData).then(Response => {
                 console.log(Response);
                 this.priceSettings();
             })
@@ -79,6 +101,32 @@ export default {
                     console.error('Error during fetch:', error);
                 });
         },
+        handleChangeBewerkingen(event, index1, index2) {
+            this.dataBewerkingen[index1][index2] = event;
+            let jsonData = this.dataBewerkingen;
+            for (const key in jsonData) {
+                // eslint-disable-next-line no-prototype-builtins
+                if (jsonData.hasOwnProperty(key)) {
+                    const object = jsonData[key];
+                    for (const key2 in object) {
+                        // eslint-disable-next-line no-prototype-builtins
+                        if (object.hasOwnProperty(key2)) {
+                            const value = object[key2];
+                            object[key2] = value;
+                        }
+                    }
+                }
+            }
+            console.log(jsonData);
+            PostDataWithBody("bewerkingen", jsonData).then(Response => {
+                console.log(Response);
+                this.bewerkingenSettings();
+            })
+                .catch(error => {
+                    console.error('Error during fetch:', error);
+                });
+
+        }
     }
 }
 </script>

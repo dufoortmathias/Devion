@@ -30,6 +30,11 @@ const router = createRouter({
       path: '/sync',
       name: 'sync',
       component: () => import('../views/SyncView.vue')
+    },
+    {
+      path: '/projectenvoortgang',
+      name: 'projectenvoortgang',
+      component: () => import('../views/VoortgangView.vue')
     }
   ]
 })

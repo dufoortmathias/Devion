@@ -18,6 +18,9 @@ import { RouterLink } from 'vue-router';
       <li class="c-nav__item">
         <RouterLink to="/sync" class="c-nav__link">Syncronisatie</RouterLink>
       </li>
+      <li class="c-nav__item">
+        <RouterLink to="/projectenvoortgang" class="c-nav__link">ProjectenVoortgang</RouterLink>
+        </li>
     </ul>
   </nav>
 </template>

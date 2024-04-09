@@ -7,6 +7,14 @@
             <ButtonDevion :label="buttonSyncMet.label" :isDisabled="buttonSyncMet.isDisabled"
                 :showButton="buttonSyncMet.showButton" @click="handleButtonSyncMet" />
         </div>
+        <div class="sync">
+            <div :style="{ backgroundColor: syncStatus.syncDev ? 'red' : 'green' }" class="metrics">
+                Devion: {{ syncStatus.syncDev ? 'Syncing' : 'Not syncing' }}
+            </div>
+            <div :style="{ backgroundColor: syncStatus.syncMet ? 'red' : 'green' }" class="metrics">
+                Metabil: {{ syncStatus.syncMet ? 'Syncing' : 'Not syncing' }}
+            </div>
+        </div>
     </div>
 </template>
 
@@ -14,10 +22,12 @@
 import ButtonDevion from '../components/componenten/ButtonDevion.vue';
 import { GetData } from '../global/global';
 
+let loop;
+
 export default {
     name: "SyncView",
     props: {
-        count: Number
+        count: Number,
     },
     components: {
         ButtonDevion
@@ -39,61 +49,79 @@ export default {
                 label: 'Sync Metetabil',
                 isDisabled: false,
                 showButton: true
+            },
+            syncStatus:
+            {
+                syncDev: false,
+                syncMet: false
             }
         };
     },
     methods: {
         handleButtonSyncDev() {
+            this.syncStatus.syncDev = 1;
             GetData("devion/sync").then(response => {
-                console.log(response)
+                this.syncStatus.syncDev = 0;
                 return response;
             })
-                .then(data => {
-                    // Handle the data
-                    console.log("Data:", data);
-                })
                 .catch(error => {
                     console.error('Error during fetch:', error);
                 });
         },
         handleButtonSyncMet() {
+            this.syncStatus.syncMet = 1;
             GetData("metabil/sync").then(response => {
-                console.log(response)
+                this.syncStatus.syncMet = 0;
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return response.json();
             })
-                .then(data => {
-                    // Handle the data
-                    console.log("Data:", data);
-                })
                 .catch(error => {
                     console.error('Error during fetch:', error);
                 });
         },
         update: function () {
             //set function for sync
-            console.log("test")
-            setTimeout(this.update, 10000);
+            GetData("devion/sync/status").then(response => {
+                return response;
+            }).then(data => {
+                this.syncStatus.syncDev = data.sync;
+            })
+
+            GetData("metabil/sync/status").then(response => {
+                return response;
+            }).then(data => {
+                this.syncStatus.syncMet = data.sync;
+            })
+            loop = setTimeout(this.update, 1000);
         }
     },
     mounted: function () {
-        this.update()
+        loop = setTimeout(this.update, 1000);
     },
     beforeUnmount: function () {
         console.log("unmounted")
-        clearTimeout(this.update)
+        clearTimeout(loop)
     }
 }
 </script>
 
 <style>
-.buttons {
+.buttons, .sync {
     display: flex;
     justify-content: space-between;
     width: 100%;
     margin-top: 20px;
     gap: 5rem;
+}
+
+.metrics {
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 </style>

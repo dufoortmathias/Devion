@@ -30,6 +30,7 @@ export default {
   width: 100%;
   outline: none;
   transition: all var(--global-transitionTiming-alpha);
+  cursor: pointer;
 }
 
 .c-button:hover {
