@@ -24,10 +24,10 @@
         public string? Bewerking4 { get; set; } = "-";
         public string? Merk { get; set; } = "Devion";
         public float Mass { get; set; } = 0;
-        public int AankoopPer { get; set; } = 1;
+        public string AankoopPer { get; set; } = "1";
         public string? Aankoopeenh { get; set; } = "ST";
         public string? Verbruikseenh { get; set; } = "ST";
-        public int Omrekeningsfactor { get; set; } = 1;
+        public string Omrekeningsfactor { get; set; } = "1";
         public string? TypeFactor { get; set; } = "Deelfactor";
     }
 
@@ -80,5 +80,6 @@
         public string Hoogte { get; set; }
         public string Hoofdleverancier { get; set; }
         public string Minaan { get; set; }
+        public string Mass { get; set; }
     }
 }

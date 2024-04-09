@@ -272,8 +272,6 @@ public class ETSArticleHelper : ETSHelper
 
         if (count == 0)
         {
-            // TODO  (Create query) to link articles in ETS -> Table: TBL_ARTIKEL_GEKOPPELD
-            Console.WriteLine("linking master: " + main.Number + " article: " + part.Number + " lynNumber: " + part.LynNumber + " quantity: " + part.Quantity);
             string query1 = "select art_id from csartpx where art_nr = @number";
             Dictionary<string, object> parametersMain = new()
             {

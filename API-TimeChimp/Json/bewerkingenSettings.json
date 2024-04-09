@@ -1,0 +1,24 @@
+{
+  "DEVION": {
+    "FREZEN": "BV VNC CNC",
+    "LASSEN": "BV METABIL Metaaltechniek",
+    "DRAAIEN": "BV VNC CNC",
+    "PRINTEN": "3ID BVBA",
+    "LASEREN": "ANCON",
+    "BUISLASEREN": "ANCON",
+    "ZAGEN": "ANCON",
+    "PLEXI": "VINK",
+    "OPLASSEN":  "BV METABIL Metaaltechniek"
+  },
+  "METABIL": {
+    "FREZEN": "VNC CNC",
+    "LASSEN": "",
+    "DRAAIEN": "VNC CNC",
+    "PRINTEN": "3ID BVBA",
+    "LASEREN": "BV ANCON",
+    "BUISLASEREN": "BV ANCON",
+    "ZAGEN": "BV ANCON",
+    "PLEXI": "VINK",
+    "OPLASSEN":  ""
+  }
+}

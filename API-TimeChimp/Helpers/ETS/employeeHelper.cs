@@ -38,7 +38,6 @@ public class ETSEmployeeHelper : ETSHelper
         //get data from ETS
         string json = ETSClient.selectQuery(query, parameters);
 
-        Console.WriteLine(json);
         //check if json is not empty
         if (json == null)
         {
