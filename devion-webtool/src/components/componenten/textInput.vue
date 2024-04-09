@@ -7,7 +7,7 @@
             <label class="c-label--error"> {{ errorText }}</label>
         </div>
         <div v-else>
-            <input type="text" :id="id" v-model="selectedOption" @change="emitSelectedOption" class="c-input" :placeholder="placeholder"/>
+            <input type="text" :id="id" v-model="selectedOption" @change="emitSelectedOption" class="c-input" :placeholder="placeholder" @input="$emit('option-selected', $event.target.value)"/>
         </div>
     </div>
 </template>
@@ -34,6 +34,7 @@ export default {
     methods: {
         emitSelectedOption() {
             // Emit the selected option when the value changes
+            console.log('Emitting selected option:', this.selectedOption);
             this.$emit('option-selected', this.selectedOption);
         },
     }

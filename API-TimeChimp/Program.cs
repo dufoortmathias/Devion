@@ -1010,7 +1010,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             ProcessStartInfo start = new()
             {
                 FileName = "python",
-                Arguments = argument,
+                Arguments = $"R:\\Devion Software\\Scripts\\algemene-sync.py {company.ToLower()}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true

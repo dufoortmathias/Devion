@@ -26,6 +26,11 @@ const router = createRouter({
       name: 'assembly',
       component: () => import('../views/AssemblyView.vue')
     },
+    {
+      path: '/sync',
+      name: 'sync',
+      component: () => import('../views/SyncView.vue')
+    }
   ]
 })
 

@@ -1,4 +1,6 @@
 <template>
+    <SettingsDevion @click="() => TogglePopup('settings')" :showSettings="settings.showSettings" />
+    <SettingsPopupDevion :TogglePopup="() => TogglePopup('settings')" v-show="popupTriggers.settings" />
     <excelFileInput :label="file.label" :error="file.error" :filename="file.filename" :showFile="file.showFile"
         @file-updated="handleFileUpdate" />
     <ButtonDevion :label="button.label" :isDisabled="button.isDisabled" :showButton="button.showButton"
@@ -8,8 +10,6 @@
     </div>
     <div v-show="treeView.showTree" class="c-dev">
         <h2 class="c-dev-title">Devion</h2>
-        <textInput :id="mass.id" :label="mass.label" :error="mass.error" :placeholder="mass.placeholder"
-            :errorText="mass.errorText" class="c-mass" @option-selected="handleMass" />
         <ButtonDevion :label="changeDev.label" :isDisabled="changeDev.isDisabled" :showButton="changeDev.showButton"
             @click="() => TogglePopup('changeDevion')" class="c-button c-change-dev" />
     </div>
@@ -39,7 +39,7 @@
     <div class="c-artikel-form">
 
         <artikelForm :showform="artikelForm.showform" :data="artikelForm.data" @object-artikel="handleArtikel"
-            :mass="artikelForm.mass" class="c-form" :check="artikelForm.check" ref="article" />
+            :priceData="artikelForm.priceData" class="c-form" :check="artikelForm.check" ref="article" />
         <div class="c-artikel-button--save" :class="{ 'o-hide-accessible': !save.showButton }">
             <buttonDevion :label="save.label" :isDisabled="save.isButtonDisabled" :showButton="save.showButton"
                 @click="handleSaveButtonClick" class="c-button-artikel--next" />
@@ -71,10 +71,11 @@ import DialogDevion from '../components/componenten/DialogDevion.vue';
 import { createConfirmDialog } from "vuejs-confirm-dialog";
 import TreeViewMet from '../components/componenten/TreeViewMet.vue';
 import BasicToggleSwitch from '../components/componenten/ToggleButton.vue';
-import textInput from '../components/componenten/textInput.vue';
 import PopupDevion from '../components/componenten/PopupDevion.vue';
 import TitleDevion from '../components/componenten/TitleDevion.vue';
+import SettingsDevion from '../components/componenten/SettingsDevion.vue';
 // import { useConfirmBeforeAction } from '../composables';
+import SettingsPopupDevion from '../components/componenten/SettingsPopupDevion.vue';
 import { ref } from 'vue'
 
 import { GetData, PostDataWithBody, PutDataWithBody } from '../global/global';
@@ -99,10 +100,11 @@ let changesDev = []
 let changesMet = []
 const popupTriggers = ref({
     changeDevion: false,
-    changeMetabil: false
+    changeMetabil: false,
+    settings: false
 })
 let logs = []
-let mass = parseFloat(0).toFixed(2)
+let priceData = []
 
 export default {
     components: {
@@ -114,24 +116,21 @@ export default {
         LoadingAnimation,
         TreeViewMet,
         BasicToggleSwitch,
-        textInput,
         PopupDevion,
-        TitleDevion
+        TitleDevion,
+        SettingsDevion,
+        SettingsPopupDevion
     },
     data() {
         return {
             artikelenMet: Array(),
             popupTriggers,
             LinkModel: true,
-            mass: {
+            settings: {
                 components: {
-                    textInput,
+                    SettingsDevion
                 },
-                id: 'mass',
-                label: 'prijs/kg',
-                error: false,
-                placeholder: 'euro',
-                errorText: 'mass prijs is verplicht'
+                showSettings: false,
             },
             file: {
                 components: {
@@ -205,7 +204,7 @@ export default {
                 showform: false,
                 data: null,
                 check: false,
-                mass: 0
+                priceData: priceData
             },
             save: {
                 components: {
@@ -313,6 +312,18 @@ export default {
         }
     },
     methods: {
+        GetPriceSettings() {
+            GetData("pricesettings").then(Response => {
+                return Response;
+            })
+                .then(data => {
+                    priceData = data;
+                    this.artikelForm.priceData = priceData;
+                })
+                .catch(error => {
+                    console.error('Error during fetch:', error);
+                });
+        },
         handleFileUpdate(file) {
             this.file.error = false;
             this.file.showLabel = false;
@@ -366,18 +377,26 @@ export default {
                     this.treeViewMet.showTree = false
                 }
             })
+            this.GetPriceSettings()
         },
         handleButtonSave() {
-            if (partsNotFound == 0){
+            if (partsNotFound == 0) {
                 metArtikel = true
             } else {
                 metArtikel = false
             }
             if (!metArtikel) {
                 this.artikelForm.showform = true
-                this.save.showButton = false
-                this.next.showButton = true
-                this.prev.showButton = true
+                if (partsNotFound.length == 1) {
+                    this.save.showButton = true
+                    this.next.showButton = false
+                    this.prev.showButton = false
+                }
+                else {
+                    this.save.showButton = false
+                    this.next.showButton = true
+                    this.prev.showButton = false
+                }
                 index = 0
                 this.artikelProgress.showLabel = true
                 this.artikelForm.data = partsNotFound[0]
@@ -393,13 +412,19 @@ export default {
                 this.titleDevion.title = 'Devion'
             } else if (metArtikel) {
                 this.artikelForm.showform = true
-                this.save.showButton = false
-                this.next.showButton = true
-                this.prev.showButton = true
+                if (partsNotFoundMet.length == 1) {
+                    this.save.showButton = true
+                    this.next.showButton = false
+                    this.prev.showButton = false
+                }
+                else {
+                    this.save.showButton = false
+                    this.next.showButton = true
+                    this.prev.showButton = false
+                }
                 metIndex = 0
                 this.artikelProgress.showLabel = true
                 this.artikelForm.data = partsNotFoundMet[0]
-                this.artikelForm.mass = mass
                 this.artikelProgress.label = 'Artikel 1/' + partsNotFoundMet.length
                 this.file.showFile = false
                 this.button.showButton = false
@@ -410,6 +435,7 @@ export default {
                 this.missing.showlabel = false
                 this.missingMet.showlabel = false
                 this.titleDevion.title = 'Metabil'
+                this.handleArtikel(partsNotFoundMet[0])
             }
         },
         async checkArtikel(artikel) {
@@ -576,16 +602,16 @@ export default {
         },
         handleArtikel(object) {
             let artikel = object
-            artikels[index] = artikel
             if (metArtikel) {
-
-                if (save == true) {
-                    // let endpoint = `metabil/cebeo/createarticle`
-                    // artikels.forEach(artikel => {
-                    //     PostDataWithBody(endpoint, artikel).then((data) => {
-                    //         console.log(data)
-                    //     })
-                    // });
+                let indexMet = artikelenMet.findIndex(art => art.number === artikel.number)
+                artikelenMet[indexMet] = artikel
+                if (metSave == true) {
+                    let endpoint = `metabil/ets/createitem`
+                    artikels.forEach(artikel => {
+                        PostDataWithBody(endpoint, artikel).then((data) => {
+                            console.log(data)
+                        })
+                    });
                     console.log("saved")
                     this.artikelForm.showform = false
                     this.save.showButton = false
@@ -619,13 +645,15 @@ export default {
                     this.ArtikelZoeken()
                 }
             } else {
+                let indexDev = artikelen.findIndex(art => art.number === artikel.number)
+                artikelen[indexDev] = artikel
                 if (save == true) {
-                    // let endpoint = `devion/cebeo/createarticle`
-                    // artikels.forEach(artikel => {
-                    //     PostDataWithBody(endpoint, artikel).then((data) => {
-                    //         console.log(data)
-                    //     })
-                    // });
+                    let endpoint = `devion/ets/createitem`
+                    artikelen.forEach(artikel => {
+                        PostDataWithBody(endpoint, artikel).then((data) => {
+                            console.log(data)
+                        })
+                    });
                     console.log("saved")
                     this.artikelForm.showform = false
                     this.save.showButton = false
@@ -641,6 +669,7 @@ export default {
                 } else {
                     save = false
                     index = index2
+                    console.log(partsNotFound.length)
                     if (index == partsNotFound.length - 1) {
                         this.next.showButton = false;
                         this.save.showButton = true;
@@ -649,6 +678,11 @@ export default {
                         this.next.showButton = true;
                         this.save.showButton = false;
                         this.prev.showButton = false;
+                        this.artikelProgress.label = `Artikel ${index + 1}/${partsNotFound.length}`
+                    } else if (partsNotFound.length == 1) {
+                        this.next.showButton = false
+                        this.prev.showButton = false
+                        this.save.showButton = true
                         this.artikelProgress.label = `Artikel ${index + 1}/${partsNotFound.length}`
                     } else {
                         this.next.showButton = true;
@@ -706,12 +740,13 @@ export default {
             } else {
                 save = true
                 this.$refs.article.createInfoObject()
+                if (partsNotFoundMet.length > 0) {
+                    metArtikel = true
+                    this.handleButtonSave()
+                }
             }
         },
         handleTest() { },
-        handleMass(object) {
-            mass = parseFloat(object).toFixed(2)
-        },
         TogglePopup(trigger) {
             popupTriggers.value[trigger] = !popupTriggers.value[trigger]
         },
@@ -740,6 +775,10 @@ export default {
                 }
                 this.handleButton();
             }
+        },
+        ToggleSettings() {
+            console.log("test")
+            this.settings.showSettings = !this.settings.showSettings
         }
     }
 }
@@ -782,8 +821,8 @@ export default {
 
 .c-metabil {
     display: grid;
-    grid-template-areas: "title link toggle mass button";
-    grid-template-columns: 2fr 1fr 1fr 2fr 4fr;
+    grid-template-areas: "title link toggle button";
+    grid-template-columns: 3fr 1fr 1fr 20vw;
     align-items: baseline;
 }
 
@@ -812,8 +851,8 @@ export default {
 
 .c-dev {
     display: grid;
-    grid-template-areas: "title mass button";
-    grid-template-columns: 6fr 2fr 4fr;
+    grid-template-areas: "title button";
+    grid-template-columns: 3fr 20vw;
     align-items: baseline;
 }
 
