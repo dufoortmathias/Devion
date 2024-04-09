@@ -17,7 +17,7 @@ public class WebClient : IWebClient
         _httpClient = new HttpClient();
     }
 
-    // Create a new instance of HttpClient that is configured with the base address of the API and the bearer token
+    // Create a new instance of HttpClient that is configured with the base address of the API and the api token
     public WebClient(string url, string token)
     {
         _httpClient = new HttpClient
@@ -25,7 +25,8 @@ public class WebClient : IWebClient
             BaseAddress = new Uri(url)
         };
 
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        _httpClient.DefaultRequestHeaders.Add("api-key", token);
+        _httpClient.DefaultRequestHeaders.Add("api-version", "2.0");
     }
 
     //get async
@@ -88,6 +89,27 @@ public class WebClient : IWebClient
         {
             // Handle error response if needed
             throw new Exception($"PUT {response.StatusCode} with endpoint: {_httpClient.BaseAddress + endpoint}");
+        }
+    }
+
+    public string PatchAsync(string endpoint, string jsonPayload)
+    {
+        // Create a StringContent object with the JSON payload
+        StringContent content = new(jsonPayload, Encoding.UTF8, "application/json");
+
+        //send the request to the API endpoint with response
+        HttpResponseMessage response = _httpClient.PatchAsync(endpoint, content).Result;
+
+        //check if statuscode is success
+        if (response.IsSuccessStatusCode)
+        {
+            // Return the response body
+            return response.Content.ReadAsStringAsync().Result;
+        }
+        else
+        {
+            // Handle error response if needed
+            throw new Exception($"PATCH {response.StatusCode} with endpoint: {_httpClient.BaseAddress + endpoint}");
         }
     }
 }

@@ -235,7 +235,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             UurcodeTimeChimp TCUurcode = new(ETSUurcode);
 
             //check if uurcode exists in timechimp
-            return uurcodeHelperTC.uurcodeExists(uurcodeId)
+            return uurcodeHelperTC.UurcodeExists(uurcodeId)
                 ? Results.Ok(uurcodeHelperTC.UpdateUurcode(TCUurcode))
                 : Results.Ok(uurcodeHelperTC.CreateUurcode(TCUurcode));
         }
@@ -273,15 +273,16 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
 
             //determine role by most used role for all users except admins/managers
-            int roleId = employeeHelperTC.GetEmployees()
-                .Where(e => e.roleId > 4 || e.roleId == 1)
-                .GroupBy(e => e.roleId ?? throw new Exception("Employee received from timechimp has no roleId"))
+             int roleId = employeeHelperTC.GetEmployees()
+                .Where(e => e.Role.Id > 4 || e.Role.Id == 1)
+                .GroupBy(e => e.Role.Id)
                 .Select(g => new
                 {
                     RoleId = g.Key,
                     Count = g.Count()
                 })
                 .MaxBy(o => o.Count)?.RoleId ?? 1;
+            roleId = 4;
 
             //change to timechimp class
             EmployeeTimeChimp TCEmployee = new(ETSEmployee, roleId);
@@ -294,24 +295,24 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             else
             {
                 //check if employee has an emailaddress
-                if (TCEmployee.userName == null)
+                if (TCEmployee.UserName == null)
                 {
-                    return Results.Problem($"Can't create the employee {TCEmployee.displayName} without an emailaddress");
+                    return Results.Problem($"Can't create the employee {TCEmployee.DisplayName} without an emailaddress");
                 }
 
                 EmployeeTimeChimp employee = employeeHelperTC.CreateEmployee(TCEmployee);
-                TCEmployee.id = employee.id;
+                TCEmployee.Id = employee.Id;
                 employee = employeeHelperTC.UpdateEmployee(TCEmployee);
 
                 //adds employee to all existing projects in TimeChimp
-                projectUserHelperTC.AddAllProjectUserForEmployee(employee.id ?? throw new Exception("User received from timechimp has no id"));
+                projectUserHelperTC.AddAllProjectUserForEmployee(employee.Id);
 
                 return Results.Ok(employee);
             }
         }
         catch (Exception exception)
         {
-            return Results.Problem(exception.Message);
+            return Results.Problem(exception.Message, exception.Data.ToString());
         }
 
     }).WithName($"{company}SyncEmployeeTimechimp").WithTags(company);
@@ -402,7 +403,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                         }
                         else
                         {
-                            int taskId = uurcodes.Find(u => u.code != null && u.code.Equals(projectTaskETS.VO_UUR))?.id ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
+                            int taskId = uurcodes.Find(u => u.Code != null && u.Code.Equals(projectTaskETS.VO_UUR))?.Id ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
                             projectTaskHelperTC.CreateOrUpdateProjectTask(taskId, subProject.id.Value, projectTaskETS.VO_AANT.Value);
                             totalBudgetHours += projectTaskETS.VO_AANT.Value;
                         }
@@ -496,7 +497,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
 
             string projectNumber = projectHelperTC.GetProject(mileage.projectId).code ?? throw new Exception("Project received from timechimp has no code");
-            string employeeNumber = employeeHelperTC.GetEmployee(mileage.userId).employeeNumber ?? throw new Exception("Employee received from timechimp has no employeeNumber");
+            string employeeNumber = employeeHelperTC.GetEmployee(mileage.userId).EmployeeNumber ?? throw new Exception("Employee received from timechimp has no employeeNumber");
 
             MileageETS mileageETS = new(mileage, projectNumber, employeeNumber);
             MileageETS response = mileageHelperETS.UpdateMileage(mileageETS);
