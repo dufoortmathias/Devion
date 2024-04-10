@@ -64,11 +64,11 @@ public class ETSTimeHelper : ETSHelper
 
         //get data from ETS for the customer
         CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(timeTC.customerId) ?? throw new Exception("Error getting customer from TimeChimp with id: " + timeTC.customerId);
-        timeETS.PLA_KLANT = customer.relationId;
+        timeETS.PLA_KLANT = customer.RelationId;
 
         //get data from ETS for the uurcode
         UurcodeTimeChimp uurCode = new TimeChimpUurcodeHelper(TCClient).GetUurcode(timeTC.TaskId) ?? throw new Exception("Error getting uurcode from TimeChimp with id: " + timeTC.TaskId);
-        timeETS.PLA_UURCODE = uurCode.code;
+        timeETS.PLA_UURCODE = uurCode.Code;
 
         //get data from ETS for the project
         ProjectTimeChimp subProject = new TimeChimpProjectHelper(TCClient).GetProject(timeTC.projectId) ?? throw new Exception("Error getting project from TimeChimp with id: " + timeTC.projectId);
@@ -81,7 +81,7 @@ public class ETSTimeHelper : ETSHelper
 
         //get data from ETS for the employee
         EmployeeTimeChimp employee = new TimeChimpEmployeeHelper(TCClient).GetEmployee(timeTC.userId) ?? throw new Exception("Error getting employee from TimeChimp with id: " + timeTC.userId);
-        timeETS.PLA_PERSOON = employee.employeeNumber;
+        timeETS.PLA_PERSOON = employee.EmployeeNumber;
 
         //create the caption
         timeETS.PLA_CAPTION = $"{subProject.code}: {mainProject.PR_KROM}";
@@ -89,7 +89,7 @@ public class ETSTimeHelper : ETSHelper
         //create the text
         timeETS.PLA_TEKST =
             timeTC.notes + "\n" +
-            $"{uurCode.name} ({timeETS.PLA_UURCODE})\n" +
+            $"{uurCode.Name} ({timeETS.PLA_UURCODE})\n" +
             $"TimeChimp: {timeTC.id}\n";
 
         //create the query

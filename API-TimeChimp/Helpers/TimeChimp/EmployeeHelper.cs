@@ -9,17 +9,20 @@ namespace Api.Devion.Helpers.TimeChimp
         //chek if employee exists
         public bool EmployeeExists(string employeeId)
         {
-            return GetEmployees().Any(employee => employee.employeeNumber != null && employee.employeeNumber.Equals(employeeId));
+            return GetEmployees().Any(employee => employee.EmployeeNumber != null && employee.EmployeeNumber.Equals(employeeId));
         }
 
         //get all employees
         public List<EmployeeTimeChimp> GetEmployees()
         {
             //get data from timechimp
-            string response = TCClient.GetAsync("v1/users");
+            string response = TCClient.GetAsync("users?&$filter=active eq true&$orderby=employeeNumber");
 
             //convert data to employeeTimeChimp object
-            List<EmployeeTimeChimp> employees = JsonTool.ConvertTo<List<EmployeeTimeChimp>>(response);
+            Console.WriteLine(response);
+
+            ResponseTCEmployee result = JsonTool.ConvertTo<ResponseTCEmployee>(response) ?? throw new Exception("Error getting employees from TimeChimp");
+            List<EmployeeTimeChimp> employees = result.Result.ToList();
             return employees;
         }
 
@@ -27,20 +30,14 @@ namespace Api.Devion.Helpers.TimeChimp
         public EmployeeTimeChimp CreateEmployee(EmployeeTimeChimp employee)
         {
             //set properties
-            employee.email = employee.userName;
-            employee.sendInvitation = true;
+            employee.UserName = employee.UserName;
+            employee.SendInvitation = true;
 
             //create json
-            string json = JsonTool.ConvertFrom(employee);
-
-            //check if json is not empty
-            if (json == null)
-            {
-                throw new Exception("Error converting employee to json");
-            }
+            string json = JsonTool.ConvertFrom(employee) ?? throw new Exception("Error converting employee to json");
 
             //send data to timechimp
-            string response = TCClient.PostAsync($"v1/users", json);
+            string response = TCClient.PostAsync($"users", json);
 
             //throw an error when post request fails with status WaitingForActivation
             //this status means an employee already exists with that email and is waiting for approval
@@ -59,14 +56,14 @@ namespace Api.Devion.Helpers.TimeChimp
         public EmployeeTimeChimp UpdateEmployee(EmployeeTimeChimp employee)
         {
             //get employeeid
-            EmployeeTimeChimp employeeFound = GetEmployees().Find(e => e.userName != null && e.userName.Equals(employee.userName)) ?? throw new Exception($"Timechimp has no employee with userName = {employee.userName} to update");
-            employee.id = employeeFound.id;
+            EmployeeTimeChimp employeeFound = GetEmployees().Find(e => e.UserName != null && e.UserName.Equals(employee.UserName)) ?? throw new Exception($"Timechimp has no employee with UserName = {employee.UserName} to update");
+            employee.Id = employeeFound.Id;
 
             //create json
             string json = JsonTool.ConvertFrom(employee) ?? throw new Exception("Error converting employee to json");
 
             //send data to timechimp
-            string response = TCClient.PutAsync("v1/users", json);
+            string response = TCClient.PutAsync($"users/{employee.Id}", json);
 
             //convert response to employeeTimeChimp object
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
@@ -77,7 +74,7 @@ namespace Api.Devion.Helpers.TimeChimp
         public EmployeeTimeChimp GetEmployee(int employeeId)
         {
             //get data form timechimp
-            string response = TCClient.GetAsync($"v1/users/{employeeId}");
+            string response = TCClient.GetAsync($"users/{employeeId}");
 
             //convert data to employeeTimeChimp object
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);

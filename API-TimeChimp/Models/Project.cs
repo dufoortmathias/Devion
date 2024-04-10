@@ -18,7 +18,7 @@
         public string? externalUrl { get; set; }
         public string? externalName { get; set; }
         public string? invoiceReference { get; set; }
-        public List<ProjectTaskTimechimp>? projectTasks { get; set; }
+        public List<TaskTimechimp>? projectTasks { get; set; }
         public object[]? projectUsers { get; set; }
         public int? id { get; set; }
         public bool? active { get; set; }

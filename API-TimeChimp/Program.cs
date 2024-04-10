@@ -40,6 +40,10 @@ int syncDevion = 0;
 int syncMetabil = 0;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
+    if (config[$"Companies:{companyIndex}:Name"].Equals("Devion"))
+    {
+        continue;
+    }
     //create clients
     WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
@@ -187,8 +191,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             //get contact from ets
             ContactETS ETSContact = contactHelperETS.GetContact(contactId) ?? throw new Exception($"ETS doesn't contain a contact with id = {contactId}");
 
-            CustomerTimeChimp customer = customerHelperTC.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSContact.CO_KLCOD)) ?? throw new Exception($"Customer with number = {ETSContact.CO_KLCOD} doesn't exist in TimeChimp");
-            int customerId = customer.id ?? throw new Exception("Customer received from timechimp has no id");
+            CustomerTimeChimp customer = customerHelperTC.GetCustomers().Find(c => c.RelationId != null && c.RelationId.Equals(ETSContact.CO_KLCOD)) ?? throw new Exception($"Customer with number = {ETSContact.CO_KLCOD} doesn't exist in TimeChimp");
+            int customerId = customer.Id;
 
             //change to timechimp class
             ContactTimeChimp TCContact = new(ETSContact, customerId);
@@ -351,13 +355,13 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // Find customer id TimeChimpETSContact.CO_KLCOD
             if (ETSProject.PR_KLNR == null)
             {
-                customer = customerHelperTC.GetCustomers().Find(c => c.intern != null && c.intern.Value) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
+                customer = customerHelperTC.GetCustomers().Find(c => c.Intern != null && c.Intern.Value) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
             }
             else
             {
-                customer = customerHelperTC.GetCustomers().Find(c => c.relationId != null && c.relationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
+                customer = customerHelperTC.GetCustomers().Find(c => c.RelationId != null && c.RelationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
             }
-            TCProject.customerId = customer.id ?? throw new Exception("Customer received from timechimp has no id");
+            TCProject.customerId = customer.Id;
 
             ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
 

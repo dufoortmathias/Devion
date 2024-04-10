@@ -9,17 +9,17 @@ public class TimeChimpContactHelper : TimeChimpHelper
     //check if contact exists
     public bool ContactExists(ContactETS contactETS)
     {
-        return GetContacts().Any(contact => contact.name != null && contact.name.Equals(contactETS.CO_CONTACTPERSOON) && ((contact.email == null && contactETS.CO_EMAIL == null) || (contact.email != null && contact.email.Equals(contactETS.CO_EMAIL))));
+        return GetContacts().Any(contact => contact.Name != null && contact.Name.Equals(contactETS.CO_CONTACTPERSOON));
     }
 
     //get all contacts
     public List<ContactTimeChimp> GetContacts()
     {
         //get data from timechimp
-        string response = TCClient.GetAsync("v1/contacts");
+        string response = TCClient.GetAsync("contacts?expand=customers");
 
         //convert data to contactTimeChimp object
-        List<ContactTimeChimp> contacts = JsonTool.ConvertTo<List<ContactTimeChimp>>(response);
+        List<ContactTimeChimp> contacts = JsonTool.ConvertTo<ResponseTCContact>(response).Result.ToList();
         return contacts;
     }
 
@@ -27,34 +27,27 @@ public class TimeChimpContactHelper : TimeChimpHelper
     public ContactTimeChimp CreateContact(ContactTimeChimp contact)
     {
         //send data to timechimp
-        string response = TCClient.PostAsync("v1/contacts", JsonTool.ConvertFrom(contact));
+        string response = TCClient.PostAsync("contacts", JsonTool.ConvertFrom(contact));
 
         //convert response to contactTimeChimp object
-        ContactTimeChimp contactResponse = JsonTool.ConvertTo<ContactTimeChimp>(response);
+        ContactTimeChimp contactResponse = JsonTool.ConvertTo<ResponseTCContact>(response).Result[0];
         return contactResponse;
     }
 
     public ContactTimeChimp UpdateContact(ContactTimeChimp contact)
     {
-        if (contact.id == null)
+        if (contact.Id == 0)
         {
             // find TimeChimp id of contact
-            ContactTimeChimp contactFound = GetContacts().Find(c => c.name != null && c.name.Equals(contact.name) && ((c.email != null && c.email.Equals(contact.email)) || c.email == null)) ?? throw new Exception($"No contact found in TimeChimp with name = {contact.name}" + (contact.email == null ? "" : $" and email = {contact.email}"));
-            contact.id = contactFound.id;
+            ContactTimeChimp contactFound = GetContacts().Find(c => c.Customers.FirstOrDefault()!=null && c.Customers.FirstOrDefault().Id == contact.Customers.FirstOrDefault().Id) ?? throw new Exception($"No contact found in TimeChimp with name = {contact.Name}");
+            contact.Id = contactFound.Id;
         }
 
         // update contact TimeChimp
-        string json = JsonTool.ConvertFrom(contact);
+        string json = JsonTool.ConvertFrom(contact) ?? throw new Exception("Error converting contact to json");
+        string response2 = TCClient.PutAsync($"contacts/{contact.Id}", json);
 
-        //check if json is not empty
-        if (json == null)
-        {
-            throw new Exception("Error converting contact to json");
-        }
-
-        string response2 = TCClient.PutAsync("v1/contacts", json);
-
-        ContactTimeChimp contactResponse = JsonTool.ConvertTo<ContactTimeChimp>(response2);
+        ContactTimeChimp contactResponse = JsonTool.ConvertTo<ResponseTCContact>(response2).Result[0];
         return contactResponse;
 
     }
