@@ -1,6 +1,6 @@
 namespace Api.Devion.Models;
 
-public class TaskTimechimp
+public class TaskTimeChimp
 {
     public int? Id { get; set; }
     public int? ProjectId { get; set; }
@@ -8,6 +8,8 @@ public class TaskTimechimp
     public double? BudgetHours { get; set; }
     public bool? Billable { get; set; }
     public bool? Unspecified { get; set; }
+    public string? Code { get; set; }
+    public string? Name { get; set; }
     public DateTime? Modified { get; set; }
     public DateTime? Created { get; set; }
     public List<Tag>? Tags { get; set; }

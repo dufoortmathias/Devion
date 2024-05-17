@@ -31,22 +31,18 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     }
 
     //get approved mileages by date
-    public List<int> GetApprovedMileageIdsByDate(DateTime date)
+    public List<int> GetApprovedMileageIds()
     {
-        string endpoint = $"v1/mileage/daterange/{date:yyyy-MM-dd}/{DateTime.Now.Date:yyyy-MM-dd}";
+        string endpoint = $"/mileages/";
 
         //get data from timechimp between date and now
         string response = TCClient.GetAsync(endpoint);
 
         //convert data to mileageTimeChimp object
-        List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
+        List<MileageTimeChimp> mileages = JsonTool.ConvertTo<ResponseTCMileage>(response).Result.ToList();
 
         //return all mileages with status approved (2)
-        return mileages
-            .FindAll(mileage => mileage.statusIntern == 2)
-            .Select(mileage => mileage.id)
-            .Reverse()
-            .ToList();
+        return mileages.Select(mileages => mileages.Id).ToList();
     }
 
     //change status of mileage

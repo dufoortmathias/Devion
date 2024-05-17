@@ -52,7 +52,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         TimeChimpProjectHelper projectHelper = new(TCClient);
 
         //get projectId from timechimp
-        int projectId = projectHelper.GetProjects().Find(p => p.code != null && p.code.Equals(projectNumber))?.id ?? throw new Exception($"Error getting project from timechimp with code = {projectNumber}");
+        int projectId = projectHelper.GetProjects().Find(p => p.Code != null && p.Code.Equals(projectNumber))?.Id ?? throw new Exception($"Error getting project from timechimp with code = {projectNumber}");
 
         //get project from timechimp
         ProjectTimeChimp project = projectHelper.GetProject(projectId) ?? throw new Exception($"Error getting project from timechimp with endpoint: v1/projects/{projectId}");
@@ -119,9 +119,9 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         foreach (ProjectTimeChimp project in new TimeChimpProjectHelper(TCClient).GetProjects())
         {
             //check if user is not already added to project
-            if (project.id != null && !projectUsers.Exists(e => e.projectId.Equals(project.id)))
+            if (project.Id != null && !projectUsers.Exists(e => e.projectId.Equals(project.Id)))
             {
-                ProjectUserTimechimp projectUser = new(employeeId, project.id.Value);
+                ProjectUserTimechimp projectUser = new(employeeId, project.Id);
                 ProjectUserTimechimp response = AddProjectUser(projectUser) ?? throw new Exception($"Error adding projectuser to timechimp with endpoint: v1/projectusers");
                 projectUsersAdded.Add(projectUser);
             }

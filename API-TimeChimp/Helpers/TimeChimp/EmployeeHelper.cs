@@ -77,7 +77,7 @@ namespace Api.Devion.Helpers.TimeChimp
             string response = TCClient.GetAsync($"users/{employeeId}");
 
             //convert data to employeeTimeChimp object
-            EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<EmployeeTimeChimp>(response);
+            EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<ResponseTCEmployee>(response).Result[0];
             return employeeResponse;
         }
     }

@@ -23,7 +23,7 @@ public class UurcodeTimeChimp
         Name = uurcode.UR_OMS;
         Code = uurcode.UR_COD;
         Billable = true;
-        Common = false;
+        Common = true;
         Unspecified = false;
         Active = true;
         Tags = Array.Empty<Tag>();
