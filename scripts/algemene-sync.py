@@ -85,7 +85,7 @@ output = f"Sync TimeChimp log: van {json_data['last_sync']} tot {start_time.strf
 # Logs a message by printing it in the console and saving it to put it in the log file
 def log(message):
     global output
-    output = f"{output}{message}"
+    output += message
     print(message, end="", flush=True)
 
 # Receives ids from all employees that have changed in ETS after last sync
@@ -146,7 +146,7 @@ def get_projects_to_sync():
 # Receives ids from all times that have changed in ETS after last sync
 def get_times_to_sync():
     response = requests.get(
-        f"{base_URL}ets/timeids?dateString={(min(start_time, datetime.datetime.strptime(json_data['last_sync'], dateformat)).date() - datetime.timedelta(7*amount_weeks)).strftime(dateformat)}"
+        f"{base_URL}ets/timeids"
     )
     if response.ok:
         return response.json()
@@ -298,26 +298,26 @@ def sync_mileages(mileage_ids):
 try:
     if len(company) == 0: raise Exception("Script was run without an argument for the company name")
 
-    log("Sync employees:\n")
-    # Checks if json already contains data from previous failed employee syncs, creates this field with empty list if false
-    if "failed_employees" not in json_data:
-        json_data["failed_employees"] = []
-    # Retrieves employees to sync and adds employees where previous sync attempt failed
-    employee_ids = list(set(get_employees_to_sync() + json_data["failed_employees"]))
-    # Syncs these employees and receives employees where sync was successful
-    synced_employee_ids = sync_employees(employee_ids)
-    # Updates json to contain new failed employee sync attempts
-    json_data["failed_employees"] = list(set(employee_ids) - set(synced_employee_ids))
-    # Log total results sync employees
-    if len(employee_ids) == 0:
-        log(f"Nothing to syncronize")
-    else:
-        log("\n")
-        log(f"Total amount Synchronize succeeded: {len(synced_employee_ids)}\n")
-        log(
-            f"Total amount Synchronize failed: {len(employee_ids)-len(synced_employee_ids)}"
-        )
-    log("\n\n")
+    # log("Sync employees:\n")
+    # # Checks if json already contains data from previous failed employee syncs, creates this field with empty list if false
+    # if "failed_employees" not in json_data:
+    #     json_data["failed_employees"] = []
+    # # Retrieves employees to sync and adds employees where previous sync attempt failed
+    # employee_ids = list(set(get_employees_to_sync() + json_data["failed_employees"]))
+    # # Syncs these employees and receives employees where sync was successful
+    # synced_employee_ids = sync_employees(employee_ids)
+    # # Updates json to contain new failed employee sync attempts
+    # json_data["failed_employees"] = list(set(employee_ids) - set(synced_employee_ids))
+    # # Log total results sync employees
+    # if len(employee_ids) == 0:
+    #     log(f"Nothing to syncronize")
+    # else:
+    #     log("\n")
+    #     log(f"Total amount Synchronize succeeded: {len(synced_employee_ids)}\n")
+    #     log(
+    #         f"Total amount Synchronize failed: {len(employee_ids)-len(synced_employee_ids)}"
+    #     )
+    # log("\n\n")
 
     log("Sync uurcodes:\n")
     # Checks if json already contains data from previous failed uurcode syncs, creates this field with empty list if false
@@ -465,6 +465,13 @@ os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 with open(log_filename, "w+") as log_file:
     log_file.write(output)
 
+with open(data_file, "w+") as json_file:
+    # Update last sync field in json to date script started
+    json_data["last_sync"] = start_time.strftime(dateformat)
+
+    # Write data to the json file
+    json_file.write(json.dumps(json_data, indent=2))
+    send_mail = False
 # notify people if something went wrong
 if send_mail:
     message = MIMEMultipart()
