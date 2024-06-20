@@ -362,7 +362,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             // update mainproject
             TCProject.id = mainProject.id;
-            mainProject = projectHelperTC.UpdateProject(TCProject);
+            mainProject = projectHelperTC.UpdateProject(TCProject, employeeHelperTC);
 
             List<string> errorMessages = new();
             double totalBudgetHours = 0;
@@ -380,7 +380,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.code ?? throw new Exception("Subproject received from timechimp has no code")) ?? projectHelperTC.CreateProject(TCSubproject);
 
                 TCSubproject.id = subProject.id;
-                subProject = projectHelperTC.UpdateProject(TCSubproject);
+                subProject = projectHelperTC.UpdateProject(TCSubproject, employeeHelperTC);
 
                 if (TCSubproject.active ?? false)
                 {
@@ -413,7 +413,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // update mainproject
             TCProject.id = mainProject.id;
             TCProject.budgetHours = totalBudgetHours;
-            mainProject = projectHelperTC.UpdateProject(TCProject);
+            mainProject = projectHelperTC.UpdateProject(TCProject, employeeHelperTC);
 
 
             if (errorMessages.Count > 0)

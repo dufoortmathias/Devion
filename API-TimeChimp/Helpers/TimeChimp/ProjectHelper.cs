@@ -60,7 +60,7 @@
         }
 
         //update project
-        public ProjectTimeChimp UpdateProject(ProjectTimeChimp projectUpdate)
+        public ProjectTimeChimp UpdateProject(ProjectTimeChimp projectUpdate, TimeChimpEmployeeHelper employeehelperTC)
         {
             //get project from timechimp
             ProjectTimeChimp project = GetProject(projectUpdate.id ?? throw new Exception("Project TimeChimp has not id"));
@@ -78,7 +78,16 @@
             project.active = projectUpdate.active;
             project.budgetMethod = projectUpdate.budgetMethod;
             project.budgetHours = projectUpdate.budgetHours;
-            project.customerId = projectUpdate.customerId;
+            project.customerId = projectUpdate.customerId;  
+
+            List<EmployeeTimeChimp> employees = employeehelperTC.GetEmployees();
+
+            project.projectUsers = employees.Select(employee => new ProjectUserTimechimp
+            {
+                userId = employee.id ?? throw new Exception("Employee TimeChimp has no id"),
+                projectId = project.id ?? throw new Exception("Project TimeChimp has no id"),
+                active = true
+            }).ToArray();
 
             //send data to timechimp
             string response = TCClient.PutAsync("v1/projects", JsonTool.ConvertFrom(project));
