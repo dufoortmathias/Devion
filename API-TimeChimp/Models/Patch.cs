@@ -12,4 +12,8 @@ public class Patch
         Path = path;
         Value = value;
     }
+
+    public Patch()
+    {
+    }
 }

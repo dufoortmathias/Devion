@@ -64,13 +64,7 @@ public class ETSEmployeeHelper : ETSHelper
         };
 
         //get data from ETS
-        string json = ETSClient.selectQuery(query, parameters);
-
-        //check if json is not empty
-        if (json == null)
-        {
-            throw new Exception("Error getting employee from ETS with query: " + query);
-        }
+        string json = ETSClient.selectQuery(query, parameters) ?? throw new Exception("Error getting employee from ETS with query: " + query);
 
         //convert data to employeeETS object
         EmployeeETS? employee = JsonTool.ConvertTo<EmployeeETS[]>(json).FirstOrDefault();

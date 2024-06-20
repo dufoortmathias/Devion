@@ -6,25 +6,25 @@
         {
         }
 
-        public ProjectTaskTimechimp? FindProjectTask(int taskId, int subprojectId)
+        public TaskTimeChimp? FindProjectTask(int taskId, int subprojectId)
         {
             string response = TCClient.GetAsync($"v1/projecttasks/project/{subprojectId}");
 
-            List<ProjectTaskTimechimp> projectTasks = JsonTool.ConvertTo<List<ProjectTaskTimechimp>>(response);
+            List<TaskTimeChimp> projectTasks = JsonTool.ConvertTo<List<TaskTimeChimp>>(response);
 
-            return projectTasks.Find(pt => pt.taskId == taskId);
+            return projectTasks.Find(pt => pt.Id == taskId);
         }
 
         public void CreateOrUpdateProjectTask(int taskId, int subprojectId, double aantal)
         {
-            ProjectTaskTimechimp projectTask = FindProjectTask(taskId, subprojectId) ?? new()
+            TaskTimeChimp projectTask = FindProjectTask(taskId, subprojectId) ?? new()
             {
-                taskId = taskId,
-                projectId = subprojectId,
-                budgetHours = aantal
+                Id = taskId,
+                ProjectId = subprojectId,
+                BudgetHours = aantal
             };
 
-            if (projectTask.id != null)
+            if (projectTask.Id != null)
             {
                 TCClient.PutAsync("v1/projecttasks", JsonTool.ConvertFrom(projectTask));
             }

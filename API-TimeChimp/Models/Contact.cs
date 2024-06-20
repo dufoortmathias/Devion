@@ -2,14 +2,16 @@ namespace Api.Devion.Models;
 
 public class ContactTimeChimp
 {
-    public string? name { get; set; }
-    public string? jobTitle { get; set; }
-    public string? email { get; set; }
-    public string? phone { get; set; }
-    public bool useForInvoicing { get; set; }
-    public bool active { get; set; }
-    public int? id { get; set; }
-    public int[]? customerIds { get; set; }
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? JobTitle { get; set; }
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
+    public bool? UseForInvoicing { get; set; }
+    public bool? Active { get; set; }
+    public DateTime? Created { get; set; }
+    public DateTime? Modified { get; set; }
+    public CustomerTimeChimp[]? Customers { get; set; }
 
     //constructor without specific parameters
     public ContactTimeChimp() { }
@@ -21,11 +23,11 @@ public class ContactTimeChimp
         {
             throw new Exception("Contact has no name");
         }
-        name = contactETS.CO_CONTACTPERSOON;
-        email = contactETS.CO_EMAIL;
-        phone = contactETS.CO_GSM;
-        jobTitle = contactETS.FUT_OMSCHRIJVING;
-        customerIds = new int[] { customerId };
+        Name = contactETS.CO_CONTACTPERSOON;
+        Email = contactETS.CO_EMAIL;
+        Phone = contactETS.CO_GSM;
+        JobTitle = contactETS.FUT_OMSCHRIJVING;
+        Customers = new CustomerTimeChimp[] { new() { Id = customerId } };
     }
 }
 
@@ -42,4 +44,11 @@ public class ContactETS
     public string? CO_ACTIEF { get; set; }
     public string? FUT_OMSCHRIJVING { get; set; }
     public string? CO_CONTACTPERSOON { get; set; }
+}
+
+public class ResponseTCContact
+{
+    public ContactTimeChimp[]? Result { get; set; }
+    public Link[]? Links { get; set; }
+    public int? Count { get; set; }
 }

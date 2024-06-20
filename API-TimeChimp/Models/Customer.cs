@@ -2,37 +2,30 @@ namespace Api.Devion.Models;
 
 public class CustomerTimeChimp
 {
-    public int? id { get; set; }
-    public bool active { get; set; }
-    public string? relationId { get; set; }
-    public string? name { get; set; }
-    public string? address { get; set; }
-    public string? postalCode { get; set; }
-    public string? city { get; set; }
-    public string? country { get; set; }
-    public string? phone { get; set; }
-    public string? email { get; set; }
-    public string? website { get; set; }
-    public int paymentPeriod { get; set; }
-    public double? tax { get; set; }
-    public double? hourlyRate { get; set; }
-    public double? mileageRate { get; set; }
-    public string? iban { get; set; }
-    public string? bic { get; set; }
-    public string? vatNumber { get; set; }
-    public string? kvkNumber { get; set; }
-    public string? invoiceAddress { get; set; }
-    public string? invoicePostalCode { get; set; }
-    public string? invoiceCity { get; set; }
-    public string? invoiceCountry { get; set; }
-    public string? clientId { get; set; }
-    public int[]? tagIds { get; set; }
-    public string[]? tagNames { get; set; }
-    public int? VatRateId { get; set; }
-    public double? VatRatePercentage { get; set; }
-    public ContactTimeChimp[]? contacts { get; set; }
-    public DateTime? modified { get; set; }
-    public bool? intern { get; set; }
+    public int Id { get; set; }
+    public bool? Active { get; set; }
+    public bool? Unspecified { get; set; }
+    public bool? Intern { get; set; }
+    public string? Name { get; set; }
+    public string? RelationId { get; set; }
+    public AddressTimechimp? Address { get; set; }
+    public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? Website { get; set; }
+    public int PaymentPeriod { get; set; }
+    public float? HourlyRate { get; set; }
+    public float? MileageRate { get; set; }
+    public string? Iban { get; set; }
+    public string? Bic { get; set; }
+    public string? VatNumber { get; set; }
+    public string? KvkNumber { get; set; }
+    public AddressTimechimp? InvoiceAddress { get; set; }
+    public string? Notes { get; set; }
+    public DateTime? Created { get; set; }
+    public DateTime? Modified { get; set; }
+    public VatRate? VatRate { get; set; }
+    public Tag[]? Tags { get; set; }
+    public ContactTimeChimp[]? Contacts { get; set; }
 
     //constructor without specific parameters
     public CustomerTimeChimp() { }
@@ -40,16 +33,19 @@ public class CustomerTimeChimp
     //constructor to from ets class to timechimp class
     public CustomerTimeChimp(CustomerETS customerETS)
     {
-        name = customerETS.KL_NAM;
-        email = customerETS.KL_EMAIL;
-        phone = customerETS.KL_TEL;
-        address = customerETS.KL_STR;
-        country = customerETS.KL_LND;
-        city = customerETS.KL_WPL;
-        postalCode = customerETS.KL_PNR;
-        website = customerETS.KL_WEBPAGE;
-        relationId = customerETS.KL_COD;
-        active = customerETS.KL_BOE == "K";
+        Name = customerETS.KL_NAM;
+        Email = customerETS.KL_EMAIL;
+        Phone = customerETS.KL_TEL;
+        Address = new AddressTimechimp()
+        {
+            Address = customerETS.KL_STR,
+            Country = customerETS.KL_LND,
+            City = customerETS.KL_WPL,
+            PostalCode = customerETS.KL_PNR
+        };
+        Website = customerETS.KL_WEBPAGE;
+        RelationId = customerETS.KL_COD;
+        Active = customerETS.KL_BOE == "K";
     }
 }
 
@@ -80,3 +76,9 @@ public class CustomerETS
     public string? KL_SLECHTBET { get; set; }
 }
 
+public class ResponseTCCustomer
+{
+    public CustomerTimeChimp[]? Result { get; set; }
+    public Link[]? Links { get; set; }
+    public int? Count { get; set; }
+}
