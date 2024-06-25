@@ -50,13 +50,7 @@ public class ETSMileageHelper : ETSHelper
         }
 
         //get data from ETS
-        string responseGet = ETSClient.selectQuery(queryGet, parametersGet);
-
-        //check if response is succesfull
-        if (responseGet == null)
-        {
-            throw new Exception("Error getting mileages from ETS with query: " + queryGet);
-        }
+        string responseGet = ETSClient.selectQuery(queryGet, parametersGet) ?? throw new Exception("Error getting mileages from ETS with query: " + queryGet);
 
         //convert first data  record to mileageETS object
         //the first mileage data object from ETS is always used to store new mileage registrations 
@@ -64,6 +58,7 @@ public class ETSMileageHelper : ETSHelper
 
         mileage.PLA_KM += mileageETS.PLA_KM;
         mileage.PLA_ID = mileageETS.PLA_ID;
+        mileage.PLA_KM_DERDEN = "0";
 
 
         //update query

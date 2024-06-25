@@ -20,10 +20,10 @@ public class MileageTimeChimp
     public TimeChimpStatus? ClientStatus { get; set; }
     public DateTime? Created { get; set; }
     public DateTime? Modified { get; set; }
-    public CustomerTimeChimp Customer { get; set; }
-    public ProjectTimeChimp Project { get; set; }
+    public CustomerTimeChimp? Customer { get; set; }
+    public ProjectTimeChimp? Project { get; set; }
     public VehicleTimeChimp? Vehicle { get; set; }
-    public EmployeeTimeChimp User { get; set; }
+    public EmployeeTimeChimp? User { get; set; }
 }
 
 public class MileageETS

@@ -77,5 +77,15 @@
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ResponseTCProject>(response).Result[0];
             return projectResponse;
         }
+
+        public ResponseTCProject GetProjectTimeChimpByETSId(string projectId)
+        {
+            //get data from timechimp
+            string response = TCClient.GetAsync($"projects?$filter=code eq '{projectId}'&$count=true");
+
+            //convert data to projectTimeChimp object
+            ResponseTCProject project = JsonTool.ConvertTo<ResponseTCProject>(response);
+            return project;
+        }
     }
 }

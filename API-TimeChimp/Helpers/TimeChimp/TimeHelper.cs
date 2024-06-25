@@ -47,15 +47,13 @@ public class TimeChimpTimeHelper : TimeChimpHelper
     //change status of time
     public TimeTimeChimp InvoiceTime(int timeId)
     {
-        Patch patch = new()
+        var obj = new
         {
-            Op = "replace",
-            Path = "/status",
-            Value = "Invoiced"
+            status = TimeChimpStatus.Invoiced,
+            times = new[] { new { id = timeId } }
         };
-
         //send data to timechimp
-        _ = TCClient.PatchAsync($"times/{timeId}", JsonTool.ConvertFrom(patch));
+        _ = TCClient.PutAsync($"times/status", JsonTool.ConvertFrom(obj));
 
         return new TimeChimpTimeHelper(TCClient, ETSClient).GetTime(timeId);
     }
