@@ -337,105 +337,22 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            // Get project from ETS
-            ProjectETS ETSProject = projectHelperETS.GetProject(projectId);
+            // Check if project exists in Timechimp
+            
+            ResponseTCProject projecten = projectHelperTC.GetProjectTimeChimpByETSId(projectId);
 
-            // Handle when project doesn't exist in ETS
-            if (ETSProject == null)
+            if (projecten.Count == 0)
             {
-                return Results.Problem($"ETS doesn't contain a project with id = {projectId}");
+                //create project in timechimp
+                Console.WriteLine("New project");
+
+            } else
+            {
+                //update project in timechimp
+                Console.WriteLine("Update project");
             }
-
-            // Change to TimeChimp class
-            ProjectTimeChimp TCProject = new(ETSProject);
-
-            CustomerTimeChimp customer;
-            // Find customer id TimeChimpETSContact.CO_KLCOD
-            if (ETSProject.PR_KLNR == null)
-            {
-                customer = customerHelperTC.GetCustomers().Find(c => c.Intern != null && c.Intern.Value) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
-            }
-            else
-            {
-                customer = customerHelperTC.GetCustomers().Find(c => c.RelationId != null && c.RelationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
-            }
-            TCProject.Customer = new()
-            {
-                Id = customer.Id
-            };
-
-            ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
-
-            // update mainproject
-            TCProject.Id = mainProject.Id;
-
-            mainProject = projectHelperTC.UpdateProject(TCProject);
-
-            List<string> errorMessages = new();
-            double totalBudgetHours = 0;
-            List<UurcodeTimeChimp> uurcodes = uurcodeHelperTC.GetUurcodes();
-            // get subprojects from ETS
-            List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
-            foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => subProject.SU_SUB != null && !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
-            {
-                // Change to TimeChimp class
-                ProjectTimeChimp TCSubproject = new(ETSSubproject, mainProject);
-
-                ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.Code ?? throw new Exception("Subproject received from timechimp has no code")) ?? projectHelperTC.CreateProject(TCSubproject);
-
-                TCSubproject.Id = subProject.Id;
-                subProject = projectHelperTC.UpdateProject(TCSubproject);
-
-                if (TCSubproject.Active ?? false)
-                {
-                    //update budgethours for each projecttask in timeChimp
-                    List<ProjectTaskETS> projectTasksETS = uurcodeHelperETS.GetUurcodesSubproject(ETSProject.PR_NR ?? throw new Exception("Project received from ETS has no NR"), ETSSubproject.SU_SUB ?? throw new Exception("Subproject received from ETS has no SUBNR"));
-                    foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
-                    {
-                        Console.WriteLine(projectTaskETS.VO_ID);
-                        if (subProject.Id == null)
-                        {
-                            errorMessages.Add($"Subproject {subProject.Code} has no id");
-                        }
-                        else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
-                        {
-                            errorMessages.Add($"Subproject {subProject.Code} field VO_UUR is empty in table J2W_VOPX");
-                        }
-                        else if (projectTaskETS.VO_AANT == null)
-                        {
-                            errorMessages.Add($"Subproject {subProject.Code} field VO_AANT is null in table J2W_VOPX");
-                        }
-                        else
-                        {
-                            int taskId = uurcodes.Find(u => u.Code != null && u.Code.Equals(projectTaskETS.VO_UUR))?.Id ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
-                            ProjectTaskTC projectTaskTC = new()
-                            {
-                                Task = new TaskTC
-                                {
-                                    Id = taskId
-                                },
-                                BudgetHours = float.Parse(projectTaskETS.VO_AANT.Value.ToString())
-                            };
-                            subProject.ProjectTasks[^1] = projectTaskTC;
-                            totalBudgetHours += projectTaskETS.VO_AANT.Value;
-                        }
-                    }
-                }
-                subProject = projectHelperTC.UpdateProject(subProject);
-            }
-
-            // update mainproject
-            TCProject.Id = mainProject.Id;
-            TCProject.Budget.Hours = float.Parse(totalBudgetHours.ToString());
-            mainProject = projectHelperTC.UpdateProject(TCProject);
-
-
-            if (errorMessages.Count > 0)
-            {
-                throw new Exception(string.Join(", ", errorMessages));
-            }
-
-            return Results.Ok(mainProject);
+            
+            return Results.Ok(projecten);
         }
         catch (Exception e)
         {
@@ -504,7 +421,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             MileageTimeChimp mileage = mileageHelperTC.GetMileage(mileageId);
 
-            mileage.Vehicle = vehicleHelper.GetVehicle(mileage.Vehicle.Id) ?? throw new Exception("Vehicle received from timechimp has no vehicle");
+            //mileage.Vehicle = vehicleHelper.GetVehicle(mileage.Vehicle.Id) ?? throw new Exception("Vehicle received from timechimp has no vehicle");
+            Console.WriteLine(JsonTool.ConvertFromWithNullValues(mileage));
             
             string projectNumber = projectHelperTC.GetProject(mileage.Project.Id).Code ?? throw new Exception("Project received from timechimp has no code");
             string employeeNumber = employeeHelperTC.GetEmployee(mileage.User.Id).EmployeeNumber ?? throw new Exception("Employee received from timechimp has no employeeNumber");

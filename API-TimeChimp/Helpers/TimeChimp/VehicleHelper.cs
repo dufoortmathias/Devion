@@ -9,7 +9,7 @@
         public VehicleTimeChimp GetVehicle(int vehicleId)
         {
             //get data from timechimp
-            string response = TCClient.GetAsync($"vehicles?$filter=Id eq {vehicleId}");
+            string response = TCClient.GetAsync($"mileageVehicles?$filter=id eq {vehicleId}");
 
             //convert data to vehicleTimeChimp object
             VehicleTimeChimp vehicle = JsonTool.ConvertTo<ResponseTCVehicle>(response).Result[0];
