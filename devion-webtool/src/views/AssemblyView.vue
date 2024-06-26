@@ -855,7 +855,7 @@ export default {
 .c-metabil {
     display: grid;
     grid-template-areas: "title link toggle button";
-    grid-template-columns: 3fr 1fr 1fr 20vw;
+    grid-template-columns: 3fr 1fr 1fr 3fr;
     align-items: baseline;
 }
 
@@ -885,7 +885,7 @@ export default {
 .c-dev {
     display: grid;
     grid-template-areas: "title button";
-    grid-template-columns: 3fr 20vw;
+    grid-template-columns: 3fr 2fr;
     align-items: baseline;
 }
 
@@ -905,7 +905,7 @@ export default {
     align-items: center;
     margin: 0;
     padding: 0;
-    width: 70vw;
+    /* width: 70vw; */
     height: 100px;
 }
 </style>
