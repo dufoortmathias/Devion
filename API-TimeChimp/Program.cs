@@ -1149,6 +1149,18 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ProjectenVoortgangImport").WithTags(company);
+
+    app.MapGet($"api/{company.ToLower()}/artikel/groepen", () =>
+    {
+        List<ArticleGroep> art_Groeps = articleHelperETS.GetArticleGroeps();
+        return Results.Ok(art_Groeps);
+    }).WithName($"{company}ArtikeGroeps").WithTags(company);
+
+    app.MapGet($"api/{company.ToLower()}/historiek/stock", (string Groep, string StartDate, string EndDate) =>
+    {
+        Console.WriteLine(Groep + StartDate + EndDate);
+        return Results.Ok();
+    }).WithName($"{company}HistoriekStock").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");

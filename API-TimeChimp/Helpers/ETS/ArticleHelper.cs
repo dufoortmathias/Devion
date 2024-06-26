@@ -410,4 +410,12 @@ public class ETSArticleHelper : ETSHelper
             throw new Exception("Article is empty");
         }
     }
+
+    public List<ArticleGroep> GetArticleGroeps()
+    {
+        string query = "SELECT ARG_ID, ARG_OMSCHRIJVING FROM TBL_ARTIKEL_GROEP";
+        string json = ETSClient.selectQuery(query) ?? throw new Exception("Error getting article groups from ETS with query: " + query);
+        List<ArticleGroep> articleGroeps = JsonTool.ConvertTo<List<ArticleGroep>>(json);
+        return articleGroeps;
+    }
 }
