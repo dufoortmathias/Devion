@@ -82,7 +82,7 @@ export default {
                 components: {
                     ButtonDevion
                 },
-                label: 'Zoeken',
+                label: 'Historiek ophalen',
                 isDisabled: false,
                 showButton: true
             },
@@ -100,17 +100,49 @@ export default {
             this.dropdownCompanies.selected = this.dropdownCompanies.options.find((x) => x.label.toLowerCase() == "devion").value
             company = this.dropdownCompanies.selected
             console.log(company)
+            let endpoint = company + "/artikel/groepen"
+            GetData(endpoint).then((data) => {
+                return data
+            }).then((data) => {
+                console.log(data)
+                for (var element of data) {
+                    console.log(element)
+                    this.dropdownArtikelGroep.options.push({ value: element['arG_ID'], label: element['arG_OMSCHRIJVING'] })
+                }
+            })
         })
     },
     methods: {
         handledropdownCompaniesSelected(value) {
             company = value
-            console.log(company)
+            let endpoint = company + "/artikel/groepen"
+            GetData(endpoint).then((data) => {
+                return data
+            }).then((data) => {
+                console.log(data)
+                this.dropdownArtikelGroep.options = []
+                for (var element of data) {
+                    console.log(element)
+                    this.dropdownArtikelGroep.options.push({ value: element['arG_ID'], label: element['arG_OMSCHRIJVING'] })
+                }
+            })
+        },
+        handledropdownArtikelGroepSelected(value) {
+            console.log(value)
+            this.dropdownArtikelGroep.selected = value
         },
         handleButton() {
             console.log(company)
-            console.log(this.StartDate.getDate() + '/'+ this.StartDate.getMonth() + '/'+ this.StartDate.getFullYear())
-            console.log(this.EndDate.getDate() + '/'+ this.EndDate.getMonth() + '/'+ this.EndDate.getFullYear())
+            console.log(this.StartDate.getDate() + '.'+ this.StartDate.getMonth() + '.'+ this.StartDate.getFullYear())
+            console.log(this.EndDate.getDate() + '.'+ this.EndDate.getMonth() + '.'+ this.EndDate.getFullYear())
+            let startdate = this.StartDate.getDate() + '-'+ this.StartDate.getMonth() + '-'+ this.StartDate.getFullYear()
+            let enddate = this.EndDate.getDate() + '-'+ this.EndDate.getMonth() + '-'+ this.EndDate.getFullYear()
+
+            let endpoint = company + "/historiek/stock?Groep=" + this.dropdownArtikelGroep.selected + "&StartDate=" + startdate + "&EndDate=" + enddate
+            console.log(endpoint)
+            GetData(endpoint).then((data) => {
+                console.log(data)
+            })
         }
     }
 

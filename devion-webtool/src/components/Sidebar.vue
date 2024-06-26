@@ -31,10 +31,10 @@
                 <span class="material-icons">trending_up</span>
                 <span class="text">Projecten Voortgang</span>
             </router-link>
-            <router-link to="/historiek" class="button">
+            <!-- <router-link to="/historiek" class="button">
                 <span class="material-icons">history</span>
                 <span class="text">Historiek</span>
-            </router-link>
+            </router-link> -->
             
         </div>
         
