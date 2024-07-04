@@ -19,8 +19,6 @@ namespace Api.Devion.Helpers.TimeChimp
             string response = TCClient.GetAsync("users?&$filter=active eq true&$orderby=employeeNumber");
 
             //convert data to employeeTimeChimp object
-            Console.WriteLine(response);
-
             ResponseTCEmployee result = JsonTool.ConvertTo<ResponseTCEmployee>(response) ?? throw new Exception("Error getting employees from TimeChimp");
             List<EmployeeTimeChimp> employees = result.Result.ToList();
             return employees;

@@ -71,8 +71,7 @@
             project.Customer.Id = projectUpdate.Customer.Id;
             //send data to timechimp
             string response = TCClient.PutAsync($"projects/{project.Id}", JsonTool.ConvertFrom(project));
-
-            Console.WriteLine(response);                                                    
+            
             //convert response to projectTimeChimp object
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ResponseTCProject>(response).Result[0];
             return projectResponse;
