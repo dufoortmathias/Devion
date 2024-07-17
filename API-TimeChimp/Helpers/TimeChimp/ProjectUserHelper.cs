@@ -119,7 +119,7 @@ public class TimeChimpProjectUserHelper : TimeChimpHelper
         foreach (ProjectTimeChimp project in new TimeChimpProjectHelper(TCClient).GetProjects())
         {
             //check if user is not already added to project
-            if (project.Id != null && !projectUsers.Exists(e => e.projectId.Equals(project.Id)))
+            if (!projectUsers.Exists(e => e.projectId.Equals(project.Id)))
             {
                 ProjectUserTimechimp projectUser = new(employeeId, project.Id);
                 ProjectUserTimechimp response = AddProjectUser(projectUser) ?? throw new Exception($"Error adding projectuser to timechimp with endpoint: v1/projectusers");

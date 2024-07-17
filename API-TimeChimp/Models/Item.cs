@@ -18,17 +18,20 @@
         public string? MainSupplier { get; set; }
         public List<Item?> Parts { get; set; } = new();
         public string? LynNumber { get; set; }
-        public string? Bewerking1 { get; set; } = "-";
-        public string? Bewerking2 { get; set; } = "-";
-        public string? Bewerking3 { get; set; } = "-";
-        public string? Bewerking4 { get; set; } = "-";
+        public string Bewerking1 { get; set; } = "-";
+        public string Bewerking2 { get; set; } = "-";
+        public string Bewerking3 { get; set; } = "-";
+        public string Bewerking4 { get; set; } = "-";
         public string? Merk { get; set; } = "Devion";
         public float Mass { get; set; } = 0;
-        public string AankoopPer { get; set; } = "1";
+        public string? AankoopPer { get; set; } = "1";
         public string? Aankoopeenh { get; set; } = "ST";
         public string? Verbruikseenh { get; set; } = "ST";
         public string Omrekeningsfactor { get; set; } = "1";
         public string? TypeFactor { get; set; } = "Deelfactor";
+        public string? Nabehandeling1 { get; set; } = "-";
+        public string? Nabehandeling2 { get; set; } = "-";
+        public ItemFile Files { get; set; } = new ItemFile();
     }
 
     public class Change
@@ -81,5 +84,14 @@
         public string Hoofdleverancier { get; set; }
         public string Minaan { get; set; }
         public string Mass { get; set; }
+    }
+
+    public class ItemFile
+    {
+        public string? dxf { get; set; } = "N/A";
+        public string? pdf { get; set; } = "N/A";
+        public string? stp { get; set; } = "N/A";
+        public string? stl { get; set; } = "N/A";
+        public string? flatDxf { get; set; } = "N/A";
     }
 }

@@ -18,9 +18,9 @@
         public CustomerTimeChimp? Customer { get; set; }
         public Project? MainProject { get; set; }
         public Project[]? SubProjects { get; set; }
-        public ProjectTaskTC[]? ProjectTasks { get; set; }
-        public List<ProjectTaskTC> ProjectTaskList { get; set; }
-        public ProjectUserTC[]? ProjectUsers { get; set;}
+        public List<Manager>? Managers { get; set; }
+        public List<ProjectTaskTC>? ProjectTasks { get; set; }
+        public List<ProjectUserTC>? ProjectUsers { get; set;}
         public Tag[]? Tags { get; set; }
 
         //constructor without specific parameters
@@ -38,6 +38,7 @@
             Budget = new ();
             Invoicing.Method = "TaskHourlyRate"; //TODO: add value to seperate file
             Budget.Method = "TotalHours"; //TODO: add value to seperate file
+            Managers = new List<Manager>();
         }
 
         //constructor to from timechimp class to ets class (subproject)
@@ -63,7 +64,8 @@
                 {
                     Method = "TaskHours" //TODO: add value to seperate file
                 };
-                ProjectTaskList = new();
+                ProjectTasks = new List<ProjectTaskTC>();
+                Managers = new List<Manager>();
             }
         }
     }
@@ -75,6 +77,7 @@
         public DateTime? PR_START_PRODUCTIE { get; set; }
         public DateTime? PR_BELOOFD { get; set; }
         public char? PR_STAT { get; set; }
+        public string? PR_BESTEMMELING { get; set; }
     }
 
     public class SubprojectETS
@@ -128,6 +131,15 @@
         public float? NotificationPercentage { get; set; }
     }
 
+    public class Manager
+    {
+        public int? Id { get; set; }
+        public bool? Active { get; set; }
+        public bool? Unspecified { get; set; }
+        public string? UserName { get; set; }
+        public string? DisplayName { get; set; }
+    }
+
     public class Invoicing
     {
         public string? Method { get; set; }
@@ -159,7 +171,7 @@
 
     public class ProjectUserTC
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public bool? Active { get; set; }
         public float? HourlyRate { get; set; }
         public float? BudgetHours { get; set; }

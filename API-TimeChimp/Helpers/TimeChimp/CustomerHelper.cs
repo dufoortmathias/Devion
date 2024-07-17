@@ -16,7 +16,7 @@ public class TimeChimpCustomerHelper : TimeChimpHelper
     public List<CustomerTimeChimp> GetCustomers()
     {
         //get data from timechimp
-        string response = TCClient.GetAsync("customers");
+        string response = TCClient.GetAsync("customers?$top=10000");
 
         //convert data to customerTimeChimp object
         List<CustomerTimeChimp> customers = JsonTool.ConvertTo<ResponseTCCustomer>(response).Result.ToList();
