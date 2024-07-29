@@ -166,10 +166,6 @@ export default {
     this.getFolders()
   },
   watch: {
-    errorToggle(newValue, oldValue) {
-      console.log('Error toggle changed:', newValue, oldValue)
-      // You can also call a method to re-render the table here
-    }
   },
   methods: {
     handleFileUpdate(file) {
@@ -198,13 +194,13 @@ export default {
         .then((response) => {
           this.button.isDisabled = true
           BOMData = JSON.parse(response)[0][0]
-          console.log(BOMData)
+          
           endpoint = 'devion/tekeningen/check'
           endpoint += '?project=' + project.replaceAll(' ', '%20')
           PostDataWithBody(endpoint, BOMData)
             .then((response) => {
               BOMData = JSON.parse(response)
-              console.log(BOMData)
+              
               this.loading.showLoad = false
               this.fileTable.products = this.filterItems(JSON.parse(response))
               this.fileTable.showTable = true
@@ -212,7 +208,7 @@ export default {
               this.GetDifferentNabehandelingen()
               this.GetBewerkingen(this.fileTable.products)
               this.GetDifferentBewerkingen()
-              console.log(this.NabehandelingenData)
+              
             })
             .catch((error) => {
               this.dropdownFolders.error = true
@@ -242,7 +238,7 @@ export default {
     },
     async handledropdownFoldersSelected(selectedOption) {
       project = selectedOption
-      console.log(selectedOption)
+      
       if (this.file.name != '') {
         this.button.isDisabled = false
       }
@@ -282,7 +278,7 @@ export default {
       if (Bewerking == 'Monteren') {
         if (Part != null) {
           if (Part.parts != []) {
-            console.log(Part)
+            
             let data = {
               MainPart: Part,
               Project: project,
@@ -292,9 +288,6 @@ export default {
             let endpoint = 'devion/tekeningen/createbooks'
             if (this.LinkModelMontage) {
               PostDataWithBody(endpoint, data)
-                .then((response) => {
-                  console.log(response)
-                })
                 .catch((error) => {
                   console.error(error)
                 })
@@ -323,9 +316,6 @@ export default {
               let endpoint = 'devion/tekeningen/createbooks'
               if (this.LinkModelLassen) {
                 PostDataWithBody(endpoint, data)
-                  .then((response) => {
-                    console.log(response)
-                  })
                   .catch((error) => {
                     console.error(error)
                   })
@@ -384,7 +374,7 @@ export default {
       this.UniqueNabehandelingen = [
         ...new Set(this.NabehandelingenData.map((item) => item.nabehandeling))
       ]
-      console.log(this.uniqueBewerkingen)
+      
       this.UniqueNabehandelingen.forEach((nabehandeling) => {
         const index = this.NabehandelingenData.findIndex(
           (item) => item.nabehandeling === nabehandeling
@@ -396,7 +386,7 @@ export default {
     },
     GetNabehandelingen(artikels) {
       artikels.forEach((artikel) => {
-        console.log(artikel)
+        
         if (
           artikel.nabehandeling1 != null &&
           artikel.nabehandeling1 != '' &&
@@ -406,7 +396,7 @@ export default {
             nabehandeling: artikel.nabehandeling1.toLowerCase(),
             artikel: artikel.number
           }
-          console.log(data)
+          
           this.NabehandelingenData.push(data)
         }
 
@@ -425,7 +415,7 @@ export default {
     },
     GetDifferentBewerkingen() {
       this.uniqueBewerkingen = [...new Set(this.bewerkingenData.map((item) => item.bewerking))]
-      console.log(this.uniqueBewerkingen)
+      
       this.uniqueBewerkingen.forEach((bewerking) => {
         const index = this.bewerkingenData.findIndex((item) => item.bewerking === bewerking)
         if (index !== -1) {
@@ -434,7 +424,7 @@ export default {
       })
     },
     handleKopieerButton() {
-      console.log(this.bewerkingenStatus)
+      
       let bewerkingen = []
       this.bewerkingenData.forEach((bewerking) => {
         if (this.bewerkingenStatus[bewerking.bewerking]) {
@@ -444,7 +434,7 @@ export default {
           }
         }
       })
-      console.log(bewerkingen)
+      
       var data = {
         Folders: bewerkingen,
         BasePath: project
@@ -461,9 +451,6 @@ export default {
           }
           let endpoint = 'devion/tekeningen/kopieer/bewerkingen'
           PostDataWithBody(endpoint, data)
-            .then((response) => {
-              console.log(response)
-            })
             .catch((error) => {
               console.error(error)
             })
@@ -472,7 +459,7 @@ export default {
       alert('Kopieer actie voltooid')
     },
     handleKopieerButtonNabehandelingen() {
-      console.log(this.nabehandelingenStatus)
+      
       let nabehandelingen = []
       this.NabehandelingenData.forEach((nabehandeling) => {
         if (this.nabehandelingenStatus[nabehandeling.nabehandeling]) {
@@ -482,7 +469,7 @@ export default {
           }
         }
       })
-      console.log(nabehandelingen)
+      
       var data = {
         Folders: nabehandelingen,
         BasePath: project
@@ -503,9 +490,6 @@ export default {
       })
       endpoint = 'devion/tekeningen/kopieer/nabehandelingen'
       PostDataWithBody(endpoint, dataset)
-        .then((response) => {
-          console.log(response)
-        })
         .catch((error) => {
           console.error(error)
         })
