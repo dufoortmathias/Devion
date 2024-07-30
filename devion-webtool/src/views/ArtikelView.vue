@@ -1,4 +1,5 @@
 <template>
+  <h1>artikel</h1>
   <textInput :id="textInputArtikelSearch.id" :label="textInputArtikelSearch.label" :error="textInputArtikelSearch.error"
     :errorText="textInputArtikelSearch.errorText" :placeholder="textInputArtikelSearch.label"
     @option-selected="handleTextInputArtikelSearch" />

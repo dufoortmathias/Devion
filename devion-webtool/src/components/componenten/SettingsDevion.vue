@@ -24,7 +24,7 @@ export default {
     justify-content: end;
     align-items: end;
     width: 100%;
-    transform: translateX(10vw)
+    /* transform: translateX(10vw) */
 }
 
 .icon:hover {

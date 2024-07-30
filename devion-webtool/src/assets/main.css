@@ -403,13 +403,6 @@ table {
 .c-app {
   --c-app__topbar-height: calc(var(--global-baseline) * 14);
   min-height: 100vh;
-  display: grid;
-  grid-template-areas: "header header" "body body";
-  align-items: center;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
-  align-self: center;
 }
 
 .c-header {
@@ -422,7 +415,7 @@ table {
   justify-content: center;
   justify-items: center;
   align-self: center;
-  width: 100vw;
+  width: auto;
 }
 
 .c-app_body {
@@ -431,8 +424,8 @@ table {
   background-color: #fff;
   box-shadow: var(--global-boxShadow);
   z-index: 10;
-  height: calc(100vh - var(--c-app__topbar-height));
-  width: 70vw;
+  height: calc(100vh);
+  width: 100vw;
   align-items: center;
   justify-content: center;
   justify-items: center;
@@ -477,15 +470,6 @@ table {
   border-width: var(--global-borderWidth);
 }
 
-@media (max-width: 768px) {
-  .c-app {
-    grid-template-areas: "logo" "topbar" "body";
-  }
-  .c-app_body {
-    width: 100vw;
-  }
-}
-
 .c-file-input {
   display: flex;
   justify-content: end;
@@ -526,7 +510,7 @@ table {
 
 .c-artikel-form {
   display: grid;
-  width: 100vw;
+  width: 80vw;
   transform: translateX(-15vw);
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-areas: "form form form" "prev progress next";

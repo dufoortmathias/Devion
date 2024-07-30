@@ -1,0 +1,13 @@
+{
+  "last_sync": "12/04/2024 08:06:02",
+  "failed_uurcodes": [],
+  "failed_customers": [],
+  "failed_contacts": [],
+  "failed_projects": [
+    "0230006",
+    "0230005",
+    "0000002"
+  ],
+  "failed_times": [],
+  "failed_mileages": []
+}
