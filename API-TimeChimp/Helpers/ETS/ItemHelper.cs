@@ -165,33 +165,33 @@ public class ETSItemHelper : ETSHelper
         // No more parts, add your code here to process the item
         // For example, you can check if the item has a file associated with it
         // and perform some action if it does
-        if (item.Bewerking1.ToLower() != "kopen" && item.Bewerking1.ToLower() != "normelement" && item.Bewerking1.ToLower() != "referentie" && item.Bewerking1.ToLower() != "-" && item.Bewerking1.ToLower() != "")
+        if (item.Bewerking1.ToLower() != "kopen" && item.Bewerking1.ToLower() != "normelement" && item.Bewerking1.ToLower() != "referentie" && item.Bewerking1.ToLower() != "-" && item.Bewerking1.ToLower() != "" && !item.Bewerking1.ToLower().Contains("klant"))
         {
             if (File.Exists(basePath + item.Number + ".dxf"))
             {
-                item.Files.dxf = "TRUE";
+                item.Files.dxf = "OK";
             }
             else
             {
-                item.Files.dxf = "FALSE";
+                item.Files.dxf = "NOK";
             }
 
             if (File.Exists(basePath + item.Number + ".pdf"))
             {
-                item.Files.pdf = "TRUE";
+                item.Files.pdf = "OK";
             }
             else
             {
-                item.Files.pdf = "FALSE";
+                item.Files.pdf = "NOK";
             }
 
             if (File.Exists(basePath + item.Number + ".stp"))
             {
-                item.Files.stp = "TRUE";
+                item.Files.stp = "OK";
             }
             else
             {
-                item.Files.stp = "FALSE";
+                item.Files.stp = "NOK";
             }
         }
 
@@ -199,11 +199,11 @@ public class ETSItemHelper : ETSHelper
         {
             if (File.Exists(basePath + item.Number + ".stl"))
             {
-                item.Files.stl = "TRUE";
+                item.Files.stl = "OK";
             }
             else
             {
-                item.Files.stl = "FALSE";
+                item.Files.stl = "NOK";
             }
         }
 
@@ -211,11 +211,11 @@ public class ETSItemHelper : ETSHelper
         {
             if (File.Exists(basePath + item.Number + "_FLAT.dxf"))
             {
-                item.Files.flatDxf = "TRUE";
+                item.Files.flatDxf = "OK";
             }
             else
             {
-                item.Files.flatDxf = "FALSE";
+                item.Files.flatDxf = "NOK";
             }
         }
         return item;
