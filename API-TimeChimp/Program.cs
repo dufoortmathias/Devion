@@ -378,6 +378,45 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             List<string> errorMessages = new();
             double totalBudgetHours = 0;
             List<UurcodeTimeChimp> uurcodes = uurcodeHelperTC.GetUurcodes();
+            // check if subproject of hoofdproject but with subprojectcode 0000 exists otherwise create one
+            string subprojectCode = mainProject.Code + "0000";
+            ProjectTimeChimp Subproject = new()
+            {
+                Code = subprojectCode,
+                Name = mainProject.Name,
+                Active = mainProject.Active,
+                Customer = mainProject.Customer,
+                Budget = new Budget
+                {
+                    Hours = 0,
+                    Method = "TaskHours"
+                },
+                MainProject = new Project
+                {
+                    Id = mainProject.Id
+                },
+            };
+
+            ProjectTimeChimp mainSubproject = projectHelperTC.FindProject(subprojectCode) ?? projectHelperTC.CreateProject(Subproject);
+
+            List<int> usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+            if (mainSubproject.ProjectUsers == null)
+            {
+                mainSubproject.ProjectUsers = new List<ProjectUserTC>();
+            }
+            mainSubproject.ProjectUsers.Clear();
+            foreach (int userId in usersIds)
+            {
+                mainSubproject.ProjectUsers ??= new List<ProjectUserTC>();
+
+                mainSubproject.ProjectUsers.Add(new ProjectUserTC
+                {
+                    User = new UserTC
+                    {
+                        Id = userId
+                    }
+                });
+            }
             // get subprojects from ETS
             List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
             foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => subProject.SU_SUB != null && !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
@@ -858,8 +897,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             });
 
             Item MainPart = new Item();
-            string number = fileName.Split('.')[0].Split('_')[0];
-            string omschrijving = fileName.Split('.')[0].Split('_')[1];
+            string number = fileName.Substring(0, 15);
+            string omschrijving = "";
             MainPart.Number = number;
             MainPart.Description = omschrijving;
             MainPart.LynNumber = "1";
@@ -889,7 +928,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     else
                     {
 #pragma warning disable CS8604 // Dereference of a possibly linenull reference.
-                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
+                        Item part = new(row["Part Number"]?.ToString(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
 #pragma warning restore CS8604 // Dereference of a possibly null reference.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
@@ -1269,10 +1308,43 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         string project = required.Project;
         string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\";
+
+        PdfDocument pdf = new();
+
+        string path = baseFolderpath + @"05_PDF_DXF_STP_Compleet\" + required.MainPart.Number + ".pdf";
+
+        // check if file exists
+        if (File.Exists(path))
+        {
+            using (PdfDocument part = PdfReader.Open(path, PdfDocumentOpenMode.Import))
+            {
+                bookHelper.CopyPages(part, pdf);
+            }
+        }
+
         required.Boeken.ForEach(b =>
         {
-            bookHelper.CreateBook(b, required.MainPart, baseFolderpath, required.hoofdartikel);
+            bookHelper.CreateBook(b, required.MainPart, baseFolderpath, required.hoofdartikel, pdf);
         });
+
+
+        // save pdf
+        //check if folder exists
+        if (Directory.Exists(baseFolderpath + @"03_Montage_boek") == false)
+        {
+            Directory.CreateDirectory(baseFolderpath + @"03_Montage_boek");
+        }
+
+        if (Directory.Exists(baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd")) == false)
+        {
+            Directory.CreateDirectory(baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd"));
+        }
+
+        string savePath = baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\MOB_" + required.MainPart.Number + ".pdf";
+        if (pdf.PageCount > 0)
+        {
+            pdf.Save(savePath);
+        }
         return Results.Ok();
     }).WithName($"{company}CreateBooks").WithTags(company);
 
@@ -1400,6 +1472,6 @@ if (app.Environment.IsProduction())
 }
 else
 {
-    app.Run();
+    app.Run("http://*:5000");
 }
 

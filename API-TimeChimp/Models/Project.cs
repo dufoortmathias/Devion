@@ -17,7 +17,7 @@
         public DateTime? Modified { get; set; }
         public CustomerTimeChimp? Customer { get; set; }
         public Project? MainProject { get; set; }
-        public Project[]? SubProjects { get; set; }
+        public List<Project>? SubProjects { get; set; }
         public List<Manager>? Managers { get; set; }
         public List<ProjectTaskTC>? ProjectTasks { get; set; }
         public List<ProjectUserTC>? ProjectUsers { get; set;}
@@ -33,7 +33,7 @@
             Name = projectETS.PR_KROM;
             StartDate = projectETS.PR_START_PRODUCTIE.ToString();
             Active = projectETS.PR_STAT.Equals('L');
-            SubProjects = Array.Empty<Project>();
+            SubProjects = new List<Project>();
             Invoicing = new();
             Budget = new ();
             Invoicing.Method = "TaskHourlyRate"; //TODO: add value to seperate file
