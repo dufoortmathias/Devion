@@ -9,6 +9,9 @@ global using ExcelDataReader;
 global using FirebirdSql.Data.FirebirdClient;
 global using Microsoft.AspNetCore.Mvc;
 global using Newtonsoft.Json;
+global using PdfSharp.Pdf;
+global using PdfSharp.Pdf.IO;
+
 //dotnet namespaces
 global using System;
 global using System.Collections.Generic;

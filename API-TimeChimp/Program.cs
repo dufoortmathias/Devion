@@ -1,3 +1,4 @@
+using Api.Devion.Helpers.General;
 using Api.Devion.Models;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -69,6 +70,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     TimeChimpProjectTaskHelper projectTaskHelperTC = new(TCClient);
     TimeChimpTimeHelper timeHelperTC = new(TCClient, ETSClient);
     TimeChimpUurcodeHelper uurcodeHelperTC = new(TCClient);
+
+    GeneralKopieerHelper kopieerHelper = new();
+    GeneralBookHelper bookHelper = new();
 
     //get companies from config
     string company = config[$"Companies:{companyIndex}:Name"];
@@ -1149,6 +1153,95 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ProjectenVoortgangImport").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/foldernames", () =>
+    {
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten";
+
+        List<string> folders = new();
+
+        foreach (string folderName in Directory.EnumerateDirectories(baseFolderpath))
+        {
+            folders.Add(Path.GetFileName(folderName));
+        }
+
+        return Results.Ok(folders);
+    }).WithName($"{company}FolderNames").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/check", ([FromBody] Item MainPart, string project) =>
+    {
+        try
+        {
+            string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\05_PDF_DXF_STP_Compleet\";
+            MainPart = itemHelperETS.CheckFiles(MainPart, baseFolderpath);
+            return Results.Ok(MainPart);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"error: {e.Message}");
+            Console.WriteLine($"line: {e.StackTrace}");
+            return Results.Problem(e.Message);
+        }
+
+    }).WithName($"{company}CheckTekenigen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/createbooks", ([FromBody] Book required) =>
+    {
+        string project = required.Project;
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\";
+        required.Boeken.ForEach(b =>
+        {
+            bookHelper.CreateBook(b, required.MainPart, baseFolderpath, required.hoofdartikel);
+        });
+        return Results.Ok();
+    }).WithName($"{company}CreateBooks").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/bewerkingen", ([FromBody] Kopieer bewerking) =>
+    {
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + bewerking.Project + @"\11_Productie\";
+        kopieerHelper.KopieerTekenigen(basePath, bewerking);
+        return Results.Ok();
+    }).WithName($"{company}KopieerTekenigenBewerkingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/bewerkingen/delete", ([FromBody] KopieerDelete bewerking) =>
+    {
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + bewerking.BasePath + @"\11_Productie\06_PDF_DXF_STP_Bewerkingen\";
+        kopieerHelper.DeleteFolders(bewerking.Folders, baseFolderpath);
+        return Results.Ok();
+    }).WithName($"{company}DeleteBewerking").WithTags(company);
+
+    //app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/nabehandelingen", ([FromBody] KopieerNa nabehandeling) =>
+    //{
+    //    string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandeling.Project + @"\11_Productie\";
+    //    kopieerHelper.KopieerTekeningenNabehandeling(basePath, nabehandeling);
+    //    return Results.Ok();
+    //}).WithName($"{company}KopieerTekenigenNabehandelingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/nabehandelingen", ([FromBody] List<KopieerNa> nabehandelingen) =>
+    {
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandelingen[0].Project + @"\11_Productie\";
+        var groupedNabehandelingen = nabehandelingen.GroupBy(n => n.Nabehandeling)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var group in groupedNabehandelingen)
+        {
+            PdfDocument to = new();
+            foreach (var nabehandeling in group.Value)
+            {
+                kopieerHelper.KopieerTekeningenNabehandeling(basePath, nabehandeling, to);
+            }
+            string savePath = basePath + @"07_PDF_Nabehandelingen\" + group.Key + @"\" + group.Key + "_" + group.Value[0].HoofdArtikel + ".pdf";
+            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+            to.Save(savePath);
+        }
+    }).WithName($"{company}KopieerTekenigenNabehandelingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/nabehandelingen/delete", ([FromBody] KopieerDelete nabehandeling) =>
+    {
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandeling.BasePath + @"\11_Productie\07_PDF_Nabehandelingen\";
+        kopieerHelper.DeleteFolders(nabehandeling.Folders, baseFolderpath);
+        return Results.Ok();
+    }).WithName($"{company}DeleteNabehandeling").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
@@ -1229,4 +1322,3 @@ else
 {
     app.Run();
 }
-

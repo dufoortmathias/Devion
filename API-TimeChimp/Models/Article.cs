@@ -281,3 +281,9 @@ public class ArticleWeb
     public string? linkMime { get; set; }
     public string? linkImage { get; set; }
 }
+
+public class ArticleGroep
+{
+    public string? ARG_ID { get; set; }
+    public string? ARG_OMSCHRIJVING { get; set; }
+}
