@@ -1,5 +1,6 @@
 using Api.Devion.Helpers.General;
 using Api.Devion.Models;
+using System.IO;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,7 @@ WebApplication app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("AllowOrigins");
+app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 //app.UseHttpsRedirection();
 
 
@@ -366,6 +367,22 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             // update mainproject
             TCProject.id = mainProject.id;
+
+            // create new subproject with the project name the same as the main project and add 0000 to the end of the project code
+            ProjectTimeChimp Subproject = new(ETSProject)
+            {
+                code = TCProject.code + "0000",
+                name = TCProject.name,
+                mainProjectId = mainProject.id,
+                customerId = mainProject.customerId,
+                invoiceMethod = mainProject.invoiceMethod,
+                budgetMethod = mainProject.budgetMethod,
+                useSubprojects = false,
+            };
+
+            ProjectTimeChimp mainSubProject = projectHelperTC.FindProject(Subproject.code ?? throw new Exception("Subproject received from timechimp has no code")) ?? projectHelperTC.CreateProject(Subproject);
+            mainSubProject.active = mainProject.active;
+            mainSubProject = projectHelperTC.UpdateProject(mainSubProject, employeeHelperTC);
             mainProject = projectHelperTC.UpdateProject(TCProject, employeeHelperTC);
 
             List<string> errorMessages = new();
@@ -787,6 +804,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             MainPart.Number = number;
             MainPart.Description = omschrijving;
             MainPart.LynNumber = "1";
+            MainPart.Bewerking1 = "Monteren";
 
             List<Item> MetabilItems = new List<Item>();
 
@@ -812,14 +830,14 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     else
                     {
 #pragma warning disable CS8604 // Dereference of a possibly linenull reference.
-                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
+                        Item part = new(row["Part Number"]?.ToString(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
 #pragma warning restore CS8604 // Dereference of a possibly null reference.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-                        if (part.Number is not null && part.Number.Length > 25)
-                        {
-                            throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
-                        }
+                        //if (part.Number is not null && part.Number.Length > 25)
+                        //{
+                        //    throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
+                        //}
                         try
                         {
 
@@ -829,13 +847,15 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             part.Bewerking2 = row["Bewerking 2"] != DBNull.Value ? ((string)row["Bewerking 2"]).ToUpper().Trim() : "-";
                             part.Bewerking3 = row["Bewerking 3"] != DBNull.Value ? ((string)row["Bewerking 3"]).ToUpper().Trim() : "-";
                             part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
+                            part.Nabehandeling1 = row["Nabehandeling 1"] != DBNull.Value ? ((string)row["Nabehandeling 1"]).ToUpper().Trim() : "-";
+                            part.Nabehandeling2 = row["Nabehandeling 2"] != DBNull.Value ? ((string)row["Nabehandeling 2"]).ToUpper().Trim() : "-";
 
                             part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Split(' ')[0], out float massValue) ? float.Parse(row["Mass"].ToString().Split(' ')[0]) : 0;
 
                             part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
-                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? ((string)row["Aankoop per"]) : "1";
+                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? (row["Aankoop per"].ToString()) : "1";
                             part.Verbruikseenh = row["Verbruikseenh"] != DBNull.Value ? ((string)row["Verbruikseenh"]).ToUpper().Trim() : "ST";
-                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? ((string)row["Omrekeningsfactor"]) : "1";
+                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? ((string)row["Omrekeningsfactor"].ToString()) : "1";
                             part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
 
 
@@ -895,6 +915,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.Message, e.StackTrace);
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}TransformBomExcel").WithTags(company);
@@ -1188,11 +1209,57 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     app.MapPost($"/api/{company.ToLower()}/tekeningen/createbooks", ([FromBody] Book required) =>
     {
         string project = required.Project;
-        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\";
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\";
+        string path = basePath + @"05_PDF_DXF_STP_Compleet\" + required.MainPart.Number + ".pdf";
+        PdfDocument to = new PdfDocument();
+
+        if (File.Exists(path))
+        {
+            using (PdfDocument part = PdfReader.Open(path, PdfDocumentOpenMode.Import))
+            {
+                bookHelper.CopyPages(part, to);
+            }
+        }
         required.Boeken.ForEach(b =>
         {
-            bookHelper.CreateBook(b, required.MainPart, baseFolderpath, required.hoofdartikel);
+            bookHelper.CreateBook(b, required.MainPart, basePath, required.hoofdartikel, to);
         });
+
+
+        // save pdf
+        //check if folder exists
+        string savePath = "";
+        if (required.MainPart.Bewerking1.ToLower() == "monteren")
+        {
+            if (Directory.Exists(basePath + @"03_Montage_boek") == false)
+            {
+                Directory.CreateDirectory(basePath + @"03_Montage_boek");
+            }
+
+            if (Directory.Exists(basePath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd")) == false)
+            {
+                Directory.CreateDirectory(basePath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd"));
+            }
+
+            savePath = basePath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\MOB_" + required.MainPart.Number + ".pdf";
+        } else if (required.MainPart.Bewerking1.ToLower() == "lassen")
+        {
+            if (Directory.Exists(basePath + @"04_Las_boek") == false)
+            {
+                Directory.CreateDirectory(basePath + @"04_Las_boek");
+            }
+
+            if (Directory.Exists(basePath + @"04_Las_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd")) == false)
+            {
+                Directory.CreateDirectory(basePath + @"04_Las_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd"));
+            }
+
+            savePath = basePath + @"04_Las_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\WEB_" + required.MainPart.Number + ".pdf";
+        }
+        if (to.PageCount > 0)
+        {
+            to.Save(savePath);
+        }
         return Results.Ok();
     }).WithName($"{company}CreateBooks").WithTags(company);
 
