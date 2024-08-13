@@ -1,6 +1,9 @@
 using Api.Devion.Helpers.General;
 using Api.Devion.Models;
+using Microsoft.SharePoint.Client;
 using System.IO;
+using System.Net;
+using System.Security;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +46,7 @@ int syncMetabil = 0;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
     //create clients
-    WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
+    Api.Devion.Client.WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
     //create helpers
@@ -799,7 +802,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             });
 
             Item MainPart = new Item();
-            string number = fileName.Split('.')[0].Split('_')[0];
+            string number = fileName.Substring(0, 15);
             string omschrijving = fileName.Split('.')[0].Split('_')[1];
             MainPart.Number = number;
             MainPart.Description = omschrijving;
@@ -981,7 +984,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     //gets differences between articles in ets and bom
     app.MapPost($"/api/{company.ToLower()}/ets/articledifference", ([FromBody] Item articles) =>
     {
-        Dictionary<string, Change> difference = articleHelperETS.ArticleDifference(articles);
+        Dictionary<string, Api.Devion.Models.Change> difference = articleHelperETS.ArticleDifference(articles);
         return difference;
 
     }).WithName($"{company}ArticleDifference").WithTags(company);
@@ -1004,9 +1007,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     //create article in ets
     app.MapPost($"/api/{company.ToLower()}/ets/createitem", ([FromBody] NewItem item) =>
     {
-    try
-    {
-        if (item.Hoofdleverancier.ToLower() == "lassen" || item.Hoofdleverancier.ToLower() == "oplassen" && company.ToLower() == "metabil")
+        try
+        {
+            if (item.Hoofdleverancier.ToLower() == "lassen" || item.Hoofdleverancier.ToLower() == "oplassen" && company.ToLower() == "metabil")
             {
                 item.Hoofdleverancier = "";
             }
@@ -1213,7 +1216,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         string path = basePath + @"05_PDF_DXF_STP_Compleet\" + required.MainPart.Number + ".pdf";
         PdfDocument to = new PdfDocument();
 
-        if (File.Exists(path))
+        if (System.IO.File.Exists(path))
         {
             using (PdfDocument part = PdfReader.Open(path, PdfDocumentOpenMode.Import))
             {
@@ -1242,7 +1245,8 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             }
 
             savePath = basePath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\MOB_" + required.MainPart.Number + ".pdf";
-        } else if (required.MainPart.Bewerking1.ToLower() == "lassen")
+        }
+        else if (required.MainPart.Bewerking1.ToLower() == "lassen")
         {
             if (Directory.Exists(basePath + @"04_Las_boek") == false)
             {
@@ -1262,6 +1266,115 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
         return Results.Ok();
     }).WithName($"{company}CreateBooks").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/createbook", ([FromBody] CompleteBook book) =>
+    {
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + book.Project + @"\11_Productie\03_Montage_boek\" + book.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\";
+        List<string> pdfFiles = new();
+        while (pdfFiles.Count != book.Amount)
+        {
+            pdfFiles = Directory.GetFiles(basePath, "*.pdf").ToList();
+        }
+
+        pdfFiles.Sort();
+
+        PdfDocument to = new PdfDocument();
+
+        foreach (var pdf in pdfFiles)
+        {
+            using (PdfDocument part = PdfReader.Open(pdf, PdfDocumentOpenMode.Import))
+            {
+                bookHelper.CopyPages(part, to);
+            }
+        }
+
+        string savePath = basePath + @"MOB_" + book.hoofdartikel + ".pdf";
+        to.Save(savePath);
+        foreach (var pdf in pdfFiles)
+        {
+            if (pdf != savePath)
+            {
+                System.IO.File.Delete(pdf);
+            }
+        }
+
+        return Results.Ok();
+    }).WithName($"{company}CreateBook").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/createmontagelijst", ([FromBody] Lijst lijst) =>
+    {
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + lijst.Project + @"\11_Productie\03_Montage_boek\" + lijst.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\";
+        using (var package = new ExcelPackage())
+        {
+            var workbook = package.Workbook;
+            var worksheet = workbook.Worksheets.Add("Monteren");
+
+            //set header
+            worksheet.Cells[1, 1].Value = "Artikel";
+            worksheet.Cells[1, 2].Value = "Aantal";
+            worksheet.Cells[1, 3].Value = "Done";
+
+            //set the data rows
+            int row = 2;
+            foreach (var item in lijst.data)
+            {
+                worksheet.Cells[row, 1].Value = item.partNumber;
+                worksheet.Cells[row, 2].Value = item.Aantal;
+                worksheet.Cells[row, 3].Value = item.Done;
+                row++;
+            }
+
+            //create table from the data in the worksheet
+            var table = worksheet.Tables.Add(worksheet.Dimension, "MontageLijst");
+            table.TableStyle = TableStyles.Medium16;
+            worksheet.Column(1).AutoFit();
+            worksheet.Column(2).AutoFit();
+            worksheet.Column(3).AutoFit();
+
+            //save the file
+            string savePath = basePath + @"Montagelijst_" + lijst.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + ".xlsx";
+            package.SaveAs(new FileInfo(savePath));
+        }
+
+    }).WithName($"{company}CreateMontageLijst").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/createlaslijst", ([FromBody] Lijst lijst) =>
+    {
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + lijst.Project + @"\11_Productie\04_Las_boek\" + lijst.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\";
+        using (var package = new ExcelPackage())
+        {
+            var workbook = package.Workbook;
+            var worksheet = workbook.Worksheets.Add("Lassen");
+
+            //set header 
+            worksheet.Cells[1, 1].Value = "Artikel";
+            worksheet.Cells[1, 2].Value = "Aantal";
+            worksheet.Cells[1, 3].Value = "Done";
+
+            //set the data rows
+            int row = 2;
+            foreach (var item in lijst.data)
+            {
+                worksheet.Cells[row, 1].Value = item.partNumber;
+                worksheet.Cells[row, 2].Value = item.Aantal;
+                worksheet.Cells[row, 3].Value = item.Done;
+                row++;
+            }
+
+            //create table from the data in the worksheet
+            var table = worksheet.Tables.Add(worksheet.Dimension, "Laslijst");
+            table.TableStyle = TableStyles.Medium16;
+            worksheet.Column(1).AutoFit();
+            worksheet.Column(2).AutoFit();
+            worksheet.Column(3).AutoFit();
+
+            //save the file
+            string savePath = basePath + @"Laslijst_" + lijst.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + ".xlsx";
+            package.SaveAs(new FileInfo(savePath));
+        }
+    }).WithName($"{company}CreateLasLijst").WithTags(company);
 
     app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/bewerkingen", ([FromBody] Kopieer bewerking) =>
     {
@@ -1309,6 +1422,41 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         kopieerHelper.DeleteFolders(nabehandeling.Folders, baseFolderpath);
         return Results.Ok();
     }).WithName($"{company}DeleteNabehandeling").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/sharepoint/test", () =>
+    {
+        string siteUrl = @"https://dceng.sharepoint.com/sites/MechanicalDesign/";
+
+        using (ClientContext clientContext = new(siteUrl))
+        {
+            SecureString password = new();
+            foreach (char c in "Md@12345")
+            {
+                password.AppendChar(c);
+            }
+            clientContext.Credentials = new NetworkCredential("mathias", password, "Devion");
+
+            Web web = clientContext.Web;
+            clientContext.Load(web, w => w.ServerRelativeUrl);
+            clientContext.ExecuteQuery();
+
+            Folder targetFolder = web.GetFolderByServerRelativeUrl(web.ServerRelativeUrl + "/Shared Documents/General");
+            clientContext.Load(targetFolder.Files);
+            clientContext.Load(targetFolder.Folders);
+
+            clientContext.ExecuteQuery();
+
+            // Print the folder count
+            Console.WriteLine("Folder count: " + targetFolder.Folders.Count);
+
+            // Iterate through the folders
+            foreach (Folder folder in targetFolder.Folders)
+            {
+                Console.WriteLine("Folder: " + folder.Name);
+            }
+        }
+            return Results.Ok();
+    }).WithName($"{company}SharepointTest").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");
@@ -1318,7 +1466,7 @@ app.MapGet("/api/price", () =>
     try
     {
         Dictionary<string, Dictionary<string, float>> data = new Dictionary<string, Dictionary<string, float>>();
-        string json = File.ReadAllText("./Json/priceSettings.json");
+        string json = System.IO.File.ReadAllText("./Json/priceSettings.json");
         data = JsonTool.ConvertTo<Dictionary<string, Dictionary<string, float>>>(json);
         priceSettings = data;
         return Results.Ok(data);
@@ -1337,7 +1485,7 @@ app.MapPost("/api/price", ([FromBody] Dictionary<string, Dictionary<string, floa
         //write to file
         priceSettings = settings;
         string json = JsonTool.ConvertFrom(settings);
-        File.WriteAllText("./Json/priceSettings.json", json);
+        System.IO.File.WriteAllText("./Json/priceSettings.json", json);
         return Results.Ok(settings);
     }
     catch (Exception e)
@@ -1352,7 +1500,7 @@ app.MapGet("/api/bewerkingen", () =>
     try
     {
         Dictionary<string, Dictionary<string, string>> data = new Dictionary<string, Dictionary<string, string>>();
-        string json = File.ReadAllText("./Json/bewerkingenSettings.json");
+        string json = System.IO.File.ReadAllText("./Json/bewerkingenSettings.json");
         data = JsonTool.ConvertTo<Dictionary<string, Dictionary<string, string>>>(json);
         bewerkingenSettings = data;
         return Results.Ok(data);
@@ -1371,7 +1519,7 @@ app.MapPost("/api/bewerkingen", ([FromBody] Dictionary<string, Dictionary<string
         //write to file
         bewerkingenSettings = settings;
         string json = JsonTool.ConvertFrom(settings);
-        File.WriteAllText("./Json/bewerkingenSettings.json", json);
+        System.IO.File.WriteAllText("./Json/bewerkingenSettings.json", json);
         return Results.Ok(settings);
     }
     catch (Exception e)

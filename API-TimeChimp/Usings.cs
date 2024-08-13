@@ -11,6 +11,11 @@ global using Microsoft.AspNetCore.Mvc;
 global using Newtonsoft.Json;
 global using PdfSharp.Pdf;
 global using PdfSharp.Pdf.IO;
+global using OfficeOpenXml;
+global using OfficeOpenXml.Table;
+global using OfficeOpenXml.Style;
+global using System.IO;
+global using Microsoft.SharePoint.Client;
 
 //dotnet namespaces
 global using System;

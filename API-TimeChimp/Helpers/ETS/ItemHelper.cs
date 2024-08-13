@@ -7,7 +7,7 @@ public class ETSItemHelper : ETSHelper
     {
     }
 
-    public Dictionary<string, string> UpdateItem(ItemChange item)
+    public Dictionary<string, string> UpdateItem(Api.Devion.Models.ItemChange item)
     {
         var query = $"update CSARTPX set {item.Key} = @value where ART_NR = @articleNumber";
 
@@ -167,7 +167,7 @@ public class ETSItemHelper : ETSHelper
         // and perform some action if it does
         if (item.Bewerking1.ToLower() != "kopen" && item.Bewerking1.ToLower() != "normelement" && item.Bewerking1.ToLower() != "referentie" && item.Bewerking1.ToLower() != "-" && item.Bewerking1.ToLower() != "" && !item.Bewerking1.ToLower().Contains("klant"))
         {
-            if (File.Exists(basePath + item.Number + ".dxf"))
+            if (System.IO.File.Exists(basePath + item.Number + ".dxf"))
             {
                 item.Files.dxf = "OK";
             }
@@ -176,7 +176,7 @@ public class ETSItemHelper : ETSHelper
                 item.Files.dxf = "NOK";
             }
 
-            if (File.Exists(basePath + item.Number + ".pdf"))
+            if (System.IO.File.Exists(basePath + item.Number + ".pdf"))
             {
                 item.Files.pdf = "OK";
             }
@@ -185,7 +185,7 @@ public class ETSItemHelper : ETSHelper
                 item.Files.pdf = "NOK";
             }
 
-            if (File.Exists(basePath + item.Number + ".stp"))
+            if (System.IO.File.Exists(basePath + item.Number + ".stp"))
             {
                 item.Files.stp = "OK";
             }
@@ -197,7 +197,7 @@ public class ETSItemHelper : ETSHelper
 
         if (item.Bewerking1.ToLower() == "3d printen" || item.Bewerking2.ToLower() == "3d printen" || item.Bewerking3.ToLower() == "3d printen" || item.Bewerking4.ToLower() == "3d printen")
         {
-            if (File.Exists(basePath + item.Number + ".stl"))
+            if (System.IO.File.Exists(basePath + item.Number + ".stl"))
             {
                 item.Files.stl = "OK";
             }
@@ -209,7 +209,7 @@ public class ETSItemHelper : ETSHelper
 
         if (item.Bewerking1.ToLower() == "laseren" || item.Bewerking2.ToLower() == "laseren" || item.Bewerking3.ToLower() == "laseren" || item.Bewerking4.ToLower() == "laseren")
         {
-            if (File.Exists(basePath + item.Number + "_FLAT.dxf"))
+            if (System.IO.File.Exists(basePath + item.Number + "_FLAT.dxf"))
             {
                 item.Files.flatDxf = "OK";
             }

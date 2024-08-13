@@ -20,17 +20,13 @@ public class GeneralBookHelper
                         if (part.Bewerking1.ToLower() != "monteren" && part.Bewerking2.ToLower() != "monteren" && part.Bewerking3.ToLower() != "monteren" && part.Bewerking4.ToLower() != "monteren")
                         {
                             path = basePath + @"05_PDF_DXF_STP_Compleet\" + part.Number + ".pdf";
-                            if (File.Exists(path))
+                            if (System.IO.File.Exists(path))
                             {
                                 using (PdfDocument part2 = PdfReader.Open(path, PdfDocumentOpenMode.Import))
                                 {
                                     CopyPages(part2, to);
                                 }
                             }
-                        }
-                        if (part.Bewerking1.ToLower() == "monteren" || part.Bewerking2.ToLower() == "monteren" || part.Bewerking3.ToLower() == "monteren" || part.Bewerking4.ToLower() == "monteren")
-                        {
-                            CreateBook("Monteren", part, basePath, hoofdArtikel, to);
                         }
                     }
                 });
@@ -50,7 +46,7 @@ public class GeneralBookHelper
                         if (part.Bewerking1.ToLower() != "lassen" && part.Bewerking2.ToLower() != "lassen" && part.Bewerking3.ToLower() != "lassen" && part.Bewerking4.ToLower() != "lassen")
                         {
                             path = basePath + @"05_PDF_DXF_STP_Compleet\" + part.Number + ".pdf";
-                            if (File.Exists(path))
+                            if (System.IO.File.Exists(path))
                             {
                                 using (PdfDocument part2 = PdfReader.Open(path, PdfDocumentOpenMode.Import))
                                 {
