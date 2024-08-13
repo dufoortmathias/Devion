@@ -1048,9 +1048,9 @@ export default {
         "merk familie subfamilie"
         "lengte breedte hoogte"
         "hoofdleverancier link minaan";
-    grid-template-columns: 30vw 30vw 30vw;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-gap: var(--global-whitespace-lg);
-    width: 100vw;
+    /* width: 100vw; */
 }
 
 .c-artikelNr {
