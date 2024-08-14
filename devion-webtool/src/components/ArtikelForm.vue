@@ -1050,7 +1050,7 @@ export default {
         "hoofdleverancier link minaan";
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: var(--global-whitespace-lg);
-    /* width: 80vw; */
+    /* width: 100vw; */
 }
 
 .c-artikelNr {

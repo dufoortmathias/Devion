@@ -1,4 +1,4 @@
-﻿namespace Api.Devion.Helpers.General;
+namespace Api.Devion.Helpers.General;
 public class GeneralKopieerHelper
 {
     public void KopieerTekenigen(string BasePath, Kopieer kopieer)
@@ -30,9 +30,9 @@ public class GeneralKopieerHelper
 
         files.ForEach(file =>
         {
-            if (File.Exists(filepath + file))
+            if (System.IO.File.Exists(filepath + file))
             {
-                File.Copy(filepath + file, savePath + file, true);
+                System.IO.File.Copy(filepath + file, savePath + file, true);
             }
         });
     }
@@ -61,7 +61,7 @@ public class GeneralKopieerHelper
     {
         if (basePath != null)
         {
-            if (File.Exists(basePath + @"05_PDF_DXF_STP_Compleet\" + kopieer.Artikel + ".pdf"))
+            if (System.IO.File.Exists(basePath + @"05_PDF_DXF_STP_Compleet\" + kopieer.Artikel + ".pdf"))
             {
                 using (PdfDocument from = PdfReader.Open(basePath + @"05_PDF_DXF_STP_Compleet\" + kopieer.Artikel + ".pdf", PdfDocumentOpenMode.Import))
                 {

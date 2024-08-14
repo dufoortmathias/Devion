@@ -9,11 +9,11 @@
         <th class="bg-blue">.stp</th>
         <th class="bg-blue">_FLAT.dxf</th>
         <th class="bg-blue">.stl</th>
+        <th class="bg-blue">.png</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="(product, index) in filteredProducts" :key="index">
-
         <td
           :class="{
             'bg-red': hasMissingFiles(product.files),
@@ -67,51 +67,60 @@
         >
           {{ product.files.stl }}
         </td>
-        
+        <td
+          :class="{
+            'bg-red': product.files.png === 'NOK',
+            'bg-green': product.files.png === 'OK',
+            'bg-gray': product.files.png === 'N/A'
+          }"
+        >
+          {{ product.files.png }}
+        </td>
       </tr>
     </tbody>
   </table>
 </template>
-
-<script>
+  
+  <script>
 export default {
   props: {
     products: {
       type: Array,
-      required: true,
+      required: true
     },
     errorToggle: {
       type: Boolean,
       required: true,
-      default: false,
-    },
+      default: false
+    }
   },
   computed: {
     filteredProducts() {
       if (this.errorToggle) {
-        return this.products.filter(product => this.hasMissingFiles(product.files));
+        return this.products.filter((product) => this.hasMissingFiles(product.files))
       } else {
-        return this.products;
+        return this.products
       }
     }
   },
   methods: {
     hasMissingFiles(files) {
       if (
-        files.dxf === 'FALSE' ||
-        files.pdf === 'FALSE' ||
-        files.stp === 'FALSE' ||
-        files.stl === 'FALSE' ||
-        files.flatDxf === 'FALSE'
+        files.dxf === 'NOK' ||
+        files.pdf === 'NOK' ||
+        files.stp === 'NOK' ||
+        files.stl === 'NOK' ||
+        files.flatDxf === 'NOK' ||
+        files.png === 'NOK'
       ) {
-        return true;
+        return true
       }
     }
   }
 }
 </script>
-
-<style>
+  
+  <style>
 .bg-red {
   background-color: #ff0000;
 }

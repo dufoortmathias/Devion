@@ -39,7 +39,16 @@ export async function PutDataWithBody(endpoint, data) {
 }
 
 export async function GetData(endpoint) {
-  return fetch(baseUrl + endpoint)
+  var myHeaders = new Headers()
+  myHeaders.append('Content-Type', 'application/json')
+  myHeaders.append('Access-Control-Allow-Origin', '*')
+  myHeaders.append('Access-Control-Allow-Headers', '*')
+  var requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow'
+  }
+  return fetch(baseUrl + endpoint, requestOptions)
     .then((response) => response.json())
     .then((data) => data)
     .catch((error) => console.error(error))

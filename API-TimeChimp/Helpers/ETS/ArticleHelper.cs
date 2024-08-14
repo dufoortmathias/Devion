@@ -323,19 +323,19 @@ public class ETSArticleHelper : ETSHelper
         }
     }
 
-    public Dictionary<string, Change> ArticleDifference(Item Article)
+    public Dictionary<string, Api.Devion.Models.Change> ArticleDifference(Item Article)
     {
         if (Article is not null)
         {
             ArticleETS? articleETS = GetArticle(Article.Number);
 
-            var dict = new Dictionary<string, Change>();
+            var dict = new Dictionary<string, Api.Devion.Models.Change>();
 
             if (articleETS is not null)
             {
                 if (articleETS.ART_NR != Article.Number)
                 {
-                    var ch = new Change
+                    var ch = new Api.Devion.Models.Change
                     {
                         ETSWaarde = articleETS.ART_NR,
                         NewWaarde = Article.Number
@@ -344,7 +344,7 @@ public class ETSArticleHelper : ETSHelper
                 }
                 if (articleETS.ART_OMS is not null && Article.Description is not null && articleETS.ART_OMS.ToUpper() != Article.Description)
                 {
-                    var ch = new Change
+                    var ch = new Api.Devion.Models.Change
                     {
                         ETSWaarde = articleETS.ART_OMS.ToString(),
                         NewWaarde = Article.Description
@@ -353,7 +353,7 @@ public class ETSArticleHelper : ETSHelper
                 }
                 if (articleETS.ART_AANKOOP_PER is not null && articleETS.ART_AANKOOP_PER.ToString() != Article.AankoopPer.ToString())
                 {
-                    var ch = new Change
+                    var ch = new Api.Devion.Models.Change
                     {
                         ETSWaarde = articleETS.ART_AANKOOP_PER.ToString(),
                         NewWaarde = Article.AankoopPer.ToString(),
@@ -368,7 +368,7 @@ public class ETSArticleHelper : ETSHelper
                 {
                     if (aaneh[0].EH_OMS2.ToString() != Article.Verbruikseenh.ToString())
                     {
-                        var ch = new Change
+                        var ch = new Api.Devion.Models.Change
                         {
                             ETSWaarde = aaneh[0].EH_OMS2.ToString(),
                             NewWaarde = Article.Aankoopeenh
@@ -384,7 +384,7 @@ public class ETSArticleHelper : ETSHelper
                 {
                     if (vereh[0].EH_OMS2.ToString() != Article.Verbruikseenh.ToString())
                     {
-                        var ch = new Change
+                        var ch = new Api.Devion.Models.Change
                         {
                             ETSWaarde = vereh[0].EH_OMS2.ToString(),
                             NewWaarde = Article.Verbruikseenh
@@ -395,7 +395,7 @@ public class ETSArticleHelper : ETSHelper
 
                 if (articleETS.ART_CONVERSIEFACTOR.ToString() != Article.Omrekeningsfactor.ToString())
                 {
-                    var ch = new Change
+                    var ch = new Api.Devion.Models.Change
                     {
                         ETSWaarde = articleETS.ART_CONVERSIEFACTOR_TYPE.ToString(),
                         NewWaarde = Article.Omrekeningsfactor.ToString()

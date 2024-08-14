@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1>Tekeningen</h1>
+    <div>
+      <h1>Tekeningen</h1>
+    </div>
     <excelFileInput
       :label="file.label"
       :error="file.error"
@@ -27,11 +29,11 @@
       <LoadingAnimation :showLoad="loading.showLoad" />
     </div>
     <div v-if="fileTable.showTable">
-      <!-- <div class="c-boek">
+      <div class="c-boek">
         <p>Toggle Errors:</p>
         <BasicToggleSwitch v-model="errorToggle" class="c-toggle" />
-      </div> -->
-      <FileTableVue :products="fileTable.products" />
+      </div>
+      <FileTableVue :products="fileTable.products" :errorToggle="errorToggle" />
     </div>
     <div v-if="fileTable.showTable">
       <h2>Boeken</h2>
@@ -81,8 +83,8 @@
     </div>
   </div>
 </template>
-
-<script>
+  
+  <script>
 import ExcelFileInput from '../components/componenten/excelFileInput.vue'
 import ButtonDevion from '../components/componenten/ButtonDevion.vue'
 import LoadingAnimation from '../components/componenten/LoadingAnimation.vue'
@@ -96,7 +98,9 @@ let FileContents = ''
 let FileName = ''
 let BOMData = []
 let project = ''
-
+let MonterenLijst = []
+let LasLijst = []
+let lijst = []
 
 export default {
   name: 'TekeningenView',
@@ -118,6 +122,9 @@ export default {
       UniqueNabehandelingen: [],
       nabehandelingenStatus: {},
       NabehandelingenData: [],
+      errorToggle: false,
+      showPopup: false,
+      loginDetails: null,
       file: {
         components: {
           ExcelFileInput
@@ -157,17 +164,22 @@ export default {
           FileTableVue
         },
         products: [],
-        showTable: false
-        // errorToggle: errorToggle,
+        showTable: false,
+        errorToggle: this.errorToggle
       }
     }
   },
   created() {
     this.getFolders()
   },
-  watch: {
-  },
+  watch: {},
   methods: {
+    handleLogin(loginDetails) {
+      // Receive the login details from the LoginPopup component
+      this.loginDetails = loginDetails
+      // You can now use the login details to call your API or perform any other action
+      console.log('Login details:', loginDetails)
+    },
     handleFileUpdate(file) {
       this.file.error = false
       this.file.showLabel = false
@@ -194,21 +206,22 @@ export default {
         .then((response) => {
           this.button.isDisabled = true
           BOMData = JSON.parse(response)[0][0]
-          
+
           endpoint = 'devion/tekeningen/check'
           endpoint += '?project=' + project.replaceAll(' ', '%20')
           PostDataWithBody(endpoint, BOMData)
             .then((response) => {
               BOMData = JSON.parse(response)
-              
+
               this.loading.showLoad = false
               this.fileTable.products = this.filterItems(JSON.parse(response))
+              lijst = this.Items(JSON.parse(response))
+              this.quantityOverdracht(JSON.parse(response), null)
               this.fileTable.showTable = true
               this.GetNabehandelingen(this.fileTable.products)
               this.GetDifferentNabehandelingen()
               this.GetBewerkingen(this.fileTable.products)
               this.GetDifferentBewerkingen()
-              
             })
             .catch((error) => {
               this.dropdownFolders.error = true
@@ -238,17 +251,23 @@ export default {
     },
     async handledropdownFoldersSelected(selectedOption) {
       project = selectedOption
-      
+
       if (this.file.name != '') {
         this.button.isDisabled = false
       }
     },
     filterItems(item) {
       const filtered = []
+
       if (item) {
         if (item.parts != []) {
           item.parts.forEach((part) => {
-            filtered.push(...this.filterItems(part))
+            this.filterItems(part).forEach((filteredItem) => {
+              const existingItem = filtered.find((i) => i.number === filteredItem.number)
+              if (!existingItem) {
+                filtered.push(filteredItem)
+              }
+            })
           })
         }
 
@@ -257,40 +276,187 @@ export default {
           item.files.pdf != 'N/A' ||
           item.files.stp != 'N/A' ||
           item.files.stl != 'N/A' ||
-          item.files.flatDxf != 'N/A'
+          item.files.flatDxf != 'N/A'||
+          item.files.png != 'N/A'
+        ) {
+          const existingItem = filtered.find((i) => i.number === item.number)
+          if (!existingItem) {
+            filtered.push(item)
+          }
+        }
+      }
+
+      return filtered.sort((a, b) => a.number.localeCompare(b.number))
+    },
+    Items(item) {
+      const filtered = []
+
+      if (item) {
+        if (item.parts != []) {
+          item.parts.forEach((part) => {
+            this.filterItems(part).forEach((filteredItem) => {
+              filtered.push(filteredItem)
+            })
+          })
+        }
+
+        if (
+          item.files.dxf != 'N/A' ||
+          item.files.pdf != 'N/A' ||
+          item.files.stp != 'N/A' ||
+          item.files.stl != 'N/A' ||
+          item.files.flatDxf != 'N/A' ||
+          item.files.png != 'N/A'
         ) {
           filtered.push(item)
         }
       }
+
       return filtered.sort((a, b) => a.number.localeCompare(b.number))
+    },
+    quantityOverdracht(subpart, hoofdpart) {
+      if (subpart == null) {
+        return
+      }
+      console.log(hoofdpart, subpart)
+      if (hoofdpart != null) {
+        subpart.quantity *= hoofdpart.quantity
+      }
+      if (subpart.parts != []) {
+        subpart.parts.forEach((part) => {
+          this.quantityOverdracht(part, subpart)
+        })
+      }
+    },
+    createMonterenLijst(parts) {
+      const index = MonterenLijst.findIndex((i) => i.partNumber === parts.number)
+      if (parts.bewerking1.toLowerCase() == 'monteren') {
+        if (index !== -1) {
+          MonterenLijst[index].Aantal += parts.quantity
+        } else {
+          MonterenLijst.push({
+            partNumber: parts.number,
+            Aantal: parts.quantity,
+            Done: ''
+          })
+        }
+      }
+    },
+    createLasLijst(parts) {
+      const index = LasLijst.findIndex((i) => i.partNumber === parts.number)
+      if (parts.bewerking1.toLowerCase() == 'lassen') {
+        if (index !== -1) {
+          LasLijst[index].Aantal += parts.quantity
+        } else {
+          LasLijst.push({
+            partNumber: parts.number,
+            Aantal: parts.quantity,
+            Done: ''
+          })
+        }
+      }
     },
     async handleCreateButton() {
       let boeken = []
       if (this.LinkModelMontage) {
         this.Check(BOMData, 'Monteren')
+
+        let monteerStukken = []
+        this.fileTable.products.forEach((item) => {
+          if (item.bewerking1.toLowerCase() == 'monteren') {
+            monteerStukken.push(item)
+          }
+        })
+
+        var data = {
+          hoofdartikel: this.file.filename.split('_')[0],
+          project: project,
+          amount: monteerStukken.length
+        }
+
+        let endpoint = 'devion/tekeningen/createbook'
+        PostDataWithBody(endpoint, data)
+          .then(() => {
+            MonterenLijst = []
+            lijst.forEach((part) => {
+              this.createMonterenLijst(part)
+            })
+            var data = {
+              data: MonterenLijst,
+              project: project,
+              hoofdartikel: this.file.filename.split('_')[0]
+            }
+            endpoint = 'devion/tekeningen/createmontagelijst'
+
+            PostDataWithBody(endpoint, data).catch((error) => {
+              console.error(error)
+            })
+          })
+          .catch((error) => {
+            console.error(error)
+          })
       }
       if (this.LinkModelLassen) {
         boeken.push('Lassen')
+
+        this.Check(BOMData, 'Lassen')
+        LasLijst = []
+        lijst.forEach((part) => {
+          this.createLasLijst(part)
+        })
+        data = {
+          data: LasLijst,
+          project: project,
+          hoofdartikel: this.file.filename.split('_')[0]
+        }
+        let endpoint = 'devion/tekeningen/createlaslijst'
+        PostDataWithBody(endpoint, data).catch((error) => {
+          console.error(error)
+        })
       }
       alert('Boeken gemaakt')
     },
     async Check(Part, Bewerking) {
       if (Bewerking == 'Monteren') {
         if (Part != null) {
-          if (Part.parts != []) {
-            
-            let data = {
-              MainPart: Part,
-              Project: project,
-              Boeken: ['Monteren'],
-              hoofdartikel: this.file.filename.split('_')[0]
+          let data = {
+            MainPart: Part,
+            Project: project,
+            Boeken: ['Monteren'],
+            hoofdartikel: this.file.filename.split('_')[0]
+          }
+          let endpoint = 'devion/tekeningen/createbooks'
+          if (this.LinkModelMontage) {
+            PostDataWithBody(endpoint, data).catch((error) => {
+              console.error(error)
+            })
+          }
+          Part.parts.forEach((part) => {
+            if (part != null) {
+              if (part.bewerking1.toLowerCase() == 'monteren') {
+                this.Check(part, 'Monteren')
+              } else if (part.bewerking1.toLowerCase() == 'lassen') {
+                this.Check(part, 'Lassen')
+              }
             }
-            let endpoint = 'devion/tekeningen/createbooks'
-            if (this.LinkModelMontage) {
-              PostDataWithBody(endpoint, data)
-                .catch((error) => {
+          })
+        }
+      } else if (Bewerking == 'Lassen') {
+        if (Part != null) {
+          if (Part.parts != []) {
+            if (Part.bewerking1.toLowerCase() == 'lassen') {
+              let data = {
+                MainPart: Part,
+                Project: project,
+                Boeken: ['Lassen'],
+                hoofdartikel: this.file.filename.split('_')[0]
+              }
+              let endpoint = 'devion/tekeningen/createbooks'
+              if (this.LinkModelLassen) {
+                PostDataWithBody(endpoint, data).catch((error) => {
                   console.error(error)
                 })
+              }
             }
             Part.parts.forEach((part) => {
               if (part != null) {
@@ -301,35 +467,6 @@ export default {
                 }
               }
             })
-          }
-        }
-      } else if (Bewerking == 'Lassen') {
-        if (Part != null) {
-          if (Part.parts != []) {
-            if (Part.bewerking1.toLowerCase() == 'lassen') {
-              let data = {
-                MainPart: Part,
-                Project: project,
-                Boeken: ['Lassen'],
-                hoofdartikel: Part.number
-              }
-              let endpoint = 'devion/tekeningen/createbooks'
-              if (this.LinkModelLassen) {
-                PostDataWithBody(endpoint, data)
-                  .catch((error) => {
-                    console.error(error)
-                  })
-              }
-              Part.parts.forEach((part) => {
-                if (part != null) {
-                  if (part.bewerking1.toLowerCase() == 'monteren') {
-                    this.Check(part, 'Monteren')
-                  } else if (part.bewerking1.toLowerCase() == 'lassen') {
-                    this.Check(part, 'Lassen')
-                  }
-                }
-              })
-            }
           }
         }
       }
@@ -374,7 +511,7 @@ export default {
       this.UniqueNabehandelingen = [
         ...new Set(this.NabehandelingenData.map((item) => item.nabehandeling))
       ]
-      
+
       this.UniqueNabehandelingen.forEach((nabehandeling) => {
         const index = this.NabehandelingenData.findIndex(
           (item) => item.nabehandeling === nabehandeling
@@ -386,7 +523,6 @@ export default {
     },
     GetNabehandelingen(artikels) {
       artikels.forEach((artikel) => {
-        
         if (
           artikel.nabehandeling1 != null &&
           artikel.nabehandeling1 != '' &&
@@ -396,7 +532,7 @@ export default {
             nabehandeling: artikel.nabehandeling1.toLowerCase(),
             artikel: artikel.number
           }
-          
+
           this.NabehandelingenData.push(data)
         }
 
@@ -415,7 +551,7 @@ export default {
     },
     GetDifferentBewerkingen() {
       this.uniqueBewerkingen = [...new Set(this.bewerkingenData.map((item) => item.bewerking))]
-      
+
       this.uniqueBewerkingen.forEach((bewerking) => {
         const index = this.bewerkingenData.findIndex((item) => item.bewerking === bewerking)
         if (index !== -1) {
@@ -424,7 +560,6 @@ export default {
       })
     },
     handleKopieerButton() {
-      
       let bewerkingen = []
       this.bewerkingenData.forEach((bewerking) => {
         if (this.bewerkingenStatus[bewerking.bewerking]) {
@@ -434,7 +569,7 @@ export default {
           }
         }
       })
-      
+
       var data = {
         Folders: bewerkingen,
         BasePath: project
@@ -449,17 +584,16 @@ export default {
             leverancier: bewerking.leverancier,
             project: project
           }
+
           let endpoint = 'devion/tekeningen/kopieer/bewerkingen'
-          PostDataWithBody(endpoint, data)
-            .catch((error) => {
-              console.error(error)
-            })
+          PostDataWithBody(endpoint, data).catch((error) => {
+            console.error(error)
+          })
         }
       })
       alert('Kopieer actie voltooid')
     },
     handleKopieerButtonNabehandelingen() {
-      
       let nabehandelingen = []
       this.NabehandelingenData.forEach((nabehandeling) => {
         if (this.nabehandelingenStatus[nabehandeling.nabehandeling]) {
@@ -469,7 +603,7 @@ export default {
           }
         }
       })
-      
+
       var data = {
         Folders: nabehandelingen,
         BasePath: project
@@ -489,18 +623,17 @@ export default {
         }
       })
       endpoint = 'devion/tekeningen/kopieer/nabehandelingen'
-      PostDataWithBody(endpoint, dataset)
-        .catch((error) => {
-          console.error(error)
-        })
+      PostDataWithBody(endpoint, dataset).catch((error) => {
+        console.error(error)
+      })
       this.showModalNabehandelingen = true
       alert('Kopieer actie voltooid')
     }
   }
 }
 </script>
-
-<style lang="css">
+  
+  <style lang="css">
 .c-load {
   margin-top: 2rem;
   display: flex;

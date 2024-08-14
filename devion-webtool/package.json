@@ -27,7 +27,11 @@
     "eslint": "^8.46.0",
     "eslint-plugin-vue": "^9.16.1",
     "prettier": "^3.0.0",
+<<<<<<< HEAD
     "sass": "^1.77.6",
+=======
+    "sass": "^1.77.8",
+>>>>>>> feature/#39-tekeningen-printen
     "vite": "^4.4.9"
   }
 }

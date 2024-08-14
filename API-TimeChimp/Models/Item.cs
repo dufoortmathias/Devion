@@ -1,4 +1,4 @@
-﻿namespace Api.Devion.Models
+namespace Api.Devion.Models
 {
     public class Item
     {
