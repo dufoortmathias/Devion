@@ -1,0 +1,1 @@
+import{o as a,c as n,n as s}from"./index-2a712484.js";const m={__name:"ToggleButton",props:{modelValue:{required:!0,type:Boolean}},emits:["update:modelValue"],setup(e,{emit:o}){const l=e,t=()=>{o("update:modelValue",!l.modelValue)};return(c,u)=>(a(),n("div",{class:s(["toggle-switch",{checked:e.modelValue}]),onClick:t},null,2))}};export{m as _};
