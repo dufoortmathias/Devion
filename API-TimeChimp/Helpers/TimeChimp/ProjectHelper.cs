@@ -1,6 +1,6 @@
-﻿namespace Api.Devion.Helpers.TimeChimp
+namespace Api.Devion.Helpers.TimeChimp
 {
-    public class TimeChimpProjectHelper : TimeChimpHelper
+    public class TimeChimpProjectHelper: TimeChimpHelper
     {
         public TimeChimpProjectHelper(WebClient client) : base(client)
         {
@@ -9,10 +9,10 @@
         //check if project exists
         public ProjectTimeChimp? FindProject(string projectId)
         {
-            ProjectTimeChimp? project = GetProjects().Find(project => project.code != null && project.code.Equals(projectId));
+            ProjectTimeChimp? project = GetProjects().Find(project => project.Code != null && project.Code.Equals(projectId));
             if (project != null)
             {
-                project = GetProject(project.id ?? throw new Exception("Project form TimeChimp has no id"));
+                project = GetProject(project.Id);
             }
             return project;
         }
@@ -21,10 +21,10 @@
         public ProjectTimeChimp GetProject(int projectId)
         {
             //get data form timechimp
-            string response = TCClient.GetAsync($"v1/projects/{projectId}");
+            string response = TCClient.GetAsync($"projects/{projectId}?$expand=projectTasks, projectUsers, subprojects");
 
             //convert data to projectTimeChimp object
-            ProjectTimeChimp project = JsonTool.ConvertTo<ProjectTimeChimp>(response);
+            ProjectTimeChimp project = JsonTool.ConvertTo<ResponseTCProject>(response).Result[0];
             return project;
         }
 
@@ -32,10 +32,10 @@
         public List<ProjectTimeChimp> GetProjects()
         {
             //get data from timechimp
-            string response = TCClient.GetAsync("v2/projects");
+            string response = TCClient.GetAsync("projects?$expand=subprojects");
 
             //convert data to projectTimeChimp object
-            List<ProjectTimeChimp> projects = JsonTool.ConvertTo<List<ProjectTimeChimp>>(response);
+            List<ProjectTimeChimp> projects = JsonTool.ConvertTo<ResponseTCProject>(response).Result.ToList();
             return projects;
         }
 
@@ -43,19 +43,13 @@
         public ProjectTimeChimp CreateProject(ProjectTimeChimp project)
         {
             //convert project to json
-            string json = JsonTool.ConvertFrom(project);
-
-            //check if json is not empty
-            if (json == null)
-            {
-                throw new Exception("Error converting project to json");
-            }
+			string json = JsonTool.ConvertFrom(project) ?? throw new Exception("Error converting project to json");
 
             //add project to timechimp
-            string response = TCClient.PostAsync("v1/projects", json);
+            string response = TCClient.PostAsync("projects", json);
 
             //convert response to projectTimeChimp object
-            ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
+            ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ResponseTCProject>(response).Result[0];
             return projectResponse;
         }
 
@@ -63,38 +57,35 @@
         public ProjectTimeChimp UpdateProject(ProjectTimeChimp projectUpdate, TimeChimpEmployeeHelper employeehelperTC)
         {
             //get project from timechimp
-            ProjectTimeChimp project = GetProject(projectUpdate.id ?? throw new Exception("Project TimeChimp has not id"));
-
-            //check if project exists
-            if (project == null)
-            {
-                throw new Exception("Project does not exist in timechimp");
-            }
+            ProjectTimeChimp project = GetProject(projectUpdate.Id) ?? throw new Exception("Project does not exist in timechimp");
 
             //update some fields
-            project.name = projectUpdate.name;
-            project.endDate = projectUpdate.endDate;
-            project.startDate = projectUpdate.startDate;
-            project.active = projectUpdate.active;
-            project.budgetMethod = projectUpdate.budgetMethod;
-            project.budgetHours = projectUpdate.budgetHours;
-            project.customerId = projectUpdate.customerId;  
-
-            List<EmployeeTimeChimp> employees = employeehelperTC.GetEmployees();
-
-            project.projectUsers = employees.Select(employee => new ProjectUserTimechimp
-            {
-                userId = employee.id ?? throw new Exception("Employee TimeChimp has no id"),
-                projectId = project.id ?? throw new Exception("Project TimeChimp has no id"),
-                active = true
-            }).ToArray();
-
+            project.Name = projectUpdate.Name;
+            project.EndDate = projectUpdate.EndDate;
+            project.StartDate = projectUpdate.StartDate;
+            project.Active = projectUpdate.Active;
+            project.Budget = new();
+            project.Budget.Method = projectUpdate.Budget.Method;
+            project.Budget.Hours = projectUpdate.Budget.Hours;
+            project.Customer = new();
+            project.Customer.Id = projectUpdate.Customer.Id;
             //send data to timechimp
-            string response = TCClient.PutAsync("v1/projects", JsonTool.ConvertFrom(project));
+            string response = TCClient.PutAsync($"projects/{project.Id}", JsonTool.ConvertFrom(project));
 
+            Console.WriteLine(response);                                                    
             //convert response to projectTimeChimp object
-            ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ProjectTimeChimp>(response);
+            ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ResponseTCProject>(response).Result[0];
             return projectResponse;
+        }
+
+        public ResponseTCProject GetProjectTimeChimpByETSId(string projectId)
+        {
+            //get data from timechimp
+            string response = TCClient.GetAsync($"projects?$filter=code eq '{projectId}'&$count=true");
+
+            //convert data to projectTimeChimp object
+            ResponseTCProject project = JsonTool.ConvertTo<ResponseTCProject>(response);
+            return project;
         }
     }
 }

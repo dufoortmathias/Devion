@@ -10,21 +10,21 @@ public class TimeChimpTimeHelper : TimeChimpHelper
     }
 
     //get timeids between 2 dates and status approved
-    public string[] GetTimes(DateTime date)
+    public string[] GetTimes()
     {
         //get data from timechimp
-        string response = TCClient.GetAsync($"v1/time/daterange/{date:yyyy-MM-dd}/{DateTime.Now:yyyy-MM-dd}");
+        string response = TCClient.GetAsync($"times?$filter=status eq 'Approved'");
 
         //convert data to timeTimeChimp object
-        List<TimeTimeChimp> times = JsonTool.ConvertTo<List<TimeTimeChimp>>(response);
+        List<TimeTimeChimp> times = JsonTool.ConvertTo<ResponseTCTime>(response).Result.ToList();
 
         List<string> timeIds = new();
         foreach (TimeTimeChimp time in times)
         {
             //check if status is approved (2)
-            if (time.status == 2)
+            if (time.Status == TimeChimpStatus.Approved)
             {
-                timeIds.Add(time.id.ToString());
+                timeIds.Add(time.Id.ToString());
             }
         }
         timeIds.Reverse();
@@ -35,10 +35,10 @@ public class TimeChimpTimeHelper : TimeChimpHelper
     public TimeTimeChimp GetTime(int timeId)
     {
         //get data from timechimp
-        string response = TCClient.GetAsync($"v1/time/{timeId}");
+        string response = TCClient.GetAsync($"times/{timeId}");
 
         //convert data to timeTimeChimp object
-        TimeTimeChimp time = JsonTool.ConvertTo<TimeTimeChimp>(response);
+        TimeTimeChimp time = JsonTool.ConvertTo<ResponseTCTime>(response).Result[0];
 
 
         return time;
@@ -47,14 +47,13 @@ public class TimeChimpTimeHelper : TimeChimpHelper
     //change status of time
     public TimeTimeChimp InvoiceTime(int timeId)
     {
-        Dictionary<string, object> changes = new()
+        var obj = new
         {
-            {"registrationIds", new int[] { timeId} },
-            {"status", 3 }
+            status = TimeChimpStatus.Invoiced,
+            times = new[] { new { id = timeId } }
         };
-
         //send data to timechimp
-        _ = TCClient.PostAsync("v1/time/changestatusintern", JsonTool.ConvertFrom(changes));
+        _ = TCClient.PutAsync($"times/status", JsonTool.ConvertFrom(obj));
 
         return new TimeChimpTimeHelper(TCClient, ETSClient).GetTime(timeId);
     }

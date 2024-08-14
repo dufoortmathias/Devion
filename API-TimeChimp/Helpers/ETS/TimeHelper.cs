@@ -63,34 +63,32 @@ public class ETSTimeHelper : ETSHelper
         timeETS.PLA_ID = maxId + 1;
 
         //get data from ETS for the customer
-        CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(timeTC.customerId) ?? throw new Exception("Error getting customer from TimeChimp with id: " + timeTC.customerId);
-        timeETS.PLA_KLANT = customer.relationId;
+        CustomerTimeChimp customer = new TimeChimpCustomerHelper(TCClient).GetCustomer(timeTC.Customer.Id) ?? throw new Exception("Error getting customer from TimeChimp with id: " + timeTC.Customer.Id);
+        timeETS.PLA_KLANT = customer.RelationId;
 
         //get data from ETS for the uurcode
-        UurcodeTimeChimp uurCode = new TimeChimpUurcodeHelper(TCClient).GetUurcode(timeTC.TaskId) ?? throw new Exception("Error getting uurcode from TimeChimp with id: " + timeTC.TaskId);
-        timeETS.PLA_UURCODE = uurCode.code;
+        timeETS.PLA_UURCODE = timeTC.Task.Code;
 
         //get data from ETS for the project
-        ProjectTimeChimp subProject = new TimeChimpProjectHelper(TCClient).GetProject(timeTC.projectId) ?? throw new Exception("Error getting project from TimeChimp with id: " + timeTC.projectId);
-        timeETS.PLA_PROJECT = subProject.code?[..7];
-        timeETS.PLA_SUBPROJECT = subProject.code?[7..];
+        timeETS.PLA_PROJECT = timeTC.Project.Code?[..7];
+        timeETS.PLA_SUBPROJECT = timeTC.Project.Code?[7..];
 
 
         //get data from ETS for the project
         ProjectETS mainProject = new ETSProjectHelper(ETSClient).GetProject(timeETS.PLA_PROJECT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_PROJECT")) ?? throw new Exception("Error getting project from ETS with id: " + timeETS.PLA_PROJECT);
 
         //get data from ETS for the employee
-        EmployeeTimeChimp employee = new TimeChimpEmployeeHelper(TCClient).GetEmployee(timeTC.userId) ?? throw new Exception("Error getting employee from TimeChimp with id: " + timeTC.userId);
-        timeETS.PLA_PERSOON = employee.employeeNumber;
+        EmployeeTimeChimp employee = new TimeChimpEmployeeHelper(TCClient).GetEmployee(timeTC.User.Id) ?? throw new Exception("Error getting employee from TimeChimp with id: " + timeTC.User.Id);
+        timeETS.PLA_PERSOON = employee.EmployeeNumber;
 
         //create the caption
-        timeETS.PLA_CAPTION = $"{subProject.code}: {mainProject.PR_KROM}";
+        timeETS.PLA_CAPTION = $"{timeTC.Project.Code}: {mainProject.PR_KROM}";
 
         //create the text
         timeETS.PLA_TEKST =
-            timeTC.notes + "\n" +
-            $"{uurCode.name} ({timeETS.PLA_UURCODE})\n" +
-            $"TimeChimp: {timeTC.id}\n";
+            timeTC.Notes + "\n" +
+            $"{timeTC.Task.Name} ({timeETS.PLA_UURCODE})\n" +
+            $"TimeChimp: {timeTC.Id}\n";
 
         //create the query
         string query = $"INSERT INTO tbl_planning (PLA_ID, PLA_KLEUR, PLA_CAPTION, PLA_START, PLA_EINDE, PLA_KM_PAUZE, PLA_TEKST, PLA_PROJECT, PLA_SUBPROJECT, PLA_PERSOON, PLA_KLANT, PLA_UURCODE, PLA_KM, PLA_KM_HEEN_TERUG, PLA_KM_VERGOEDING, PLA_INTERN) " +
@@ -108,7 +106,7 @@ public class ETSTimeHelper : ETSHelper
             {"@persoon", timeETS.PLA_PERSOON ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_PERSOON")},
             {"@klant", timeETS.PLA_KLANT ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_KLANT")},
             {"@uurcode", timeETS.PLA_UURCODE ?? throw new Exception($"Time {timeETS.PLA_ID} from ETS has no PLA_UURCODE")},
-            {"@timechimp", timeTC.id}
+            {"@timechimp", timeTC.Id}
         };
 
         //send data to ETS

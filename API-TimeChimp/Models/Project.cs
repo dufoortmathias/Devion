@@ -2,45 +2,24 @@
 {
     public class ProjectTimeChimp
     {
-        public double? remainingBudgetHours { get; set; }
-        public int[]? tagIds { get; set; }
-        public string[]? tagNames { get; set; }
-        public bool? unspecified { get; set; }
-        public DateTime? invoiceDate { get; set; }
-        public bool? invoiceInInstallments { get; set; }
-        public double? budgetNotificationPercentage { get; set; }
-        public bool? budgetNotificationHasBeenSent { get; set; }
-        public string? clientId { get; set; }
-        public int? invoiceStatus { get; set; }
-        public int? invoiceId { get; set; }
-        public string? color { get; set; }
-        public bool? visibleOnSchedule { get; set; }
-        public string? externalUrl { get; set; }
-        public string? externalName { get; set; }
-        public string? invoiceReference { get; set; }
-        public List<ProjectTaskTimechimp>? projectTasks { get; set; }
-        public object[]? projectUsers { get; set; }
-        public int? id { get; set; }
-        public bool? active { get; set; }
-        public int customerId { get; set; }
-        public string? customerName { get; set; }
-        public string? name { get; set; }
-        public string? code { get; set; }
-        public string? notes { get; set; }
-        public int invoiceMethod { get; set; }
-        public double? hourlyRate { get; set; }
-        public double? rate { get; set; }
-        public int budgetMethod { get; set; }
-        public double? budgetRate { get; set; }
-        public double? budgetHours { get; set; }
-        public DateTime? startDate { get; set; }
-        public DateTime? endDate { get; set; }
-        public object? projectSubscription { get; set; }
-        public DateTime? modified { get; set; }
-        public int? mainProjectId { get; set; }
-        public int[]? projectManagerIds { get; set; }
-        public bool? useSubprojects { get; set; }
-        public int[]? subprojectIds { get; set; }
+        public int Id { get; set; }
+        public bool? Active { get; set; }
+        public bool? Unspecified { get; set; }
+        public string? Name { get; set; }
+        public string? Code { get; set; }
+        public string? Notes { get; set; }
+        public string? Color { get; set; }
+        public string? StartDate { get; set; }
+        public string? EndDate { get; set; }
+        public Invoicing? Invoicing { get; set; }
+        public Budget? Budget { get; set; }
+        public DateTime? Created { get; set; }
+        public DateTime? Modified { get; set; }
+        public CustomerTimeChimp? Customer { get; set; }
+        public Project? MainProject { get; set; }
+        public Project[]? SubProjects { get; set; }
+        public ProjectTaskTC[]? ProjectTasks { get; set; }
+        public Tag[]? Tags { get; set; }
 
         //constructor without specific parameters
         public ProjectTimeChimp() { }
@@ -48,13 +27,15 @@
         //constructor to from timechimp class to ets class (mainproject)
         public ProjectTimeChimp(ProjectETS projectETS)
         {
-            code = projectETS.PR_NR;
-            name = projectETS.PR_KROM;
-            startDate = projectETS.PR_START_PRODUCTIE;
-            active = projectETS.PR_STAT.Equals('L');
-            useSubprojects = true; //TODO: add value to seperate file
-            invoiceMethod = 2; //TODO: add value to seperate file
-            budgetMethod = 2; //TODO: add value to seperate file
+            Code = projectETS.PR_NR;
+            Name = projectETS.PR_KROM;
+            StartDate = projectETS.PR_START_PRODUCTIE.ToString();
+            Active = projectETS.PR_STAT.Equals('L');
+            SubProjects = Array.Empty<Project>();
+            Invoicing = new();
+            Budget = new ();
+            Invoicing.Method = InvoiceMethod.TaskHourlyRate; //TODO: add value to seperate file
+            Budget.Method = BudgetMethod.TaskHours; //TODO: add value to seperate file
         }
 
         //constructor to from timechimp class to ets class (subproject)
@@ -62,14 +43,25 @@
         {
             if (subprojectETS != null && mainProject != null)
             {
-                code = subprojectETS.VOLNR;
-                name = subprojectETS.SU_OMS;
-                customerId = mainProject.customerId;
-                startDate = subprojectETS.SU_START_PRODUCTIE;
-                active = subprojectETS.SU_AFGEWERKT != 1;
-                useSubprojects = false; //TODO: add value to seperate file
-                invoiceMethod = 2; //TODO: add value to seperate file
-                budgetMethod = 3; //TODO: add value to seperate file
+                Code = subprojectETS.VOLNR;
+                Name = subprojectETS.SU_OMS;
+                Customer = new();
+                Customer.Id = mainProject.Customer.Id;
+                StartDate = subprojectETS.SU_START_PRODUCTIE.ToString();
+                Active = subprojectETS.SU_AFGEWERKT != 1;
+                MainProject = new()
+                {
+                    Id = mainProject.Id
+                };
+                Invoicing = new()
+                {
+                    Method = InvoiceMethod.TaskHourlyRate //TODO: add value to seperate file
+                };
+                Budget = new()
+                {
+                    Method = BudgetMethod.TaskHours //TODO: add value to seperate file
+                };
+                ProjectTasks = Array.Empty<ProjectTaskTC>();
             }
         }
     }
@@ -91,5 +83,82 @@
         public string? VOLNR { get; set; }
         public int? SU_AFGEWERKT { get; set; }
         public DateTime? SU_START_PRODUCTIE { get; set; }
+    }
+
+    public class Project
+    {
+        public int? Id { get; set; }
+        public bool? Active { get; set; }
+        public bool? Unspecified { get; set; }
+        public string? Name { get; set; }
+        public string? Color { get; set; }
+    }
+
+    public enum BudgetMethod
+    {
+        NoBudget,
+        TotalHours,
+        TaskHours,
+        USerHours,
+        TotalRate,
+        TaskRate,
+        Invoice,
+        TotalCost
+    }
+
+    public enum InvoiceMethod
+    {
+        NoInvoicing,
+        TaskHourlyRate,
+        UserHourlyRate,
+        ProjectHourlyRate,
+        CustomerHourlyRate,
+        ProjectRate,
+        TaskRate,
+        Subscription
+    }
+
+    public class Budget
+    {
+        public BudgetMethod? Method { get; set; }
+        public float? Hours { get; set; }
+        public float? Rate { get; set; }
+        public float? NotificationPercentage { get; set; }
+    }
+
+    public class Invoicing
+    {
+        public InvoiceMethod? Method { get; set; }
+        public float? HourlyRate { get; set; }
+        public float? FixedRate { get; set; }
+        public string? Reference { get; set; }
+        public string? Date { get; set; }
+    }
+
+    public class TaskTC
+    {
+        public int Id { get; set; }
+        public bool? Active { get; set; }
+        public bool? Unspecified { get; set; }
+        public string? Name { get; set; }
+        public string? Code { get; set; }
+    }
+    public class ProjectTaskTC
+    {
+        public int Id { get; set; }
+        public bool? Active { get; set; }
+        public bool? Unspecified { get; set; }
+        public float? HourlyRate { get; set; }
+        public float? FixedRate { get; set; }
+        public float? BudgetHours { get; set; }
+        public float? BudgetRate { get; set; }
+        public TaskTC? Task { get; set; }
+    }
+
+    public class ResponseTCProject
+    {
+        public ProjectTimeChimp[]? Result { get; set; }
+        public Link[]? Links { get; set; }
+        public int? Count { get; set; }
     }
 }

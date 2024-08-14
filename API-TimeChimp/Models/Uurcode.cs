@@ -2,16 +2,17 @@ namespace Api.Devion.Models;
 
 public class UurcodeTimeChimp
 {
-    public int? id { get; set; }
-    public bool? active { get; set; }
-    public string? name { get; set; }
-    public string? code { get; set; }
-    public string? hourlyRate { get; set; }
-    public bool? billable { get; set; }
-    public bool? common { get; set; }
-    public bool? unspecified { get; set; }
-    public int[]? tagIds { get; set; }
-    public string[]? tagNames { get; set; }
+    public int? Id { get; set; }
+    public bool? Active { get; set; }
+    public string? Name { get; set; }
+    public string? Code { get; set; }
+    public string? HourlyRate { get; set; }
+    public bool? Billable { get; set; }
+    public bool? Common { get; set; }
+    public bool? Unspecified { get; set; }
+    public DateTime? Created { get; set; }
+    public DateTime? Modified { get; set; }
+    public Tag[]? Tags { get; set; }
 
     //constructor without specific parameters
     public UurcodeTimeChimp() { }
@@ -19,15 +20,14 @@ public class UurcodeTimeChimp
     //constructor to from ets class to timechimp class
     public UurcodeTimeChimp(UurcodeETS uurcode)
     {
-        name = uurcode.UR_OMS;
-        code = uurcode.UR_COD;
-        billable = true;
-        common = false;
-        unspecified = false;
-        active = true;
-        tagIds = new int[] { };
-        tagNames = new string[] { };
-        hourlyRate = null;
+        Name = uurcode.UR_OMS;
+        Code = uurcode.UR_COD;
+        Billable = true;
+        Common = true;
+        Unspecified = false;
+        Active = true;
+        Tags = Array.Empty<Tag>();
+        HourlyRate = null;
     }
 }
 
@@ -35,4 +35,10 @@ public class UurcodeETS
 {
     public string? UR_COD { get; set; }
     public string? UR_OMS { get; set; }
+}
+
+public class ResponseTCUurcode
+{
+    public UurcodeTimeChimp[]? Result { get; set; }
+    public int? Count { get; set; }
 }

@@ -9,13 +9,13 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     //get mileage
     public MileageTimeChimp GetMileage(int mileageId)
     {
-        string enpoint = $"v1/mileage/{mileageId}";
+        string enpoint = $"mileages/{mileageId}";
 
         //get data from timechimp
         string response = TCClient.GetAsync(enpoint);
 
         //convert data to mileageTimeChimp object
-        MileageTimeChimp mileage = JsonTool.ConvertTo<MileageTimeChimp>(response);
+        MileageTimeChimp mileage = JsonTool.ConvertTo<ResponseTCMileage>(response).Result[0];
         return mileage;
     }
 
@@ -23,7 +23,7 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     public List<MileageTimeChimp> GetMileages()
     {
         //get data from timechimp
-        string response = TCClient.GetAsync("v1/mileage");
+        string response = TCClient.GetAsync("mileages");
 
         //convert data to mileageTimeChimp object
         List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
@@ -31,36 +31,32 @@ public class TimeChimpMileageHelper : TimeChimpHelper
     }
 
     //get approved mileages by date
-    public List<int> GetApprovedMileageIdsByDate(DateTime date)
+    public List<int> GetApprovedMileageIds()
     {
-        string endpoint = $"v1/mileage/daterange/{date:yyyy-MM-dd}/{DateTime.Now.Date:yyyy-MM-dd}";
+        string endpoint = $"mileages?$filter=status eq 'Approved'";
 
         //get data from timechimp between date and now
         string response = TCClient.GetAsync(endpoint);
 
         //convert data to mileageTimeChimp object
-        List<MileageTimeChimp> mileages = JsonTool.ConvertTo<List<MileageTimeChimp>>(response);
+        List<MileageTimeChimp> mileages = JsonTool.ConvertTo<ResponseTCMileage>(response).Result.ToList();
 
         //return all mileages with status approved (2)
-        return mileages
-            .FindAll(mileage => mileage.statusIntern == 2)
-            .Select(mileage => mileage.id)
-            .Reverse()
-            .ToList();
+        return mileages.Select(mileages => mileages.Id).ToList();
     }
 
     //change status of mileage
     public MileageTimeChimp changeStatus(int mileageId)
     {
         //create new object
-        Dictionary<string, object> changes = new()
+        var obj = new
         {
-            {"registrationIds", new int[] { mileageId } },
-            {"status", 3 }
+            status = TimeChimpStatus.Invoiced,
+            mileages = new[] { new { id = mileageId } }
         };
 
         //send data to timechimp
-        TCClient.PostAsync("v1/mileage/changestatusintern", JsonTool.ConvertFrom(changes));
+        TCClient.PutAsync("mileages/status", JsonTool.ConvertFrom(obj));
 
         return new TimeChimpMileageHelper(TCClient).GetMileage(mileageId);
     }
