@@ -26,7 +26,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("AllowOrigins");
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 
 
@@ -70,6 +70,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     TimeChimpTimeHelper timeHelperTC = new(TCClient, ETSClient);
     TimeChimpUurcodeHelper uurcodeHelperTC = new(TCClient);
     VehicleHelper vehicleHelper = new(TCClient);
+
+    GeneralBookHelper bookHelper = new();
+    GeneralKopieerHelper kopieerHelper = new();
 
     //get companies from config
     string company = config[$"Companies:{companyIndex}:Name"];
@@ -337,22 +340,209 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     {
         try
         {
-            // Check if project exists in Timechimp
-            
-            ResponseTCProject projecten = projectHelperTC.GetProjectTimeChimpByETSId(projectId);
+            // Get project from ETS
+            ProjectETS ETSProject = projectHelperETS.GetProject(projectId);
 
-            if (projecten.Count == 0)
+            // Handle when project doesn't exist in ETS
+            if (ETSProject == null)
             {
-                //create project in timechimp
-                Console.WriteLine("New project");
-
-            } else
-            {
-                //update project in timechimp
-                Console.WriteLine("Update project");
+                return Results.Problem($"ETS doesn't contain a project with id = {projectId}");
             }
-            
-            return Results.Ok(projecten);
+
+            // Change to TimeChimp class
+            ProjectTimeChimp TCProject = new(ETSProject);
+            EmployeeTimeChimp ManagerId = employeeHelperTC.GetEmployeeByEmployeeNumber(ETSProject.PR_BESTEMMELING ?? null);
+
+            CustomerTimeChimp customer;
+            // Find customer id TimeChimpETSContact.CO_KLCOD
+            if (ETSProject.PR_KLNR == null)
+            {
+                customer = customerHelperTC.GetCustomers().Find(c => c.Intern != null && c.Intern.Value) ?? throw new Exception($"The ETS record for project with id = {projectId} has no customernumber, internal customer is still archived in TimeChimp!");
+            }
+            else
+            {
+                customer = customerHelperTC.GetCustomers().Find(c => c.RelationId != null && c.RelationId.Equals(ETSProject.PR_KLNR)) ?? throw new Exception($"No timechimp cutomer found with id = {ETSProject.PR_KLNR}");
+            }
+            TCProject.Customer = new()
+            {
+                Id = customer.Id
+            };
+
+            ProjectTimeChimp mainProject = projectHelperTC.FindProject(projectId) ?? projectHelperTC.CreateProject(TCProject);
+
+            // update mainproject
+            TCProject.Id = mainProject.Id;
+
+            mainProject = projectHelperTC.UpdateProject(TCProject);
+
+            List<string> errorMessages = new();
+            double totalBudgetHours = 0;
+            List<UurcodeTimeChimp> uurcodes = uurcodeHelperTC.GetUurcodes();
+            // check if subproject of hoofdproject but with subprojectcode 0000 exists otherwise create one
+            string subprojectCode = mainProject.Code + "0000";
+            ProjectTimeChimp Subproject = new()
+            {
+                Code = subprojectCode,
+                Name = mainProject.Name,
+                Active = mainProject.Active,
+                Customer = mainProject.Customer,
+                Budget = new Budget
+                {
+                    Hours = 0,
+                    Method = "TaskHours"
+                },
+                MainProject = new Project
+                {
+                    Id = mainProject.Id
+                },
+            };
+
+            ProjectTimeChimp mainSubproject = projectHelperTC.FindProject(subprojectCode) ?? projectHelperTC.CreateProject(Subproject);
+
+            List<int> usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+            if (mainSubproject.ProjectUsers == null)
+            {
+                mainSubproject.ProjectUsers = new List<ProjectUserTC>();
+            }
+            mainSubproject.ProjectUsers.Clear();
+            foreach (int userId in usersIds)
+            {
+                mainSubproject.ProjectUsers ??= new List<ProjectUserTC>();
+
+                mainSubproject.ProjectUsers.Add(new ProjectUserTC
+                {
+                    User = new UserTC
+                    {
+                        Id = userId
+                    }
+                });
+            }
+            // get subprojects from ETS
+            List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
+            foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => subProject.SU_SUB != null && !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
+            {
+                double budgetHours = 0;
+                // Change to TimeChimp class
+                ProjectTimeChimp TCSubproject = new(ETSSubproject, mainProject);
+
+                ProjectTimeChimp subProject = projectHelperTC.FindProject(TCSubproject.Code ?? throw new Exception("Subproject received from timechimp has no code")) ?? projectHelperTC.CreateProject(TCSubproject);
+
+                TCSubproject.Id = subProject.Id;
+                subProject = projectHelperTC.UpdateProject(TCSubproject);
+
+
+                subProject.ProjectTasks.Clear();
+                subProject.ProjectUsers.Clear();
+
+                if (TCSubproject.Active ?? false)
+                {
+                    //update budgethours for each projecttask in timeChimp
+                    List<ProjectTaskETS> projectTasksETS = uurcodeHelperETS.GetUurcodesSubproject(ETSProject.PR_NR ?? throw new Exception("Project received from ETS has no NR"), ETSSubproject.SU_SUB ?? throw new Exception("Subproject received from ETS has no SUBNR"));
+                    foreach (ProjectTaskETS projectTaskETS in projectTasksETS)
+                    {
+                        if (float.Parse(projectTaskETS.VO_AANT.ToString()) == 0)
+                        {
+                            break;
+                        }
+                        if (subProject.Id == null)
+                        {
+                            errorMessages.Add($"Subproject {subProject.Code} has no id");
+                        }
+                        else if (string.IsNullOrEmpty(projectTaskETS.VO_UUR?.Trim()))
+                        {
+                            errorMessages.Add($"Subproject {subProject.Code} field VO_UUR is empty in table J2W_VOPX");
+                        }
+                        else if (projectTaskETS.VO_AANT == null)
+                        {
+                            errorMessages.Add($"Subproject {subProject.Code} field VO_AANT is null in table J2W_VOPX");
+                        }
+                        else
+                        {
+                            int taskId = uurcodes.Find(u => u.Code != null && u.Code.Equals(projectTaskETS.VO_UUR))?.Id ?? throw new Exception($"TimeChimp has no task with code = {projectTaskETS.VO_UUR}");
+                            ProjectTaskTC projectTaskTC = new()
+                            {
+                                Task = new TaskTC
+                                {
+                                    Id = taskId
+                                },
+                                BudgetHours = float.Parse(projectTaskETS.VO_AANT.Value.ToString())
+                            };
+
+                            subProject.ProjectTasks.Add(projectTaskTC);
+
+                            totalBudgetHours += projectTaskETS.VO_AANT.Value;
+                            budgetHours += projectTaskETS.VO_AANT.Value;
+                        }
+                    }
+                }
+
+                List<int> userIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+
+                foreach (int userId in userIds)
+                {
+                    subProject.ProjectUsers ??= new List<ProjectUserTC>();
+
+                    subProject.ProjectUsers.Add(new ProjectUserTC
+                    {
+                        User = new UserTC
+                        {
+                            Id = userId
+                        }
+                    });
+                }
+                subProject.Budget.Hours = float.Parse(budgetHours.ToString());
+                subProject.Budget.Method = "TaskHours";
+                subProject.Managers.Clear();
+                if (ManagerId != null)
+                {
+                    subProject.Managers.Add(new Manager
+                    {
+                        Id = ManagerId.Id
+                    });
+                }
+
+                subProject = projectHelperTC.UpdateProject(subProject);
+            }
+
+            // update mainproject
+            TCProject.Id = mainProject.Id;
+            TCProject.Budget.Hours = float.Parse(totalBudgetHours.ToString());
+            usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+            if (TCProject.ProjectUsers == null)
+            {
+                TCProject.ProjectUsers = new List<ProjectUserTC>();
+            }
+            TCProject.ProjectUsers.Clear();
+            foreach (int userId in usersIds)
+            {
+                TCProject.ProjectUsers ??= new List<ProjectUserTC>();
+
+                TCProject.ProjectUsers.Add(new ProjectUserTC
+                {
+                    User = new UserTC
+                    {
+                        Id = userId
+                    }
+                });
+            }
+
+            TCProject.Managers.Clear();
+            if (ManagerId != null)
+            {
+                TCProject.Managers.Add(new Manager
+                {
+                    Id = ManagerId.Id
+                });
+            }
+            mainProject = projectHelperTC.UpdateProject(TCProject);
+
+
+            if (errorMessages.Count > 0)
+            {
+                throw new Exception(string.Join(", ", errorMessages));
+            }
+
+            return Results.Ok(mainProject);
         }
         catch (Exception e)
         {
@@ -423,7 +613,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             //mileage.Vehicle = vehicleHelper.GetVehicle(mileage.Vehicle.Id) ?? throw new Exception("Vehicle received from timechimp has no vehicle");
             Console.WriteLine(JsonTool.ConvertFromWithNullValues(mileage));
-            
+
             string projectNumber = projectHelperTC.GetProject(mileage.Project.Id).Code ?? throw new Exception("Project received from timechimp has no code");
             string employeeNumber = employeeHelperTC.GetEmployee(mileage.User.Id).EmployeeNumber ?? throw new Exception("Employee received from timechimp has no employeeNumber");
 
@@ -707,11 +897,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             });
 
             Item MainPart = new Item();
-            string number = fileName.Split('.')[0].Split('_')[0];
-            string omschrijving = fileName.Split('.')[0].Split('_')[1];
+            string number = fileName.Substring(0, 15);
+            string omschrijving = "";
             MainPart.Number = number;
             MainPart.Description = omschrijving;
             MainPart.LynNumber = "1";
+            MainPart.Bewerking1 = "Monteren";
 
             List<Item> MetabilItems = new List<Item>();
 
@@ -737,14 +928,14 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     else
                     {
 #pragma warning disable CS8604 // Dereference of a possibly linenull reference.
-                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
+                        Item part = new(row["Part Number"]?.ToString(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
 #pragma warning restore CS8604 // Dereference of a possibly null reference.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-                        if (part.Number is not null && part.Number.Length > 25)
-                        {
-                            throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
-                        }
+                        //if (part.Number is not null && part.Number.Length > 25)
+                        //{
+                        //    throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
+                        //}
                         try
                         {
 
@@ -754,13 +945,15 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             part.Bewerking2 = row["Bewerking 2"] != DBNull.Value ? ((string)row["Bewerking 2"]).ToUpper().Trim() : "-";
                             part.Bewerking3 = row["Bewerking 3"] != DBNull.Value ? ((string)row["Bewerking 3"]).ToUpper().Trim() : "-";
                             part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
+                            part.Nabehandeling1 = row["Nabehandeling 1"] != DBNull.Value ? ((string)row["Nabehandeling 1"]).ToUpper().Trim() : "-";
+                            part.Nabehandeling2 = row["Nabehandeling 2"] != DBNull.Value ? ((string)row["Nabehandeling 2"]).ToUpper().Trim() : "-";
 
                             part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Split(' ')[0], out float massValue) ? float.Parse(row["Mass"].ToString().Split(' ')[0]) : 0;
 
                             part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
-                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? ((string)row["Aankoop per"]) : "1";
+                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? (row["Aankoop per"].ToString()) : "1";
                             part.Verbruikseenh = row["Verbruikseenh"] != DBNull.Value ? ((string)row["Verbruikseenh"]).ToUpper().Trim() : "ST";
-                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? ((string)row["Omrekeningsfactor"]) : "1";
+                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? ((string)row["Omrekeningsfactor"].ToString()) : "1";
                             part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
 
 
@@ -820,6 +1013,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.Message, e.StackTrace);
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}TransformBomExcel").WithTags(company);
@@ -1079,17 +1273,127 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
     }).WithName($"{company}ProjectenVoortgangImport").WithTags(company);
 
-    app.MapGet($"api/{company.ToLower()}/artikel/groepen", () =>
+    app.MapGet($"/api/{company.ToLower()}/foldernames", () =>
     {
-        List<ArticleGroep> art_Groeps = articleHelperETS.GetArticleGroeps();
-        return Results.Ok(art_Groeps);
-    }).WithName($"{company}ArtikeGroeps").WithTags(company);
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten";
 
-    app.MapGet($"api/{company.ToLower()}/historiek/stock", (string Groep, string StartDate, string EndDate) =>
+        List<string> folders = new();
+
+        foreach (string folderName in Directory.EnumerateDirectories(baseFolderpath))
+        {
+            folders.Add(Path.GetFileName(folderName));
+        }
+
+        return Results.Ok(folders);
+    }).WithName($"{company}FolderNames").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/check", ([FromBody] Item MainPart, string project) =>
     {
-        Console.WriteLine(Groep + StartDate + EndDate);
+        try
+        {
+            string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\05_PDF_DXF_STP_Compleet\";
+            MainPart = itemHelperETS.CheckFiles(MainPart, baseFolderpath);
+            return Results.Ok(MainPart);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"error: {e.Message}");
+            Console.WriteLine($"line: {e.StackTrace}");
+            return Results.Problem(e.Message);
+        }
+
+    }).WithName($"{company}CheckTekenigen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/createbooks", ([FromBody] Book required) =>
+    {
+        string project = required.Project;
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\";
+
+        PdfDocument pdf = new();
+
+        string path = baseFolderpath + @"05_PDF_DXF_STP_Compleet\" + required.MainPart.Number + ".pdf";
+
+        // check if file exists
+        if (File.Exists(path))
+        {
+            using (PdfDocument part = PdfReader.Open(path, PdfDocumentOpenMode.Import))
+            {
+                bookHelper.CopyPages(part, pdf);
+            }
+        }
+
+        required.Boeken.ForEach(b =>
+        {
+            bookHelper.CreateBook(b, required.MainPart, baseFolderpath, required.hoofdartikel, pdf);
+        });
+
+
+        // save pdf
+        //check if folder exists
+        if (Directory.Exists(baseFolderpath + @"03_Montage_boek") == false)
+        {
+            Directory.CreateDirectory(baseFolderpath + @"03_Montage_boek");
+        }
+
+        if (Directory.Exists(baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd")) == false)
+        {
+            Directory.CreateDirectory(baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd"));
+        }
+
+        string savePath = baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\MOB_" + required.MainPart.Number + ".pdf";
+        if (pdf.PageCount > 0)
+        {
+            pdf.Save(savePath);
+        }
         return Results.Ok();
-    }).WithName($"{company}HistoriekStock").WithTags(company);
+    }).WithName($"{company}CreateBooks").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/bewerkingen", ([FromBody] Kopieer bewerking) =>
+    {
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + bewerking.Project + @"\11_Productie\";
+        kopieerHelper.KopieerTekenigen(basePath, bewerking);
+        return Results.Ok();
+    }).WithName($"{company}KopieerTekenigenBewerkingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/bewerkingen/delete", ([FromBody] KopieerDelete bewerking) =>
+    {
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + bewerking.BasePath + @"\11_Productie\06_PDF_DXF_STP_Bewerkingen\";
+        kopieerHelper.DeleteFolders(bewerking.Folders, baseFolderpath);
+        return Results.Ok();
+    }).WithName($"{company}DeleteBewerking").WithTags(company);
+
+    //app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/nabehandelingen", ([FromBody] KopieerNa nabehandeling) =>
+    //{
+    //    string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandeling.Project + @"\11_Productie\";
+    //    kopieerHelper.KopieerTekeningenNabehandeling(basePath, nabehandeling);
+    //    return Results.Ok();
+    //}).WithName($"{company}KopieerTekenigenNabehandelingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/nabehandelingen", ([FromBody] List<KopieerNa> nabehandelingen) =>
+    {
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandelingen[0].Project + @"\11_Productie\";
+        var groupedNabehandelingen = nabehandelingen.GroupBy(n => n.Nabehandeling)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var group in groupedNabehandelingen)
+        {
+            PdfDocument to = new();
+            foreach (var nabehandeling in group.Value)
+            {
+                kopieerHelper.KopieerTekeningenNabehandeling(basePath, nabehandeling, to);
+            }
+            string savePath = basePath + @"07_PDF_Nabehandelingen\" + group.Key + @"\" + group.Key + "_" + group.Value[0].HoofdArtikel + ".pdf";
+            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+            to.Save(savePath);
+        }
+    }).WithName($"{company}KopieerTekenigenNabehandelingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/nabehandelingen/delete", ([FromBody] KopieerDelete nabehandeling) =>
+    {
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandeling.BasePath + @"\11_Productie\07_PDF_Nabehandelingen\";
+        kopieerHelper.DeleteFolders(nabehandeling.Folders, baseFolderpath);
+        return Results.Ok();
+    }).WithName($"{company}DeleteNabehandeling").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");

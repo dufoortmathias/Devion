@@ -149,4 +149,75 @@ public class ETSItemHelper : ETSHelper
             return logDict;
         }
     }
+
+    public Item CheckFiles(Item item, string basePath)
+    {
+        if (item.Parts != null && item.Parts.Count > 0)
+        {
+            item.Parts.ForEach(part =>
+            {
+                if (part != null)
+                {
+                    part = CheckFiles(part, basePath);
+                }
+            });
+        }
+        // No more parts, add your code here to process the item
+        // For example, you can check if the item has a file associated with it
+        // and perform some action if it does
+        if (item.Bewerking1.ToLower() != "kopen" && item.Bewerking1.ToLower() != "normelement" && item.Bewerking1.ToLower() != "referentie" && item.Bewerking1.ToLower() != "-" && item.Bewerking1.ToLower() != "" && !item.Bewerking1.ToLower().Contains("klant"))
+        {
+            if (File.Exists(basePath + item.Number + ".dxf"))
+            {
+                item.Files.dxf = "OK";
+            }
+            else
+            {
+                item.Files.dxf = "NOK";
+            }
+
+            if (File.Exists(basePath + item.Number + ".pdf"))
+            {
+                item.Files.pdf = "OK";
+            }
+            else
+            {
+                item.Files.pdf = "NOK";
+            }
+
+            if (File.Exists(basePath + item.Number + ".stp"))
+            {
+                item.Files.stp = "OK";
+            }
+            else
+            {
+                item.Files.stp = "NOK";
+            }
+        }
+
+        if (item.Bewerking1.ToLower() == "3d printen" || item.Bewerking2.ToLower() == "3d printen" || item.Bewerking3.ToLower() == "3d printen" || item.Bewerking4.ToLower() == "3d printen")
+        {
+            if (File.Exists(basePath + item.Number + ".stl"))
+            {
+                item.Files.stl = "OK";
+            }
+            else
+            {
+                item.Files.stl = "NOK";
+            }
+        }
+
+        if (item.Bewerking1.ToLower() == "laseren" || item.Bewerking2.ToLower() == "laseren" || item.Bewerking3.ToLower() == "laseren" || item.Bewerking4.ToLower() == "laseren")
+        {
+            if (File.Exists(basePath + item.Number + "_FLAT.dxf"))
+            {
+                item.Files.flatDxf = "OK";
+            }
+            else
+            {
+                item.Files.flatDxf = "NOK";
+            }
+        }
+        return item;
+    }
 }

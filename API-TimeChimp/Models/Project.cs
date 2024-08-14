@@ -17,8 +17,10 @@
         public DateTime? Modified { get; set; }
         public CustomerTimeChimp? Customer { get; set; }
         public Project? MainProject { get; set; }
-        public Project[]? SubProjects { get; set; }
-        public ProjectTaskTC[]? ProjectTasks { get; set; }
+        public List<Project>? SubProjects { get; set; }
+        public List<Manager>? Managers { get; set; }
+        public List<ProjectTaskTC>? ProjectTasks { get; set; }
+        public List<ProjectUserTC>? ProjectUsers { get; set;}
         public Tag[]? Tags { get; set; }
 
         //constructor without specific parameters
@@ -31,11 +33,12 @@
             Name = projectETS.PR_KROM;
             StartDate = projectETS.PR_START_PRODUCTIE.ToString();
             Active = projectETS.PR_STAT.Equals('L');
-            SubProjects = Array.Empty<Project>();
+            SubProjects = new List<Project>();
             Invoicing = new();
             Budget = new ();
-            Invoicing.Method = InvoiceMethod.TaskHourlyRate; //TODO: add value to seperate file
-            Budget.Method = BudgetMethod.TaskHours; //TODO: add value to seperate file
+            Invoicing.Method = "TaskHourlyRate"; //TODO: add value to seperate file
+            Budget.Method = "TotalHours"; //TODO: add value to seperate file
+            Managers = new List<Manager>();
         }
 
         //constructor to from timechimp class to ets class (subproject)
@@ -55,13 +58,14 @@
                 };
                 Invoicing = new()
                 {
-                    Method = InvoiceMethod.TaskHourlyRate //TODO: add value to seperate file
+                    Method = "TaskHourlyRate" //TODO: add value to seperate file
                 };
                 Budget = new()
                 {
-                    Method = BudgetMethod.TaskHours //TODO: add value to seperate file
+                    Method = "TaskHours" //TODO: add value to seperate file
                 };
-                ProjectTasks = Array.Empty<ProjectTaskTC>();
+                ProjectTasks = new List<ProjectTaskTC>();
+                Managers = new List<Manager>();
             }
         }
     }
@@ -73,6 +77,7 @@
         public DateTime? PR_START_PRODUCTIE { get; set; }
         public DateTime? PR_BELOOFD { get; set; }
         public char? PR_STAT { get; set; }
+        public string? PR_BESTEMMELING { get; set; }
     }
 
     public class SubprojectETS
@@ -99,7 +104,7 @@
         NoBudget,
         TotalHours,
         TaskHours,
-        USerHours,
+        UserHours,
         TotalRate,
         TaskRate,
         Invoice,
@@ -120,15 +125,24 @@
 
     public class Budget
     {
-        public BudgetMethod? Method { get; set; }
+        public String? Method { get; set; }
         public float? Hours { get; set; }
         public float? Rate { get; set; }
         public float? NotificationPercentage { get; set; }
     }
 
+    public class Manager
+    {
+        public int? Id { get; set; }
+        public bool? Active { get; set; }
+        public bool? Unspecified { get; set; }
+        public string? UserName { get; set; }
+        public string? DisplayName { get; set; }
+    }
+
     public class Invoicing
     {
-        public InvoiceMethod? Method { get; set; }
+        public string? Method { get; set; }
         public float? HourlyRate { get; set; }
         public float? FixedRate { get; set; }
         public string? Reference { get; set; }
@@ -145,14 +159,31 @@
     }
     public class ProjectTaskTC
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public bool? Active { get; set; }
-        public bool? Unspecified { get; set; }
+        public bool? Billable { get; set; }
         public float? HourlyRate { get; set; }
         public float? FixedRate { get; set; }
         public float? BudgetHours { get; set; }
         public float? BudgetRate { get; set; }
         public TaskTC? Task { get; set; }
+    }
+
+    public class ProjectUserTC
+    {
+        public int? Id { get; set; }
+        public bool? Active { get; set; }
+        public float? HourlyRate { get; set; }
+        public float? BudgetHours { get; set; }
+        public UserTC? User { get; set; }
+    }
+
+    public class UserTC
+    {
+        public int Id { get; set; }
+        public bool? Active { get; set; }
+        public string? UserName { get; set; }
+        public string? DisplayName { get; set; }
     }
 
     public class ResponseTCProject
