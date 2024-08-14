@@ -1,4 +1,6 @@
-﻿namespace Api.Devion.Helpers.TimeChimp
+﻿using System.Globalization;
+
+namespace Api.Devion.Helpers.TimeChimp
 {
     public class TimeChimpProjectHelper : TimeChimpHelper
     {
@@ -63,13 +65,23 @@
             project.Name = projectUpdate.Name;
             if (projectUpdate.EndDate != null && projectUpdate.EndDate != "")
             {
-                string format = "d/M/yyyy h:mm:ss";
-                project.EndDate = DateTime.ParseExact(projectUpdate.EndDate, format, System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy-MM-dd h:mm:ss");
+                string format = "dd/MM/yyyy HH:mm:ss";
+                project.EndDate = DateTime.ParseExact(projectUpdate.EndDate, format, System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
             }
             if (projectUpdate.StartDate != null && projectUpdate.StartDate != "")
             {
-                string format = "d/M/yyyy h:mm:ss";
-                project.StartDate = DateTime.ParseExact(projectUpdate.StartDate, format, System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy-MM-dd h:mm:ss");
+                Console.WriteLine(projectUpdate.StartDate.Trim());
+                string format = "dd/MM/yyyy HH:mm:ss";
+                DateTime startDate;
+                if (DateTime.TryParseExact(projectUpdate.StartDate, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out startDate))
+                {
+                    project.StartDate = startDate.ToString("yyyy-MM-dd");
+                }
+                else
+                {
+                    // Handle parsing error
+                    Console.WriteLine($"Error parsing date: {projectUpdate.StartDate}");
+                }
             }
             project.Active = projectUpdate.Active;
             project.Budget = new();
@@ -80,6 +92,7 @@
             project.ProjectTasks = projectUpdate.ProjectTasks;
             project.ProjectUsers = projectUpdate.ProjectUsers;
             //send data to timechimp
+            Console.WriteLine(JsonTool.ConvertFrom(project));
             string response = TCClient.PutAsync($"projects/{project.Id}", JsonTool.ConvertFrom(project));
 
             //convert response to projectTimeChimp object

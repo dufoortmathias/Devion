@@ -507,7 +507,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // update mainproject
             TCProject.Id = mainProject.Id;
             TCProject.Budget.Hours = float.Parse(totalBudgetHours.ToString());
-            List<int> usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+            usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
             if (TCProject.ProjectUsers == null)
             {
                 TCProject.ProjectUsers = new List<ProjectUserTC>();
@@ -1472,6 +1472,6 @@ if (app.Environment.IsProduction())
 }
 else
 {
-    app.Run("http://*:5000");
+    app.Run();
 }
 
