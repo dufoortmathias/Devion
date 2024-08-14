@@ -66,11 +66,19 @@ namespace Api.Devion.Helpers.TimeChimp
             if (projectUpdate.EndDate != null && projectUpdate.EndDate != "")
             {
                 string format = "dd/MM/yyyy HH:mm:ss";
-                project.EndDate = DateTime.ParseExact(projectUpdate.EndDate, format, System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                DateTime startDate;
+                if (DateTime.TryParseExact(projectUpdate.StartDate, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out startDate))
+                {
+                    project.StartDate = startDate.ToString("yyyy-MM-dd");
+                }
+                else
+                {
+                    // Handle parsing error
+                    Console.WriteLine($"Error parsing date: {projectUpdate.StartDate}");
+                }
             }
             if (projectUpdate.StartDate != null && projectUpdate.StartDate != "")
             {
-                Console.WriteLine(projectUpdate.StartDate.Trim());
                 string format = "dd/MM/yyyy HH:mm:ss";
                 DateTime startDate;
                 if (DateTime.TryParseExact(projectUpdate.StartDate, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out startDate))
@@ -92,7 +100,6 @@ namespace Api.Devion.Helpers.TimeChimp
             project.ProjectTasks = projectUpdate.ProjectTasks;
             project.ProjectUsers = projectUpdate.ProjectUsers;
             //send data to timechimp
-            Console.WriteLine(JsonTool.ConvertFrom(project));
             string response = TCClient.PutAsync($"projects/{project.Id}", JsonTool.ConvertFrom(project));
 
             //convert response to projectTimeChimp object
