@@ -1,6 +1,10 @@
 <template>
-    <h1>Assembly</h1>
-  <SettingsDevion @click="() => TogglePopup('settings')" :showSettings="settings.showSettings" class="c-settings"/>
+  <h1>Assembly</h1>
+  <SettingsDevion
+    @click="() => TogglePopup('settings')"
+    :showSettings="settings.showSettings"
+    class="c-settings"
+  />
   <SettingsPopupDevion
     :TogglePopup="() => TogglePopup('settings')"
     v-show="popupTriggers.settings"
@@ -391,6 +395,7 @@ export default {
           return Response
         })
         .then((data) => {
+          console.log(data)
           priceData = data
           this.artikelForm.priceData = priceData
         })
@@ -433,7 +438,6 @@ export default {
       PostDataWithBody(endpoint, data).then((response) => {
         this.button.isDisabled = true
         let artikelMetDev = JSON.parse(response)
-        console.log(artikelMetDev)
         let artikelDev = artikelMetDev[0][0]
         artikelenMet = []
         for (let item of artikelMetDev[1]) {
@@ -444,6 +448,9 @@ export default {
         artikelen.push(artikelDev)
         this.treeView.showTree = true
         this.treeView.jsonData = Array.from(artikelen)
+
+        this.treeView.jsonData = this.removeNullValues(this.treeView.jsonData)
+        console.log(this.treeView.jsonData)
         changesDev = []
         changesMet = []
         notFound = 0
@@ -530,13 +537,14 @@ export default {
     async checkArtikel(artikel) {
       totalParts++
       if (artikel) {
-        if (artikel.number.charAt(artikel.number.length - 1) == 'W') {
+        if (artikel.bewerking1 == 'Lassen') {
           artikel.parts = null
         }
 
         if (artikel.parts) {
           for (let part of artikel.parts) {
-            this.checkArtikel(part)
+            if (part){
+            this.checkArtikel(part)}
           }
         }
         GetData('Devion/ets/articleexists?ArticleNumber=' + artikel.number)
@@ -890,6 +898,31 @@ export default {
     },
     ToggleSettings() {
       this.settings.showSettings = !this.settings.showSettings
+    },
+    removeNullValues(obj) {
+      // Create a new object to avoid modifying the original object.
+      const newObj = {}
+
+      // Iterate through the object's properties.
+      for (const key in obj) {
+        if (key === 'parts') {
+          // If the key is "parts", filter out null values from the list of objects.
+          newObj[key] = obj[key]
+            .filter((part) => {
+              // Recursively call the function on each object in the list.
+              const filteredPart = this.removeNullValues(part)
+              // Return true if the filtered object is not empty, false otherwise.
+              return Object.keys(filteredPart).length > 0 ? filteredPart : null
+            })
+            .filter((part) => part !== null)
+        } else if (obj[key] !== null) {
+          // If the property is not "parts" and not null, add it to the new object.
+          newObj[key] = obj[key]
+        }
+      }
+
+      // Return the new object with all null values removed.
+      return newObj
     }
   }
 }

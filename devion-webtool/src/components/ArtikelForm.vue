@@ -423,8 +423,8 @@ export default {
                     this.omschrijving.placeholder = object.description
                     omschrijving = object.description
                 }
-                this.hoofdleverancier.placeholder = object.bewerking1
-                hoofdleverancier = object.bewerking1
+                this.hoofdleverancier.placeholder = object.mainSupplier
+                hoofdleverancier = object.mainSupplier
                 this.merk.placeholder = "devion"
                 merk = "devion"
                 this.familie.selected = this.familie.options.find((x) => x.label.toLowerCase() == 'niet courant materiaal').value
@@ -448,7 +448,8 @@ export default {
                 this.tarief.placeholder = "0"
                 tarief = "0"
 
-                let prices = this.priceData["devion"]
+                let prices = this.priceData["Devion"]
+                console.log(prices)
                 if (prices[object.bewerking1.toLowerCase()]) {
                     const price = prices[object.bewerking1.toLowerCase()] * object.mass
                     this.tarief.placeholder = price.toString()
