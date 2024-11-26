@@ -18,9 +18,10 @@
         public CustomerTimeChimp? Customer { get; set; }
         public Project? MainProject { get; set; }
         public Project[]? SubProjects { get; set; }
+        public List<ManagerTC> Managers { get; set; }
         public ProjectTaskTC[]? ProjectTasks { get; set; }
         public List<ProjectTaskTC> ProjectTaskList { get; set; }
-        public ProjectUserTC[]? ProjectUsers { get; set;}
+        public ProjectUserTC[]? ProjectUsers { get; set; }
         public Tag[]? Tags { get; set; }
 
         //constructor without specific parameters
@@ -32,12 +33,14 @@
             Code = projectETS.PR_NR;
             Name = projectETS.PR_KROM;
             StartDate = projectETS.PR_START_PRODUCTIE.ToString();
-            Active = projectETS.PR_STAT.Equals('L');
+            Console.WriteLine(projectETS.PR_STAT + "luk");
+            Active = projectETS.PR_STAT.Contains('L');
             SubProjects = Array.Empty<Project>();
             Invoicing = new();
-            Budget = new ();
+            Budget = new();
             Invoicing.Method = "TaskHourlyRate"; //TODO: add value to seperate file
             Budget.Method = "TotalHours"; //TODO: add value to seperate file
+            Managers = new();
         }
 
         //constructor to from timechimp class to ets class (subproject)
@@ -64,6 +67,7 @@
                     Method = "TaskHours" //TODO: add value to seperate file
                 };
                 ProjectTaskList = new();
+                Managers = new();
             }
         }
     }
@@ -74,7 +78,8 @@
         public string? PR_KROM { get; set; }
         public DateTime? PR_START_PRODUCTIE { get; set; }
         public DateTime? PR_BELOOFD { get; set; }
-        public char? PR_STAT { get; set; }
+        public string? PR_STAT { get; set; }
+        public string? PR_BESTEMMELING { get; set; }
     }
 
     public class SubprojectETS
@@ -179,5 +184,13 @@
         public ProjectTimeChimp[]? Result { get; set; }
         public Link[]? Links { get; set; }
         public int? Count { get; set; }
+    }
+
+    public class ManagerTC
+    {
+        public int Id { get; set; }
+        public bool Active { get; set; }
+        public string? UserName { get; set; }
+        public string? DisplayName { get; set; }
     }
 }

@@ -21,7 +21,7 @@
         public ProjectTimeChimp GetProject(int projectId)
         {
             //get data form timechimp
-            string response = TCClient.GetAsync($"projects/{projectId}?$expand=projectTasks, projectUsers, subprojects");
+            string response = TCClient.GetAsync($"projects/{projectId}?$expand=projectTasks, projectUsers, subprojects, managers");
 
             //convert data to projectTimeChimp object
             ProjectTimeChimp project = JsonTool.ConvertTo<ResponseTCProject>(response).Result[0];
@@ -69,12 +69,13 @@
             project.Budget.Hours = projectUpdate.Budget.Hours;
             project.Customer = new();
             project.Customer.Id = projectUpdate.Customer.Id;
+            project.Managers = projectUpdate.Managers;
             //send data to timechimp
             string response = TCClient.PutAsync($"projects/{project.Id}", JsonTool.ConvertFrom(project));
             
             //convert response to projectTimeChimp object
             ProjectTimeChimp projectResponse = JsonTool.ConvertTo<ResponseTCProject>(response).Result[0];
-            return projectResponse;
+            return project;
         }
 
         public ResponseTCProject GetProjectTimeChimpByETSId(string projectId)
