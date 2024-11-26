@@ -133,6 +133,15 @@
         public float? NotificationPercentage { get; set; }
     }
 
+    public class Manager
+    {
+        public int? Id { get; set; }
+        public bool? Active { get; set; }
+        public bool? Unspecified { get; set; }
+        public string? UserName { get; set; }
+        public string? DisplayName { get; set; }
+    }
+
     public class Invoicing
     {
         public string? Method { get; set; }
@@ -164,7 +173,7 @@
 
     public class ProjectUserTC
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public bool? Active { get; set; }
         public float? HourlyRate { get; set; }
         public float? BudgetHours { get; set; }

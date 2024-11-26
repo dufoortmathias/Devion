@@ -26,7 +26,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("AllowOrigins");
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 
 
@@ -70,6 +70,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
     TimeChimpTimeHelper timeHelperTC = new(TCClient, ETSClient);
     TimeChimpUurcodeHelper uurcodeHelperTC = new(TCClient);
     VehicleHelper vehicleHelper = new(TCClient);
+
+    GeneralBookHelper bookHelper = new();
+    GeneralKopieerHelper kopieerHelper = new();
 
     //get companies from config
     string company = config[$"Companies:{companyIndex}:Name"];
@@ -348,6 +351,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
             // Change to TimeChimp class
             ProjectTimeChimp TCProject = new(ETSProject);
+            EmployeeTimeChimp ManagerId = employeeHelperTC.GetEmployeeByEmployeeNumber(ETSProject.PR_BESTEMMELING ?? null);
 
             CustomerTimeChimp customer;
             // Find customer id TimeChimpETSContact.CO_KLCOD
@@ -391,6 +395,45 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             List<string> errorMessages = new();
             double totalBudgetHours = 0;
             List<UurcodeTimeChimp> uurcodes = uurcodeHelperTC.GetUurcodes();
+            // check if subproject of hoofdproject but with subprojectcode 0000 exists otherwise create one
+            string subprojectCode = mainProject.Code + "0000";
+            ProjectTimeChimp Subproject = new()
+            {
+                Code = subprojectCode,
+                Name = mainProject.Name,
+                Active = mainProject.Active,
+                Customer = mainProject.Customer,
+                Budget = new Budget
+                {
+                    Hours = 0,
+                    Method = "TaskHours"
+                },
+                MainProject = new Project
+                {
+                    Id = mainProject.Id
+                },
+            };
+
+            ProjectTimeChimp mainSubproject = projectHelperTC.FindProject(subprojectCode) ?? projectHelperTC.CreateProject(Subproject);
+
+            List<int> usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+            if (mainSubproject.ProjectUsers == null)
+            {
+                mainSubproject.ProjectUsers = new List<ProjectUserTC>();
+            }
+            mainSubproject.ProjectUsers.Clear();
+            foreach (int userId in usersIds)
+            {
+                mainSubproject.ProjectUsers ??= new List<ProjectUserTC>();
+
+                mainSubproject.ProjectUsers.Add(new ProjectUserTC
+                {
+                    User = new UserTC
+                    {
+                        Id = userId
+                    }
+                });
+            }
             // get subprojects from ETS
             List<SubprojectETS> ETSSubprojects = projectHelperETS.GetSubprojects(projectId);
             foreach (SubprojectETS ETSSubproject in ETSSubprojects.Where(subProject => subProject.SU_SUB != null && !subProject.SU_SUB.StartsWith('2'))) //  only iterate subprojects with ids from [0000, 2000[ en [3000, ...]
@@ -403,6 +446,10 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                 TCSubproject.Id = subProject.Id;
                 subProject = projectHelperTC.UpdateProject(TCSubproject);
+
+
+                subProject.ProjectTasks.Clear();
+                subProject.ProjectUsers.Clear();
 
                 if (TCSubproject.Active ?? false)
                 {
@@ -435,13 +482,11 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                                 {
                                     Id = taskId
                                 },
-                                BudgetHours = float.Parse(projectTaskETS.VO_AANT.Value.ToString()),
-                                Active = true
+                                BudgetHours = float.Parse(projectTaskETS.VO_AANT.Value.ToString())
                             };
 
-                            subProject.ProjectTaskList ??= new();
+                            subProject.ProjectTasks.Add(projectTaskTC);
 
-                            subProject.ProjectTaskList.Add(projectTaskTC);
                             totalBudgetHours += projectTaskETS.VO_AANT.Value;
                             budgetHours += projectTaskETS.VO_AANT.Value;
                         }
@@ -452,7 +497,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
 
                 foreach (int userId in userIds)
                 {
-                    subProject.ProjectUsers[^1] = (new ProjectUserTC
+                    subProject.ProjectUsers ??= new List<ProjectUserTC>();
+
+                    subProject.ProjectUsers.Add(new ProjectUserTC
                     {
                         User = new UserTC
                         {
@@ -460,7 +507,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                         }
                     });
                 }
-                //subProject.Budget.Hours = float.Parse(budgetHours.ToString());
+                subProject.Budget.Hours = float.Parse(budgetHours.ToString());
                 subProject.Budget.Method = "TaskHours";
                 subProject.ProjectTasks = subProject.ProjectTaskList.ToArray();
                 if (managerid != "" || managerid != null)
@@ -485,6 +532,33 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // update mainproject
             TCProject.Id = mainProject.Id;
             TCProject.Budget.Hours = float.Parse(totalBudgetHours.ToString());
+            usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+            if (TCProject.ProjectUsers == null)
+            {
+                TCProject.ProjectUsers = new List<ProjectUserTC>();
+            }
+            TCProject.ProjectUsers.Clear();
+            foreach (int userId in usersIds)
+            {
+                TCProject.ProjectUsers ??= new List<ProjectUserTC>();
+
+                TCProject.ProjectUsers.Add(new ProjectUserTC
+                {
+                    User = new UserTC
+                    {
+                        Id = userId
+                    }
+                });
+            }
+
+            TCProject.Managers.Clear();
+            if (ManagerId != null)
+            {
+                TCProject.Managers.Add(new Manager
+                {
+                    Id = ManagerId.Id
+                });
+            }
             mainProject = projectHelperTC.UpdateProject(TCProject);
 
 
@@ -851,11 +925,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             });
 
             Item MainPart = new Item();
-            string number = fileName.Split('.')[0].Split('_')[0];
-            string omschrijving = fileName.Split('.')[0].Split('_')[1];
+            string number = fileName.Substring(0, 15);
+            string omschrijving = "";
             MainPart.Number = number;
             MainPart.Description = omschrijving;
             MainPart.LynNumber = "1";
+            MainPart.Bewerking1 = "Monteren";
 
             List<Item> MetabilItems = new List<Item>();
 
@@ -881,14 +956,14 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     else
                     {
 #pragma warning disable CS8604 // Dereference of a possibly linenull reference.
-                        Item part = new(row["Part Number"]?.ToString().Split("_").First(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
+                        Item part = new(row["Part Number"]?.ToString(), row["Description"] is System.DBNull ? String.Empty : (string)row["Description"].ToString().ToUpper(), Convert.ToInt32((double)row["QTY"]), row["Item"]?.ToString()?.Split('.')?.ToList().Last());
 #pragma warning restore CS8604 // Dereference of a possibly null reference.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-                        if (part.Number is not null && part.Number.Length > 25)
-                        {
-                            throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
-                        }
+                        //if (part.Number is not null && part.Number.Length > 25)
+                        //{
+                        //    throw new Exception($"Excel contains an item where the part number is longer then 25 characters \"{part.Number}\", this is not allowed");
+                        //}
                         try
                         {
 
@@ -898,13 +973,15 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                             part.Bewerking2 = row["Bewerking 2"] != DBNull.Value ? ((string)row["Bewerking 2"]).ToUpper().Trim() : "-";
                             part.Bewerking3 = row["Bewerking 3"] != DBNull.Value ? ((string)row["Bewerking 3"]).ToUpper().Trim() : "-";
                             part.Bewerking4 = row["Bewerking 4"] != DBNull.Value ? ((string)row["Bewerking 4"]).ToUpper().Trim() : "-";
+                            part.Nabehandeling1 = row["Nabehandeling 1"] != DBNull.Value ? ((string)row["Nabehandeling 1"]).ToUpper().Trim() : "-";
+                            part.Nabehandeling2 = row["Nabehandeling 2"] != DBNull.Value ? ((string)row["Nabehandeling 2"]).ToUpper().Trim() : "-";
 
                             part.Mass = row["Mass"] != DBNull.Value && float.TryParse(row["Mass"].ToString().Split(' ')[0], out float massValue) ? float.Parse(row["Mass"].ToString().Split(' ')[0]) : 0;
 
                             part.Aankoopeenh = row["Aankoopeenh"] != DBNull.Value ? ((string)row["Aankoopeenh"]).ToUpper().Trim() : "ST";
-                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? ((string)row["Aankoop per"]) : "1";
+                            part.AankoopPer = row["Aankoop per"] != DBNull.Value ? (row["Aankoop per"].ToString()) : "1";
                             part.Verbruikseenh = row["Verbruikseenh"] != DBNull.Value ? ((string)row["Verbruikseenh"]).ToUpper().Trim() : "ST";
-                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? ((string)row["Omrekeningsfactor"]) : "1";
+                            part.Omrekeningsfactor = row["Omrekeningsfactor"] != DBNull.Value ? ((string)row["Omrekeningsfactor"].ToString()) : "1";
                             part.TypeFactor = row["Type Factor"] != DBNull.Value ? ((string)row["Type Factor"]).Trim() : "Deelfactor";
 
 
@@ -964,6 +1041,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.Message, e.StackTrace);
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}TransformBomExcel").WithTags(company);
@@ -1222,6 +1300,128 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}ProjectenVoortgangImport").WithTags(company);
+
+    app.MapGet($"/api/{company.ToLower()}/foldernames", () =>
+    {
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten";
+
+        List<string> folders = new();
+
+        foreach (string folderName in Directory.EnumerateDirectories(baseFolderpath))
+        {
+            folders.Add(Path.GetFileName(folderName));
+        }
+
+        return Results.Ok(folders);
+    }).WithName($"{company}FolderNames").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/check", ([FromBody] Item MainPart, string project) =>
+    {
+        try
+        {
+            string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\05_PDF_DXF_STP_Compleet\";
+            MainPart = itemHelperETS.CheckFiles(MainPart, baseFolderpath);
+            return Results.Ok(MainPart);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"error: {e.Message}");
+            Console.WriteLine($"line: {e.StackTrace}");
+            return Results.Problem(e.Message);
+        }
+
+    }).WithName($"{company}CheckTekenigen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/createbooks", ([FromBody] Book required) =>
+    {
+        string project = required.Project;
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + project + @"\11_Productie\";
+
+        PdfDocument pdf = new();
+
+        string path = baseFolderpath + @"05_PDF_DXF_STP_Compleet\" + required.MainPart.Number + ".pdf";
+
+        // check if file exists
+        if (File.Exists(path))
+        {
+            using (PdfDocument part = PdfReader.Open(path, PdfDocumentOpenMode.Import))
+            {
+                bookHelper.CopyPages(part, pdf);
+            }
+        }
+
+        required.Boeken.ForEach(b =>
+        {
+            bookHelper.CreateBook(b, required.MainPart, baseFolderpath, required.hoofdartikel, pdf);
+        });
+
+
+        // save pdf
+        //check if folder exists
+        if (Directory.Exists(baseFolderpath + @"03_Montage_boek") == false)
+        {
+            Directory.CreateDirectory(baseFolderpath + @"03_Montage_boek");
+        }
+
+        if (Directory.Exists(baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd")) == false)
+        {
+            Directory.CreateDirectory(baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd"));
+        }
+
+        string savePath = baseFolderpath + @"03_Montage_boek\" + required.hoofdartikel + "_" + DateTime.Now.ToString("yyyy-MM-dd") + @"\MOB_" + required.MainPart.Number + ".pdf";
+        if (pdf.PageCount > 0)
+        {
+            pdf.Save(savePath);
+        }
+        return Results.Ok();
+    }).WithName($"{company}CreateBooks").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/bewerkingen", ([FromBody] Kopieer bewerking) =>
+    {
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + bewerking.Project + @"\11_Productie\";
+        kopieerHelper.KopieerTekenigen(basePath, bewerking);
+        return Results.Ok();
+    }).WithName($"{company}KopieerTekenigenBewerkingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/bewerkingen/delete", ([FromBody] KopieerDelete bewerking) =>
+    {
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + bewerking.BasePath + @"\11_Productie\06_PDF_DXF_STP_Bewerkingen\";
+        kopieerHelper.DeleteFolders(bewerking.Folders, baseFolderpath);
+        return Results.Ok();
+    }).WithName($"{company}DeleteBewerking").WithTags(company);
+
+    //app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/nabehandelingen", ([FromBody] KopieerNa nabehandeling) =>
+    //{
+    //    string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandeling.Project + @"\11_Productie\";
+    //    kopieerHelper.KopieerTekeningenNabehandeling(basePath, nabehandeling);
+    //    return Results.Ok();
+    //}).WithName($"{company}KopieerTekenigenNabehandelingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/kopieer/nabehandelingen", ([FromBody] List<KopieerNa> nabehandelingen) =>
+    {
+        string basePath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandelingen[0].Project + @"\11_Productie\";
+        var groupedNabehandelingen = nabehandelingen.GroupBy(n => n.Nabehandeling)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var group in groupedNabehandelingen)
+        {
+            PdfDocument to = new();
+            foreach (var nabehandeling in group.Value)
+            {
+                kopieerHelper.KopieerTekeningenNabehandeling(basePath, nabehandeling, to);
+            }
+            string savePath = basePath + @"07_PDF_Nabehandelingen\" + group.Key + @"\" + group.Key + "_" + group.Value[0].HoofdArtikel + ".pdf";
+            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+            to.Save(savePath);
+        }
+    }).WithName($"{company}KopieerTekenigenNabehandelingen").WithTags(company);
+
+    app.MapPost($"/api/{company.ToLower()}/tekeningen/nabehandelingen/delete", ([FromBody] KopieerDelete nabehandeling) =>
+    {
+        string baseFolderpath = @"C:\Users\mathias\Devion\MechanicalDesign - Mechanical Projecten\" + nabehandeling.BasePath + @"\11_Productie\07_PDF_Nabehandelingen\";
+        kopieerHelper.DeleteFolders(nabehandeling.Folders, baseFolderpath);
+        return Results.Ok();
+    }).WithName($"{company}DeleteNabehandeling").WithTags(company);
 }
 
 app.MapGet("/api/companies", () => Results.Ok(companies)).WithName($"GetCompanyNames");

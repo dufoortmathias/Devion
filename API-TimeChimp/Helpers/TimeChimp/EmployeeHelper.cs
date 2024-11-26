@@ -78,5 +78,23 @@ namespace Api.Devion.Helpers.TimeChimp
             EmployeeTimeChimp employeeResponse = JsonTool.ConvertTo<ResponseTCEmployee>(response).Result[0];
             return employeeResponse;
         }
+
+        public EmployeeTimeChimp GetEmployeeByEmployeeNumber(string employeeNumber)
+        {
+            //get data form timechimp
+            string response = TCClient.GetAsync($"users?$filter=employeeNumber eq '{employeeNumber}' and active eq true&$count=true");
+
+            //convert data to employeeTimeChimp object
+            ResponseTCEmployee responseEmployee = JsonTool.ConvertTo<ResponseTCEmployee>(response);
+
+            if (responseEmployee.Count <= 0)
+            {
+                return null;
+            }
+            else
+            {
+                return responseEmployee.Result[0];
+            }
+        }
     }
 }

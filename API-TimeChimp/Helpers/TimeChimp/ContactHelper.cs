@@ -39,7 +39,7 @@ public class TimeChimpContactHelper : TimeChimpHelper
         if (contact.Id == 0)
         {
             // find TimeChimp id of contact
-            ContactTimeChimp contactFound = GetContacts().Find(c => c.Customers.FirstOrDefault()!=null && c.Customers.FirstOrDefault().Id == contact.Customers.FirstOrDefault().Id) ?? throw new Exception($"No contact found in TimeChimp with name = {contact.Name}");
+            ContactTimeChimp contactFound = GetContacts().Find(c => c.Customers.FirstOrDefault()!=null && (c.Customers.FirstOrDefault().Id == contact.Id||c.Customers.FirstOrDefault().Email == contact.Email)) ?? throw new Exception($"No contact found in TimeChimp with Id = {contact.Id} or Email = {contact.Email}");
             contact.Id = contactFound.Id;
         }
 
