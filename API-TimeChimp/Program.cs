@@ -206,7 +206,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         {
             return Results.Problem(e.Message);
         }
-    }).WithName($"{company}SyncContactTimechimp").WithTags(company); ;
+    }).WithName($"{company}SyncContactTimechimp").WithTags(company);
 
     //get uurcodes from ets
     app.MapGet($"/api/{company.ToLower()}/ets/uurcodeids", (string dateString) =>
@@ -373,8 +373,25 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // update mainproject
             TCProject.Id = mainProject.Id;
 
+            // Get list of users
+            List<EmployeeTimeChimp> users = employeeHelperTC.GetEmployees().Where(e => e.Active == true).ToList();
+
+            string managerid = ETSProject.PR_BESTEMMELING;
+            if (managerid != "" || managerid != null)
+            {
+                EmployeeTimeChimp manager = users.Where(e => e.EmployeeNumber == managerid).FirstOrDefault();
+                ManagerTC managerTC = new()
+                {
+                    Id = manager.Id
+                };
+
+                TCProject.Managers.Add(managerTC);
+                Console.WriteLine("manager added");
+            };
+
             mainProject = projectHelperTC.UpdateProject(TCProject);
 
+            Console.WriteLine(JsonTool.ConvertFrom(mainProject));
             List<string> errorMessages = new();
             double totalBudgetHours = 0;
             List<UurcodeTimeChimp> uurcodes = uurcodeHelperTC.GetUurcodes();
@@ -476,7 +493,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     }
                 }
 
-                List<int> userIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+                List<int> userIds = users.Select(e => e.Id).ToList();
 
                 foreach (int userId in userIds)
                 {
@@ -492,14 +509,22 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 }
                 subProject.Budget.Hours = float.Parse(budgetHours.ToString());
                 subProject.Budget.Method = "TaskHours";
-                subProject.Managers.Clear();
-                if (ManagerId != null)
+                subProject.ProjectTasks = subProject.ProjectTaskList.ToArray();
+                if (managerid != "" || managerid != null)
                 {
-                    subProject.Managers.Add(new Manager
+                    EmployeeTimeChimp manager = users.Where(e => e.EmployeeNumber == managerid).FirstOrDefault();
+                    ManagerTC managerTC = new()
                     {
-                        Id = ManagerId.Id
-                    });
-                }
+                        Id = manager.Id
+                    };
+                    Console.WriteLine(mainProject.Managers.Count);
+
+                    if (subProject.Managers == null || subProject.Managers.Count == 0)
+                    {
+                        subProject.Managers.Add(managerTC);
+
+                    }
+                };
 
                 subProject = projectHelperTC.UpdateProject(subProject);
             }
@@ -546,6 +571,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.Source);
+            Console.WriteLine(e.StackTrace);
             return Results.Problem(e.Message);
         }
     }).WithName($"{company}SyncProjectTimechimp").WithTags(company);
