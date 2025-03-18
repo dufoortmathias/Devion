@@ -7,9 +7,12 @@ public interface IWebClient
     string PutAsync(string endpoint, string jsonPayload);
 }
 
-public class WebClient : IWebClient
+public class WebClient: IWebClient
 {
     private readonly HttpClient _httpClient;
+    public int Calls = 0;
+    public int MaxCalls;
+    private int minute;
 
     // Create a new instance of HttpClient
     public WebClient()
@@ -18,8 +21,9 @@ public class WebClient : IWebClient
     }
 
     // Create a new instance of HttpClient that is configured with the base address of the API and the api token
-    public WebClient(string url, string token)
+    public WebClient(string url, string token, int MaxCalls)
     {
+        this.MaxCalls = MaxCalls;
         _httpClient = new HttpClient
         {
             BaseAddress = new Uri(url)
@@ -27,14 +31,37 @@ public class WebClient : IWebClient
 
         _httpClient.DefaultRequestHeaders.Add("api-key", token);
         _httpClient.DefaultRequestHeaders.Add("api-version", "2.0");
+        Thread t = new Thread(Update);
+        t.Start();
+    }
+
+    public void Update()
+    {
+        Console.WriteLine(MaxCalls);
+        while (true)
+        {
+            if (minute == 0 || minute == null)
+            {
+                minute = DateTime.Now.Minute;
+            }
+
+            if (minute != DateTime.Now.Minute)
+            {
+                Calls = 0;
+                minute = DateTime.Now.Minute;
+            }
+        }
     }
 
     //get async
     public string GetAsync(string endpoint)
     {
-        // Send the request to the API endpoint with response
+        while (Calls >= MaxCalls)
+        {
+            Task.Delay(1000);
+        }
         HttpResponseMessage response = _httpClient.GetAsync(endpoint).Result;
-
+        Calls += 1;
         //check if statuscode is success
         if (response.IsSuccessStatusCode)
         {
@@ -51,12 +78,15 @@ public class WebClient : IWebClient
     //post async
     public string PostAsync(string endpoint, string jsonPayload)
     {
+        while (Calls >= MaxCalls)
+        {
+            Task.Delay(1000);
+        }
         // Create a StringContent object with the JSON payload
         StringContent content = new(jsonPayload, Encoding.UTF8, "application/json");
-
+        Calls += 1;
         //send the request to the API endpoint with response
         HttpResponseMessage response = _httpClient.PostAsync(endpoint, content).Result;
-
         //check if statuscode is success
         if (response.IsSuccessStatusCode)
         {
@@ -73,12 +103,16 @@ public class WebClient : IWebClient
     //put async
     public string PutAsync(string endpoint, string jsonPayload)
     {
+        while (Calls >= MaxCalls)
+        {
+            Task.Delay(1000);
+        }
         // Create a StringContent object with the JSON payload
         StringContent content = new(jsonPayload, Encoding.UTF8, "application/json");
 
         //send the request to the API endpoint with response
         HttpResponseMessage response = _httpClient.PutAsync(endpoint, content).Result;
-
+        Calls += 1;
         //check if statuscode is success
         if (response.IsSuccessStatusCode)
         {
@@ -94,12 +128,16 @@ public class WebClient : IWebClient
 
     public string PatchAsync(string endpoint, string jsonPayload)
     {
+        while (Calls >= MaxCalls)
+        {
+            Task.Delay(1000);
+        }
         // Create a StringContent object with the JSON payload
         StringContent content = new(jsonPayload, Encoding.UTF8, "application/json");
 
         //send the request to the API endpoint with response
         HttpResponseMessage response = _httpClient.PatchAsync(endpoint, content).Result;
-
+        Calls += 1;
         //check if statuscode is success
         if (response.IsSuccessStatusCode)
         {
@@ -111,5 +149,6 @@ public class WebClient : IWebClient
             // Handle error response if needed
             throw new Exception($"PATCH {response.StatusCode} with endpoint: {_httpClient.BaseAddress + endpoint}");
         }
+
     }
 }

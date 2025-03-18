@@ -26,6 +26,7 @@
             }
 
             //convert data to projectETS object
+            //Console.WriteLine(json);
             ProjectETS project = JsonTool.ConvertTo<ProjectETS[]>(json).First();
             return project;
         }

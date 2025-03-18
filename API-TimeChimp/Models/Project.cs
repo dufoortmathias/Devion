@@ -19,9 +19,9 @@
         public Project? MainProject { get; set; }
         public Project[]? SubProjects { get; set; }
         public List<ManagerTC> Managers { get; set; }
-        public ProjectTaskTC[]? ProjectTasks { get; set; }
+        public List<ProjectTaskTC>? ProjectTasks { get; set; }
         public List<ProjectTaskTC> ProjectTaskList { get; set; }
-        public ProjectUserTC[]? ProjectUsers { get; set; }
+        public List<ProjectUserTC>? ProjectUsers { get; set; }
         public Tag[]? Tags { get; set; }
 
         //constructor without specific parameters

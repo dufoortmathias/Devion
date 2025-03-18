@@ -41,7 +41,7 @@ int syncMetabil = 0;
 while (config[$"Companies:{++companyIndex}:Name"] != null)
 {
     //create clients
-    WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"]);
+    WebClient TCClient = new(config["TimeChimpBaseURL"], config[$"Companies:{companyIndex}:TimeChimpToken"], Int32.Parse(config["MaxCalls"]));
     FirebirdClientETS ETSClient = new(config["ETSServer"], config[$"Companies:{companyIndex}:ETSUser"], config[$"Companies:{companyIndex}:ETSPassword"], config[$"Companies:{companyIndex}:ETSDatabase"]);
 
     //create helpers
@@ -294,7 +294,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             //check if employee exists in timechimp
             if (employeeHelperTC.EmployeeExists(employeeId))
             {
-                projectUserHelperTC.AddAllProjectUserForEmployee(int.Parse(employeeId));
+                //projectUserHelperTC.AddAllProjectUserForEmployee(employeeId);
                 return Results.Ok(employeeHelperTC.UpdateEmployee(TCEmployee));
             }
             else
@@ -310,7 +310,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 employee = employeeHelperTC.UpdateEmployee(TCEmployee);
 
                 //adds employee to all existing projects in TimeChimp
-                projectUserHelperTC.AddAllProjectUserForEmployee(employee.Id);
+                //projectUserHelperTC.AddAllProjectUserForEmployee(employee.EmployeeNumber);
 
                 return Results.Ok(employee);
             }
@@ -341,6 +341,7 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         try
         {
             // Get project from ETS
+            //Console.WriteLine(projectId);
             ProjectETS ETSProject = projectHelperETS.GetProject(projectId);
 
             // Handle when project doesn't exist in ETS
@@ -377,21 +378,21 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             List<EmployeeTimeChimp> users = employeeHelperTC.GetEmployees().Where(e => e.Active == true).ToList();
 
             string managerid = ETSProject.PR_BESTEMMELING;
-            if (managerid != "" || managerid != null)
+            ManagerTC managerTC = new();
+            //Console.WriteLine(managerid);
+            if (managerid != "" || managerid != null || managerid != string.Empty)
             {
-                EmployeeTimeChimp manager = users.Where(e => e.EmployeeNumber == managerid).FirstOrDefault();
-                ManagerTC managerTC = new()
+                EmployeeTimeChimp manager = users.FirstOrDefault(e => e.EmployeeNumber == managerid);
+                if (manager != null || manager.Id is not 0)
                 {
-                    Id = manager.Id
+                    managerTC.Id = manager.Id;
                 };
 
                 TCProject.Managers.Add(managerTC);
-                Console.WriteLine("manager added");
             };
 
             mainProject = projectHelperTC.UpdateProject(TCProject);
 
-            Console.WriteLine(JsonTool.ConvertFrom(mainProject));
             List<string> errorMessages = new();
             double totalBudgetHours = 0;
             List<UurcodeTimeChimp> uurcodes = uurcodeHelperTC.GetUurcodes();
@@ -412,17 +413,17 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 {
                     Id = mainProject.Id
                 },
+                Managers = mainProject.Managers
             };
 
             ProjectTimeChimp mainSubproject = projectHelperTC.FindProject(subprojectCode) ?? projectHelperTC.CreateProject(Subproject);
-
-            List<int> usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
+            List<int> userIds = users.Select(e => e.Id).ToList();
             if (mainSubproject.ProjectUsers == null)
             {
                 mainSubproject.ProjectUsers = new List<ProjectUserTC>();
             }
             mainSubproject.ProjectUsers.Clear();
-            foreach (int userId in usersIds)
+            foreach (int userId in userIds)
             {
                 mainSubproject.ProjectUsers ??= new List<ProjectUserTC>();
 
@@ -493,7 +494,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     }
                 }
 
-                List<int> userIds = users.Select(e => e.Id).ToList();
 
                 foreach (int userId in userIds)
                 {
@@ -509,15 +509,9 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                 }
                 subProject.Budget.Hours = float.Parse(budgetHours.ToString());
                 subProject.Budget.Method = "TaskHours";
-                subProject.ProjectTasks = subProject.ProjectTaskList.ToArray();
+                subProject.ProjectTasks = subProject.ProjectTaskList;
                 if (managerid != "" || managerid != null)
                 {
-                    EmployeeTimeChimp manager = users.Where(e => e.EmployeeNumber == managerid).FirstOrDefault();
-                    ManagerTC managerTC = new()
-                    {
-                        Id = manager.Id
-                    };
-                    Console.WriteLine(mainProject.Managers.Count);
 
                     if (subProject.Managers == null || subProject.Managers.Count == 0)
                     {
@@ -532,13 +526,12 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
             // update mainproject
             TCProject.Id = mainProject.Id;
             TCProject.Budget.Hours = float.Parse(totalBudgetHours.ToString());
-            usersIds = employeeHelperTC.GetEmployees().Where(e => e.Active == true).Select(e => e.Id).ToList();
             if (TCProject.ProjectUsers == null)
             {
                 TCProject.ProjectUsers = new List<ProjectUserTC>();
             }
             TCProject.ProjectUsers.Clear();
-            foreach (int userId in usersIds)
+            foreach (int userId in userIds)
             {
                 TCProject.ProjectUsers ??= new List<ProjectUserTC>();
 
@@ -548,15 +541,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
                     {
                         Id = userId
                     }
-                });
-            }
-
-            TCProject.Managers.Clear();
-            if (ManagerId != null)
-            {
-                TCProject.Managers.Add(new Manager
-                {
-                    Id = ManagerId.Id
                 });
             }
             mainProject = projectHelperTC.UpdateProject(TCProject);
@@ -571,7 +555,6 @@ while (config[$"Companies:{++companyIndex}:Name"] != null)
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
             Console.WriteLine(e.Source);
             Console.WriteLine(e.StackTrace);
             return Results.Problem(e.Message);
